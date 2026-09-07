@@ -57,12 +57,9 @@ export function Bullets({ items, marker }: { items: string[]; marker?: ReactNode
 
 /* ---------- layout ---------- */
 
-export function Page({ children, wide }: { children: ReactNode; wide?: boolean }) {
-  return (
-    <main className={`w-full px-5 pt-7 pb-20 sm:px-8 ${wide ? 'max-w-5xl' : 'max-w-3xl'}`}>
-      {children}
-    </main>
-  )
+export function Page({ children }: { children: ReactNode; wide?: boolean }) {
+  // full width — the sidebar is the only fixed column; content fills the rest
+  return <main className="w-full px-5 pt-7 pb-20 sm:px-8">{children}</main>
 }
 
 export function PageHeader({
@@ -87,7 +84,7 @@ export function PageHeader({
         {title}
       </h1>
       {lede ? (
-        <p className="mt-3 max-w-2xl text-[16.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <p className="mt-3 text-[16.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
           <Rich text={lede} />
         </p>
       ) : null}

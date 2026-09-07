@@ -118,7 +118,7 @@ export default async function AdminPage() {
     })
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-8">
+    <main className="w-full px-5 py-10 sm:px-8">
       <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="text-[12px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>

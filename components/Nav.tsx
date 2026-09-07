@@ -23,7 +23,7 @@ export function Shell({ children }: { children: ReactNode }) {
   return (
     <SidebarCtx.Provider value={{ open, setOpen }}>
       <Header />
-      <div className="mx-auto flex w-full max-w-[1400px] flex-1">
+      <div className="flex w-full flex-1">
         <Sidebar />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
@@ -66,7 +66,7 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b" style={{ background: 'var(--surface)' }}>
-      <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-2.5">
+      <div className="flex w-full items-center gap-3 px-4 py-2.5">
         <button
           type="button"
           onClick={() => setOpen(!open)}
@@ -273,7 +273,7 @@ export function Footer() {
   return (
     <footer className="mt-auto border-t px-5 py-6">
       <div
-        className="mx-auto flex w-full max-w-[1400px] flex-col gap-2 text-[12.5px] sm:flex-row sm:items-center sm:justify-between"
+        className="flex w-full flex-col gap-2 text-[12.5px] sm:flex-row sm:items-center sm:justify-between"
         style={{ color: 'var(--faint)' }}
       >
         <p>Write your own answer before you read ours.</p>
