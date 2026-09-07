@@ -112,6 +112,23 @@ export type FlowScenario =
   | 'sharding'
   | 'fan-out-write'
   | 'rate-limit'
+  | 'round-robin'
+  | 'least-connections'
+  | 'ip-hash'
+  | 'weighted'
+  | 'health-check'
+  | 'active-passive'
+  | 'active-active'
+  | 'write-through'
+  | 'write-back'
+  | 'cdn-pull'
+  | 'cdn-push'
+  | 'leader-follower'
+  | 'multi-leader'
+  | 'consistent-hash-ring'
+  | 'two-phase-commit'
+  | 'saga'
+  | 'circuit-breaker'
 
 // ---------- concepts ----------
 
@@ -342,4 +359,79 @@ export interface ProgressState {
   scores: ScoreEntry[]
   mocks: MockRun[]
   blank: { title: string; stages: Record<string, string>; savedAt: string }[]
+}
+
+/* ---------- from-scratch lessons ---------- */
+
+export interface Lesson {
+  slug: string
+  title: string
+  oneLine: string
+  /** why a total beginner should care, before any jargon */
+  body: string[]
+  visual?: ConceptVisual
+  keyPoints: string[]
+  /** the one thing to remember */
+  remember: string
+}
+
+/* ---------- deep dives ("view more") ---------- */
+
+export interface DeepSection {
+  heading: string
+  /** short lead-in, before any list or visual */
+  body: string[]
+  /** scannable takeaways for this sub-topic */
+  points?: string[]
+  /** several visuals per section — one per sub-technique, not one per page */
+  visuals?: ConceptVisual[]
+  compare?: CompareSpec
+  table?: { caption: string; headers: string[]; rows: string[][] }
+  callouts?: { variant: 'cost' | 'trap' | 'say-this'; text: string }[]
+}
+
+export interface DeepDive {
+  /** one paragraph on what the deep version adds over the summary */
+  intro: string
+  minutes: number
+  sections: DeepSection[]
+}
+
+/** a concrete worked example closing a concept page */
+export interface WorkedExample {
+  title: string
+  scenario: string
+  steps: { step: string; detail: string }[]
+  outcome: string
+  /** full five-stage problem to go and try */
+  problemSlug?: string
+}
+
+/* ---------- company practice ---------- */
+
+export interface CompanyQuestion {
+  id: string
+  company: string
+  title: string
+  prompt: string
+  difficulty: 'starter' | 'core' | 'hard'
+  /** what this company is really testing with this question */
+  whatTheyWant: string
+  /** revealed one at a time, before the answer — nudges, never answers */
+  hints: { label: string; text: string }[]
+  /** the model answer, gated behind the user's own attempt */
+  model: string[]
+  checklist: string[]
+  followUp: { q: string; answer: string }
+  relatedProblem?: string
+  concepts: string[]
+}
+
+export interface Company {
+  id: string
+  name: string
+  /** how this company tends to run the round */
+  style: string
+  weights: string
+  archetype: ArchetypeId
 }

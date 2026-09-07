@@ -3,12 +3,14 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
-import { CONCEPTS, TIER_INFO, conceptsByTier } from '@/content/concepts'
+import { CONCEPTS, PATH, getConcept } from '@/content/concepts'
+import { LESSONS } from '@/content/foundations'
 import { GROUPS } from '@/content/method'
 import { PROBLEMS } from '@/content/problems'
 import { ARCHETYPES } from '@/content/archetypes'
-import { conceptState, problemState, streakCount, useProgress } from '@/lib/store'
-import type { Tier } from '@/lib/types'
+import { COMPANIES } from '@/content/companies'
+import { hasDeepDive } from '@/content/deep'
+import { conceptState, dueConcepts, problemState, streakCount, useProgress } from '@/lib/store'
 import { AccountButton } from './Account'
 
 /* ---------- sidebar open/close, shared with the header button ---------- */
@@ -119,10 +121,13 @@ function Item({
   href,
   children,
   dot,
+  deep,
 }: {
   href: string
   children: ReactNode
   dot?: string
+  /** has a "view more" deep dive */
+  deep?: boolean
 }) {
   const pathname = usePathname()
   const { setOpen } = useContext(SidebarCtx)
@@ -146,7 +151,16 @@ function Item({
           aria-hidden
         />
       ) : null}
-      <span className="min-w-0 truncate">{children}</span>
+      <span className="min-w-0 flex-1 truncate">{children}</span>
+      {deep ? (
+        <span
+          className="shrink-0 rounded px-1 text-[9px] font-bold tracking-wide"
+          style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+          title="Has an in-depth page"
+        >
+          +
+        </span>
+      ) : null}
     </Link>
   )
 }
@@ -176,6 +190,7 @@ function Sidebar() {
   const { open, setOpen } = useContext(SidebarCtx)
   const { state, ready } = useProgress()
   const pathname = usePathname()
+  const due = ready ? dueConcepts(state).length : 0
 
   // close the drawer whenever the route changes on mobile
   useEffect(() => {
@@ -206,28 +221,69 @@ function Sidebar() {
           <span className="text-[14px] font-bold">Menu</span>
         </div>
 
-        <Group title="Start">
-          <Item href="/">Today</Item>
+        <Group title="Today">
+          <Item href="/">What to do today</Item>
+          <Item href="/progress">Progress &amp; gap log</Item>
+          <Item href="/map">Curriculum map</Item>
+        </Group>
+
+        <Group title="Start from scratch">
+          <Item href="/learn">Overview — all topics in order</Item>
+          {LESSONS.map((l) => (
+            <Item key={l.slug} href={`/learn/${l.slug}`}>
+              {l.title}
+            </Item>
+          ))}
+        </Group>
+
+        {PATH.filter((stage) => stage.concepts?.length).map((stage) => (
+          <Group key={stage.id} title={stage.name}>
+            {(stage.concepts ?? []).map((slug) => {
+              const c = getConcept(slug)
+              if (!c) return null
+              return (
+                <Item
+                  key={slug}
+                  href={`/concepts/${slug}`}
+                  dot={ready ? STATE_COLOR[conceptState(state, slug)] : undefined}
+                  deep={hasDeepDive(slug)}
+                >
+                  {c.title}
+                </Item>
+              )
+            })}
+          </Group>
+        ))}
+
+        <Group title="Practice">
           <Item href="/practice/daily">Daily rep · 15 min</Item>
           <Item href="/practice/mock">Timed mock · 45 min</Item>
           <Item href="/practice/blitz">Follow-up blitz · 10 min</Item>
-          <Item href="/practice/check">Concept check · 5 min</Item>
           <Item href="/practice/blank">Blank page</Item>
+          <Item href="/company">Company questions</Item>
+          {COMPANIES.map((co) => (
+            <Item key={co.id} href={`/company/${co.id}`}>
+              {'\u2007'}
+              {co.name}
+            </Item>
+          ))}
         </Group>
 
-        {([1, 2, 3] as Tier[]).map((tier) => (
-          <Group key={tier} title={TIER_INFO[tier].name.replace(/^Tier \d+ — /, `Tier ${tier}: `)}>
-            {conceptsByTier(tier).map((c) => (
-              <Item
-                key={c.slug}
-                href={`/concepts/${c.slug}`}
-                dot={ready ? STATE_COLOR[conceptState(state, c.slug)] : undefined}
+        <Group title="Topic revision">
+          <Item href="/practice/check">
+            Concept check · 5 min
+            {due > 0 ? (
+              <span
+                className="tabular ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                style={{ background: 'var(--bad)', color: '#fff' }}
               >
-                {c.title}
-              </Item>
-            ))}
-          </Group>
-        ))}
+                {due}
+              </span>
+            ) : null}
+          </Item>
+          <Item href="/drills">Defence drills</Item>
+          <Item href="/map">Where I am</Item>
+        </Group>
 
         <Group title="Problems by shape">
           {GROUPS.map((g) => {
@@ -253,15 +309,9 @@ function Sidebar() {
           ))}
         </Group>
 
-        <Group title="Your progress">
-          <Item href="/drills">Defence drills</Item>
-          <Item href="/map">Curriculum map</Item>
-          <Item href="/progress">Progress &amp; gap log</Item>
-        </Group>
-
         <div className="px-3 pt-2 text-[11.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
           {ready
-            ? `${CONCEPTS.filter((c) => conceptState(state, c.slug) === 'solid').length} of ${CONCEPTS.length} concepts solid`
+            ? `${CONCEPTS.filter((c) => conceptState(state, c.slug) === 'solid').length} of ${CONCEPTS.length} topics solid`
             : ''}
         </div>
       </nav>

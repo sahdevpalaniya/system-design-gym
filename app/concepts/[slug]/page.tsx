@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { CONCEPTS, TIER_INFO, getConcept } from '@/content/concepts'
 import { PROBLEMS } from '@/content/problems'
 import { Callout } from '@/components/visuals'
+import { getDeepDive, getExample } from '@/content/deep'
+import { WorkedExampleBlock } from '@/components/DeepDive'
 import { ConceptCheck, ConceptVisualBlock } from '@/components/ConceptCheck'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/ui'
 
@@ -17,6 +19,8 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
 
   const related = (c.related ?? []).map(getConcept).filter(Boolean)
   const usedIn = PROBLEMS.filter((p) => p.concepts.includes(c.slug))
+  const deep = getDeepDive(c.slug)
+  const example = getExample(c.slug)
   const i = CONCEPTS.findIndex((x) => x.slug === c.slug)
   const prev = i > 0 ? CONCEPTS[i - 1] : null
   const next = i < CONCEPTS.length - 1 ? CONCEPTS[i + 1] : null
@@ -93,6 +97,34 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         ) : null}
       </Section>
 
+      {deep ? (
+        <section className="mb-10">
+          <Link
+            href={`/concepts/${c.slug}/deep`}
+            className="card flex flex-wrap items-center justify-between gap-4 p-5 transition hover:-translate-y-px"
+            style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
+          >
+            <span className="min-w-0">
+              <span className="mb-1 block text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+                Go deeper · {deep.minutes} min
+              </span>
+              <span className="block text-[17px] font-semibold">
+                View more — {c.title.toLowerCase()} in depth
+              </span>
+              <span className="mt-1 block text-[13.5px]" style={{ color: 'var(--muted)' }}>
+                {deep.sections.length} sections, every sub-topic covered separately, with a worked example at the end.
+              </span>
+            </span>
+            <span
+              className="shrink-0 rounded-lg px-4 py-2.5 text-[14px] font-semibold"
+              style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
+            >
+              Read it →
+            </span>
+          </Link>
+        </section>
+      ) : null}
+
       <Section n="5" title="The follow-up an interviewer will ask">
         <Card>
           <p className="mb-4 text-[17px] leading-snug font-semibold">
@@ -112,6 +144,12 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
       <Section n="6" title="Your turn">
         <ConceptCheck concept={c} />
       </Section>
+
+      {example ? (
+        <div className="mb-10">
+          <WorkedExampleBlock example={example} />
+        </div>
+      ) : null}
 
       <nav className="mb-10 flex items-stretch justify-between gap-3 border-t pt-6" aria-label="Concept order">
         {prev ? (

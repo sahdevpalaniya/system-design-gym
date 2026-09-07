@@ -27,7 +27,11 @@ export function Figure({
   return (
     <figure className="my-6">
       <div className="card overflow-hidden">
-        <div className="overflow-x-auto p-4 sm:p-5">{children}</div>
+        <div className="flex justify-center overflow-x-auto p-3 sm:p-4">
+          <div className="w-full" style={{ maxWidth: MAX_FIGURE_W }}>
+            {children}
+          </div>
+        </div>
         {actions ? (
           <div className="flex justify-end border-t px-3 py-2" style={{ background: 'var(--surface-2)' }}>
             {actions}
@@ -47,11 +51,13 @@ export function Figure({
    Diagram — boxes and arrows
    ============================================================ */
 
-const BOX_W = 138
-const BOX_H = 58
-const GAP_X = 58
-const GAP_Y = 46
-const PAD = 14
+const BOX_W = 108
+const BOX_H = 46
+const GAP_X = 42
+const GAP_Y = 34
+const PAD = 12
+/** diagrams stop growing past this, so they stay readable on a wide screen */
+const MAX_FIGURE_W = 640
 
 function nodeBox(n: DiagramNode) {
   const span = n.span ?? 1
@@ -105,7 +111,7 @@ export function Diagram({ spec }: { spec: DiagramSpec }) {
     <Figure caption={spec.caption}>
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        style={{ minWidth: Math.min(width, 560), width: '100%', height: 'auto' }}
+        style={{ width: '100%', maxWidth: Math.min(width, MAX_FIGURE_W), height: 'auto' }}
         role="img"
         aria-label={spec.caption}
       >
@@ -151,7 +157,7 @@ export function Diagram({ spec }: { spec: DiagramSpec }) {
                   x={mx}
                   y={horizontal ? my - 7 : my}
                   textAnchor="middle"
-                  fontSize="10.5"
+                  fontSize="9"
                   fontFamily="var(--font-ui)"
                   fill="var(--muted)"
                   style={{ paintOrder: 'stroke' }}
@@ -174,7 +180,7 @@ export function Diagram({ spec }: { spec: DiagramSpec }) {
                 key={n.id}
                 x={b.x}
                 y={b.y + b.h / 2}
-                fontSize="11"
+                fontSize="9.5"
                 fontFamily="var(--font-ui)"
                 fill="var(--faint)"
                 fontStyle="italic"
@@ -240,10 +246,10 @@ export function Diagram({ spec }: { spec: DiagramSpec }) {
               )}
               <text
                 x={b.x + b.w / 2}
-                y={b.y + (n.sub ? b.h / 2 - 4 : b.h / 2 + 4)}
+                y={b.y + (n.sub ? b.h / 2 - 3 : b.h / 2 + 3.5)}
                 textAnchor="middle"
-                fontSize="12"
-                fontWeight="550"
+                fontSize="10"
+                fontWeight="600"
                 fontFamily="var(--font-ui)"
                 fill="var(--text)"
               >
@@ -252,9 +258,9 @@ export function Diagram({ spec }: { spec: DiagramSpec }) {
               {n.sub ? (
                 <text
                   x={b.x + b.w / 2}
-                  y={b.y + b.h / 2 + 12}
+                  y={b.y + b.h / 2 + 9}
                   textAnchor="middle"
-                  fontSize="10"
+                  fontSize="8.5"
                   fontFamily="var(--font-ui)"
                   fill="var(--muted)"
                 >
@@ -275,11 +281,11 @@ export function Diagram({ spec }: { spec: DiagramSpec }) {
 
 export function LifecycleChain({ spec }: { spec: LifecycleSpec }) {
   const uid = useId().replace(/[:]/g, '')
-  const W = 128
-  const H = 46
-  const GAP = 46
-  const TOP = 16
-  const DROP = 62
+  const W = 104
+  const H = 40
+  const GAP = 34
+  const TOP = 14
+  const DROP = 54
   const width = PAD * 2 + spec.states.length * W + (spec.states.length - 1) * GAP
   const branchRows = new Map<string, number>()
   spec.failures.forEach((f) => {
@@ -295,7 +301,7 @@ export function LifecycleChain({ spec }: { spec: LifecycleSpec }) {
     <Figure caption={spec.caption}>
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        style={{ minWidth: Math.min(width, 620), width: '100%', height: 'auto' }}
+        style={{ width: '100%', minWidth: 460, height: 'auto' }}
         role="img"
         aria-label={spec.caption}
       >
@@ -352,9 +358,9 @@ export function LifecycleChain({ spec }: { spec: LifecycleSpec }) {
             />
             <text
               x={xOf(i) + W / 2}
-              y={TOP + (s.by ? H / 2 - 3 : H / 2 + 4)}
+              y={TOP + (s.by ? H / 2 - 2 : H / 2 + 3.5)}
               textAnchor="middle"
-              fontSize="11.5"
+              fontSize="9.5"
               fontWeight="600"
               fontFamily="var(--font-ui)"
               fill="var(--text)"
@@ -364,9 +370,9 @@ export function LifecycleChain({ spec }: { spec: LifecycleSpec }) {
             {s.by ? (
               <text
                 x={xOf(i) + W / 2}
-                y={TOP + H / 2 + 12}
+                y={TOP + H / 2 + 9}
                 textAnchor="middle"
-                fontSize="9.5"
+                fontSize="8"
                 fontFamily="var(--font-ui)"
                 fill="var(--faint)"
               >
@@ -399,7 +405,7 @@ export function LifecycleChain({ spec }: { spec: LifecycleSpec }) {
               <text
                 x={x + 26}
                 y={y1 - 2}
-                fontSize="10.5"
+                fontSize="9"
                 fontWeight="600"
                 fontFamily="var(--font-ui)"
                 fill="var(--bad)"
@@ -408,8 +414,8 @@ export function LifecycleChain({ spec }: { spec: LifecycleSpec }) {
               </text>
               <text
                 x={x + 26}
-                y={y1 + 13}
-                fontSize="10"
+                y={y1 + 11}
+                fontSize="8.5"
                 fontFamily="var(--font-ui)"
                 fill="var(--muted)"
               >
@@ -638,6 +644,435 @@ const FLOWS: Record<FlowScenario, FlowDef> = {
       { tone: 'ok', text: 'many writes out — reads later are free' },
     ],
   },
+  'round-robin': {
+    w: 460,
+    h: 210,
+    nodes: [
+      { id: 'c', label: 'Requests', x: 20, y: 82, kind: 'client' },
+      { id: 'lb', label: 'Round robin', sub: '1,2,3,1,2,3…', x: 170, y: 82, kind: 'service' },
+      { id: 's1', label: 'Server 1', x: 320, y: 20, kind: 'service' },
+      { id: 's2', label: 'Server 2', x: 320, y: 82, kind: 'service' },
+      { id: 's3', label: 'Server 3', x: 320, y: 144, kind: 'service' },
+    ],
+    links: [
+      [130, 108, 170, 108],
+      [280, 108, 300, 108],
+      [300, 108, 300, 46],
+      [300, 46, 320, 46],
+      [300, 108, 320, 108],
+      [300, 108, 300, 170],
+      [300, 170, 320, 170],
+    ],
+    trips: [
+      { points: [[130, 108], [300, 108], [300, 46], [322, 46]], dur: 1.4, delay: 0, tone: 'accent' },
+      { points: [[130, 108], [322, 108]], dur: 1.4, delay: 0.5, tone: 'accent' },
+      { points: [[130, 108], [300, 108], [300, 170], [322, 170]], dur: 1.4, delay: 1.0, tone: 'accent' },
+      { points: [[130, 108], [300, 108], [300, 46], [322, 46]], dur: 1.4, delay: 1.5, tone: 'accent' },
+    ],
+    legend: [{ tone: 'accent', text: 'strict rotation — each server takes the next request in turn, regardless of how busy it is' }],
+  },
+  'least-connections': {
+    w: 460,
+    h: 210,
+    nodes: [
+      { id: 'c', label: 'Requests', x: 20, y: 82, kind: 'client' },
+      { id: 'lb', label: 'Least conns', sub: 'picks the idle one', x: 170, y: 82, kind: 'service' },
+      { id: 's1', label: 'Server 1', sub: '8 open', x: 320, y: 20, kind: 'service' },
+      { id: 's2', label: 'Server 2', sub: '1 open', x: 320, y: 82, kind: 'service' },
+      { id: 's3', label: 'Server 3', sub: '7 open', x: 320, y: 144, kind: 'service' },
+    ],
+    links: [
+      [130, 108, 170, 108],
+      [280, 108, 300, 108],
+      [300, 108, 300, 46],
+      [300, 46, 320, 46],
+      [300, 108, 320, 108],
+      [300, 108, 300, 170],
+      [300, 170, 320, 170],
+    ],
+    trips: [
+      { points: [[130, 108], [322, 108]], dur: 1.3, delay: 0, tone: 'ok' },
+      { points: [[130, 108], [322, 108]], dur: 1.3, delay: 0.6, tone: 'ok' },
+      { points: [[130, 108], [322, 108]], dur: 1.3, delay: 1.2, tone: 'ok' },
+    ],
+    legend: [{ tone: 'ok', text: 'every request goes to the server with fewest open connections — right when requests take wildly different times' }],
+  },
+  'ip-hash': {
+    w: 460,
+    h: 210,
+    nodes: [
+      { id: 'c', label: 'Same user', sub: 'same IP', x: 20, y: 82, kind: 'client' },
+      { id: 'lb', label: 'hash(IP)', x: 170, y: 82, kind: 'service' },
+      { id: 's1', label: 'Server 1', x: 320, y: 20, kind: 'service' },
+      { id: 's2', label: 'Server 2', sub: 'always this one', x: 320, y: 82, kind: 'service' },
+      { id: 's3', label: 'Server 3', x: 320, y: 144, kind: 'service' },
+    ],
+    links: [
+      [130, 108, 170, 108],
+      [280, 108, 300, 108],
+      [300, 108, 300, 46],
+      [300, 46, 320, 46],
+      [300, 108, 320, 108],
+      [300, 108, 300, 170],
+      [300, 170, 320, 170],
+    ],
+    trips: [
+      { points: [[130, 108], [322, 108]], dur: 1.2, delay: 0, tone: 'accent' },
+      { points: [[130, 108], [322, 108]], dur: 1.2, delay: 0.7, tone: 'accent' },
+      { points: [[130, 108], [322, 108]], dur: 1.2, delay: 1.4, tone: 'accent' },
+    ],
+    legend: [{ tone: 'accent', text: 'the same client always lands on the same server — good for cache locality, bad when that server dies' }],
+  },
+  weighted: {
+    w: 460,
+    h: 210,
+    nodes: [
+      { id: 'c', label: 'Requests', x: 20, y: 82, kind: 'client' },
+      { id: 'lb', label: 'Weighted', sub: '3 : 1 : 1', x: 170, y: 82, kind: 'service' },
+      { id: 's1', label: 'Big server', sub: 'weight 3', x: 320, y: 20, kind: 'service' },
+      { id: 's2', label: 'Small', sub: 'weight 1', x: 320, y: 82, kind: 'service' },
+      { id: 's3', label: 'Small', sub: 'weight 1', x: 320, y: 144, kind: 'service' },
+    ],
+    links: [
+      [130, 108, 170, 108],
+      [280, 108, 300, 108],
+      [300, 108, 300, 46],
+      [300, 46, 320, 46],
+      [300, 108, 320, 108],
+      [300, 108, 300, 170],
+      [300, 170, 320, 170],
+    ],
+    trips: [
+      { points: [[130, 108], [300, 108], [300, 46], [322, 46]], dur: 1.2, delay: 0, tone: 'accent' },
+      { points: [[130, 108], [300, 108], [300, 46], [322, 46]], dur: 1.2, delay: 0.4, tone: 'accent' },
+      { points: [[130, 108], [300, 108], [300, 46], [322, 46]], dur: 1.2, delay: 0.8, tone: 'accent' },
+      { points: [[130, 108], [322, 108]], dur: 1.2, delay: 1.2, tone: 'muted' },
+      { points: [[130, 108], [300, 108], [300, 170], [322, 170]], dur: 1.2, delay: 1.6, tone: 'muted' },
+    ],
+    legend: [{ tone: 'accent', text: 'a bigger machine gets proportionally more traffic — use when your fleet is not uniform' }],
+  },
+  'health-check': {
+    w: 460,
+    h: 210,
+    nodes: [
+      { id: 'lb', label: 'Balancer', sub: 'probes every 2s', x: 20, y: 82, kind: 'service' },
+      { id: 's1', label: 'Server 1', sub: 'healthy', x: 200, y: 20, kind: 'service' },
+      { id: 's2', label: 'Server 2', sub: 'FAILING', x: 200, y: 82, kind: 'external' },
+      { id: 's3', label: 'Server 3', sub: 'healthy', x: 200, y: 144, kind: 'service' },
+    ],
+    links: [
+      [130, 108, 180, 108],
+      [180, 108, 180, 46],
+      [180, 46, 200, 46],
+      [180, 108, 200, 108],
+      [180, 108, 180, 170],
+      [180, 170, 200, 170],
+    ],
+    trips: [
+      { points: [[130, 108], [180, 108], [180, 46], [202, 46]], dur: 1.1, delay: 0, tone: 'ok' },
+      { points: [[130, 108], [180, 108], [180, 170], [202, 170]], dur: 1.1, delay: 0.5, tone: 'ok' },
+      { points: [[130, 108], [175, 108]], dur: 0.8, delay: 1.0, tone: 'bad' },
+    ],
+    legend: [
+      { tone: 'ok', text: 'healthy servers keep receiving traffic' },
+      { tone: 'bad', text: 'the failing one is probed, does not answer, and is pulled from the pool' },
+    ],
+  },
+  'active-passive': {
+    w: 460,
+    h: 170,
+    nodes: [
+      { id: 'c', label: 'Traffic', x: 20, y: 62, kind: 'client' },
+      { id: 'a', label: 'Active', sub: 'serving', x: 180, y: 20, kind: 'service' },
+      { id: 'p', label: 'Standby', sub: 'idle, waiting', x: 180, y: 100, kind: 'external' },
+    ],
+    links: [
+      [130, 88, 160, 88],
+      [160, 88, 160, 46],
+      [160, 46, 180, 46],
+      [160, 88, 160, 126],
+      [160, 126, 180, 126],
+      [235, 72, 235, 100],
+    ],
+    trips: [
+      { points: [[130, 88], [160, 88], [160, 46], [182, 46]], dur: 1.2, delay: 0, tone: 'ok' },
+      { points: [[130, 88], [160, 88], [160, 46], [182, 46]], dur: 1.2, delay: 0.6, tone: 'ok' },
+      { points: [[235, 72], [235, 98]], dur: 1.4, delay: 0.3, tone: 'muted' },
+    ],
+    legend: [
+      { tone: 'ok', text: 'all traffic goes to the active node' },
+      { tone: 'muted', text: 'the standby only copies state — it is never proven by real traffic until the day it has to take over' },
+    ],
+  },
+  'active-active': {
+    w: 460,
+    h: 170,
+    nodes: [
+      { id: 'c', label: 'Traffic', x: 20, y: 62, kind: 'client' },
+      { id: 'a', label: 'Node A', sub: 'serving', x: 180, y: 20, kind: 'service' },
+      { id: 'b', label: 'Node B', sub: 'also serving', x: 180, y: 100, kind: 'service' },
+    ],
+    links: [
+      [130, 88, 160, 88],
+      [160, 88, 160, 46],
+      [160, 46, 180, 46],
+      [160, 88, 160, 126],
+      [160, 126, 180, 126],
+    ],
+    trips: [
+      { points: [[130, 88], [160, 88], [160, 46], [182, 46]], dur: 1.2, delay: 0, tone: 'ok' },
+      { points: [[130, 88], [160, 88], [160, 126], [182, 126]], dur: 1.2, delay: 0.5, tone: 'ok' },
+      { points: [[130, 88], [160, 88], [160, 46], [182, 46]], dur: 1.2, delay: 1.0, tone: 'ok' },
+      { points: [[130, 88], [160, 88], [160, 126], [182, 126]], dur: 1.2, delay: 1.5, tone: 'ok' },
+    ],
+    legend: [{ tone: 'ok', text: 'both nodes serve constantly, so both are continuously proven to work — and losing one halves capacity, not availability' }],
+  },
+  'write-through': {
+    w: 460,
+    h: 150,
+    nodes: [
+      { id: 'a', label: 'Write', x: 20, y: 52, kind: 'client' },
+      { id: 'k', label: 'Cache', sub: 'updated first', x: 170, y: 52, kind: 'cache' },
+      { id: 'd', label: 'Database', x: 320, y: 52, kind: 'store' },
+    ],
+    links: [
+      [130, 78, 170, 78],
+      [280, 78, 320, 78],
+    ],
+    trips: [
+      { points: [[130, 78], [175, 78]], dur: 0.9, delay: 0, tone: 'accent' },
+      { points: [[280, 78], [325, 78]], dur: 0.9, delay: 0.9, tone: 'accent' },
+      { points: [[325, 78], [130, 78]], dur: 1.0, delay: 1.9, tone: 'ok' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'cache and database are both written before the user is told it worked' },
+      { tone: 'ok', text: 'never stale — and every write pays both costs' },
+    ],
+  },
+  'write-back': {
+    w: 460,
+    h: 150,
+    nodes: [
+      { id: 'a', label: 'Write', x: 20, y: 52, kind: 'client' },
+      { id: 'k', label: 'Cache', sub: 'confirms now', x: 170, y: 52, kind: 'cache' },
+      { id: 'd', label: 'Database', sub: 'written later', x: 320, y: 52, kind: 'store' },
+    ],
+    links: [
+      [130, 78, 170, 78],
+      [280, 78, 320, 78],
+    ],
+    trips: [
+      { points: [[130, 78], [175, 78]], dur: 0.6, delay: 0, tone: 'accent' },
+      { points: [[175, 78], [130, 78]], dur: 0.6, delay: 0.6, tone: 'ok' },
+      { points: [[280, 78], [325, 78]], dur: 1.6, delay: 1.6, tone: 'muted' },
+    ],
+    legend: [
+      { tone: 'ok', text: 'the user is told it worked as soon as the cache has it — fast' },
+      { tone: 'muted', text: 'the database catches up afterwards, so a crash in that gap loses the write' },
+    ],
+  },
+  'cdn-pull': {
+    w: 460,
+    h: 170,
+    nodes: [
+      { id: 'u', label: 'First user', x: 20, y: 62, kind: 'client' },
+      { id: 'e', label: 'Edge', sub: 'empty, fetches', x: 180, y: 62, kind: 'cache' },
+      { id: 'o', label: 'Origin', x: 330, y: 62, kind: 'service' },
+    ],
+    links: [
+      [130, 88, 180, 88],
+      [290, 88, 330, 88],
+    ],
+    trips: [
+      { points: [[130, 88], [185, 88]], dur: 0.8, delay: 0, tone: 'accent' },
+      { points: [[290, 88], [335, 88]], dur: 0.8, delay: 0.9, tone: 'bad' },
+      { points: [[335, 88], [185, 88]], dur: 0.9, delay: 1.8, tone: 'muted' },
+      { points: [[185, 88], [130, 88]], dur: 0.7, delay: 2.8, tone: 'ok' },
+    ],
+    legend: [
+      { tone: 'bad', text: 'the first request pays a trip to origin — this user is the one who suffers' },
+      { tone: 'ok', text: 'the edge keeps a copy, so everyone after them is fast' },
+    ],
+  },
+  'cdn-push': {
+    w: 460,
+    h: 170,
+    nodes: [
+      { id: 'o', label: 'You deploy', x: 20, y: 62, kind: 'service' },
+      { id: 'e', label: 'Edge', sub: 'preloaded', x: 180, y: 62, kind: 'cache' },
+      { id: 'u', label: 'Every user', x: 330, y: 62, kind: 'client' },
+    ],
+    links: [
+      [130, 88, 180, 88],
+      [290, 88, 330, 88],
+    ],
+    trips: [
+      { points: [[130, 88], [185, 88]], dur: 1.2, delay: 0, tone: 'muted' },
+      { points: [[290, 88], [335, 88]], dur: 0.7, delay: 1.4, tone: 'ok' },
+      { points: [[290, 88], [335, 88]], dur: 0.7, delay: 2.1, tone: 'ok' },
+    ],
+    legend: [
+      { tone: 'muted', text: 'you push content out ahead of demand' },
+      { tone: 'ok', text: 'nobody ever pays the first-request penalty — and you pay to store things nobody may request' },
+    ],
+  },
+  'leader-follower': {
+    w: 460,
+    h: 200,
+    nodes: [
+      { id: 'w', label: 'Writes', x: 20, y: 24, kind: 'client' },
+      { id: 'l', label: 'Leader', sub: 'all writes', x: 180, y: 24, kind: 'store' },
+      { id: 'f1', label: 'Follower', sub: 'reads', x: 330, y: 24, kind: 'store' },
+      { id: 'f2', label: 'Follower', sub: 'reads', x: 330, y: 110, kind: 'store' },
+      { id: 'r', label: 'Reads', x: 20, y: 110, kind: 'client' },
+    ],
+    links: [
+      [130, 50, 180, 50],
+      [290, 50, 330, 50],
+      [235, 76, 235, 136],
+      [235, 136, 330, 136],
+      [130, 136, 235, 136],
+    ],
+    trips: [
+      { points: [[130, 50], [185, 50]], dur: 0.8, delay: 0, tone: 'accent' },
+      { points: [[290, 50], [332, 50]], dur: 1.0, delay: 0.9, tone: 'muted' },
+      { points: [[235, 76], [235, 134], [332, 134]], dur: 1.2, delay: 0.9, tone: 'muted' },
+      { points: [[130, 136], [230, 136]], dur: 0.9, delay: 1.6, tone: 'ok' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'every write goes to the one leader' },
+      { tone: 'muted', text: 'followers copy from it, always slightly behind' },
+      { tone: 'ok', text: 'reads spread across followers — which is why replication scales reads and not writes' },
+    ],
+  },
+  'multi-leader': {
+    w: 460,
+    h: 200,
+    nodes: [
+      { id: 'u1', label: 'Europe', x: 20, y: 24, kind: 'client' },
+      { id: 'l1', label: 'Leader EU', sub: 'accepts writes', x: 170, y: 24, kind: 'store' },
+      { id: 'l2', label: 'Leader US', sub: 'accepts writes', x: 170, y: 120, kind: 'store' },
+      { id: 'u2', label: 'America', x: 20, y: 120, kind: 'client' },
+      { id: 'x', label: 'conflict!', x: 330, y: 72, kind: 'note' },
+    ],
+    links: [
+      [130, 50, 170, 50],
+      [130, 146, 170, 146],
+      [225, 76, 225, 120],
+    ],
+    trips: [
+      { points: [[130, 50], [175, 50]], dur: 0.8, delay: 0, tone: 'accent' },
+      { points: [[130, 146], [175, 146]], dur: 0.8, delay: 0.2, tone: 'accent' },
+      { points: [[225, 76], [225, 118]], dur: 1.4, delay: 1.0, tone: 'bad' },
+      { points: [[225, 118], [225, 78]], dur: 1.4, delay: 1.0, tone: 'bad' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'both regions take writes locally, so both are fast' },
+      { tone: 'bad', text: 'the same row edited in two places at once — now you own a conflict to resolve' },
+    ],
+  },
+  'consistent-hash-ring': {
+    w: 460,
+    h: 210,
+    nodes: [
+      { id: 'k', label: 'Keys', x: 20, y: 82, kind: 'client' },
+      { id: 'r', label: 'Hash ring', sub: 'clockwise', x: 170, y: 82, kind: 'service' },
+      { id: 'a', label: 'Node A', x: 320, y: 20, kind: 'store' },
+      { id: 'b', label: 'Node B', sub: 'NEW', x: 320, y: 82, kind: 'cache' },
+      { id: 'c', label: 'Node C', x: 320, y: 144, kind: 'store' },
+    ],
+    links: [
+      [130, 108, 170, 108],
+      [280, 108, 300, 108],
+      [300, 108, 300, 46],
+      [300, 46, 320, 46],
+      [300, 108, 320, 108],
+      [300, 108, 300, 170],
+      [300, 170, 320, 170],
+    ],
+    trips: [
+      { points: [[130, 108], [300, 108], [300, 46], [322, 46]], dur: 1.4, delay: 0, tone: 'muted' },
+      { points: [[130, 108], [322, 108]], dur: 1.4, delay: 0.6, tone: 'accent' },
+      { points: [[130, 108], [300, 108], [300, 170], [322, 170]], dur: 1.4, delay: 1.2, tone: 'muted' },
+    ],
+    legend: [
+      { tone: 'muted', text: 'most keys keep the home they already had' },
+      { tone: 'accent', text: 'only the slice behind the new node moves — about 1/N of keys, not all of them' },
+    ],
+  },
+  'two-phase-commit': {
+    w: 460,
+    h: 200,
+    nodes: [
+      { id: 'c', label: 'Coordinator', x: 20, y: 72, kind: 'service' },
+      { id: 'a', label: 'Service A', sub: 'holds locks', x: 200, y: 20, kind: 'store' },
+      { id: 'b', label: 'Service B', sub: 'holds locks', x: 200, y: 120, kind: 'store' },
+    ],
+    links: [
+      [130, 98, 180, 98],
+      [180, 98, 180, 46],
+      [180, 46, 200, 46],
+      [180, 98, 180, 146],
+      [180, 146, 200, 146],
+    ],
+    trips: [
+      { points: [[130, 98], [180, 98], [180, 46], [202, 46]], dur: 0.9, delay: 0, tone: 'accent' },
+      { points: [[130, 98], [180, 98], [180, 146], [202, 146]], dur: 0.9, delay: 0, tone: 'accent' },
+      { points: [[202, 46], [180, 46], [180, 98], [132, 98]], dur: 0.9, delay: 1.0, tone: 'ok' },
+      { points: [[130, 98], [180, 98], [180, 46], [202, 46]], dur: 0.9, delay: 2.2, tone: 'muted' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'phase 1 — "can you commit?" Everyone locks and waits' },
+      { tone: 'ok', text: 'all say yes' },
+      { tone: 'muted', text: 'phase 2 — commit. If the coordinator dies between the two, everyone is stuck holding locks' },
+    ],
+  },
+  saga: {
+    w: 460,
+    h: 180,
+    nodes: [
+      { id: 's', label: 'Reserve', sub: 'stock', x: 20, y: 30, kind: 'service' },
+      { id: 'p', label: 'Charge', sub: 'card', x: 175, y: 30, kind: 'service' },
+      { id: 'd', label: 'Book', sub: 'courier', x: 330, y: 30, kind: 'service' },
+      { id: 'u', label: 'undo: refund, release stock', x: 20, y: 118, kind: 'note' },
+    ],
+    links: [
+      [130, 56, 175, 56],
+      [285, 56, 330, 56],
+    ],
+    trips: [
+      { points: [[130, 56], [178, 56]], dur: 0.8, delay: 0, tone: 'ok' },
+      { points: [[285, 56], [332, 56]], dur: 0.8, delay: 0.9, tone: 'ok' },
+      { points: [[332, 90], [130, 90]], dur: 1.6, delay: 1.9, tone: 'bad' },
+    ],
+    legend: [
+      { tone: 'ok', text: 'each step commits locally — nothing blocks, nothing holds locks' },
+      { tone: 'bad', text: 'if a later step fails, compensating actions run backwards to undo the earlier ones' },
+    ],
+  },
+  'circuit-breaker': {
+    w: 460,
+    h: 160,
+    nodes: [
+      { id: 'c', label: 'Your service', x: 20, y: 56, kind: 'service' },
+      { id: 'b', label: 'Breaker', sub: 'OPEN', x: 190, y: 56, kind: 'service' },
+      { id: 'd', label: 'Sick dependency', sub: 'timing out', x: 330, y: 56, kind: 'external' },
+    ],
+    links: [
+      [130, 82, 190, 82],
+      [300, 82, 330, 82],
+    ],
+    trips: [
+      { points: [[130, 82], [245, 82]], dur: 0.7, delay: 0, tone: 'bad' },
+      { points: [[245, 82], [130, 82]], dur: 0.5, delay: 0.7, tone: 'accent' },
+      { points: [[130, 82], [245, 82]], dur: 0.7, delay: 1.4, tone: 'bad' },
+      { points: [[245, 82], [130, 82]], dur: 0.5, delay: 2.1, tone: 'accent' },
+    ],
+    legend: [
+      { tone: 'bad', text: 'calls reach the breaker' },
+      { tone: 'accent', text: 'and fail instantly instead of waiting 30 seconds — the sick dependency is never touched, so it gets room to recover' },
+    ],
+  },
   'rate-limit': {
     w: 460,
     h: 170,
@@ -722,7 +1157,7 @@ ${pathKeyframes(t.points)}
       <style dangerouslySetInnerHTML={{ __html: css }} />
       <svg
         viewBox={`0 0 ${def.w} ${def.h}`}
-        style={{ minWidth: Math.min(def.w, 440), width: '100%', height: 'auto' }}
+        style={{ width: '100%', maxWidth: MAX_FIGURE_W, height: 'auto' }}
         className={paused ? 'anim-paused' : undefined}
         role="img"
         aria-label={caption}
@@ -759,7 +1194,7 @@ ${pathKeyframes(t.points)}
                 x={n.x + w / 2}
                 y={n.y + (n.sub ? h / 2 - 3 : h / 2 + 4)}
                 textAnchor="middle"
-                fontSize="11.5"
+                fontSize="10"
                 fontWeight="600"
                 fontFamily="var(--font-ui)"
                 fill="var(--text)"
@@ -769,9 +1204,9 @@ ${pathKeyframes(t.points)}
               {n.sub ? (
                 <text
                   x={n.x + w / 2}
-                  y={n.y + h / 2 + 12}
+                  y={n.y + h / 2 + 11}
                   textAnchor="middle"
-                  fontSize="9.5"
+                  fontSize="8.5"
                   fontFamily="var(--font-ui)"
                   fill="var(--muted)"
                 >
