@@ -1,14 +1,17 @@
 'use client'
 
+import { useSession } from 'next-auth/react'
 import {
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react'
+import { mergeProgress } from './merge'
 import {
   AXES,
   type ArchetypeId,
@@ -93,9 +96,15 @@ export function tagGap(text: string): string[] {
 
 /* ---------- context ---------- */
 
+export type SyncState = 'off' | 'syncing' | 'synced' | 'error'
+
 interface Ctx {
   state: ProgressState
   ready: boolean
+  /** 'off' when signed out — progress is then local to this browser only */
+  sync: SyncState
+  signedIn: boolean
+  user: { name?: string | null; image?: string | null } | null
   setTheme: (t: ProgressState['theme']) => void
   setArchetype: (a: ArchetypeId | null) => void
   saveStage: (
@@ -128,6 +137,12 @@ const ProgressCtx = createContext<Ctx | null>(null)
 export function ProgressProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ProgressState>(emptyState)
   const [ready, setReady] = useState(false)
+  const [sync, setSync] = useState<SyncState>('off')
+  const session = useSession()
+  const signedIn = session.status === 'authenticated'
+  const pulled = useRef(false)
+  const pushTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastPushed = useRef<string>('')
 
   useEffect(() => {
     try {
@@ -150,6 +165,73 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       /* quota or private mode — progress is best-effort, never block the UI */
     }
   }, [state, ready])
+
+  /* ---------- account sync ----------
+     Signed out, nothing here runs and progress stays in localStorage exactly as
+     before. Signed in, the account becomes the durable copy and localStorage is
+     a fast local mirror. */
+
+  // one-time pull on sign-in: fold whatever is on this device into the account
+  useEffect(() => {
+    if (!ready || !signedIn || pulled.current) return
+    pulled.current = true
+    setSync('syncing')
+    let cancelled = false
+    ;(async () => {
+      try {
+        const res = await fetch('/api/progress', { cache: 'no-store' })
+        if (!res.ok) throw new Error(`pull failed: ${res.status}`)
+        const { data } = (await res.json()) as { data: ProgressState | null }
+        if (cancelled) return
+        // merge before pushing, so signing in on a browser with anonymous
+        // progress adds to the account rather than replacing or being replaced
+        setState((local) => (data ? mergeProgress(local, data) : local))
+        setSync('synced')
+      } catch (err) {
+        console.error(err)
+        if (!cancelled) setSync('error')
+      }
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [ready, signedIn])
+
+  // reset when the user signs out, so a different account starts clean
+  useEffect(() => {
+    if (session.status === 'unauthenticated') {
+      pulled.current = false
+      lastPushed.current = ''
+      setSync('off')
+    }
+  }, [session.status])
+
+  // debounced push of every change; the server merges rather than overwrites
+  useEffect(() => {
+    if (!ready || !signedIn || !pulled.current) return
+    const body = JSON.stringify(state)
+    if (body === lastPushed.current) return
+    if (pushTimer.current) clearTimeout(pushTimer.current)
+    pushTimer.current = setTimeout(async () => {
+      try {
+        setSync('syncing')
+        const res = await fetch('/api/progress', {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body,
+        })
+        if (!res.ok) throw new Error(`push failed: ${res.status}`)
+        lastPushed.current = body
+        setSync('synced')
+      } catch (err) {
+        console.error(err)
+        setSync('error')
+      }
+    }, 1500)
+    return () => {
+      if (pushTimer.current) clearTimeout(pushTimer.current)
+    }
+  }, [state, ready, signedIn])
 
   // theme is applied to <html> so CSS variables switch
   useEffect(() => {
@@ -345,6 +427,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     () => ({
       state,
       ready,
+      sync,
+      signedIn,
+      user: session.data?.user ?? null,
       setTheme,
       setArchetype,
       saveStage,
@@ -361,6 +446,9 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [
       state,
       ready,
+      sync,
+      signedIn,
+      session.data?.user,
       setTheme,
       setArchetype,
       saveStage,

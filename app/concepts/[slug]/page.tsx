@@ -17,6 +17,9 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
 
   const related = (c.related ?? []).map(getConcept).filter(Boolean)
   const usedIn = PROBLEMS.filter((p) => p.concepts.includes(c.slug))
+  const i = CONCEPTS.findIndex((x) => x.slug === c.slug)
+  const prev = i > 0 ? CONCEPTS[i - 1] : null
+  const next = i < CONCEPTS.length - 1 ? CONCEPTS[i + 1] : null
 
   return (
     <Page>
@@ -109,6 +112,45 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
       <Section n="6" title="Your turn">
         <ConceptCheck concept={c} />
       </Section>
+
+      <nav className="mb-10 flex items-stretch justify-between gap-3 border-t pt-6" aria-label="Concept order">
+        {prev ? (
+          <Link
+            href={`/concepts/${prev.slug}`}
+            className="card flex min-w-0 flex-1 items-center gap-3 p-4 transition hover:-translate-y-px"
+          >
+            <span style={{ color: 'var(--accent)' }} aria-hidden>
+              &larr;
+            </span>
+            <span className="min-w-0">
+              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>
+                Previous
+              </span>
+              <span className="block truncate text-[14px] font-semibold">{prev.title}</span>
+            </span>
+          </Link>
+        ) : (
+          <span className="flex-1" />
+        )}
+        {next ? (
+          <Link
+            href={`/concepts/${next.slug}`}
+            className="card flex min-w-0 flex-1 items-center justify-end gap-3 p-4 text-right transition hover:-translate-y-px"
+          >
+            <span className="min-w-0">
+              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>
+                Next
+              </span>
+              <span className="block truncate text-[14px] font-semibold">{next.title}</span>
+            </span>
+            <span style={{ color: 'var(--accent)' }} aria-hidden>
+              &rarr;
+            </span>
+          </Link>
+        ) : (
+          <span className="flex-1" />
+        )}
+      </nav>
 
       {(related.length || usedIn.length) > 0 ? (
         <section className="border-t pt-8">

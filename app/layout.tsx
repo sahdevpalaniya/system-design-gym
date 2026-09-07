@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import { ProgressProvider } from '@/lib/store'
-import { Footer, Nav } from '@/components/Nav'
+import { Providers } from '@/components/Providers'
+import { Footer, Shell } from '@/components/Nav'
 
 export const metadata: Metadata = {
   title: 'System Design Gym',
@@ -28,11 +28,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
       </head>
       <body className="flex min-h-screen flex-col">
-        <ProgressProvider>
-          <Nav />
-          {children}
+        <Providers>
+          <Shell>{children}</Shell>
           <Footer />
-        </ProgressProvider>
+        </Providers>
       </body>
     </html>
   )

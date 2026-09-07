@@ -2,19 +2,36 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useState } from 'react'
-import { useProgress, streakCount } from '@/lib/store'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { CONCEPTS, TIER_INFO, conceptsByTier } from '@/content/concepts'
+import { GROUPS } from '@/content/method'
+import { PROBLEMS } from '@/content/problems'
+import { ARCHETYPES } from '@/content/archetypes'
+import { conceptState, problemState, streakCount, useProgress } from '@/lib/store'
+import type { Tier } from '@/lib/types'
+import { AccountButton } from './Account'
 
-const LINKS = [
-  { href: '/', label: 'Today' },
-  { href: '/practice', label: 'Practice' },
-  { href: '/concepts', label: 'Concepts' },
-  { href: '/problems', label: 'Problems' },
-  { href: '/drills', label: 'Drills' },
-  { href: '/archetypes', label: 'Interviewers' },
-  { href: '/map', label: 'Map' },
-  { href: '/progress', label: 'Progress' },
-]
+/* ---------- sidebar open/close, shared with the header button ---------- */
+
+const SidebarCtx = createContext<{ open: boolean; setOpen: (v: boolean) => void }>({
+  open: false,
+  setOpen: () => {},
+})
+
+export function Shell({ children }: { children: ReactNode }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <SidebarCtx.Provider value={{ open, setOpen }}>
+      <Header />
+      <div className="mx-auto flex w-full max-w-[1400px] flex-1">
+        <Sidebar />
+        <div className="min-w-0 flex-1">{children}</div>
+      </div>
+    </SidebarCtx.Provider>
+  )
+}
+
+/* ---------- header: logo, theme, account. Nothing else. ---------- */
 
 function ThemeToggle() {
   const { state, setTheme } = useProgress()
@@ -42,22 +59,29 @@ function ThemeToggle() {
   )
 }
 
-export function Nav() {
-  const pathname = usePathname()
+function Header() {
+  const { open, setOpen } = useContext(SidebarCtx)
   const { state, ready } = useProgress()
-  const [open, setOpen] = useState(false)
   const streak = ready ? streakCount(state) : 0
 
-  const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href))
-
   return (
-    <header
-      className="sticky top-0 z-40 border-b backdrop-blur"
-      style={{ background: 'color-mix(in srgb, var(--bg) 88%, transparent)' }}
-    >
-      <div className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-3 sm:px-7">
-        <Link href="/" className="flex shrink-0 items-center gap-2.5" onClick={() => setOpen(false)}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
+    <header className="sticky top-0 z-40 border-b" style={{ background: 'var(--surface)' }}>
+      <div className="mx-auto flex w-full max-w-[1400px] items-center gap-3 px-4 py-2.5">
+        <button
+          type="button"
+          onClick={() => setOpen(!open)}
+          aria-label="Menu"
+          aria-expanded={open}
+          className="flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"
+          style={{ color: 'var(--muted)' }}
+        >
+          <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
+            {open ? <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /> : <path d="M2 4.5h12M2 8h12M2 11.5h12" />}
+          </svg>
+        </button>
+
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
             <rect x="1.5" y="4" width="8" height="6" rx="1.6" stroke="var(--accent)" strokeWidth="1.7" />
             <rect x="14.5" y="4" width="8" height="6" rx="1.6" stroke="var(--border-strong)" strokeWidth="1.7" />
             <rect x="8" y="14.5" width="8" height="6" rx="1.6" stroke="var(--border-strong)" strokeWidth="1.7" />
@@ -68,23 +92,7 @@ export function Nav() {
           </span>
         </Link>
 
-        <nav className="ml-4 hidden flex-1 items-center gap-0.5 lg:flex">
-          {LINKS.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="rounded-lg px-2.5 py-1.5 text-[13.5px] font-medium transition"
-              style={{
-                color: isActive(l.href) ? 'var(--text)' : 'var(--muted)',
-                background: isActive(l.href) ? 'var(--surface-2)' : 'transparent',
-              }}
-            >
-              {l.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
+        <div className="ml-auto flex items-center gap-2">
           {streak > 0 ? (
             <span
               className="tabular hidden items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold sm:flex"
@@ -98,53 +106,177 @@ export function Nav() {
             </span>
           ) : null}
           <ThemeToggle />
-          <button
-            type="button"
-            onClick={() => setOpen((o) => !o)}
-            aria-label="Menu"
-            aria-expanded={open}
-            className="flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"
-            style={{ color: 'var(--muted)' }}
-          >
-            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
-              {open ? <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /> : <path d="M2 4.5h12M2 8h12M2 11.5h12" />}
-            </svg>
-          </button>
+          <AccountButton />
         </div>
       </div>
-
-      {open ? (
-        <nav className="border-t px-5 py-2 lg:hidden" style={{ background: 'var(--surface)' }}>
-          <div className="grid grid-cols-2 gap-1">
-            {LINKS.map((l) => (
-              <Link
-                key={l.href}
-                href={l.href}
-                onClick={() => setOpen(false)}
-                className="rounded-lg px-3 py-2.5 text-[14px] font-medium"
-                style={{
-                  color: isActive(l.href) ? 'var(--accent)' : 'var(--text)',
-                  background: isActive(l.href) ? 'var(--accent-soft)' : 'transparent',
-                }}
-              >
-                {l.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
-      ) : null}
     </header>
+  )
+}
+
+/* ---------- sidebar: every page, listed plainly ---------- */
+
+function Item({
+  href,
+  children,
+  dot,
+}: {
+  href: string
+  children: ReactNode
+  dot?: string
+}) {
+  const pathname = usePathname()
+  const { setOpen } = useContext(SidebarCtx)
+  const active = pathname === href
+  return (
+    <Link
+      href={href}
+      onClick={() => setOpen(false)}
+      className="flex items-center gap-2 border-l-2 py-[5px] pr-2 pl-3 text-[13.5px] leading-snug transition"
+      style={{
+        borderLeftColor: active ? 'var(--accent)' : 'transparent',
+        background: active ? 'var(--accent-soft)' : 'transparent',
+        color: active ? 'var(--accent)' : 'var(--text)',
+        fontWeight: active ? 600 : 400,
+      }}
+    >
+      {dot ? (
+        <span
+          className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
+          style={{ background: dot }}
+          aria-hidden
+        />
+      ) : null}
+      <span className="min-w-0 truncate">{children}</span>
+    </Link>
+  )
+}
+
+function Group({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="mb-5">
+      <div
+        className="mb-1 px-3 text-[11px] font-bold tracking-[0.08em] uppercase"
+        style={{ color: 'var(--faint)' }}
+      >
+        {title}
+      </div>
+      {children}
+    </div>
+  )
+}
+
+const STATE_COLOR: Record<string, string | undefined> = {
+  untouched: undefined,
+  attempted: 'var(--warn)',
+  solid: 'var(--ok)',
+  review: 'var(--bad)',
+}
+
+function Sidebar() {
+  const { open, setOpen } = useContext(SidebarCtx)
+  const { state, ready } = useProgress()
+  const pathname = usePathname()
+
+  // close the drawer whenever the route changes on mobile
+  useEffect(() => {
+    setOpen(false)
+  }, [pathname, setOpen])
+
+  return (
+    <>
+      {open ? (
+        <button
+          type="button"
+          aria-hidden
+          tabIndex={-1}
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-30 cursor-default lg:hidden"
+          style={{ background: 'rgba(0,0,0,.35)' }}
+        />
+      ) : null}
+
+      <nav
+        aria-label="All pages"
+        className={`fixed top-0 bottom-0 left-0 z-40 w-[250px] shrink-0 overflow-y-auto border-r py-4 transition-transform lg:sticky lg:top-[49px] lg:z-0 lg:h-[calc(100vh-49px)] lg:translate-x-0 ${
+          open ? 'translate-x-0' : '-translate-x-full'
+        }`}
+        style={{ background: 'var(--surface)' }}
+      >
+        <div className="mb-4 px-3 lg:hidden">
+          <span className="text-[14px] font-bold">Menu</span>
+        </div>
+
+        <Group title="Start">
+          <Item href="/">Today</Item>
+          <Item href="/practice/daily">Daily rep · 15 min</Item>
+          <Item href="/practice/mock">Timed mock · 45 min</Item>
+          <Item href="/practice/blitz">Follow-up blitz · 10 min</Item>
+          <Item href="/practice/check">Concept check · 5 min</Item>
+          <Item href="/practice/blank">Blank page</Item>
+        </Group>
+
+        {([1, 2, 3] as Tier[]).map((tier) => (
+          <Group key={tier} title={TIER_INFO[tier].name.replace(/^Tier \d+ — /, `Tier ${tier}: `)}>
+            {conceptsByTier(tier).map((c) => (
+              <Item
+                key={c.slug}
+                href={`/concepts/${c.slug}`}
+                dot={ready ? STATE_COLOR[conceptState(state, c.slug)] : undefined}
+              >
+                {c.title}
+              </Item>
+            ))}
+          </Group>
+        ))}
+
+        <Group title="Problems by shape">
+          {GROUPS.map((g) => {
+            const p = PROBLEMS.find((x) => x.group === g.id)
+            if (!p) return null
+            return (
+              <Item
+                key={p.slug}
+                href={`/problems/${p.slug}`}
+                dot={ready ? STATE_COLOR[problemState(state, p.slug)] : undefined}
+              >
+                {p.title}
+              </Item>
+            )
+          })}
+        </Group>
+
+        <Group title="Interviewers">
+          {ARCHETYPES.map((a) => (
+            <Item key={a.id} href={`/archetypes/${a.id}`}>
+              {a.name.replace(/^The /, '')}
+            </Item>
+          ))}
+        </Group>
+
+        <Group title="Your progress">
+          <Item href="/drills">Defence drills</Item>
+          <Item href="/map">Curriculum map</Item>
+          <Item href="/progress">Progress &amp; gap log</Item>
+        </Group>
+
+        <div className="px-3 pt-2 text-[11.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+          {ready
+            ? `${CONCEPTS.filter((c) => conceptState(state, c.slug) === 'solid').length} of ${CONCEPTS.length} concepts solid`
+            : ''}
+        </div>
+      </nav>
+    </>
   )
 }
 
 export function Footer() {
   return (
-    <footer className="mt-auto border-t px-5 py-8 sm:px-7">
-      <div className="mx-auto flex max-w-6xl flex-col gap-3 text-[12.5px] sm:flex-row sm:items-center sm:justify-between" style={{ color: 'var(--faint)' }}>
-        <p className="max-w-md leading-relaxed">
-          Write your own answer before you read ours. Everything here is stored in your browser only — no account,
-          no server, nothing leaves this device.
-        </p>
+    <footer className="mt-auto border-t px-5 py-6">
+      <div
+        className="mx-auto flex w-full max-w-[1400px] flex-col gap-2 text-[12.5px] sm:flex-row sm:items-center sm:justify-between"
+        style={{ color: 'var(--faint)' }}
+      >
+        <p>Write your own answer before you read ours.</p>
         <Link href="/progress" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
           Export or clear your data →
         </Link>

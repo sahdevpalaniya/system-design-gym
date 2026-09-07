@@ -19,6 +19,7 @@ import {
 } from '@/lib/store'
 import { AXES, AXIS_EARNS, AXIS_LABEL } from '@/lib/types'
 import { AxisBars, Badge, Button, Card, Empty, Page, PageHeader, Radar, StateDot } from '@/components/ui'
+import { AccountPanel } from '@/components/Account'
 
 export default function ProgressPage() {
   const { state, ready, exportJson, clearAll } = useProgress()
@@ -64,7 +65,7 @@ export default function ProgressPage() {
       <PageHeader
         eyebrow="Progress"
         title="Where you actually are"
-        lede="All of this lives in your browser and nowhere else. No account, no server, nothing sent anywhere."
+        lede="Signed out, this lives only in this browser. Sign in and it moves to your account, so it survives logging out and follows you between devices."
       />
 
       {/* ---- headline stats ---- */}
@@ -340,10 +341,20 @@ export default function ProgressPage() {
 
       {/* ---- data ---- */}
       <section className="border-t pt-8">
+        <h2 className="mb-1 text-[20px] font-bold tracking-[-0.01em]">Your account</h2>
+        <p className="mb-4 max-w-2xl text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Signing in moves your progress off this browser and onto your Google account, so it
+          survives signing out and follows you to any device.
+        </p>
+        <div className="mb-8">
+          <AccountPanel />
+        </div>
+
         <h2 className="mb-1 text-[20px] font-bold tracking-[-0.01em]">Your data</h2>
         <p className="mb-5 max-w-2xl text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Everything is stored in this browser&rsquo;s local storage. Clearing your browser data will delete it,
-          and it does not follow you to another device — so export it if you care about it.
+          A copy is always kept in this browser&rsquo;s local storage so the app works offline. Signed out,
+          that copy is the only one — clearing browser data deletes it. Clearing below wipes the local copy;
+          if you are signed in, sign out first if you want the account copy left alone.
         </p>
         <div className="flex flex-wrap gap-3">
           <Button variant="secondary" onClick={exportJson}>

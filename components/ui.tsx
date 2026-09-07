@@ -59,7 +59,7 @@ export function Bullets({ items, marker }: { items: string[]; marker?: ReactNode
 
 export function Page({ children, wide }: { children: ReactNode; wide?: boolean }) {
   return (
-    <main className={`mx-auto w-full px-5 pt-8 pb-24 sm:px-7 ${wide ? 'max-w-6xl' : 'max-w-3xl'}`}>
+    <main className={`w-full px-5 pt-7 pb-20 sm:px-8 ${wide ? 'max-w-5xl' : 'max-w-3xl'}`}>
       {children}
     </main>
   )

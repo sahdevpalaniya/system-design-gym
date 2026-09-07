@@ -2,3 +2,10 @@ node_modules
 .next
 .vercel
 next-env.d.ts
+
+# local env
+.env.local
+.env
+
+# typescript incremental build cache
+*.tsbuildinfo
