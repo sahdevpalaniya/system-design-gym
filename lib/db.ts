@@ -129,6 +129,8 @@ export interface AdminStats {
     mocks: number
     gaps: number
     followUps: number
+    blankAttempts: number
+    whiteboards: number
   }
 }
 
@@ -159,6 +161,10 @@ export async function getAdminStats(): Promise<AdminStats> {
         coalesce(sum(jsonb_array_length(coalesce(data->'mocks','[]'::jsonb))),0)::int      as mocks,
         coalesce(sum(jsonb_array_length(coalesce(data->'gaps','[]'::jsonb))),0)::int       as gaps,
         coalesce(sum(jsonb_array_length(coalesce(data->'followUps','[]'::jsonb))),0)::int  as follow_ups,
+        coalesce(sum(jsonb_array_length(coalesce(data->'blank','[]'::jsonb))),0)::int      as blank_attempts,
+        coalesce(sum((select count(*)
+                      from jsonb_array_elements(coalesce(data->'blank','[]'::jsonb)) b
+                      where b ? 'diagram')),0)::int                                        as whiteboards,
         coalesce(sum((select count(*) from jsonb_object_keys(coalesce(data->'problems','{}'::jsonb)))),0)::int as problems,
         coalesce(sum((select count(*) from jsonb_object_keys(coalesce(data->'concepts','{}'::jsonb)))),0)::int as concepts
       from progress`),
@@ -190,6 +196,8 @@ export async function getAdminStats(): Promise<AdminStats> {
       mocks: g.mocks,
       gaps: g.gaps,
       followUps: g.follow_ups,
+      blankAttempts: g.blank_attempts,
+      whiteboards: g.whiteboards,
     },
   }
 }

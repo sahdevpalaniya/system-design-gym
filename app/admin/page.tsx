@@ -168,6 +168,8 @@ export default async function AdminPage() {
           <Stat value={stats.usage.mocks} label="mocks completed" tone="var(--text)" />
           <Stat value={stats.usage.followUps} label="follow-ups drilled" tone="var(--text)" />
           <Stat value={stats.usage.gaps} label="gap-log entries" tone="var(--text)" />
+          <Stat value={stats.usage.blankAttempts} label="blank-page attempts" tone="var(--text)" />
+          <Stat value={stats.usage.whiteboards} label="whiteboards drawn" tone="var(--text)" />
         </div>
         <p className="mt-2 text-[12.5px]" style={{ color: 'var(--faint)' }}>
           Totals across all accounts. Counts only what has synced to the server — anonymous,

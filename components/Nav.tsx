@@ -315,7 +315,8 @@ function Sidebar() {
           <Item href="/practice/daily">Daily rep · 15 min</Item>
           <Item href="/practice/mock">Timed mock · 45 min</Item>
           <Item href="/practice/blitz">Follow-up blitz · 10 min</Item>
-          <Item href="/practice/blank">Blank page</Item>
+          <Item href="/practice/blank">Blank page &amp; whiteboard</Item>
+          <Item href="/solutions">Worked solutions</Item>
           <Item href="/company">Company questions</Item>
           {COMPANIES.map((co) => (
             <Item key={co.id} href={`/company/${co.id}`}>

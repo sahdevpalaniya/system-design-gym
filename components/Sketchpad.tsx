@@ -15,8 +15,23 @@ app -> queue -> worker`
  * so this is the one place you have to make the boxes connect. Optional by
  * design — it is a rehearsal aid, not another thing to be graded on.
  */
-export function Sketchpad() {
-  const [text, setText] = useState('')
+export function Sketchpad({
+  value,
+  onChange,
+  rows = 5,
+  title = 'Sketchpad · optional',
+  blurb = 'Type the arrows the way you would say them out loud and they get drawn. Not graded, not saved — it is here because a design that reads fine in a paragraph often does not connect up when you have to draw it.',
+}: {
+  /** controlled text — omit to let the component hold its own */
+  value?: string
+  onChange?: (v: string) => void
+  rows?: number
+  title?: string
+  blurb?: string
+} = {}) {
+  const [own, setOwn] = useState('')
+  const text = value ?? own
+  const setText = onChange ?? setOwn
   const { spec, notes } = useMemo(() => parseSketch(text), [text])
 
   return (
@@ -26,12 +41,10 @@ export function Sketchpad() {
           className="text-[11.5px] font-bold tracking-[0.06em] uppercase"
           style={{ color: 'var(--accent)' }}
         >
-          Sketchpad · optional
+          {title}
         </div>
         <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Type the arrows the way you would say them out loud and they get drawn. Not graded, not
-          saved — it is here because a design that reads fine in a paragraph often does not connect up
-          when you have to draw it.
+          {blurb}
         </p>
       </div>
 
@@ -39,7 +52,7 @@ export function Sketchpad() {
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
-          rows={5}
+          rows={rows}
           spellCheck={false}
           placeholder={PLACEHOLDER}
           className="w-full resize-y rounded-xl border px-4 py-3 font-mono text-[13.5px] leading-relaxed outline-none"

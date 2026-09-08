@@ -123,3 +123,38 @@ console.log('merge: all assertions passed')
   assert.equal(merged.read['concept:caching'], '2026-03-01T00:00:00.000Z')
   assert.equal(merged.read['lesson:the-vocabulary'], '2026-03-05T00:00:00.000Z')
 }
+
+/* whiteboards survive a sync — the drawing is part of the blank attempt, and
+   two devices that each saved one end up with both rather than one winning */
+{
+  const withDrawing = base({
+    blank: [
+      {
+        title: 'Design a paste bin',
+        stages: { 1: 'reads beat writes, no auth' },
+        diagram: 'client -> lb -> app -> db\napp -> cache: hit 95%',
+        savedAt: '2026-03-01T10:00:00.000Z',
+      },
+    ],
+  })
+  const otherDevice = base({
+    blank: [
+      {
+        title: 'Design a job queue',
+        stages: { 1: 'workers pull, at-least-once' },
+        diagram: 'producer -> queue -> worker -> db',
+        savedAt: '2026-03-02T10:00:00.000Z',
+      },
+    ],
+  })
+  const merged = mergeProgress(withDrawing, otherDevice)
+  assert.equal(merged.blank.length, 2, 'both devices\' attempts survive')
+  assert.equal(
+    merged.blank.find((b) => b.title === 'Design a paste bin')?.diagram,
+    'client -> lb -> app -> db\napp -> cache: hit 95%',
+    'the drawing itself is preserved through the merge',
+  )
+  // merging twice must not duplicate or drop anything
+  const again = mergeProgress(merged, otherDevice)
+  assert.equal(again.blank.length, 2, 'merge stays idempotent with drawings present')
+}

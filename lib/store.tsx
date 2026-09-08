@@ -129,7 +129,7 @@ interface Ctx {
   ) => void
   addGap: (text: string, source: string) => void
   addMock: (run: Omit<MockRun, 'id' | 'at'>) => void
-  saveBlank: (title: string, stages: Record<string, string>) => void
+  saveBlank: (title: string, stages: Record<string, string>, diagram?: string) => void
   deleteBlank: (savedAt: string) => void
   clearAll: () => void
   exportJson: () => void
@@ -404,12 +404,15 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [touchDay],
   )
 
-  const saveBlank = useCallback(
-    (title: string, stages: Record<string, string>) => {
+  const saveBlank: Ctx['saveBlank'] = useCallback(
+    (title, stages, diagram) => {
       setState((s) =>
         touchDay({
           ...s,
-          blank: [{ title, stages, savedAt: new Date().toISOString() }, ...s.blank].slice(0, 50),
+          blank: [
+            { title, stages, diagram, savedAt: new Date().toISOString() },
+            ...s.blank,
+          ].slice(0, 50),
         }),
       )
     },

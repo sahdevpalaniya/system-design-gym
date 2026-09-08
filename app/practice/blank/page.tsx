@@ -3,12 +3,30 @@
 import { useState } from 'react'
 import { STAGES } from '@/content/method'
 import { useProgress } from '@/lib/store'
-import { Button, Card, Page, PageHeader } from '@/components/ui'
+import { Button, Page, PageHeader } from '@/components/ui'
+import { Sketchpad } from '@/components/Sketchpad'
+import { parseSketch } from '@/lib/sketch'
+import { Diagram } from '@/components/visuals'
+
+/** a saved whiteboard, redrawn from the text it was stored as */
+function SavedDiagram({ text }: { text: string }) {
+  const { spec } = parseSketch(text)
+  if (!spec) return null
+  return (
+    <div>
+      <div className="mb-1 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
+        The whiteboard
+      </div>
+      <Diagram spec={spec} />
+    </div>
+  )
+}
 
 export default function BlankPage() {
   const { state, ready, saveBlank, deleteBlank } = useProgress()
   const [title, setTitle] = useState('')
   const [values, setValues] = useState<Record<string, string>>({})
+  const [diagram, setDiagram] = useState('')
   const [saved, setSaved] = useState(false)
 
   const filled = Object.values(values).filter((v) => v.trim().length > 20).length
@@ -18,7 +36,7 @@ export default function BlankPage() {
       <PageHeader
         eyebrow="Blank page · untimed"
         title="Just the scaffold"
-        lede="No nudges, no model answer, no checklist, no help of any kind. For the last week before an interview, when what you need to know is that you can produce it from nothing."
+        lede="Name it, draw it, then write it. No nudges, no model answer, no checklist, no help of any kind — for the last week before an interview, when what you need to know is that you can produce it from nothing."
       />
 
       <div className="mb-8">
@@ -34,6 +52,30 @@ export default function BlankPage() {
           style={{ borderColor: 'var(--border-strong)' }}
         />
       </div>
+
+      <section className="mb-10">
+        <div className="mb-2 flex flex-wrap items-baseline gap-2">
+          <span
+            className="flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-bold"
+            style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+            aria-hidden
+          >
+            ✎
+          </span>
+          <h2 className="text-[17px] font-semibold">The whiteboard</h2>
+        </div>
+        <p className="mb-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Draw it before you write about it, the way you would in the room. Type the arrows and they get
+          drawn for you, so the boxes have to actually connect.
+        </p>
+        <Sketchpad
+          value={diagram}
+          onChange={setDiagram}
+          rows={8}
+          title="Your whiteboard"
+          blurb="One arrow chain per line. This is saved with the attempt, so you can come back in a week and see whether you would draw it the same way."
+        />
+      </section>
 
       <div className="space-y-6">
         {STAGES.map((s) => (
@@ -66,14 +108,14 @@ export default function BlankPage() {
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
         <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
-          {filled} of 5 stages written.
+          {filled} of 5 stages written{diagram.trim() ? ', whiteboard drawn' : ''}.
         </span>
         <Button
           onClick={() => {
-            saveBlank(title.trim() || 'Untitled design', values)
+            saveBlank(title.trim() || 'Untitled design', values, diagram.trim() || undefined)
             setSaved(true)
           }}
-          disabled={filled === 0}
+          disabled={filled === 0 && !diagram.trim()}
         >
           Save this attempt
         </Button>
@@ -100,6 +142,7 @@ export default function BlankPage() {
                   </span>
                 </summary>
                 <div className="space-y-4 border-t px-5 py-4">
+                  {b.diagram ? <SavedDiagram text={b.diagram} /> : null}
                   {STAGES.map((s) =>
                     b.stages[s.id]?.trim() ? (
                       <div key={s.id}>

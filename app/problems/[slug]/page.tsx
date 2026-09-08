@@ -150,6 +150,29 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
           Try this problem again in a week without reading anything. The gap between what you write then and
           what you wrote today is the only measure of progress that means anything.
         </Callout>
+
+        <Link
+          href={`/problems/${p.slug}/solution`}
+          className="card mt-6 flex flex-wrap items-center justify-between gap-4 p-5 transition hover:-translate-y-px"
+          style={{ borderColor: 'var(--border-strong)' }}
+        >
+          <span className="min-w-0">
+            <span className="mb-1 block text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
+              Stuck, or new to this?
+            </span>
+            <span className="block text-[17px] font-semibold">Read the full worked solution</span>
+            <span className="mt-1 block text-[13.5px]" style={{ color: 'var(--muted)' }}>
+              All five stages end to end, with every diagram and every cost named — written out the way you
+              would actually say it. Best read after you have had a go.
+            </span>
+          </span>
+          <span
+            className="shrink-0 rounded-lg border px-4 py-2.5 text-[14px] font-semibold"
+            style={{ borderColor: 'var(--border-strong)' }}
+          >
+            Read it →
+          </span>
+        </Link>
       </section>
     </Page>
   )
