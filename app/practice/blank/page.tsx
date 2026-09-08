@@ -4,29 +4,13 @@ import { useState } from 'react'
 import { STAGES } from '@/content/method'
 import { useProgress } from '@/lib/store'
 import { Button, Page, PageHeader } from '@/components/ui'
-import { Sketchpad } from '@/components/Sketchpad'
-import { parseSketch } from '@/lib/sketch'
-import { Diagram } from '@/components/visuals'
-
-/** a saved whiteboard, redrawn from the text it was stored as */
-function SavedDiagram({ text }: { text: string }) {
-  const { spec } = parseSketch(text)
-  if (!spec) return null
-  return (
-    <div>
-      <div className="mb-1 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
-        The whiteboard
-      </div>
-      <Diagram spec={spec} />
-    </div>
-  )
-}
+import { Whiteboard, WhiteboardView } from '@/components/Whiteboard'
 
 export default function BlankPage() {
   const { state, ready, saveBlank, deleteBlank } = useProgress()
   const [title, setTitle] = useState('')
   const [values, setValues] = useState<Record<string, string>>({})
-  const [diagram, setDiagram] = useState('')
+  const [drawing, setDrawing] = useState('')
   const [saved, setSaved] = useState(false)
 
   const filled = Object.values(values).filter((v) => v.trim().length > 20).length
@@ -65,16 +49,10 @@ export default function BlankPage() {
           <h2 className="text-[17px] font-semibold">The whiteboard</h2>
         </div>
         <p className="mb-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Draw it before you write about it, the way you would in the room. Type the arrows and they get
-          drawn for you, so the boxes have to actually connect.
+          Draw it the way you would in the room — boxes, arrows, whatever your hand does. Interviews
+          happen at a whiteboard and this is the only part of the app that makes you use one.
         </p>
-        <Sketchpad
-          value={diagram}
-          onChange={setDiagram}
-          rows={8}
-          title="Your whiteboard"
-          blurb="One arrow chain per line. This is saved with the attempt, so you can come back in a week and see whether you would draw it the same way."
-        />
+        <Whiteboard value={drawing} onChange={setDrawing} />
       </section>
 
       <div className="space-y-6">
@@ -108,14 +86,14 @@ export default function BlankPage() {
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
         <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
-          {filled} of 5 stages written{diagram.trim() ? ', whiteboard drawn' : ''}.
+          {filled} of 5 stages written{drawing ? ', whiteboard drawn' : ''}.
         </span>
         <Button
           onClick={() => {
-            saveBlank(title.trim() || 'Untitled design', values, diagram.trim() || undefined)
+            saveBlank(title.trim() || 'Untitled design', values, drawing || undefined)
             setSaved(true)
           }}
-          disabled={filled === 0 && !diagram.trim()}
+          disabled={filled === 0 && !drawing}
         >
           Save this attempt
         </Button>
@@ -142,7 +120,17 @@ export default function BlankPage() {
                   </span>
                 </summary>
                 <div className="space-y-4 border-t px-5 py-4">
-                  {b.diagram ? <SavedDiagram text={b.diagram} /> : null}
+                  {b.drawing ? (
+                    <div>
+                      <div
+                        className="mb-1 text-[11.5px] font-bold tracking-[0.05em] uppercase"
+                        style={{ color: 'var(--faint)' }}
+                      >
+                        The whiteboard
+                      </div>
+                      <WhiteboardView value={b.drawing} />
+                    </div>
+                  ) : null}
                   {STAGES.map((s) =>
                     b.stages[s.id]?.trim() ? (
                       <div key={s.id}>

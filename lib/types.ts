@@ -364,7 +364,7 @@ export interface ProgressState {
   gaps: GapEntry[]
   scores: ScoreEntry[]
   mocks: MockRun[]
-  blank: { title: string; stages: Record<string, string>; diagram?: string; savedAt: string }[]
+  blank: { title: string; stages: Record<string, string>; drawing?: string; savedAt: string }[]
 }
 
 /* ---------- from-scratch lessons ---------- */

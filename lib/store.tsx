@@ -129,7 +129,8 @@ interface Ctx {
   ) => void
   addGap: (text: string, source: string) => void
   addMock: (run: Omit<MockRun, 'id' | 'at'>) => void
-  saveBlank: (title: string, stages: Record<string, string>, diagram?: string) => void
+  /** `drawing` is the whiteboard, stored as JSON pen strokes */
+  saveBlank: (title: string, stages: Record<string, string>, drawing?: string) => void
   deleteBlank: (savedAt: string) => void
   clearAll: () => void
   exportJson: () => void
@@ -405,12 +406,12 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
   )
 
   const saveBlank: Ctx['saveBlank'] = useCallback(
-    (title, stages, diagram) => {
+    (title, stages, drawing) => {
       setState((s) =>
         touchDay({
           ...s,
           blank: [
-            { title, stages, diagram, savedAt: new Date().toISOString() },
+            { title, stages, drawing, savedAt: new Date().toISOString() },
             ...s.blank,
           ].slice(0, 50),
         }),
