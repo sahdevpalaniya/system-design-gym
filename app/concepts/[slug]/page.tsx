@@ -7,6 +7,7 @@ import { getDeepDive, getExample } from '@/content/deep'
 import { WorkedExampleBlock } from '@/components/DeepDive'
 import { ConceptCheck, ConceptVisualBlock } from '@/components/ConceptCheck'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/ui'
+import { MarkRead } from '@/components/MarkRead'
 
 export function generateStaticParams() {
   return CONCEPTS.map((c) => ({ slug: c.slug }))
@@ -150,6 +151,10 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
           <WorkedExampleBlock example={example} />
         </div>
       ) : null}
+
+      <div className="mb-8">
+        <MarkRead id={`concept:${c.slug}`} label="this topic" />
+      </div>
 
       <nav className="mb-10 flex items-stretch justify-between gap-3 border-t pt-6" aria-label="Concept order">
         {prev ? (

@@ -5,7 +5,16 @@ export const LIVE_SCORES: Problem = {
   title: 'Live score push',
   group: 'live-push',
   difficulty: 'core',
-  concepts: ['realtime-transports', 'caching', 'message-queues', 'load-balancing', 'consistent-hashing'],
+  concepts: [
+    'realtime-transports',
+    'caching',
+    'message-queues',
+    'load-balancing',
+    'consistent-hashing',
+    'communication-protocols',
+    'availability-patterns',
+    'multi-region',
+  ],
   prompt:
     'Design a service that pushes live sports scores to millions of people watching the same match at the same time. A score update should reach everyone within a second or two.',
 

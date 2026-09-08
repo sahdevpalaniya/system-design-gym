@@ -1,6 +1,12 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 import { LOAD_BALANCING_DEEP, LOAD_BALANCING_EXAMPLE } from './load-balancing'
 import { SQL_NOSQL_DEEP, SQL_NOSQL_EXAMPLE } from './databases'
+import { REPLICATION_DEEP, REPLICATION_EXAMPLE } from './replication'
+import { PARTITIONING_DEEP, PARTITIONING_EXAMPLE } from './partitioning'
+import { CONSISTENCY_DEEP, CONSISTENCY_EXAMPLE } from './consistency'
+import { CACHING_DEEP, CACHING_EXAMPLE } from './caching'
+import { QUEUES_DEEP, QUEUES_EXAMPLE } from './queues'
+import { IDEMPOTENCY_DEEP, IDEMPOTENCY_EXAMPLE } from './idempotency'
 
 /**
  * "View more" content, keyed by concept slug. A concept without an entry here
@@ -9,11 +15,23 @@ import { SQL_NOSQL_DEEP, SQL_NOSQL_EXAMPLE } from './databases'
 export const DEEP_DIVES: Record<string, DeepDive> = {
   'load-balancing': LOAD_BALANCING_DEEP,
   'sql-vs-nosql': SQL_NOSQL_DEEP,
+  replication: REPLICATION_DEEP,
+  partitioning: PARTITIONING_DEEP,
+  'consistency-models': CONSISTENCY_DEEP,
+  caching: CACHING_DEEP,
+  'message-queues': QUEUES_DEEP,
+  idempotency: IDEMPOTENCY_DEEP,
 }
 
 export const EXAMPLES: Record<string, WorkedExample> = {
   'load-balancing': LOAD_BALANCING_EXAMPLE,
   'sql-vs-nosql': SQL_NOSQL_EXAMPLE,
+  replication: REPLICATION_EXAMPLE,
+  partitioning: PARTITIONING_EXAMPLE,
+  'consistency-models': CONSISTENCY_EXAMPLE,
+  caching: CACHING_EXAMPLE,
+  'message-queues': QUEUES_EXAMPLE,
+  idempotency: IDEMPOTENCY_EXAMPLE,
 }
 
 export function getDeepDive(slug: string): DeepDive | undefined {

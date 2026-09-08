@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { CONCEPTS, TIER_INFO, conceptsByTier } from '@/content/concepts'
-import { GROUPS } from '@/content/method'
+import { GROUPS, LEVELS } from '@/content/method'
 import { PROBLEMS } from '@/content/problems'
 import { conceptState, problemState, useProgress } from '@/lib/store'
 import type { NodeState, Tier } from '@/lib/types'
@@ -172,6 +172,49 @@ export default function MapPage() {
               label={name}
               state={ready && state.archetype === id ? 'solid' : 'untouched'}
             />
+          ))}
+        </div>
+      </section>
+      <section className="mt-12 border-t pt-8">
+        <h2 className="mb-1 text-[20px] font-bold tracking-[-0.01em]">What the bar actually is</h2>
+        <p className="mb-5 text-[14.5px]" style={{ color: 'var(--muted)' }}>
+          The same answer scores differently depending on the level. Most people practise to one bar and
+          are surprised by the gap — so know which column you are being measured against.
+        </p>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {LEVELS.map((l) => (
+            <Card key={l.level}>
+              <div className="mb-1 text-[16px] font-semibold">{l.level}</div>
+              <div className="tabular mb-3 text-[12px]" style={{ color: 'var(--faint)' }}>
+                {l.titles}
+              </div>
+              <div className="mb-1.5 text-[11px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--ok)' }}>
+                Passes
+              </div>
+              <ul className="mb-3 space-y-1.5">
+                {l.passes.map((x, i) => (
+                  <li key={i} className="text-[13.5px] leading-relaxed">
+                    {x}
+                  </li>
+                ))}
+              </ul>
+              <div className="mb-1.5 text-[11px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--bad)' }}>
+                Fails
+              </div>
+              <ul className="mb-3 space-y-1.5">
+                {l.fails.map((x, i) => (
+                  <li key={i} className="text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                    {x}
+                  </li>
+                ))}
+              </ul>
+              <p
+                className="rounded-lg px-3 py-2 text-[13px] leading-relaxed"
+                style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+              >
+                {l.tell}
+              </p>
+            </Card>
           ))}
         </div>
       </section>

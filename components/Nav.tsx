@@ -10,7 +10,7 @@ import { PROBLEMS } from '@/content/problems'
 import { ARCHETYPES } from '@/content/archetypes'
 import { COMPANIES } from '@/content/companies'
 import { hasDeepDive } from '@/content/deep'
-import { conceptState, dueConcepts, problemState, streakCount, useProgress } from '@/lib/store'
+import { conceptState, dueConcepts, problemState, readCount, streakCount, useProgress } from '@/lib/store'
 import { AccountButton } from './Account'
 
 /* ---------- sidebar open/close, shared with the header button ---------- */
@@ -122,12 +122,15 @@ function Item({
   children,
   dot,
   deep,
+  done,
 }: {
   href: string
   children: ReactNode
   dot?: string
   /** has a "view more" deep dive */
   deep?: boolean
+  /** undefined = not a trackable topic; false = still to read; true = read */
+  done?: boolean
 }) {
   const pathname = usePathname()
   const { setOpen } = useContext(SidebarCtx)
@@ -144,6 +147,26 @@ function Item({
         fontWeight: active ? 600 : 400,
       }}
     >
+      {done === undefined ? null : done ? (
+        <svg
+          width="12"
+          height="12"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="var(--ok)"
+          strokeWidth="2.4"
+          className="shrink-0"
+          aria-label="Done"
+        >
+          <path d="M3 8.5l3.2 3.2L13 5" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ) : (
+        <span
+          className="inline-block h-[11px] w-[11px] shrink-0 rounded-full border"
+          style={{ borderColor: 'var(--border-strong)' }}
+          aria-label="Not read yet"
+        />
+      )}
       {dot ? (
         <span
           className="inline-block h-1.5 w-1.5 shrink-0 rounded-full"
@@ -165,14 +188,33 @@ function Item({
   )
 }
 
-function Group({ title, children }: { title: string; children: ReactNode }) {
+function Group({
+  title,
+  children,
+  done,
+  total,
+}: {
+  title: string
+  children: ReactNode
+  /** when given, shows a "3 / 7 done" counter next to the group name */
+  done?: number
+  total?: number
+}) {
   return (
     <div className="mb-5">
       <div
-        className="mb-1 px-3 text-[11px] font-bold tracking-[0.08em] uppercase"
+        className="mb-1 flex items-baseline gap-2 px-3 text-[11px] font-bold tracking-[0.08em] uppercase"
         style={{ color: 'var(--faint)' }}
       >
-        {title}
+        <span className="min-w-0 flex-1 truncate">{title}</span>
+        {total ? (
+          <span
+            className="tabular shrink-0 tracking-normal"
+            style={{ color: done === total ? 'var(--ok)' : 'var(--faint)' }}
+          >
+            {done}/{total}
+          </span>
+        ) : null}
       </div>
       {children}
     </div>
@@ -227,17 +269,30 @@ function Sidebar() {
           <Item href="/map">Curriculum map</Item>
         </Group>
 
-        <Group title="Start from scratch">
+        <Group
+          title="Start from scratch"
+          done={ready ? readCount(state, LESSONS.map((l) => `lesson:${l.slug}`)) : 0}
+          total={LESSONS.length}
+        >
           <Item href="/learn">Overview — all topics in order</Item>
           {LESSONS.map((l) => (
-            <Item key={l.slug} href={`/learn/${l.slug}`}>
+            <Item
+              key={l.slug}
+              href={`/learn/${l.slug}`}
+              done={ready ? Boolean(state.read?.[`lesson:${l.slug}`]) : false}
+            >
               {l.title}
             </Item>
           ))}
         </Group>
 
         {PATH.filter((stage) => stage.concepts?.length).map((stage) => (
-          <Group key={stage.id} title={stage.name}>
+          <Group
+            key={stage.id}
+            title={stage.name}
+            done={ready ? readCount(state, (stage.concepts ?? []).map((s) => `concept:${s}`)) : 0}
+            total={(stage.concepts ?? []).length}
+          >
             {(stage.concepts ?? []).map((slug) => {
               const c = getConcept(slug)
               if (!c) return null
@@ -247,6 +302,7 @@ function Sidebar() {
                   href={`/concepts/${slug}`}
                   dot={ready ? STATE_COLOR[conceptState(state, slug)] : undefined}
                   deep={hasDeepDive(slug)}
+                  done={ready ? Boolean(state.read?.[`concept:${slug}`]) : false}
                 >
                   {c.title}
                 </Item>
@@ -269,7 +325,8 @@ function Sidebar() {
           ))}
         </Group>
 
-        <Group title="Topic revision">
+        <Group title="Revision">
+          <Item href="/revise">Quick revision · all topics</Item>
           <Item href="/practice/check">
             Concept check · 5 min
             {due > 0 ? (
@@ -285,21 +342,28 @@ function Sidebar() {
           <Item href="/map">Where I am</Item>
         </Group>
 
-        <Group title="Problems by shape">
-          {GROUPS.map((g) => {
-            const p = PROBLEMS.find((x) => x.group === g.id)
-            if (!p) return null
-            return (
-              <Item
-                key={p.slug}
-                href={`/problems/${p.slug}`}
-                dot={ready ? STATE_COLOR[problemState(state, p.slug)] : undefined}
-              >
-                {p.title}
-              </Item>
-            )
-          })}
-        </Group>
+        {GROUPS.map((g) => {
+          const ps = PROBLEMS.filter((x) => x.group === g.id)
+          if (!ps.length) return null
+          return (
+            <Group
+              key={g.id}
+              title={g.name}
+              done={ready ? ps.filter((p) => problemState(state, p.slug) !== 'untouched').length : 0}
+              total={ps.length}
+            >
+              {ps.map((p) => (
+                <Item
+                  key={p.slug}
+                  href={`/problems/${p.slug}`}
+                  dot={ready ? STATE_COLOR[problemState(state, p.slug)] : undefined}
+                >
+                  {p.title}
+                </Item>
+              ))}
+            </Group>
+          )
+        })}
 
         <Group title="Interviewers">
           {ARCHETYPES.map((a) => (
@@ -311,7 +375,7 @@ function Sidebar() {
 
         <div className="px-3 pt-2 text-[11.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
           {ready
-            ? `${CONCEPTS.filter((c) => conceptState(state, c.slug) === 'solid').length} of ${CONCEPTS.length} topics solid`
+            ? `${readCount(state, CONCEPTS.map((c) => `concept:${c.slug}`))} of ${CONCEPTS.length} topics read · ${CONCEPTS.filter((c) => conceptState(state, c.slug) === 'solid').length} solid`
             : ''}
         </div>
       </nav>

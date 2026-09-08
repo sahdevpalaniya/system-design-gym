@@ -9,6 +9,12 @@ import { TYPEAHEAD } from './typeahead'
 import { RATE_LIMITER } from './rate-limiter'
 import { NEARBY_PLACES } from './nearby-places'
 import { CLICK_ANALYTICS } from './click-analytics'
+import { CHAT_MESSAGING } from './chat-messaging'
+import { NOTIFICATION_SYSTEM } from './notification-system'
+import { WEB_CRAWLER } from './web-crawler'
+import { FILE_SYNC } from './file-sync'
+import { KEY_VALUE_STORE } from './key-value-store'
+import { PAYMENT_LEDGER } from './payment-ledger'
 
 export const PROBLEMS: Problem[] = [
   URL_SHORTENER,
@@ -21,6 +27,12 @@ export const PROBLEMS: Problem[] = [
   RATE_LIMITER,
   NEARBY_PLACES,
   CLICK_ANALYTICS,
+  CHAT_MESSAGING,
+  NOTIFICATION_SYSTEM,
+  WEB_CRAWLER,
+  FILE_SYNC,
+  KEY_VALUE_STORE,
+  PAYMENT_LEDGER,
 ]
 
 export function getProblem(slug: string): Problem | undefined {

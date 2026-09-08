@@ -5,7 +5,15 @@ export const SOCIAL_TIMELINE: Problem = {
   title: 'Follower timeline',
   group: 'write-heavy',
   difficulty: 'core',
-  concepts: ['partitioning', 'caching', 'message-queues', 'consistency-models', 'distributed-counter'],
+  concepts: [
+    'partitioning',
+    'caching',
+    'message-queues',
+    'consistency-models',
+    'distributed-counter',
+    'fan-out',
+    'replication',
+  ],
   prompt:
     'Design the home timeline for a social product. People follow each other; when you open the app you see recent posts from everyone you follow, newest first. Some accounts have tens of millions of followers.',
 

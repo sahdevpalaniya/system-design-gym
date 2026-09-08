@@ -5,7 +5,16 @@ export const CLICK_ANALYTICS: Problem = {
   title: 'Click analytics pipeline',
   group: 'pipelines',
   difficulty: 'core',
-  concepts: ['message-queues', 'idempotency', 'distributed-counter', 'partitioning', 'change-data-capture'],
+  concepts: [
+    'message-queues',
+    'idempotency',
+    'distributed-counter',
+    'partitioning',
+    'change-data-capture',
+    'batch-vs-stream',
+    'object-storage',
+    'capacity-and-cost',
+  ],
   prompt:
     'Design a system that ingests click and view events from a large website, and lets people query aggregates — clicks per page per hour, top referrers, conversion counts — over the last two years.',
 

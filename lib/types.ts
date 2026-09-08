@@ -181,6 +181,10 @@ export type GroupId =
   | 'limits'
   | 'location'
   | 'pipelines'
+  | 'crawling'
+  | 'sync'
+  | 'storage-engine'
+  | 'money'
 
 export interface Group {
   id: GroupId
@@ -353,6 +357,8 @@ export interface ProgressState {
   archetype: ArchetypeId | null
   streak: { days: string[] }
   concepts: Record<string, ConceptProgress>
+  /** pages you have read, keyed "lesson:<slug>" / "concept:<slug>" / "deep:<slug>" -> ISO date */
+  read: Record<string, string>
   problems: Record<string, ProblemProgress>
   followUps: FollowUpAttempt[]
   gaps: GapEntry[]

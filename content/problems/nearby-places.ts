@@ -5,7 +5,15 @@ export const NEARBY_PLACES: Problem = {
   title: 'Nearby places',
   group: 'location',
   difficulty: 'core',
-  concepts: ['geospatial-indexing', 'caching', 'indexes', 'cdn', 'search-indexing'],
+  concepts: [
+    'geospatial-indexing',
+    'caching',
+    'indexes',
+    'cdn',
+    'search-indexing',
+    'partitioning',
+    'latency-vs-throughput',
+  ],
   prompt:
     'Design a service that answers "what is near me?" — restaurants, shops, stations — ranked by distance and quality, filtered by category and whether they are open now.',
 

@@ -4,6 +4,7 @@ import { LESSONS, getLesson } from '@/content/foundations'
 import { PATH, getConcept } from '@/content/concepts'
 import { ConceptVisualBlock } from '@/components/ConceptCheck'
 import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/ui'
+import { MarkRead } from '@/components/MarkRead'
 
 export function generateStaticParams() {
   return LESSONS.map((l) => ({ slug: l.slug }))
@@ -59,6 +60,10 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           Remember:{' '}
         </span>
         <Rich text={l.remember} />
+      </div>
+
+      <div className="mb-8">
+        <MarkRead id={`lesson:${slug}`} label="this lesson" />
       </div>
 
       <nav className="flex items-stretch justify-between gap-3 border-t pt-6" aria-label="Lesson order">

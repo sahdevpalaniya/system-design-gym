@@ -5,7 +5,16 @@ export const RATE_LIMITER: Problem = {
   title: 'Distributed API rate limiter',
   group: 'limits',
   difficulty: 'core',
-  concepts: ['rate-limiting', 'distributed-counter', 'caching', 'circuit-breakers', 'consistency-models'],
+  concepts: [
+    'rate-limiting',
+    'distributed-counter',
+    'caching',
+    'circuit-breakers',
+    'consistency-models',
+    'reverse-proxy',
+    'api-design',
+    'observability',
+  ],
   prompt:
     'Design a rate limiter for a public API served from many machines across several regions. Each customer has a plan with a request quota. The limiter must not become the reason the API is slow or down.',
 

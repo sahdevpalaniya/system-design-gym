@@ -16,6 +16,7 @@ function base(overrides: Partial<ProgressState> = {}): ProgressState {
     archetype: null,
     streak: { days: [] },
     concepts: {},
+    read: {},
     problems: {},
     followUps: [],
     gaps: [],
@@ -112,3 +113,13 @@ assert.deepEqual(mergeProgress(m, m), m, 'merging a state with itself is a no-op
 assert.deepEqual(mergeProgress(m, server), m, 'remerging an already-merged state changes nothing')
 
 console.log('merge: all assertions passed')
+
+/* read marks survive both sides, and the earlier date wins */
+{
+  const merged = mergeProgress(
+    base({ read: { 'concept:caching': '2026-03-02T00:00:00.000Z' } }),
+    base({ read: { 'concept:caching': '2026-03-01T00:00:00.000Z', 'lesson:the-vocabulary': '2026-03-05T00:00:00.000Z' } }),
+  )
+  assert.equal(merged.read['concept:caching'], '2026-03-01T00:00:00.000Z')
+  assert.equal(merged.read['lesson:the-vocabulary'], '2026-03-05T00:00:00.000Z')
+}

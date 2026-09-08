@@ -1,10 +1,21 @@
 import type { Concept, Tier } from '@/lib/types'
 import { TIER1 } from './tier1'
 import { TIER1_EXTRA } from './tier1-extra'
+import { TIER1_STORAGE } from './tier1-storage'
 import { TIER2 } from './tier2'
+import { TIER2_EXTRA } from './tier2-extra'
 import { TIER3 } from './tier3'
+import { TIER3_OPS } from './tier3-ops'
 
-export const CONCEPTS: Concept[] = [...TIER1, ...TIER1_EXTRA, ...TIER2, ...TIER3]
+export const CONCEPTS: Concept[] = [
+  ...TIER1,
+  ...TIER1_EXTRA,
+  ...TIER1_STORAGE,
+  ...TIER2,
+  ...TIER2_EXTRA,
+  ...TIER3,
+  ...TIER3_OPS,
+]
 
 export const TIER_INFO: Record<Tier, { name: string; blurb: string }> = {
   1: {
@@ -73,13 +84,20 @@ export const PATH: PathStage[] = [
     id: 'request-path',
     name: 'How a request reaches you',
     blurb: 'Follow one request from a browser to your code and back, layer by layer.',
-    concepts: ['dns', 'communication-protocols', 'reverse-proxy', 'load-balancing', 'cdn'],
+    concepts: ['dns', 'communication-protocols', 'api-design', 'reverse-proxy', 'load-balancing', 'cdn'],
   },
   {
     id: 'storing',
     name: 'Storing data',
     blurb: 'Where the truth lives, how to find it quickly, and how to talk to it without falling over.',
-    concepts: ['sql-vs-nosql', 'indexes', 'connection-pooling', 'caching'],
+    concepts: [
+      'sql-vs-nosql',
+      'indexes',
+      'transactions-and-locking',
+      'connection-pooling',
+      'caching',
+      'object-storage',
+    ],
   },
   {
     id: 'more-than-one',
@@ -92,13 +110,22 @@ export const PATH: PathStage[] = [
       'consistency-models',
       'cap-pacelc',
       'consensus',
+      'clocks-and-ordering',
+      'multi-region',
     ],
   },
   {
     id: 'work-later',
     name: 'Doing work later',
     blurb: 'Queues, retries, and making it safe for the same thing to happen twice.',
-    concepts: ['message-queues', 'idempotency', 'distributed-transactions', 'change-data-capture'],
+    concepts: [
+      'message-queues',
+      'idempotency',
+      'fan-out',
+      'distributed-transactions',
+      'change-data-capture',
+      'batch-vs-stream',
+    ],
   },
   {
     id: 'patterns',
@@ -114,6 +141,19 @@ export const PATH: PathStage[] = [
       'search-indexing',
       'realtime-transports',
       'circuit-breakers',
+    ],
+  },
+  {
+    id: 'production',
+    name: 'Running it in production',
+    blurb:
+      'The part most people skip, and the part senior interviews dig into. A design you cannot deploy, watch, secure, restore or pay for is not finished.',
+    concepts: [
+      'auth-and-security',
+      'observability',
+      'deploys-and-releases',
+      'backups-and-recovery',
+      'capacity-and-cost',
     ],
   },
 ]

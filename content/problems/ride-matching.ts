@@ -5,7 +5,15 @@ export const RIDE_MATCHING: Problem = {
   title: 'Ride matching',
   group: 'matching',
   difficulty: 'hard',
-  concepts: ['geospatial-indexing', 'consensus', 'idempotency', 'realtime-transports', 'distributed-counter'],
+  concepts: [
+    'geospatial-indexing',
+    'consensus',
+    'idempotency',
+    'realtime-transports',
+    'distributed-counter',
+    'latency-vs-throughput',
+    'clocks-and-ordering',
+  ],
   prompt:
     'Design the matching part of a ride-hailing service. A rider requests a ride from where they are standing; the system finds a nearby driver, offers them the trip, and confirms the match. Drivers move continuously and can decline.',
 

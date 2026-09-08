@@ -5,7 +5,16 @@ export const VIDEO_PLATFORM: Problem = {
   title: 'Video upload and playback',
   group: 'big-files',
   difficulty: 'hard',
-  concepts: ['cdn', 'message-queues', 'idempotency', 'caching', 'change-data-capture'],
+  concepts: [
+    'cdn',
+    'message-queues',
+    'idempotency',
+    'caching',
+    'change-data-capture',
+    'object-storage',
+    'capacity-and-cost',
+    'batch-vs-stream',
+  ],
   prompt:
     'Design a service where people upload videos and other people watch them. Uploads come from phones on unreliable networks. Playback should start quickly and adapt to the viewer\'s connection.',
 

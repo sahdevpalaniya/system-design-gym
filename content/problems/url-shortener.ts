@@ -5,7 +5,16 @@ export const URL_SHORTENER: Problem = {
   title: 'Link shortener',
   group: 'read-heavy',
   difficulty: 'starter',
-  concepts: ['caching', 'back-of-envelope', 'sql-vs-nosql', 'cdn', 'indexes'],
+  concepts: [
+    'caching',
+    'back-of-envelope',
+    'sql-vs-nosql',
+    'cdn',
+    'indexes',
+    'latency-numbers',
+    'api-design',
+    'transactions-and-locking',
+  ],
   prompt:
     'Design a service that turns a long URL into a short one, and sends anyone who visits the short link to the original. Anyone can create links; links do not expire by default.',
 

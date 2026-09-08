@@ -43,6 +43,7 @@ function emptyState(): ProgressState {
     archetype: null,
     streak: { days: [] },
     concepts: {},
+    read: {},
     problems: {},
     followUps: [],
     gaps: [],
@@ -118,6 +119,8 @@ interface Ctx {
   ) => void
   completeProblem: (slug: string) => void
   saveConcept: (slug: string, rating: 1 | 2 | 3 | 4, answer?: string) => void
+  /** mark a lesson/topic page read, or un-mark it */
+  setRead: (id: string, read: boolean) => void
   saveFollowUp: (
     id: string,
     category: FollowUpCategory,
@@ -331,6 +334,19 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [touchDay],
   )
 
+  const setRead: Ctx['setRead'] = useCallback(
+    (id, read) => {
+      setState((s) => {
+        if (read === Boolean(s.read?.[id])) return s
+        const next = { ...(s.read ?? {}) }
+        if (read) next[id] = new Date().toISOString()
+        else delete next[id]
+        return touchDay({ ...s, read: next })
+      })
+    },
+    [touchDay],
+  )
+
   const saveFollowUp: Ctx['saveFollowUp'] = useCallback(
     (id, category, answer, rating) => {
       setState((s) =>
@@ -435,6 +451,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       saveStage,
       completeProblem,
       saveConcept,
+      setRead,
       saveFollowUp,
       addGap,
       addMock,
@@ -454,6 +471,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       saveStage,
       completeProblem,
       saveConcept,
+      setRead,
       saveFollowUp,
       addGap,
       addMock,
@@ -516,6 +534,15 @@ export function weakestAxis(state: ProgressState): Axis | null {
   return touched.reduce((min, a) => (s[a] < s[min] ? a : min), touched[0])
 }
 
+export function isRead(state: ProgressState, id: string): boolean {
+  return Boolean(state.read?.[id])
+}
+
+/** how many of these ids have been read — for the "4 / 7" counters in the sidebar */
+export function readCount(state: ProgressState, ids: string[]): number {
+  return ids.filter((id) => state.read?.[id]).length
+}
+
 export function conceptState(state: ProgressState, slug: string): NodeState {
   const c = state.concepts[slug]
   if (!c) return 'untouched'
@@ -539,6 +566,26 @@ export function dueConcepts(state: ProgressState): string[] {
   return Object.entries(state.concepts)
     .filter(([, c]) => Date.parse(c.dueAt) <= Date.now())
     .sort((a, b) => Date.parse(a[1].dueAt) - Date.parse(b[1].dueAt))
+    .map(([slug]) => slug)
+}
+
+/**
+ * Problems come back on a schedule too. A design you worked through once in
+ * March is a design you have forgotten by May, and only concepts having spaced
+ * repetition was a real gap.
+ */
+export function dueProblems(state: ProgressState): string[] {
+  const now = Date.now()
+  return Object.entries(state.problems)
+    .filter(([, p]) => {
+      const stages = Object.values(p.stages)
+      if (!stages.length) return false
+      const avg = stages.reduce((a, s) => a + s.score, 0) / stages.length
+      // solid work comes back in a month, shaky work in a week
+      const days = avg >= 7 ? 30 : avg >= 4 ? 14 : 7
+      return now - Date.parse(p.lastTouched) >= days * 86_400_000
+    })
+    .sort((a, b) => Date.parse(a[1].lastTouched) - Date.parse(b[1].lastTouched))
     .map(([slug]) => slug)
 }
 

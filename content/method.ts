@@ -161,8 +161,105 @@ export const GROUPS: Group[] = [
     slackNote: 'Huge. Minutes, often hours. The mistake is building this like a request path.',
     examples: ['Analytics ingestion', 'Click aggregation', 'Metrics'],
   },
+  {
+    id: 'crawling',
+    name: 'Crawling and ingestion',
+    shape: 'The work is unbounded, the sources are hostile or fragile, and you are a guest on someone else\'s machine.',
+    tell: 'There is no fixed input size — the queue of work generates more work. So the interesting questions are what you refuse to fetch, how you avoid fetching the same thing twice, and how you avoid hurting the sites you depend on.',
+    slackNote: 'Enormous. Hours or days. The mistake is building this like a request path instead of a background system that runs forever.',
+    examples: ['Web crawler', 'Feed and API ingestion', 'Data scraping pipelines'],
+  },
+  {
+    id: 'sync',
+    name: 'Sync and offline',
+    shape: 'The same data lives on several devices, all of which can be edited while disconnected.',
+    tell: 'Two people — or one person on two devices — changed the same thing offline. Everything hinges on whether you detect that or silently pick a winner, and on how little you can transfer to bring a device up to date.',
+    slackNote: 'Large for propagation, zero for local edits. The device must feel instant offline; agreeing with the server can take seconds or minutes.',
+    examples: ['File sync', 'Offline-first notes', 'Collaborative editing', 'Mobile app caches'],
+  },
+  {
+    id: 'storage-engine',
+    name: 'Building the storage itself',
+    shape: 'You are not using a database — you are being asked to design one.',
+    tell: 'The vocabulary flips from "which store do I pick" to replication, quorums, partition assignment and durability. This is the group where every Tier 2 concept is the answer rather than the context.',
+    slackNote: 'Depends entirely on the promise you make. Strong consistency means no slack on the write path; tunable quorums let you sell some.',
+    examples: ['Distributed key-value store', 'Distributed cache', 'Object storage', 'Message broker'],
+  },
+  {
+    id: 'money',
+    name: 'Money and correctness',
+    shape: 'Being fast is worthless if the number is wrong, and every mistake is somebody\'s actual money.',
+    tell: 'The design is dominated by exactly-once effects, audit trails and reconciliation with a third party who holds the real truth. Availability is negotiable here; correctness is not.',
+    slackNote: 'Seconds on the authorisation a human is waiting for, hours on everything behind it — settlement, ledgers, payouts and reconciliation.',
+    examples: ['Payments', 'Digital wallet', 'Ledger', 'Billing and invoicing'],
+  },
 ]
 
 export function getGroup(id: GroupId): Group {
   return GROUPS.find((g) => g.id === id)!
 }
+
+/* ---------- what the bar actually is, by level ----------
+   The same answer scores differently depending on the role you are interviewing
+   for. Most people practise to one bar and are surprised by the gap. */
+
+export interface LevelBar {
+  level: string
+  titles: string
+  passes: string[]
+  fails: string[]
+  tell: string
+}
+
+export const LEVELS: LevelBar[] = [
+  {
+    level: 'Entry to mid',
+    titles: 'L3–L4 · E3–E4 · SDE I–II',
+    passes: [
+      'Follows a clear structure instead of freezing or drawing immediately.',
+      'Asks a couple of questions that genuinely change the design.',
+      'Does the arithmetic and reaches a sensible high-level design.',
+      'Knows what a cache, a queue and a load balancer are for.',
+    ],
+    fails: [
+      'Draws boxes before establishing any requirement.',
+      'Cannot estimate, or estimates and then ignores the answer.',
+      'Silent for long stretches.',
+    ],
+    tell: 'The bar is a coherent, justified design. Depth on any one component is a bonus, not a requirement.',
+  },
+  {
+    level: 'Senior',
+    titles: 'L5 · E5 · SDE III',
+    passes: [
+      'Names the cost of every decision without being asked.',
+      'Goes deep on the two components the numbers said were hard.',
+      'Handles failure branches, not just the happy path.',
+      'Holds up under follow-ups: defends, or concedes and adapts, without bluffing.',
+      'Knows where their own design breaks and says so first.',
+    ],
+    fails: [
+      'A correct design with no tradeoffs named out loud.',
+      'Only ever the happy path — no answer for a dead dependency or a hot key.',
+      'Folds instantly when challenged, or refuses to move when clearly wrong.',
+    ],
+    tell: 'This is where most interviews are actually decided, and it is decided in the follow-ups rather than the diagram.',
+  },
+  {
+    level: 'Staff and above',
+    titles: 'L6+ · E6+ · Principal',
+    passes: [
+      'Questions the requirement itself, and proposes a simpler product where one exists.',
+      'Talks about cost, operations, migration and team boundaries, not just architecture.',
+      'Has a real position on build versus buy, with reasoning.',
+      'Explains how the system evolves — what you build now, and what you defer until a number changes.',
+      'Drives the conversation rather than answering it.',
+    ],
+    fails: [
+      'Technically excellent and never mentions what it costs to run or to staff.',
+      'Designs the end state with no path from where the company actually is.',
+      'Waits to be asked.',
+    ],
+    tell: 'The design is assumed. What is being assessed is judgement, and whether you would make good decisions when nobody is watching.',
+  },
+]

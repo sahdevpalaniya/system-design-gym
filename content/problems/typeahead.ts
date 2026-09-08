@@ -5,7 +5,15 @@ export const TYPEAHEAD: Problem = {
   title: 'Search typeahead',
   group: 'search',
   difficulty: 'core',
-  concepts: ['search-indexing', 'caching', 'cdn', 'rate-limiting', 'change-data-capture'],
+  concepts: [
+    'search-indexing',
+    'caching',
+    'cdn',
+    'rate-limiting',
+    'change-data-capture',
+    'latency-numbers',
+    'performance-vs-scalability',
+  ],
   prompt:
     'Design search suggestions that appear as the user types. Every keystroke should produce updated suggestions, ranked by what people actually search for.',
 

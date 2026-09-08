@@ -11,6 +11,10 @@ import Google from 'next-auth/providers/google'
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [Google],
   session: { strategy: 'jwt' },
+  // Auth.js refuses to answer on a host it does not recognise, which breaks
+  // sign-in behind any proxy and on any host that is not Vercel. We control
+  // where this is deployed, so the host header is ours to trust.
+  trustHost: true,
   callbacks: {
     jwt({ token, profile }) {
       // `sub` is Google's stable per-user id; keep it as the progress key

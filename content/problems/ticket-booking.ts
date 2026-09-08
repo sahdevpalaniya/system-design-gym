@@ -5,7 +5,16 @@ export const TICKET_BOOKING: Problem = {
   title: 'Ticket booking',
   group: 'contested',
   difficulty: 'core',
-  concepts: ['consistency-models', 'sql-vs-nosql', 'caching', 'idempotency', 'distributed-transactions'],
+  concepts: [
+    'consistency-models',
+    'sql-vs-nosql',
+    'caching',
+    'idempotency',
+    'distributed-transactions',
+    'transactions-and-locking',
+    'cap-pacelc',
+    'connection-pooling',
+  ],
   prompt:
     'Design a system for booking seats at events. Seats are specific and numbered. Popular events sell out in under a minute, with far more people trying than there are seats. Nobody may ever end up with a seat somebody else also has.',
 

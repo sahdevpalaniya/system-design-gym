@@ -4,6 +4,7 @@ import { CONCEPTS, TIER_INFO, getConcept } from '@/content/concepts'
 import { DEEP_DIVES, getDeepDive, getExample } from '@/content/deep'
 import { DeepDiveBody, WorkedExampleBlock } from '@/components/DeepDive'
 import { Page, PageHeader } from '@/components/ui'
+import { MarkRead } from '@/components/MarkRead'
 
 export function generateStaticParams() {
   return Object.keys(DEEP_DIVES).map((slug) => ({ slug }))
@@ -37,7 +38,11 @@ export default async function DeepDivePage({ params }: { params: Promise<{ slug:
 
       {example ? <WorkedExampleBlock example={example} /> : null}
 
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
+      <div className="mt-10">
+        <MarkRead id={`deep:${slug}`} label="this deep dive" />
+      </div>
+
+      <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
         <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
           Back to the summary and the self-check.
         </span>

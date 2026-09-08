@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Sketchpad } from './Sketchpad'
+import { unsupportedTicks } from '@/lib/grade'
 import { getStage, STAGE_AXIS } from '@/content/method'
 import { getArchetype } from '@/content/archetypes'
 import { getFollowUp } from '@/content/followups'
@@ -230,6 +232,8 @@ function StageBlock({
         </div>
       </div>
 
+      {stageId === 4 && !submitted ? <Sketchpad /> : null}
+
       {!submitted ? (
         <div
           className="rounded-xl border border-dashed px-4 py-6 text-center text-[13.5px]"
@@ -252,7 +256,7 @@ function StageBlock({
           recognition — writing first is what builds the ability to produce an answer on a blank whiteboard.
         </div>
       ) : reveal ? (
-        <ModelAnswer ps={ps} checked={checked} onCheck={onCheck} />
+        <ModelAnswer ps={ps} checked={checked} onCheck={onCheck} answer={answer} />
       ) : (
         <div
           className="rounded-xl border px-4 py-5 text-center text-[13.5px]"
@@ -271,12 +275,16 @@ function ModelAnswer({
   ps,
   checked,
   onCheck,
+  answer,
 }: {
   ps: Problem['stages'][number]
   checked: number[]
   onCheck: (i: number) => void
+  answer: string
 }) {
   const score = Math.round((checked.length / ps.checklist.length) * 10)
+  // self-scoring inflates, so flag ticks whose subject never appears in what you wrote
+  const unsupported = new Set(unsupportedTicks(answer, ps.checklist, checked))
   return (
     <div className="fade-up mt-6">
       <div className="mb-3 flex items-center gap-2">
@@ -327,9 +335,19 @@ function ModelAnswer({
             {checked.length} / {ps.checklist.length} → {score}/10
           </span>
         </div>
-        <p className="mb-4 text-[13px]" style={{ color: 'var(--muted)' }}>
-          Be honest — this is the number that drives your profile. Half-having it does not count.
+        <p className="mb-3 text-[13px]" style={{ color: 'var(--muted)' }}>
+          Be honest — this is the number that drives your profile. Half-having it does not count, and
+          thinking it does not count either. If you did not write it down, you did not say it.
         </p>
+        {unsupported.size ? (
+          <p
+            className="mb-4 rounded-lg px-3 py-2 text-[13px] leading-relaxed"
+            style={{ background: 'var(--say-bg)', color: 'var(--cost)' }}
+          >
+            {unsupported.size === 1 ? 'One ticked item does' : `${unsupported.size} ticked items do`} not
+            appear anywhere in what you wrote. Marked below — untick if you were being generous.
+          </p>
+        ) : null}
         <div className="space-y-1">
           {ps.checklist.map((c, i) => {
             const on = checked.includes(i)
@@ -351,6 +369,15 @@ function ModelAnswer({
                   style={{ color: on ? 'var(--text)' : 'var(--muted)' }}
                 >
                   {c}
+                  {unsupported.has(i) ? (
+                    <span
+                      className="ml-2 rounded px-1.5 py-0.5 text-[10.5px] font-bold whitespace-nowrap"
+                      style={{ background: 'var(--say-bg)', color: 'var(--cost)' }}
+                      title="Nothing in your written answer mentions this"
+                    >
+                      NOT IN YOUR ANSWER
+                    </span>
+                  ) : null}
                 </span>
               </label>
             )

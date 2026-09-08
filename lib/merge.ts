@@ -21,6 +21,8 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
     archetype: a.archetype ?? b.archetype,
     streak: { days: unique([...a.streak.days, ...b.streak.days]).sort() },
     concepts: mergeConcepts(a.concepts, b.concepts),
+    // read once on any device is read everywhere; keep the earlier date
+    read: mergeRead(a.read, b.read),
     problems: mergeProblems(a.problems, b.problems),
     followUps: dedupe([...a.followUps, ...b.followUps], (f) => `${f.id}|${f.at}`),
     gaps: dedupe([...a.gaps, ...b.gaps], (g) => g.id).sort(
@@ -50,6 +52,17 @@ function dedupe<T>(xs: T[], key: (x: T) => string): T[] {
   const seen = new Map<string, T>()
   for (const x of xs) if (!seen.has(key(x))) seen.set(key(x), x)
   return [...seen.values()]
+}
+
+function mergeRead(
+  a: ProgressState['read'] = {},
+  b: ProgressState['read'] = {},
+): ProgressState['read'] {
+  const out: ProgressState['read'] = {}
+  for (const id of unique([...Object.keys(a), ...Object.keys(b)])) {
+    out[id] = a[id] && b[id] ? earlier(a[id], b[id]) : (a[id] ?? b[id])
+  }
+  return out
 }
 
 function mergeConcepts(
