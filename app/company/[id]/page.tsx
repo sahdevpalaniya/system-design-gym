@@ -1,8 +1,8 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { COMPANIES, getCompany, questionsFor } from '@/content/companies'
-import { getArchetype } from '@/content/archetypes'
-import { Badge, Card, Page, PageHeader } from '@/components/ui'
+import { COMPANIES, getCompany, questionsFor } from '@/content/system-design/companies'
+import { getArchetype } from '@/content/system-design/archetypes'
+import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
 
 export function generateStaticParams() {
   return COMPANIES.map((c) => ({ id: c.id }))

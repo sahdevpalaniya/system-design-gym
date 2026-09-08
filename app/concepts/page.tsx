@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { CONCEPTS, TIER_INFO, conceptsByTier } from '@/content/concepts'
+import { CONCEPTS, TIER_INFO, conceptsByTier } from '@/content/system-design/concepts'
 import { conceptState, useProgress } from '@/lib/store'
 import type { Tier } from '@/lib/types'
-import { Page, PageHeader, STATE_INFO, StateDot } from '@/components/ui'
+import { Page, PageHeader, STATE_INFO, StateDot } from '@/components/common/ui'
 
 export default function ConceptsPage() {
   const { state, ready } = useProgress()

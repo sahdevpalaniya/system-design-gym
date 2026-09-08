@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useProgress } from '@/lib/store'
 import type { Archetype, ArchetypeId } from '@/lib/types'
-import { Button, Rich } from '@/components/ui'
+import { Button, Rich } from '@/components/common/ui'
 
 export function PractiseButton({ id, name }: { id: ArchetypeId; name: string }) {
   const { state, setArchetype, ready } = useProgress()

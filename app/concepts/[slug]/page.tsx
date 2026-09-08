@@ -1,13 +1,13 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { CONCEPTS, TIER_INFO, getConcept } from '@/content/concepts'
-import { PROBLEMS } from '@/content/problems'
-import { Callout } from '@/components/visuals'
-import { getDeepDive, getExample } from '@/content/deep'
-import { WorkedExampleBlock } from '@/components/DeepDive'
-import { ConceptCheck, ConceptVisualBlock } from '@/components/ConceptCheck'
-import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/ui'
-import { MarkRead } from '@/components/MarkRead'
+import { CONCEPTS, TIER_INFO, getConcept } from '@/content/system-design/concepts'
+import { PROBLEMS } from '@/content/system-design/problems'
+import { Callout } from '@/components/common/visuals'
+import { getDeepDive, getExample } from '@/content/system-design/deep'
+import { WorkedExampleBlock } from '@/components/system-design/DeepDive'
+import { ConceptCheck, ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
+import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
+import { MarkRead } from '@/components/common/MarkRead'
 
 export function generateStaticParams() {
   return CONCEPTS.map((c) => ({ slug: c.slug }))

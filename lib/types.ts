@@ -145,6 +145,8 @@ export interface ConceptVisual {
 export interface Concept {
   slug: string
   title: string
+  /** short title for the sidebar; falls back to `title` */
+  navTitle?: string
   tier: Tier
   /** one line for cards and the curriculum map */
   oneLine: string
@@ -226,6 +228,8 @@ export interface ProblemStage {
 export interface Problem {
   slug: string
   title: string
+  /** short title for the sidebar; falls back to `title` */
+  navTitle?: string
   group: GroupId
   difficulty: 'starter' | 'core' | 'hard'
   concepts: string[]
@@ -365,6 +369,8 @@ export interface ProgressState {
   scores: ScoreEntry[]
   mocks: MockRun[]
   blank: { title: string; stages: Record<string, string>; drawing?: string; savedAt: string }[]
+  /** MCQ results, keyed "quiz:<lang>:<section>". Optional: added after v1 shipped. */
+  quiz?: Record<string, QuizResult>
 }
 
 /* ---------- from-scratch lessons ---------- */
@@ -372,6 +378,8 @@ export interface ProgressState {
 export interface Lesson {
   slug: string
   title: string
+  /** short title for the sidebar; falls back to `title` */
+  navTitle?: string
   oneLine: string
   /** why a total beginner should care, before any jargon */
   body: string[]
@@ -440,4 +448,131 @@ export interface Company {
   style: string
   weights: string
   archetype: ArchetypeId
+}
+
+/* ---------- language tracks ---------- */
+
+export interface LangCode {
+  /** filename or a short caption above the block */
+  label?: string
+  src: string
+  /** one line under the block explaining what to look at */
+  note?: string
+  /**
+   * A complete, runnable program for the Run button, when `src` is only an
+   * excerpt.
+   */
+  run?: string
+  /**
+   * Set only by the verification script, on snippets it has actually compiled
+   * and run. The Run button never appears without this or `run`, so it can
+   * never be offered on code that fails.
+   */
+  canRun?: boolean
+}
+
+/** One row of a drawn folder tree. */
+export interface LangTreeNode {
+  /** how deep to indent, 0 = top level */
+  depth: number
+  name: string
+  kind: 'dir' | 'file'
+  /** what this folder or file is for, shown beside it */
+  note?: string
+}
+
+export interface LangTree {
+  caption?: string
+  nodes: LangTreeNode[]
+}
+
+/** One unit of a lesson. Blocks render in order, so prose and code interleave. */
+export interface LangBlock {
+  heading?: string
+  body?: string[]
+  code?: LangCode
+  tree?: LangTree
+  bullets?: string[]
+  table?: { headers: string[]; rows: string[][] }
+  callout?: { tone: 'warn' | 'ok' | 'note'; text: string }
+}
+
+/** A drill, with the answer hidden until the reader asks for it. */
+export interface LangExercise {
+  task: string
+  /** what they should see, or the shape of the answer — revealed on click */
+  answer?: string
+}
+
+export interface LangLesson {
+  slug: string
+  title: string
+  /**
+   * A short title for the sidebar, where there is room for roughly 24
+   * characters. Falls back to `title`. The page heading stays descriptive.
+   */
+  navTitle?: string
+  oneLine: string
+  blocks: LangBlock[]
+  keyPoints: string[]
+  /** the one thing to remember */
+  remember: string
+  /** the one thing to build before moving on */
+  task?: string
+  /** short drills to do in your own editor after the main task */
+  exercises?: (string | LangExercise)[]
+  /** official documentation for this topic */
+  refs?: { label: string; href: string }[]
+}
+
+/** A topic group in the sidebar. Order is a suggestion, not a schedule. */
+export interface LangSection {
+  id: string
+  name: string
+  blurb: string
+  /** lesson slugs, in the order they build on each other */
+  lessons: string[]
+}
+
+export interface Language {
+  id: string
+  name: string
+  tagline: string
+  blurb: string
+  /** where the official docs live */
+  home: string
+  sections: LangSection[]
+  lessons: LangLesson[]
+  /** multiple-choice questions, keyed by section id */
+  quizzes?: QuizSet[]
+}
+
+/* ---------- multiple choice ---------- */
+
+export interface QuizQuestion {
+  id: string
+  q: string
+  /** exactly one is right; index into this array */
+  options: string[]
+  answer: number
+  /** why that answer is right — shown after they commit */
+  why: string
+  /** the lesson this comes from, so a wrong answer links back */
+  from?: string
+}
+
+export interface QuizSet {
+  /** matches a LangSection id, or "all" for the mixed final test */
+  id: string
+  name: string
+  blurb: string
+  questions: QuizQuestion[]
+}
+
+/** best score per quiz, keyed "quiz:<lang>:<section>" */
+export interface QuizResult {
+  best: number
+  total: number
+  attempts: number
+  at: string
 }

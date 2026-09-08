@@ -1,8 +1,8 @@
 import Link from 'next/link'
-import { LESSONS } from '@/content/foundations'
-import { PATH } from '@/content/concepts'
-import { getConcept } from '@/content/concepts'
-import { Card, Page, PageHeader } from '@/components/ui'
+import { LESSONS } from '@/content/system-design/foundations'
+import { PATH } from '@/content/system-design/concepts'
+import { getConcept } from '@/content/system-design/concepts'
+import { Card, Page, PageHeader } from '@/components/common/ui'
 
 export default function LearnPage() {
   return (

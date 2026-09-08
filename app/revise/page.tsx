@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { LESSONS } from '@/content/foundations'
-import { PATH, getConcept } from '@/content/concepts'
-import { PROBLEMS } from '@/content/problems'
+import { LESSONS } from '@/content/system-design/foundations'
+import { PATH, getConcept } from '@/content/system-design/concepts'
+import { PROBLEMS } from '@/content/system-design/problems'
 import { conceptState, dueConcepts, dueProblems, useProgress } from '@/lib/store'
-import { Page, PageHeader, Rich } from '@/components/ui'
+import { Page, PageHeader, Rich } from '@/components/common/ui'
 
 /* One flat list of everything worth revising, in the order you learn it. */
 interface Row {

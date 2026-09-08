@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { CONCEPTS, TIER_INFO, getConcept } from '@/content/concepts'
-import { DEEP_DIVES, getDeepDive, getExample } from '@/content/deep'
-import { DeepDiveBody, WorkedExampleBlock } from '@/components/DeepDive'
-import { Page, PageHeader } from '@/components/ui'
-import { MarkRead } from '@/components/MarkRead'
+import { CONCEPTS, TIER_INFO, getConcept } from '@/content/system-design/concepts'
+import { DEEP_DIVES, getDeepDive, getExample } from '@/content/system-design/deep'
+import { DeepDiveBody, WorkedExampleBlock } from '@/components/system-design/DeepDive'
+import { Page, PageHeader } from '@/components/common/ui'
+import { MarkRead } from '@/components/common/MarkRead'
 
 export function generateStaticParams() {
   return Object.keys(DEEP_DIVES).map((slug) => ({ slug }))

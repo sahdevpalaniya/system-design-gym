@@ -2,13 +2,13 @@
 
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useState } from 'react'
-import { PROBLEMS, getProblem } from '@/content/problems'
-import { getGroup } from '@/content/method'
-import { getArchetype } from '@/content/archetypes'
+import { PROBLEMS, getProblem } from '@/content/system-design/problems'
+import { getGroup } from '@/content/system-design/method'
+import { getArchetype } from '@/content/system-design/archetypes'
 import { problemState, useProgress } from '@/lib/store'
 import type { StageId } from '@/lib/types'
-import { StageEngine } from '@/components/StageEngine'
-import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/ui'
+import { StageEngine } from '@/components/system-design/StageEngine'
+import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/common/ui'
 
 const ALL: StageId[] = [1, 2, 3, 4, 5]
 

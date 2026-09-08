@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { PROBLEMS, getProblem } from '@/content/problems'
-import { STAGES, getGroup } from '@/content/method'
-import { getConcept } from '@/content/concepts'
-import { getFollowUp } from '@/content/followups'
+import { PROBLEMS, getProblem } from '@/content/system-design/problems'
+import { STAGES, getGroup } from '@/content/system-design/method'
+import { getConcept } from '@/content/system-design/concepts'
+import { getFollowUp } from '@/content/system-design/followups'
 import {
   AnimatedFlow,
   Callout,
@@ -11,8 +11,8 @@ import {
   Diagram,
   LifecycleChain,
   NumbersBar,
-} from '@/components/visuals'
-import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/ui'
+} from '@/components/common/visuals'
+import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 
 export function generateStaticParams() {
   return PROBLEMS.map((p) => ({ slug: p.slug }))

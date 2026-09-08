@@ -1,10 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { GROUPS } from '@/content/method'
-import { PROBLEMS } from '@/content/problems'
+import { GROUPS } from '@/content/system-design/method'
+import { PROBLEMS } from '@/content/system-design/problems'
 import { problemState, useProgress } from '@/lib/store'
-import { Badge, Card, Page, PageHeader, STATE_INFO, StateDot } from '@/components/ui'
+import { Badge, Card, Page, PageHeader, STATE_INFO, StateDot } from '@/components/common/ui'
 
 export default function ProblemsPage() {
   const { state, ready } = useProgress()

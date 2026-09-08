@@ -1,10 +1,10 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { LESSONS, getLesson } from '@/content/foundations'
-import { PATH, getConcept } from '@/content/concepts'
-import { ConceptVisualBlock } from '@/components/ConceptCheck'
-import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/ui'
-import { MarkRead } from '@/components/MarkRead'
+import { LESSONS, getLesson } from '@/content/system-design/foundations'
+import { PATH, getConcept } from '@/content/system-design/concepts'
+import { ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
+import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
+import { MarkRead } from '@/components/common/MarkRead'
 
 export function generateStaticParams() {
   return LESSONS.map((l) => ({ slug: l.slug }))

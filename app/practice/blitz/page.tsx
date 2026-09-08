@@ -1,12 +1,12 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { CATEGORY_INFO, FOLLOW_UPS } from '@/content/followups'
-import { getArchetype } from '@/content/archetypes'
+import { CATEGORY_INFO, FOLLOW_UPS } from '@/content/system-design/followups'
+import { getArchetype } from '@/content/system-design/archetypes'
 import { failingCategories, useProgress } from '@/lib/store'
 import type { FollowUp } from '@/lib/types'
-import { FollowUpDrill } from '@/components/FollowUpDrill'
-import { Badge, Button, Card, Page, PageHeader } from '@/components/ui'
+import { FollowUpDrill } from '@/components/system-design/FollowUpDrill'
+import { Badge, Button, Card, Page, PageHeader } from '@/components/common/ui'
 
 const ROUND = 6
 

@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { COMPANY_QUESTIONS, getCompany, getQuestion } from '@/content/companies'
-import { getConcept } from '@/content/concepts'
-import { CompanyDrill } from '@/components/CompanyDrill'
-import { Badge, Page, PageHeader } from '@/components/ui'
+import { COMPANY_QUESTIONS, getCompany, getQuestion } from '@/content/system-design/companies'
+import { getConcept } from '@/content/system-design/concepts'
+import { CompanyDrill } from '@/components/system-design/CompanyDrill'
+import { Badge, Page, PageHeader } from '@/components/common/ui'
 
 export function generateStaticParams() {
   return COMPANY_QUESTIONS.map((q) => ({ id: q.company, qid: q.id }))

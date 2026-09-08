@@ -2,12 +2,12 @@
 
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useMemo, useState } from 'react'
-import { PROBLEMS, getProblem } from '@/content/problems'
-import { getGroup } from '@/content/method'
+import { PROBLEMS, getProblem } from '@/content/system-design/problems'
+import { getGroup } from '@/content/system-design/method'
 import { problemState, useProgress } from '@/lib/store'
 import type { StageId } from '@/lib/types'
-import { StageEngine } from '@/components/StageEngine'
-import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/ui'
+import { StageEngine } from '@/components/system-design/StageEngine'
+import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/common/ui'
 
 const DAILY_STAGES: StageId[] = [1, 2]
 

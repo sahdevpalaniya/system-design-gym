@@ -2,12 +2,12 @@
 
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useMemo, useState } from 'react'
-import { CATEGORY_INFO, FOLLOW_UPS, followUpsByCategory, getFollowUp } from '@/content/followups'
-import { getArchetype } from '@/content/archetypes'
+import { CATEGORY_INFO, FOLLOW_UPS, followUpsByCategory, getFollowUp } from '@/content/system-design/followups'
+import { getArchetype } from '@/content/system-design/archetypes'
 import { failingCategories, useProgress } from '@/lib/store'
 import type { FollowUpCategory } from '@/lib/types'
-import { FollowUpDrill } from '@/components/FollowUpDrill'
-import { Badge, Card, Page, PageHeader } from '@/components/ui'
+import { FollowUpDrill } from '@/components/system-design/FollowUpDrill'
+import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
 
 const CATEGORIES = Object.keys(CATEGORY_INFO) as FollowUpCategory[]
 

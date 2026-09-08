@@ -1,11 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { ARCHETYPES } from '@/content/archetypes'
-import { CATEGORY_INFO } from '@/content/followups'
+import { ARCHETYPES } from '@/content/system-design/archetypes'
+import { CATEGORY_INFO } from '@/content/system-design/followups'
 import { useProgress } from '@/lib/store'
 import { AXIS_LABEL, type Axis } from '@/lib/types'
-import { Badge, Button, Card, Page, PageHeader } from '@/components/ui'
+import { Badge, Button, Card, Page, PageHeader } from '@/components/common/ui'
 
 export default function ArchetypesPage() {
   const { state, setArchetype, ready } = useProgress()

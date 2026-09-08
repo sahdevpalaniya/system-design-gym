@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { CONCEPTS, getConcept } from '@/content/concepts'
-import { PROBLEMS, getProblem } from '@/content/problems'
-import { GROUPS } from '@/content/method'
-import { CATEGORY_INFO } from '@/content/followups'
+import { CONCEPTS, getConcept } from '@/content/system-design/concepts'
+import { PROBLEMS, getProblem } from '@/content/system-design/problems'
+import { GROUPS } from '@/content/system-design/method'
+import { CATEGORY_INFO } from '@/content/system-design/followups'
 import {
   axisScores,
   axisScoresBefore,
@@ -18,7 +18,8 @@ import {
   useProgress,
 } from '@/lib/store'
 import { AXIS_EARNS, AXIS_LABEL } from '@/lib/types'
-import { Badge, Button, Card, Empty, Page, Radar, StateDot, Stat } from '@/components/ui'
+import { LANGUAGES } from '@/content/languages'
+import { Badge, Button, Card, Empty, Page, Radar, StateDot, Stat } from '@/components/common/ui'
 
 export default function Home() {
   const { state, ready } = useProgress()
@@ -103,6 +104,7 @@ export default function Home() {
 
   return (
     <Page wide>
+      <Tracks />
       {fresh ? <Welcome /> : null}
 
       {/* ---- what to do today ---- */}
@@ -343,6 +345,40 @@ function WeakestNote({ scores }: { scores: ReturnType<typeof axisScores> }) {
         Most people have one axis that is always red, and just seeing that is most of the fix.
       </p>
     </div>
+  )
+}
+
+/** Both tracks, up front — so somebody here for Go is not stuck on a System Design dashboard. */
+function Tracks() {
+  const go = LANGUAGES.find((l) => l.id === 'go')
+
+  return (
+    <section className="mb-8 grid gap-3 sm:grid-cols-2">
+      <Card href="/learn">
+        <div className="mb-1 text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
+          Track 1
+        </div>
+        <h2 className="text-[18px] font-bold">System Design</h2>
+        <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          Interview-ready design from nothing. Five gated stages, {CONCEPTS.length} concepts and{' '}
+          {PROBLEMS.length} worked problems — you answer first, then compare.
+        </p>
+      </Card>
+
+      {go ? (
+        <Card href={`/languages/${go.id}`}>
+          <div className="mb-1 text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
+            Track 2
+          </div>
+          <h2 className="text-[18px] font-bold">{go.name}</h2>
+          <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            {go.lessons.length} topics from your first line to three deployed APIs. Runnable examples,
+            step-by-step projects and {go.quizzes?.reduce((n, q) => n + q.questions.length, 0) ?? 0} test
+            questions.
+          </p>
+        </Card>
+      ) : null}
+    </section>
   )
 }
 

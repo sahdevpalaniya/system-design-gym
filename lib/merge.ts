@@ -37,6 +37,7 @@ export function mergeProgress(a: ProgressState, b: ProgressState): ProgressState
     blank: dedupe([...a.blank, ...b.blank], (x) => x.savedAt).sort(
       (x, y) => Date.parse(y.savedAt) - Date.parse(x.savedAt),
     ),
+    quiz: mergeQuiz(a.quiz, b.quiz),
   }
 }
 
@@ -61,6 +62,29 @@ function mergeRead(
   const out: ProgressState['read'] = {}
   for (const id of unique([...Object.keys(a), ...Object.keys(b)])) {
     out[id] = a[id] && b[id] ? earlier(a[id], b[id]) : (a[id] ?? b[id])
+  }
+  return out
+}
+
+function mergeQuiz(
+  a: ProgressState['quiz'] = {},
+  b: ProgressState['quiz'] = {},
+): ProgressState['quiz'] {
+  const out: NonNullable<ProgressState['quiz']> = {}
+  for (const id of unique([...Object.keys(a), ...Object.keys(b)])) {
+    const x = a[id]
+    const y = b[id]
+    if (!x || !y) {
+      out[id] = (x ?? y)!
+      continue
+    }
+    // best score and attempt count both only ever go up
+    out[id] = {
+      best: Math.max(x.best, y.best),
+      total: Math.max(x.total, y.total),
+      attempts: Math.max(x.attempts, y.attempts),
+      at: Date.parse(x.at) >= Date.parse(y.at) ? x.at : y.at,
+    }
   }
   return out
 }

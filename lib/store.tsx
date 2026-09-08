@@ -25,6 +25,7 @@ import {
   type StageId,
 } from './types'
 
+// Renaming this would orphan every existing user's saved progress. Keep it.
 const KEY = 'sdgym.v1'
 
 function today(): string {
@@ -50,6 +51,7 @@ function emptyState(): ProgressState {
     scores: [],
     mocks: [],
     blank: [],
+    quiz: {},
   }
 }
 
@@ -131,6 +133,8 @@ interface Ctx {
   addMock: (run: Omit<MockRun, 'id' | 'at'>) => void
   /** `drawing` is the whiteboard, stored as JSON pen strokes */
   saveBlank: (title: string, stages: Record<string, string>, drawing?: string) => void
+  /** records an MCQ attempt; keeps the best score, counts every attempt */
+  saveQuiz: (id: string, correct: number, total: number) => void
   deleteBlank: (savedAt: string) => void
   clearAll: () => void
   exportJson: () => void
@@ -420,6 +424,27 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     [touchDay],
   )
 
+  const saveQuiz: Ctx['saveQuiz'] = useCallback(
+    (id, correct, total) => {
+      setState((s) => {
+        const prev = s.quiz?.[id]
+        return touchDay({
+          ...s,
+          quiz: {
+            ...s.quiz,
+            [id]: {
+              best: Math.max(correct, prev?.best ?? 0),
+              total,
+              attempts: (prev?.attempts ?? 0) + 1,
+              at: new Date().toISOString(),
+            },
+          },
+        })
+      })
+    },
+    [touchDay],
+  )
+
   const deleteBlank = useCallback((savedAt: string) => {
     setState((s) => ({ ...s, blank: s.blank.filter((b) => b.savedAt !== savedAt) }))
   }, [])
@@ -438,7 +463,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `system-design-gym-${today()}.json`
+    a.download = `dev-learning-${today()}.json`
     a.click()
     URL.revokeObjectURL(url)
   }, [state])
@@ -460,6 +485,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       addGap,
       addMock,
       saveBlank,
+      saveQuiz,
       deleteBlank,
       clearAll,
       exportJson,
@@ -480,6 +506,7 @@ export function ProgressProvider({ children }: { children: ReactNode }) {
       addGap,
       addMock,
       saveBlank,
+      saveQuiz,
       deleteBlank,
       clearAll,
       exportJson,

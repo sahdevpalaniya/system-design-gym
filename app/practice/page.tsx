@@ -1,4 +1,4 @@
-import { Card, Page, PageHeader } from '@/components/ui'
+import { Card, Page, PageHeader } from '@/components/common/ui'
 import Link from 'next/link'
 
 const MODES = [

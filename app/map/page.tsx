@@ -1,12 +1,12 @@
 'use client'
 
 import Link from 'next/link'
-import { CONCEPTS, TIER_INFO, conceptsByTier } from '@/content/concepts'
-import { GROUPS, LEVELS } from '@/content/method'
-import { PROBLEMS } from '@/content/problems'
+import { CONCEPTS, TIER_INFO, conceptsByTier } from '@/content/system-design/concepts'
+import { GROUPS, LEVELS } from '@/content/system-design/method'
+import { PROBLEMS } from '@/content/system-design/problems'
 import { conceptState, problemState, useProgress } from '@/lib/store'
 import type { NodeState, Tier } from '@/lib/types'
-import { Card, Page, PageHeader, STATE_INFO, StateDot } from '@/components/ui'
+import { Card, Page, PageHeader, STATE_INFO, StateDot } from '@/components/common/ui'
 
 function Node({ href, label, state }: { href: string; label: string; state: NodeState }) {
   const info = STATE_INFO[state]

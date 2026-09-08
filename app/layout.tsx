@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
-import { Providers } from '@/components/Providers'
-import { Footer, Shell } from '@/components/Nav'
+import { Providers } from '@/components/common/Providers'
+import { Footer, Shell } from '@/components/common/Nav'
 
 export const metadata: Metadata = {
-  title: 'System Design Gym',
+  title: 'Dev Learning',
   description:
-    'Learn system design by writing your own answer first, then comparing. Five gated stages, a problem library grouped by shape, and progress tracking that tells you which mistake you keep making.',
+    'Learn system design and programming languages properly. Write your own answer first, then compare. Topic-by-topic tracks, a problem library, and progress tracking that tells you which mistake you keep making.',
 }
 
 export const viewport: Viewport = {

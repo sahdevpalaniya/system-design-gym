@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import { PROBLEMS } from '@/content/problems'
-import { GROUPS } from '@/content/method'
-import { Badge, Card, Page, PageHeader } from '@/components/ui'
-import { Callout } from '@/components/visuals'
+import { PROBLEMS } from '@/content/system-design/problems'
+import { GROUPS } from '@/content/system-design/method'
+import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
+import { Callout } from '@/components/common/visuals'
 
 export const metadata = {
-  title: 'Worked solutions — System Design Gym',
+  title: 'Worked solutions — Dev Learning',
   description:
     'Every practice problem answered end to end, the way you would say it in an interview.',
 }

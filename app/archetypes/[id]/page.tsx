@@ -1,10 +1,10 @@
 import { notFound } from 'next/navigation'
-import { ARCHETYPES, getArchetype } from '@/content/archetypes'
-import { CATEGORY_INFO } from '@/content/followups'
+import { ARCHETYPES, getArchetype } from '@/content/system-design/archetypes'
+import { CATEGORY_INFO } from '@/content/system-design/followups'
 import { AXES, AXIS_LABEL, type ArchetypeId } from '@/lib/types'
-import { Callout } from '@/components/visuals'
+import { Callout } from '@/components/common/visuals'
 import { ArchetypeDrill, PractiseButton } from './drill'
-import { Badge, Bullets, Card, Page, PageHeader, Rich, Section } from '@/components/ui'
+import { Badge, Bullets, Card, Page, PageHeader, Rich, Section } from '@/components/common/ui'
 
 export function generateStaticParams() {
   return ARCHETYPES.map((a) => ({ id: a.id }))

@@ -2,10 +2,10 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { CONCEPTS, getConcept } from '@/content/concepts'
-import { PROBLEMS, getProblem } from '@/content/problems'
-import { getStage } from '@/content/method'
-import { CATEGORY_INFO, getFollowUp } from '@/content/followups'
+import { CONCEPTS, getConcept } from '@/content/system-design/concepts'
+import { PROBLEMS, getProblem } from '@/content/system-design/problems'
+import { getStage } from '@/content/system-design/method'
+import { CATEGORY_INFO, getFollowUp } from '@/content/system-design/followups'
 import {
   axisScores,
   axisScoresBefore,
@@ -18,8 +18,8 @@ import {
   useProgress,
 } from '@/lib/store'
 import { AXES, AXIS_EARNS, AXIS_LABEL } from '@/lib/types'
-import { AxisBars, Badge, Button, Card, Empty, Page, PageHeader, Radar, StateDot } from '@/components/ui'
-import { AccountPanel } from '@/components/Account'
+import { AxisBars, Badge, Button, Card, Empty, Page, PageHeader, Radar, StateDot } from '@/components/common/ui'
+import { AccountPanel } from '@/components/common/Account'
 
 export default function ProgressPage() {
   const { state, ready, exportJson, clearAll } = useProgress()

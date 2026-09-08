@@ -1,10 +1,10 @@
 'use client'
 
 import { useState } from 'react'
-import { STAGES } from '@/content/method'
+import { STAGES } from '@/content/system-design/method'
 import { useProgress } from '@/lib/store'
-import { Button, Page, PageHeader } from '@/components/ui'
-import { Whiteboard, WhiteboardView } from '@/components/Whiteboard'
+import { Button, Page, PageHeader } from '@/components/common/ui'
+import { Whiteboard, WhiteboardView } from '@/components/system-design/Whiteboard'
 
 export default function BlankPage() {
   const { state, ready, saveBlank, deleteBlank } = useProgress()

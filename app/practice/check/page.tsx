@@ -2,11 +2,11 @@
 
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
-import { CONCEPTS, getConcept } from '@/content/concepts'
+import { CONCEPTS, getConcept } from '@/content/system-design/concepts'
 import { conceptState, dueConcepts, useProgress } from '@/lib/store'
 import type { Concept } from '@/lib/types'
-import { ConceptCheck } from '@/components/ConceptCheck'
-import { Badge, Button, Card, Page, PageHeader } from '@/components/ui'
+import { ConceptCheck } from '@/components/system-design/ConceptCheck'
+import { Badge, Button, Card, Page, PageHeader } from '@/components/common/ui'
 
 const ROUND = 5
 

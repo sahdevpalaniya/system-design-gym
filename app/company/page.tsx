@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { COMPANIES, COMPANY_QUESTIONS, questionsFor } from '@/content/companies'
-import { getArchetype } from '@/content/archetypes'
-import { Badge, Card, Page, PageHeader } from '@/components/ui'
+import { COMPANIES, COMPANY_QUESTIONS, questionsFor } from '@/content/system-design/companies'
+import { getArchetype } from '@/content/system-design/archetypes'
+import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
 
 export default function CompanyIndex() {
   return (
