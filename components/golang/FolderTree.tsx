@@ -33,7 +33,7 @@ export function FolderTree({ tree }: { tree: LangTree }) {
               </span>
 
               <span
-                className="shrink-0 text-[13px]"
+                className="shrink-0 text-[0.8125rem]"
                 style={{
                   fontFamily: 'var(--font-mono)',
                   color: n.kind === 'dir' ? 'var(--text)' : 'var(--muted)',
@@ -45,7 +45,7 @@ export function FolderTree({ tree }: { tree: LangTree }) {
               </span>
 
               {n.note ? (
-                <span className="min-w-0 text-[12.5px] leading-snug" style={{ color: 'var(--faint)' }}>
+                <span className="min-w-0 text-[0.7812rem] leading-snug" style={{ color: 'var(--faint)' }}>
                   {n.note}
                 </span>
               ) : null}
@@ -54,7 +54,7 @@ export function FolderTree({ tree }: { tree: LangTree }) {
         </div>
       </div>
       {tree.caption ? (
-        <figcaption className="mt-2 text-[12.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <figcaption className="mt-2 text-[0.7812rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           {tree.caption}
         </figcaption>
       ) : null}

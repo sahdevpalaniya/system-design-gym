@@ -138,7 +138,7 @@ export function Search() {
         }}
         placeholder="Search topics…"
         aria-label="Search topics"
-        className="w-full rounded-lg border px-3 py-1.5 text-[13px] outline-none transition"
+        className="w-full rounded-lg border px-3 py-1.5 text-[0.8125rem] outline-none transition"
         style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--text)' }}
       />
 
@@ -160,19 +160,19 @@ export function Search() {
                 className="block border-b px-3.5 py-2.5 last:border-b-0"
                 style={{ background: i === active ? 'var(--accent-soft)' : 'transparent' }}
               >
-                <div className="text-[10.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
+                <div className="text-[0.6562rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
                   {r.group}
                 </div>
-                <div className="mt-0.5 text-[13.5px] font-semibold">{r.title}</div>
+                <div className="mt-0.5 text-[0.8438rem] font-semibold">{r.title}</div>
                 {r.sub ? (
-                  <div className="mt-0.5 line-clamp-2 text-[12px] leading-snug" style={{ color: 'var(--muted)' }}>
+                  <div className="mt-0.5 line-clamp-2 text-[0.75rem] leading-snug" style={{ color: 'var(--muted)' }}>
                     {r.sub}
                   </div>
                 ) : null}
               </Link>
             ))
           ) : (
-            <div className="px-3.5 py-4 text-[13px]" style={{ color: 'var(--faint)' }}>
+            <div className="px-3.5 py-4 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
               Nothing matches “{q}”.
             </div>
           )}

@@ -46,7 +46,7 @@ function DrillsInner() {
         lede="Interviews are lost in follow-ups, not in the first diagram. Ninety seconds each: the question, your defence, then **what a weak answer sounds like, what a strong one sounds like, and the trap hidden in the question**."
         meta={
           <>
-            <span className="text-[13px]" style={{ color: 'var(--muted)' }}>
+            <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
               {FOLLOW_UPS.length} questions across {CATEGORIES.length} categories
             </span>
             {archetype ? <Badge tone="accent">{archetype.name} favours their categories</Badge> : null}
@@ -59,7 +59,7 @@ function DrillsInner() {
           className="mb-8 rounded-xl border px-5 py-4"
           style={{ background: 'var(--surface-2)' }}
         >
-          <div className="mb-2 text-[13px] font-semibold">Where you are weakest so far</div>
+          <div className="mb-2 text-[0.8125rem] font-semibold">Where you are weakest so far</div>
           <div className="flex flex-wrap gap-2">
             {weak.slice(0, 3).map((c) => (
               <button
@@ -69,12 +69,12 @@ function DrillsInner() {
                   setCategory(c.category)
                   setIndex(0)
                 }}
-                className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[13px] font-medium transition hover:opacity-75"
+                className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[0.8125rem] font-medium transition hover:opacity-75"
                 style={{ borderColor: 'var(--border-strong)' }}
               >
                 {CATEGORY_INFO[c.category].name}
                 <span
-                  className="tabular text-[11.5px] font-bold"
+                  className="tabular text-[0.7188rem] font-bold"
                   style={{ color: c.rate < 2 ? 'var(--bad)' : 'var(--warn)' }}
                 >
                   {c.rate.toFixed(1)}/3
@@ -97,7 +97,7 @@ function DrillsInner() {
                 setCategory(c)
                 setIndex(0)
               }}
-              className="rounded-lg border px-3 py-1.5 text-[13px] font-medium transition"
+              className="rounded-lg border px-3 py-1.5 text-[0.8125rem] font-medium transition"
               style={{
                 borderColor: active ? 'var(--accent)' : 'var(--border)',
                 background: active ? 'var(--accent-soft)' : 'var(--surface)',
@@ -112,8 +112,8 @@ function DrillsInner() {
 
       {category !== 'all' ? (
         <div className="mb-6 rounded-xl px-5 py-4" style={{ background: 'var(--surface-2)' }}>
-          <p className="text-[14.5px] leading-relaxed">{CATEGORY_INFO[category].blurb}</p>
-          <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="text-[0.9062rem] leading-relaxed">{CATEGORY_INFO[category].blurb}</p>
+          <p className="mt-2 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             <span className="font-semibold" style={{ color: 'var(--accent)' }}>
               The tell:{' '}
             </span>
@@ -131,7 +131,7 @@ function DrillsInner() {
               onNext={() => setIndex((i) => i + 1)}
             />
           ) : null}
-          <p className="mt-4 text-center text-[12.5px]" style={{ color: 'var(--faint)' }}>
+          <p className="mt-4 text-center text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
             Question {(index % pool.length) + 1} of {pool.length}
             {category !== 'all' ? ` in ${CATEGORY_INFO[category].name}` : ''}
           </p>
@@ -139,13 +139,13 @@ function DrillsInner() {
 
         <aside>
           <Card>
-            <h3 className="mb-3 text-[14px] font-semibold">Your record</h3>
+            <h3 className="mb-3 text-[0.875rem] font-semibold">Your record</h3>
             <div className="space-y-2.5">
               {CATEGORIES.map((c) => {
                 const done = state.followUps.filter((f) => f.category === c)
                 const rate = done.length ? done.reduce((a, b) => a + b.rating, 0) / done.length : 0
                 return (
-                  <div key={c} className="flex items-center justify-between gap-2 text-[12.5px]">
+                  <div key={c} className="flex items-center justify-between gap-2 text-[0.7812rem]">
                     <span style={{ color: 'var(--muted)' }}>{CATEGORY_INFO[c].name}</span>
                     <span
                       className="tabular font-semibold"
@@ -165,21 +165,21 @@ function DrillsInner() {
                 )
               })}
             </div>
-            <p className="mt-4 border-t pt-3 text-[12.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+            <p className="mt-4 border-t pt-3 text-[0.7812rem] leading-relaxed" style={{ color: 'var(--faint)' }}>
               {state.followUps.length} answered. Each one feeds the Defence axis on your profile.
             </p>
           </Card>
 
           <Card className="mt-4">
-            <h3 className="mb-2 text-[14px] font-semibold">Answered before</h3>
+            <h3 className="mb-2 text-[0.875rem] font-semibold">Answered before</h3>
             {attempts.has(current?.id ?? '') ? (
-              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 You have answered this one {attempts.get(current.id)!.length} time
                 {attempts.get(current.id)!.length === 1 ? '' : 's'}. Answering it again from scratch is worth
                 more than rereading your old answer.
               </p>
             ) : (
-              <p className="text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 New question.
               </p>
             )}
@@ -195,7 +195,7 @@ export default function DrillsPage() {
     <Suspense
       fallback={
         <Page wide>
-          <div className="py-24 text-center text-[14px]" style={{ color: 'var(--faint)' }}>
+          <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading drills…
           </div>
         </Page>

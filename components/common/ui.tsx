@@ -38,7 +38,7 @@ export function Bullets({ items, marker }: { items: string[]; marker?: ReactNode
   return (
     <ul className="space-y-2">
       {items.map((it, i) => (
-        <li key={i} className="flex gap-2.5 text-[15px] leading-relaxed">
+        <li key={i} className="flex gap-2.5 text-[0.9375rem] leading-relaxed">
           <span className="mt-[0.45em] shrink-0" style={{ color: 'var(--border-strong)' }}>
             {marker ?? (
               <svg width="6" height="6" viewBox="0 0 6 6" aria-hidden>
@@ -57,13 +57,10 @@ export function Bullets({ items, marker }: { items: string[]; marker?: ReactNode
 
 /* ---------- layout ---------- */
 
-export function Page({ children, wide }: { children: ReactNode; wide?: boolean }) {
-  // capped reading column — full width is unreadable on a wide monitor
-  return (
-    <main className={`mx-auto w-full px-5 pt-7 pb-20 sm:px-8 ${wide ? 'max-w-[var(--read-wide)]' : 'max-w-[var(--read)]'}`}>
-      {children}
-    </main>
-  )
+export function Page({ children }: { children: ReactNode; wide?: boolean }) {
+  // content fills the shell; the shell (Nav.tsx) is what caps and centres the
+  // whole nav+content block, the way w3schools and GeeksforGeeks do it
+  return <main className="w-full px-5 pt-7 pb-20 sm:px-8 lg:pl-10">{children}</main>
 }
 
 export function PageHeader({
@@ -80,15 +77,15 @@ export function PageHeader({
   return (
     <header className="mb-8">
       {eyebrow ? (
-        <div className="mb-2.5 flex flex-wrap items-center gap-2 text-[12px] font-semibold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+        <div className="mb-2.5 flex flex-wrap items-center gap-2 text-[0.75rem] font-semibold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
           {eyebrow}
         </div>
       ) : null}
-      <h1 className="text-[28px] leading-[1.2] font-bold tracking-[-0.015em] sm:text-[34px]">
+      <h1 className="text-[1.75rem] leading-[1.15] font-bold tracking-[-0.015em] sm:text-[2.125rem] xl:text-[2.5rem]">
         {title}
       </h1>
       {lede ? (
-        <p className="mt-3 text-[16.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <p className="mt-3 text-[1.0312rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           <Rich text={lede} />
         </p>
       ) : null}
@@ -113,16 +110,16 @@ export function Section({
       <div className="mb-3 flex items-baseline gap-2.5">
         {n ? (
           <span
-            className="tabular text-[12px] font-bold"
+            className="tabular text-[0.75rem] font-bold"
             style={{ color: 'var(--accent)' }}
           >
             {n}
           </span>
         ) : null}
-        <h2 className="text-[19px] font-semibold tracking-[-0.01em]">{title}</h2>
+        <h2 className="text-[1.5rem] font-semibold tracking-[-0.015em]">{title}</h2>
       </div>
       {sub ? (
-        <p className="mb-3 text-[14px]" style={{ color: 'var(--muted)' }}>
+        <p className="mb-3 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
           {sub}
         </p>
       ) : null}
@@ -150,7 +147,7 @@ export function Badge({
   const s = colors[tone]
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11.5px] font-semibold"
+      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[0.7188rem] font-semibold"
       style={{ color: s.c, background: s.b }}
     >
       {children}
@@ -201,9 +198,9 @@ export function Button({
   size?: 'sm' | 'md' | 'lg'
 }) {
   const sizes = {
-    sm: 'px-3 py-1.5 text-[13px]',
-    md: 'px-4 py-2.5 text-[14.5px]',
-    lg: 'px-5 py-3 text-[15.5px]',
+    sm: 'px-3 py-1.5 text-[0.8125rem]',
+    md: 'px-4 py-2.5 text-[0.9062rem]',
+    lg: 'px-5 py-3 text-[0.9688rem]',
   }
   const base = `inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${sizes[size]} ${full ? 'w-full' : ''}`
   const styles: Record<string, React.CSSProperties> = {
@@ -247,8 +244,8 @@ export function Card({
 export function Stat({ value, label }: { value: ReactNode; label: string }) {
   return (
     <div>
-      <div className="tabular text-[26px] leading-none font-bold">{value}</div>
-      <div className="mt-1.5 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+      <div className="tabular text-[1.625rem] leading-none font-bold">{value}</div>
+      <div className="mt-1.5 text-[0.7812rem]" style={{ color: 'var(--muted)' }}>
         {label}
       </div>
     </div>
@@ -258,7 +255,7 @@ export function Stat({ value, label }: { value: ReactNode; label: string }) {
 export function Empty({ children }: { children: ReactNode }) {
   return (
     <div
-      className="rounded-xl border border-dashed px-5 py-8 text-center text-[14px]"
+      className="rounded-xl border border-dashed px-5 py-8 text-center text-[0.875rem]"
       style={{ color: 'var(--faint)', borderColor: 'var(--border-strong)' }}
     >
       {children}
@@ -390,8 +387,8 @@ export function AxisBars({ scores }: { scores: Scores }) {
         return (
           <div key={a}>
             <div className="mb-1 flex items-baseline justify-between">
-              <span className="text-[13px] font-medium">{AXIS_LABEL[a]}</span>
-              <span className="tabular text-[13px]" style={{ color: 'var(--muted)' }}>
+              <span className="text-[0.8125rem] font-medium">{AXIS_LABEL[a]}</span>
+              <span className="tabular text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
                 {v > 0 ? `${v.toFixed(1)} / 10` : 'no data'}
               </span>
             </div>

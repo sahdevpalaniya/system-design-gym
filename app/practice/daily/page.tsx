@@ -45,7 +45,7 @@ function DailyInner() {
         />
 
         <div
-          className="mb-8 rounded-xl border px-5 py-4 text-[14.5px] leading-relaxed"
+          className="mb-8 rounded-xl border px-5 py-4 text-[0.9062rem] leading-relaxed"
           style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
         >
           <strong style={{ color: 'var(--text)' }}>Requirements and lifecycle only.</strong> No numbers, no
@@ -56,7 +56,7 @@ function DailyInner() {
         <StageEngine problem={problem} stageIds={DAILY_STAGES} />
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
-          <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
+          <span className="text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
             Want the whole thing instead?
           </span>
           <Button href={`/problems/${problem.slug}`} variant="secondary" size="sm">
@@ -77,11 +77,11 @@ function DailyInner() {
 
       {ready ? (
         <Card className="mb-8">
-          <div className="mb-2 text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+          <div className="mb-2 text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
             Suggested for you
           </div>
-          <h2 className="text-[20px] font-bold">{suggestion.title}</h2>
-          <p className="mt-2 mb-4 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <h2 className="text-[1.25rem] font-bold">{suggestion.title}</h2>
+          <p className="mt-2 mb-4 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             {getGroup(suggestion.group).name} — a shape you have not worked yet. Covering a new shape teaches
             you more than a second problem in a shape you already know.
           </p>
@@ -89,7 +89,7 @@ function DailyInner() {
         </Card>
       ) : null}
 
-      <h2 className="mb-3 text-[17px] font-semibold">Or pick another</h2>
+      <h2 className="mb-3 text-[1.125rem] font-semibold">Or pick another</h2>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {PROBLEMS.map((p) => {
           const st = ready ? problemState(state, p.slug) : 'untouched'
@@ -101,12 +101,12 @@ function DailyInner() {
               className="card p-4 text-left transition hover:-translate-y-px"
             >
               <div className="mb-1.5 flex items-start justify-between gap-2">
-                <h3 className="text-[15px] leading-snug font-semibold">{p.title}</h3>
+                <h3 className="text-[0.9375rem] leading-snug font-semibold">{p.title}</h3>
                 <span className="mt-1.5">
                   <StateDot state={st} />
                 </span>
               </div>
-              <p className="text-[12.5px]" style={{ color: 'var(--muted)' }}>
+              <p className="text-[0.7812rem]" style={{ color: 'var(--muted)' }}>
                 {getGroup(p.group).name}
               </p>
             </button>
@@ -122,7 +122,7 @@ export default function DailyPage() {
     <Suspense
       fallback={
         <Page>
-          <div className="py-24 text-center text-[14px]" style={{ color: 'var(--faint)' }}>
+          <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>
         </Page>

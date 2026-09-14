@@ -16,7 +16,7 @@ function Table({ table }: { table: NonNullable<DeepSection['table']> }) {
   return (
     <figure className="my-6">
       <div className="card overflow-x-auto">
-        <table className="w-full text-[14px]">
+        <table className="w-full text-[0.875rem]">
           <thead>
             <tr style={{ background: 'var(--surface-2)' }}>
               {table.headers.map((h, i) => (
@@ -50,7 +50,7 @@ function Table({ table }: { table: NonNullable<DeepSection['table']> }) {
           </tbody>
         </table>
       </div>
-      <figcaption className="mt-2 px-1 text-[13px]" style={{ color: 'var(--faint)' }}>
+      <figcaption className="mt-2 px-1 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
         {table.caption}
       </figcaption>
     </figure>
@@ -62,12 +62,12 @@ export function Section({ section, n }: { section: DeepSection; n: number }) {
     <section id={`s${n}`} className="mb-14 scroll-mt-20">
       <div className="mb-4 flex items-baseline gap-3">
         <span
-          className="tabular shrink-0 text-[13px] font-bold"
+          className="tabular shrink-0 text-[0.8125rem] font-bold"
           style={{ color: 'var(--accent)' }}
         >
           {String(n).padStart(2, '0')}
         </span>
-        <h2 className="text-[22px] leading-tight font-bold tracking-[-0.01em]">
+        <h2 className="text-[1.375rem] leading-tight font-bold tracking-[-0.01em]">
           {section.heading}
         </h2>
       </div>
@@ -77,7 +77,7 @@ export function Section({ section, n }: { section: DeepSection; n: number }) {
       {section.points?.length ? (
         <div className="my-5 rounded-xl border-l-2 py-1 pl-4" style={{ borderLeftColor: 'var(--accent-line)' }}>
           <div
-            className="mb-2 text-[11px] font-bold tracking-[0.07em] uppercase"
+            className="mb-2 text-[0.6875rem] font-bold tracking-[0.07em] uppercase"
             style={{ color: 'var(--faint)' }}
           >
             In short
@@ -105,7 +105,7 @@ export function DeepDiveBody({ deep }: { deep: DeepDive }) {
       {/* contents — a long page needs a way in */}
       <nav className="card mb-12 p-5" aria-label="On this page">
         <div
-          className="mb-3 text-[11px] font-bold tracking-[0.07em] uppercase"
+          className="mb-3 text-[0.6875rem] font-bold tracking-[0.07em] uppercase"
           style={{ color: 'var(--faint)' }}
         >
           What this covers · {deep.minutes} min read
@@ -115,7 +115,7 @@ export function DeepDiveBody({ deep }: { deep: DeepDive }) {
             <li key={i}>
               <a
                 href={`#s${i + 1}`}
-                className="flex gap-3 text-[14px] transition hover:opacity-70"
+                className="flex gap-3 text-[0.875rem] transition hover:opacity-70"
               >
                 <span className="tabular shrink-0" style={{ color: 'var(--accent)' }}>
                   {String(i + 1).padStart(2, '0')}
@@ -138,13 +138,13 @@ export function WorkedExampleBlock({ example }: { example: WorkedExample }) {
   return (
     <section className="border-t pt-10">
       <div
-        className="mb-2 text-[12px] font-bold tracking-[0.06em] uppercase"
+        className="mb-2 text-[0.75rem] font-bold tracking-[0.06em] uppercase"
         style={{ color: 'var(--accent)' }}
       >
         Worked example
       </div>
-      <h2 className="mb-3 text-[22px] font-bold tracking-[-0.01em]">{example.title}</h2>
-      <p className="prose mb-6 text-[16px]">
+      <h2 className="mb-3 text-[1.375rem] font-bold tracking-[-0.01em]">{example.title}</h2>
+      <p className="prose mb-6 text-[1rem]">
         <Rich text={example.scenario} />
       </p>
 
@@ -152,14 +152,14 @@ export function WorkedExampleBlock({ example }: { example: WorkedExample }) {
         {example.steps.map((s, i) => (
           <li key={i} className="flex gap-4">
             <span
-              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[12px] font-bold"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[0.75rem] font-bold"
               style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
             >
               {i + 1}
             </span>
             <div className="min-w-0">
-              <div className="mb-1 text-[15px] font-semibold">{s.step}</div>
-              <p className="prose text-[15px]" style={{ color: 'var(--muted)' }}>
+              <div className="mb-1 text-[0.9375rem] font-semibold">{s.step}</div>
+              <p className="prose text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
                 <Rich text={s.detail} />
               </p>
             </div>
@@ -168,7 +168,7 @@ export function WorkedExampleBlock({ example }: { example: WorkedExample }) {
       </ol>
 
       <div
-        className="rounded-xl px-5 py-4 text-[15px] leading-relaxed"
+        className="rounded-xl px-5 py-4 text-[0.9375rem] leading-relaxed"
         style={{ background: 'var(--say-bg)' }}
       >
         <span className="font-semibold" style={{ color: 'var(--say)' }}>
@@ -181,7 +181,7 @@ export function WorkedExampleBlock({ example }: { example: WorkedExample }) {
         <div className="mt-5">
           <Link
             href={`/problems/${example.problemSlug}`}
-            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[14.5px] font-semibold"
+            className="inline-flex items-center gap-2 rounded-lg px-4 py-2.5 text-[0.9062rem] font-semibold"
             style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
           >
             Now try the whole problem yourself →

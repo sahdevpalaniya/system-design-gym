@@ -31,22 +31,22 @@ export default function SolutionsPage() {
           if (!list.length) return null
           return (
             <section key={g.id}>
-              <h2 className="mb-1 text-[17px] font-semibold">{g.name}</h2>
-              <p className="mb-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <h2 className="mb-1 text-[1.125rem] font-semibold">{g.name}</h2>
+              <p className="mb-3 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {g.shape}
               </p>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {list.map((p) => (
                   <Card key={p.slug} href={`/problems/${p.slug}/solution`}>
                     <div className="mb-2 flex items-start justify-between gap-3">
-                      <h3 className="text-[15.5px] leading-snug font-semibold">{p.title}</h3>
+                      <h3 className="text-[0.9688rem] leading-snug font-semibold">{p.title}</h3>
                       <Badge
                         tone={p.difficulty === 'hard' ? 'bad' : p.difficulty === 'core' ? 'accent' : 'neutral'}
                       >
                         {p.difficulty}
                       </Badge>
                     </div>
-                    <p className="text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                    <p className="text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                       {p.slack.headline}
                     </p>
                   </Card>
@@ -58,7 +58,7 @@ export default function SolutionsPage() {
       </div>
 
       <div className="mt-12 border-t pt-6">
-        <p className="text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <p className="text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           When you are ready to produce one instead of read one:{' '}
           <Link href="/practice/blank" className="font-semibold" style={{ color: 'var(--accent)' }}>
             the blank page and whiteboard →

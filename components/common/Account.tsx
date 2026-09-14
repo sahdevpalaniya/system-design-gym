@@ -75,7 +75,7 @@ export function AccountButton() {
       <button
         type="button"
         onClick={() => signIn('google')}
-        className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[12.5px] font-semibold transition hover:opacity-75"
+        className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[0.7812rem] font-semibold transition hover:opacity-75"
         style={{ borderColor: 'var(--border-strong)' }}
       >
         <GoogleMark />
@@ -98,7 +98,7 @@ export function AccountButton() {
           <img src={user.image} alt="" width={24} height={24} className="rounded-full" referrerPolicy="no-referrer" />
         ) : (
           <span
-            className="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-bold"
+            className="flex h-6 w-6 items-center justify-center rounded-full text-[0.6875rem] font-bold"
             style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
           >
             {(user?.name ?? '?').slice(0, 1).toUpperCase()}
@@ -120,12 +120,12 @@ export function AccountButton() {
             className="card fade-up absolute right-0 z-50 mt-2 w-64 p-4"
             style={{ background: 'var(--surface)' }}
           >
-            <div className="mb-1 text-[14px] font-semibold">{user?.name ?? 'Signed in'}</div>
-            <div className="mb-3 flex items-center gap-1.5 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+            <div className="mb-1 text-[0.875rem] font-semibold">{user?.name ?? 'Signed in'}</div>
+            <div className="mb-3 flex items-center gap-1.5 text-[0.7812rem]" style={{ color: 'var(--muted)' }}>
               <SyncDot sync={sync} />
               {SYNC_LABEL[sync]}
             </div>
-            <p className="mb-3 text-[12.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+            <p className="mb-3 text-[0.7812rem] leading-relaxed" style={{ color: 'var(--faint)' }}>
               Your progress follows this account, so it survives signing out and shows up on any
               browser you sign in from.
             </p>
@@ -135,7 +135,7 @@ export function AccountButton() {
                 setOpen(false)
                 signOut()
               }}
-              className="w-full rounded-lg border px-3 py-2 text-[13px] font-semibold transition hover:opacity-75"
+              className="w-full rounded-lg border px-3 py-2 text-[0.8125rem] font-semibold transition hover:opacity-75"
               style={{ borderColor: 'var(--border-strong)' }}
             >
               Sign out
@@ -156,8 +156,8 @@ export function AccountPanel() {
   if (!signedIn && !google) {
     return (
       <div className="card p-5">
-        <h3 className="mb-1 text-[16px] font-semibold">Sign-in is not configured</h3>
-        <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <h3 className="mb-1 text-[1rem] font-semibold">Sign-in is not configured</h3>
+        <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           This deployment has no Google credentials set, so progress stays in this browser only.
           Export it below if you want to keep it.
         </p>
@@ -167,17 +167,17 @@ export function AccountPanel() {
 
   return (
     <div className="card p-5">
-      <h3 className="mb-1 text-[16px] font-semibold">
+      <h3 className="mb-1 text-[1rem] font-semibold">
         {signedIn ? 'Signed in' : 'Not signed in'}
       </h3>
       {signedIn ? (
         <>
-          <div className="mb-3 flex items-center gap-2 text-[13.5px]" style={{ color: 'var(--muted)' }}>
+          <div className="mb-3 flex items-center gap-2 text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
             <SyncDot sync={sync} />
             {user?.name ? `${user.name} · ` : ''}
             {SYNC_LABEL[sync]}
           </div>
-          <p className="mb-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="mb-4 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Progress is stored against your account, so it survives signing out, clearing this
             browser, or moving to another machine. It is still mirrored locally, so the app keeps
             working if you go offline.
@@ -185,7 +185,7 @@ export function AccountPanel() {
           <button
             type="button"
             onClick={() => signOut()}
-            className="rounded-lg border px-3.5 py-2 text-[13.5px] font-semibold transition hover:opacity-75"
+            className="rounded-lg border px-3.5 py-2 text-[0.8438rem] font-semibold transition hover:opacity-75"
             style={{ borderColor: 'var(--border-strong)' }}
           >
             Sign out
@@ -193,7 +193,7 @@ export function AccountPanel() {
         </>
       ) : (
         <>
-          <p className="mb-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="mb-4 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Right now your progress lives only in this browser — clearing site data loses it, and it
             does not follow you to another device. Sign in and it moves to your account instead.
             Anything you have done so far is merged in rather than overwritten.
@@ -201,7 +201,7 @@ export function AccountPanel() {
           <button
             type="button"
             onClick={() => signIn('google')}
-            className="flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[13.5px] font-semibold transition hover:opacity-75"
+            className="flex items-center gap-2 rounded-lg border px-3.5 py-2 text-[0.8438rem] font-semibold transition hover:opacity-75"
             style={{ borderColor: 'var(--border-strong)' }}
           >
             <GoogleMark />

@@ -27,7 +27,7 @@ export function MarkRead({ id, label = 'this page' }: { id: string; label?: stri
     <button
       type="button"
       onClick={() => setRead(id, !done)}
-      className="flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-[14.5px] transition hover:-translate-y-px"
+      className="flex w-full items-center gap-3 rounded-xl border px-4 py-3 text-left text-[0.9062rem] transition hover:-translate-y-px"
       style={{
         borderColor: done ? 'var(--ok)' : 'var(--border-strong)',
         background: done ? 'var(--surface-2)' : 'var(--surface)',
@@ -49,7 +49,7 @@ export function MarkRead({ id, label = 'this page' }: { id: string; label?: stri
       </span>
       <span className="min-w-0 flex-1">
         <span className="block font-semibold">{done ? 'Done' : `Mark ${label} as done`}</span>
-        <span className="block text-[12.5px]" style={{ color: 'var(--faint)' }}>
+        <span className="block text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
           {done ? 'Click again if you want to read it later.' : 'Ticks itself once you have read for a bit.'}
         </span>
       </span>

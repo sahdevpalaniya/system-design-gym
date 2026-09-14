@@ -28,13 +28,13 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
       />
 
       <Card className="mb-8">
-        <div className="mb-2 text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
+        <div className="mb-2 text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
           How they weight it
         </div>
-        <p className="mb-4 text-[15px] leading-relaxed">{co.weights}</p>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed">{co.weights}</p>
         {arch ? (
           <div className="border-t pt-4">
-            <p className="text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               Closest interviewer archetype:{' '}
               <Link href={`/archetypes/${arch.id}`} className="font-semibold" style={{ color: 'var(--accent)' }}>
                 {arch.name}
@@ -45,18 +45,18 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
         ) : null}
       </Card>
 
-      <h2 className="mb-3 text-[19px] font-semibold">Questions</h2>
+      <h2 className="mb-3 text-[1.1875rem] font-semibold">Questions</h2>
       <div className="space-y-3">
         {qs.map((q) => (
           <Link key={q.id} href={`/company/${co.id}/${q.id}`} className="card block p-5 transition hover:-translate-y-px">
             <div className="mb-1.5 flex flex-wrap items-center gap-2">
-              <h3 className="text-[17px] font-semibold">{q.title}</h3>
+              <h3 className="text-[1.125rem] font-semibold">{q.title}</h3>
               <Badge tone={q.difficulty === 'hard' ? 'bad' : 'accent'}>{q.difficulty}</Badge>
             </div>
-            <p className="mb-3 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="mb-3 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               {q.prompt}
             </p>
-            <span className="text-[13px] font-semibold" style={{ color: 'var(--accent)' }}>
+            <span className="text-[0.8125rem] font-semibold" style={{ color: 'var(--accent)' }}>
               {q.hints.length} hints available · try it →
             </span>
           </Link>

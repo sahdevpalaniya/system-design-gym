@@ -19,7 +19,7 @@ export default function ArchetypesPage() {
       />
 
       <div
-        className="mb-8 rounded-xl border px-5 py-4 text-[14.5px] leading-relaxed"
+        className="mb-8 rounded-xl border px-5 py-4 text-[0.9062rem] leading-relaxed"
         style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
       >
         Learning &ldquo;the answer a particular company wants&rdquo; falls apart the moment an interviewer goes off
@@ -32,7 +32,7 @@ export default function ArchetypesPage() {
           className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-5 py-4"
           style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
         >
-          <div className="text-[14.5px]">
+          <div className="text-[0.9062rem]">
             <strong>Currently practising against: </strong>
             {ARCHETYPES.find((a) => a.id === state.archetype)?.name}. Problem pages and drills will lean toward
             their style.
@@ -52,11 +52,11 @@ export default function ArchetypesPage() {
             <Card key={a.id} className={active ? 'ring-1' : ''}>
               <div className="mb-2 flex items-start justify-between gap-3">
                 <Link href={`/archetypes/${a.id}`} className="hover:opacity-70">
-                  <h2 className="text-[18px] font-bold tracking-[-0.01em]">{a.name}</h2>
+                  <h2 className="text-[1.125rem] font-bold tracking-[-0.01em]">{a.name}</h2>
                 </Link>
                 {active ? <Badge tone="accent">Selected</Badge> : null}
               </div>
-              <p className="mb-4 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="mb-4 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {a.tagline}
               </p>
 
@@ -68,10 +68,10 @@ export default function ArchetypesPage() {
               </div>
 
               <div className="mb-4 rounded-lg px-3.5 py-3" style={{ background: 'var(--trap-bg)' }}>
-                <div className="mb-1 text-[11px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--trap)' }}>
+                <div className="mb-1 text-[0.6875rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--trap)' }}>
                   A failing answer here
                 </div>
-                <p className="text-[13.5px] leading-relaxed">{a.failing[0]}</p>
+                <p className="text-[0.8438rem] leading-relaxed">{a.failing[0]}</p>
               </div>
 
               <div className="flex flex-wrap gap-2">

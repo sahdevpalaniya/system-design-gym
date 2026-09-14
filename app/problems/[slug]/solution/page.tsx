@@ -61,36 +61,36 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       </Callout>
 
       <section className="mb-10">
-        <h2 className="mb-2 text-[19px] font-semibold tracking-[-0.01em]">The question</h2>
-        <p className="prose mb-4 text-[16.5px] leading-relaxed">{p.prompt}</p>
+        <h2 className="mb-2 text-[1.1875rem] font-semibold tracking-[-0.01em]">The question</h2>
+        <p className="prose mb-4 text-[1.0312rem] leading-relaxed">{p.prompt}</p>
         <Card>
-          <div className="mb-1.5 text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
+          <div className="mb-1.5 text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
             What kind of problem this is
           </div>
-          <p className="mb-2 text-[15px] leading-relaxed">
+          <p className="mb-2 text-[0.9375rem] leading-relaxed">
             <span className="font-semibold">{group.name}.</span> {group.shape}
           </p>
-          <p className="text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             {group.tell}
           </p>
         </Card>
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-1 text-[19px] font-semibold tracking-[-0.01em]">
+        <h2 className="mb-1 text-[1.1875rem] font-semibold tracking-[-0.01em]">
           Before anything: where is the slack?
         </h2>
-        <p className="mb-3 text-[14px]" style={{ color: 'var(--muted)' }}>
+        <p className="mb-3 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
           How long the system has before a person notices. Ask this before you draw a single box — it
           decides more of the design than scale does.
         </p>
         <div className="card p-5">
-          <div className="mb-2 text-[13px] font-semibold" style={{ color: 'var(--accent)' }}>
+          <div className="mb-2 text-[0.8125rem] font-semibold" style={{ color: 'var(--accent)' }}>
             {p.slack.budget}
           </div>
-          <p className="mb-3 text-[16px] leading-relaxed font-medium">{p.slack.headline}</p>
+          <p className="mb-3 text-[1rem] leading-relaxed font-medium">{p.slack.headline}</p>
           <Prose paragraphs={p.slack.body} />
-          <p className="mt-3 border-t pt-3 text-[14.5px] leading-relaxed">
+          <p className="mt-3 border-t pt-3 text-[0.9062rem] leading-relaxed">
             <span className="font-semibold">So: </span>
             {p.slack.consequence}
           </p>
@@ -103,23 +103,23 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           <section key={ps.id} className="mb-12">
             <div className="mb-2 flex flex-wrap items-baseline gap-2.5">
               <span
-                className="flex h-7 w-7 items-center justify-center rounded-full text-[13px] font-bold"
+                className="flex h-7 w-7 items-center justify-center rounded-full text-[0.8125rem] font-bold"
                 style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
               >
                 {ps.id}
               </span>
-              <h2 className="text-[21px] font-bold tracking-[-0.01em]">{def.name}</h2>
-              <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
+              <h2 className="text-[1.3125rem] font-bold tracking-[-0.01em]">{def.name}</h2>
+              <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
                 about {def.minutes} min
               </span>
             </div>
-            <p className="mb-4 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="mb-4 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               <span className="font-semibold">Why this stage exists: </span>
               {WHY[ps.id]}
             </p>
 
             <div
-              className="mb-4 rounded-xl px-4 py-3 text-[14.5px] leading-relaxed"
+              className="mb-4 rounded-xl px-4 py-3 text-[0.9062rem] leading-relaxed"
               style={{ background: 'var(--surface-2)' }}
             >
               <span className="font-semibold">What you are being asked for: </span>
@@ -128,7 +128,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
             <div className="card mb-4 p-5">
               <div
-                className="mb-3 text-[11.5px] font-bold tracking-[0.06em] uppercase"
+                className="mb-3 text-[0.7188rem] font-bold tracking-[0.06em] uppercase"
                 style={{ color: 'var(--accent)' }}
               >
                 What a strong answer sounds like
@@ -138,12 +138,12 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
             {ps.tradeoffs?.length ? (
               <div className="card mb-4 p-5">
-                <div className="mb-3 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
+                <div className="mb-3 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
                   The costs named here
                 </div>
                 <div className="space-y-2.5">
                   {ps.tradeoffs.map((t, i) => (
-                    <div key={i} className="text-[14.5px] leading-relaxed">
+                    <div key={i} className="text-[0.9062rem] leading-relaxed">
                       <span className="font-semibold">{t.decision}</span>
                       <span style={{ color: 'var(--cost)' }}> → costs: </span>
                       <span style={{ color: 'var(--muted)' }}>{t.cost}</span>
@@ -165,7 +165,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             ) : null}
 
             <details className="card overflow-hidden">
-              <summary className="cursor-pointer px-5 py-3.5 text-[14px] font-semibold select-none">
+              <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
                 What an interviewer is ticking off in this stage
               </summary>
               <div className="border-t px-5 py-4">
@@ -175,20 +175,20 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
             {ps.id === 2 ? (
               <div className="mt-6">
-                <h3 className="mb-2 text-[15px] font-semibold">The lifecycle, drawn</h3>
+                <h3 className="mb-2 text-[0.9375rem] font-semibold">The lifecycle, drawn</h3>
                 <LifecycleChain spec={p.lifecycle} />
               </div>
             ) : null}
             {ps.id === 3 ? (
               <div className="mt-6">
-                <h3 className="mb-2 text-[15px] font-semibold">The numbers, drawn</h3>
+                <h3 className="mb-2 text-[0.9375rem] font-semibold">The numbers, drawn</h3>
                 <NumbersBar spec={p.numbers} />
               </div>
             ) : null}
             {ps.id === 4 ? (
               <div className="mt-6 space-y-6">
                 <div>
-                  <h3 className="mb-2 text-[15px] font-semibold">The architecture, drawn</h3>
+                  <h3 className="mb-2 text-[0.9375rem] font-semibold">The architecture, drawn</h3>
                   <Diagram spec={p.architecture} />
                 </div>
                 {p.flow ? <AnimatedFlow scenario={p.flow.scenario} caption={p.flow.caption} /> : null}
@@ -196,7 +196,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             ) : null}
             {ps.id === 5 && p.compare ? (
               <div className="mt-6">
-                <h3 className="mb-2 text-[15px] font-semibold">The decision this turns on</h3>
+                <h3 className="mb-2 text-[0.9375rem] font-semibold">The decision this turns on</h3>
                 <CompareCards spec={p.compare} />
               </div>
             ) : null}
@@ -205,10 +205,10 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       })}
 
       <section className="mb-10 border-t pt-8">
-        <h2 className="mb-1 text-[19px] font-semibold tracking-[-0.01em]">
+        <h2 className="mb-1 text-[1.1875rem] font-semibold tracking-[-0.01em]">
           And then they push back
         </h2>
-        <p className="mb-4 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <p className="mb-4 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           A complete answer is where the interview starts, not where it ends. These are the questions
           this design invites — the interview is decided here far more often than in the diagram.
         </p>
@@ -218,23 +218,23 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             if (!f) return null
             return (
               <details key={id} className="card overflow-hidden">
-                <summary className="cursor-pointer px-5 py-3.5 text-[14.5px] font-semibold select-none">
+                <summary className="cursor-pointer px-5 py-3.5 text-[0.9062rem] font-semibold select-none">
                   {f.q}
                 </summary>
                 <div className="space-y-3 border-t px-5 py-4">
                   <div>
-                    <div className="mb-1 text-[11px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--bad)' }}>
+                    <div className="mb-1 text-[0.6875rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--bad)' }}>
                       A weak answer
                     </div>
-                    <p className="text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                    <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                       <Rich text={f.weak} />
                     </p>
                   </div>
                   <div>
-                    <div className="mb-1 text-[11px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--ok)' }}>
+                    <div className="mb-1 text-[0.6875rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--ok)' }}>
                       A strong answer
                     </div>
-                    <p className="prose text-[14.5px]">
+                    <p className="prose text-[0.9062rem]">
                       <Rich text={f.strong} />
                     </p>
                   </div>
@@ -246,7 +246,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
       </section>
 
       <section className="mb-10">
-        <h2 className="mb-3 text-[19px] font-semibold tracking-[-0.01em]">The topics this answer used</h2>
+        <h2 className="mb-3 text-[1.1875rem] font-semibold tracking-[-0.01em]">The topics this answer used</h2>
         <div className="flex flex-wrap gap-2">
           {p.concepts.map((slug) => {
             const c = getConcept(slug)
@@ -255,7 +255,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
               <Link
                 key={slug}
                 href={`/concepts/${slug}`}
-                className="rounded-lg border px-3 py-1.5 text-[13.5px] font-medium transition hover:opacity-70"
+                className="rounded-lg border px-3 py-1.5 text-[0.8438rem] font-medium transition hover:opacity-70"
                 style={{ borderColor: 'var(--border-strong)' }}
               >
                 {c.title}
@@ -269,24 +269,24 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         className="rounded-xl px-5 py-5"
         style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
       >
-        <div className="mb-1 text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+        <div className="mb-1 text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
           Now do it yourself
         </div>
-        <p className="mb-3 text-[15px] leading-relaxed">
+        <p className="mb-3 text-[0.9375rem] leading-relaxed">
           You have read a good answer. That is worth very little until you can produce one on a blank
           page — so go and write this problem without looking, and compare afterwards.
         </p>
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/problems/${p.slug}`}
-            className="rounded-lg px-4 py-2 text-[14px] font-semibold"
+            className="rounded-lg px-4 py-2 text-[0.875rem] font-semibold"
             style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
           >
             Write my own answer →
           </Link>
           <Link
             href="/practice/blank"
-            className="rounded-lg border px-4 py-2 text-[14px] font-semibold"
+            className="rounded-lg border px-4 py-2 text-[0.875rem] font-semibold"
             style={{ borderColor: 'var(--border-strong)' }}
           >
             Blank page + whiteboard

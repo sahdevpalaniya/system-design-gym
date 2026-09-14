@@ -43,7 +43,7 @@ export function Shell({ children }: { children: ReactNode }) {
   return (
     <SidebarCtx.Provider value={{ open, setOpen }}>
       <Header />
-      <div className="flex w-full flex-1">
+      <div className="mx-auto flex w-full max-w-[var(--shell)] flex-1">
         <Sidebar />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
@@ -86,7 +86,7 @@ function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b" style={{ background: 'var(--surface)' }}>
-      <div className="flex w-full items-center gap-3 px-4 py-2.5">
+      <div className="mx-auto flex w-full max-w-[var(--shell)] items-center gap-3 px-4 py-2.5">
         <button
           type="button"
           onClick={() => setOpen(!open)}
@@ -107,7 +107,7 @@ function Header() {
             <rect x="8" y="14.5" width="8" height="6" rx="1.6" stroke="var(--border-strong)" strokeWidth="1.7" />
             <path d="M9.5 7h5M6 10v2.5a2 2 0 0 0 2 2h.5M18.5 10v2.5a2 2 0 0 1-2 2H16" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
-          <span className="text-[15px] font-bold tracking-[-0.01em] whitespace-nowrap">
+          <span className="text-[0.9375rem] font-bold tracking-[-0.01em] whitespace-nowrap">
             Dev Learning
           </span>
         </Link>
@@ -116,7 +116,7 @@ function Header() {
           <Search />
           {streak > 0 ? (
             <span
-              className="tabular hidden items-center gap-1 rounded-full px-2.5 py-1 text-[12px] font-bold sm:flex"
+              className="tabular hidden items-center gap-1 rounded-full px-2.5 py-1 text-[0.75rem] font-bold sm:flex"
               style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
               title={`${streak} day streak`}
             >
@@ -142,14 +142,14 @@ function TrackTabs() {
   const active = trackFor(pathname)
 
   return (
-    <nav aria-label="Tracks" className="flex w-full gap-1 overflow-x-auto px-3">
+    <nav aria-label="Tracks" className="mx-auto flex w-full max-w-[var(--shell)] gap-1 overflow-x-auto px-3">
       {TRACKS.map((t) => {
         const on = t.id === active.id
         return (
           <Link
             key={t.id}
             href={t.href}
-            className="shrink-0 border-b-2 px-3 py-2 text-[13.5px] whitespace-nowrap transition"
+            className="shrink-0 border-b-2 px-3 py-2 text-[0.8438rem] whitespace-nowrap transition"
             style={{
               borderBottomColor: on ? 'var(--accent)' : 'transparent',
               color: on ? 'var(--accent)' : 'var(--muted)',
@@ -189,7 +189,7 @@ function Item({
     <Link
       href={href}
       onClick={() => setOpen(false)}
-      className="flex items-center gap-2 border-l-2 py-[5px] pr-2 pl-3 text-[13.5px] leading-snug transition"
+      className="flex items-center gap-2 border-l-2 py-[5px] pr-2 pl-3 text-[0.8438rem] leading-snug transition"
       style={{
         borderLeftColor: active ? 'var(--accent)' : 'transparent',
         background: active ? 'var(--accent-soft)' : 'transparent',
@@ -227,7 +227,7 @@ function Item({
       <span className="min-w-0 flex-1 truncate">{children}</span>
       {deep ? (
         <span
-          className="shrink-0 rounded px-1 text-[9px] font-bold tracking-wide"
+          className="shrink-0 rounded px-1 text-[0.5625rem] font-bold tracking-wide"
           style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
           title="Has an in-depth page"
         >
@@ -253,7 +253,7 @@ function Group({
   return (
     <div className="mb-5">
       <div
-        className="mb-1 flex items-baseline gap-2 px-3 text-[11px] font-bold tracking-[0.08em] uppercase"
+        className="mb-1 flex items-baseline gap-2 px-3 text-[0.6875rem] font-bold tracking-[0.08em] uppercase"
         style={{ color: 'var(--faint)' }}
       >
         <span className="min-w-0 flex-1 truncate">{title}</span>
@@ -357,13 +357,13 @@ function Sidebar() {
 
       <nav
         aria-label="All pages"
-        className={`fixed top-0 bottom-0 left-0 z-40 w-[268px] shrink-0 overflow-y-auto border-r py-4 transition-transform lg:sticky lg:top-[86px] lg:z-0 lg:h-[calc(100vh-86px)] lg:translate-x-0 ${
+        className={`fixed top-0 bottom-0 left-0 z-40 w-[16.75rem] shrink-0 overflow-y-auto border-r py-4 transition-transform lg:sticky lg:top-[var(--header-h)] lg:z-0 lg:h-[calc(100vh-var(--header-h))] lg:translate-x-0 ${
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
         style={{ background: 'var(--surface)' }}
       >
         <div className="mb-4 px-3 lg:hidden">
-          <span className="text-[14px] font-bold">Menu</span>
+          <span className="text-[0.875rem] font-bold">Menu</span>
         </div>
 
         {lang ? (
@@ -388,7 +388,7 @@ function Sidebar() {
             Concept check
             {due > 0 ? (
               <span
-                className="tabular ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                className="tabular ml-1.5 rounded-full px-1.5 py-0.5 text-[0.625rem] font-bold"
                 style={{ background: 'var(--bad)', color: '#fff' }}
               >
                 {due}
@@ -505,7 +505,7 @@ function Sidebar() {
           </>
         )}
 
-        <div className="px-3 pt-2 text-[11.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+        <div className="px-3 pt-2 text-[0.7188rem] leading-relaxed" style={{ color: 'var(--faint)' }}>
           {!ready
             ? ''
             : lang
@@ -526,7 +526,7 @@ export function Footer() {
   return (
     <footer className="mt-auto border-t px-5 py-6">
       <div
-        className="flex w-full flex-col gap-2 text-[12.5px] sm:flex-row sm:items-center sm:justify-between"
+        className="flex w-full flex-col gap-2 text-[0.7812rem] sm:flex-row sm:items-center sm:justify-between"
         style={{ color: 'var(--faint)' }}
       >
         <p>

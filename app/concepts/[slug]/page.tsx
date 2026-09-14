@@ -48,7 +48,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         <Callout variant="cost">
           <Rich text={c.cost} />
         </Callout>
-        <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--faint)' }}>
+        <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--faint)' }}>
           Every concept in here states a cost. A technique with no price is a technique you have not understood
           yet — and naming the cost out loud is most of what separates a senior answer from a junior one.
         </p>
@@ -57,7 +57,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
       <Section n="3" title="When to use it, when not to">
         <div className="grid gap-4 sm:grid-cols-2">
           <Card>
-            <h3 className="mb-3 flex items-center gap-2 text-[14px] font-semibold" style={{ color: 'var(--ok)' }}>
+            <h3 className="mb-3 flex items-center gap-2 text-[0.875rem] font-semibold" style={{ color: 'var(--ok)' }}>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <path d="M3 8.5l3.2 3.2L13 5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
@@ -66,7 +66,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
             <Bullets items={c.useWhen} />
           </Card>
           <Card>
-            <h3 className="mb-3 flex items-center gap-2 text-[14px] font-semibold" style={{ color: 'var(--bad)' }}>
+            <h3 className="mb-3 flex items-center gap-2 text-[0.875rem] font-semibold" style={{ color: 'var(--bad)' }}>
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                 <path d="M4 4l8 8M12 4l-8 8" strokeLinecap="round" />
               </svg>
@@ -106,18 +106,18 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
             style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
           >
             <span className="min-w-0">
-              <span className="mb-1 block text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+              <span className="mb-1 block text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
                 Go deeper · {deep.minutes} min
               </span>
-              <span className="block text-[17px] font-semibold">
+              <span className="block text-[1.125rem] font-semibold">
                 View more — {c.title.toLowerCase()} in depth
               </span>
-              <span className="mt-1 block text-[13.5px]" style={{ color: 'var(--muted)' }}>
+              <span className="mt-1 block text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
                 {deep.sections.length} sections, every sub-topic covered separately, with a worked example at the end.
               </span>
             </span>
             <span
-              className="shrink-0 rounded-lg px-4 py-2.5 text-[14px] font-semibold"
+              className="shrink-0 rounded-lg px-4 py-2.5 text-[0.875rem] font-semibold"
               style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
             >
               Read it →
@@ -128,14 +128,14 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
 
       <Section n="5" title="The follow-up an interviewer will ask">
         <Card>
-          <p className="mb-4 text-[17px] leading-snug font-semibold">
+          <p className="mb-4 text-[1.0625rem] leading-snug font-semibold">
             <Rich text={c.followUp.q} />
           </p>
           <div className="border-t pt-4">
-            <div className="mb-2 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
+            <div className="mb-2 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
               What a strong answer sounds like
             </div>
-            <p className="prose text-[15px]">
+            <p className="prose text-[0.9375rem]">
               <Rich text={c.followUp.answer} />
             </p>
           </div>
@@ -166,10 +166,10 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
               &larr;
             </span>
             <span className="min-w-0">
-              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>
+              <span className="block text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                 Previous
               </span>
-              <span className="block truncate text-[14px] font-semibold">{prev.title}</span>
+              <span className="block truncate text-[0.875rem] font-semibold">{prev.title}</span>
             </span>
           </Link>
         ) : (
@@ -181,10 +181,10 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
             className="card flex min-w-0 flex-1 items-center justify-end gap-3 p-4 text-right transition hover:-translate-y-px"
           >
             <span className="min-w-0">
-              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>
+              <span className="block text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                 Next
               </span>
-              <span className="block truncate text-[14px] font-semibold">{next.title}</span>
+              <span className="block truncate text-[0.875rem] font-semibold">{next.title}</span>
             </span>
             <span style={{ color: 'var(--accent)' }} aria-hidden>
               &rarr;
@@ -199,13 +199,13 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         <section className="border-t pt-8">
           {related.length ? (
             <div className="mb-6">
-              <h3 className="mb-3 text-[14px] font-semibold">Related concepts</h3>
+              <h3 className="mb-3 text-[0.875rem] font-semibold">Related concepts</h3>
               <div className="flex flex-wrap gap-2">
                 {related.map((r) => (
                   <Link
                     key={r!.slug}
                     href={`/concepts/${r!.slug}`}
-                    className="rounded-lg border px-3 py-1.5 text-[13.5px] font-medium transition hover:opacity-70"
+                    className="rounded-lg border px-3 py-1.5 text-[0.8438rem] font-medium transition hover:opacity-70"
                     style={{ borderColor: 'var(--border-strong)' }}
                   >
                     {r!.title}
@@ -216,13 +216,13 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
           ) : null}
           {usedIn.length ? (
             <div>
-              <h3 className="mb-3 text-[14px] font-semibold">Where you will use this</h3>
+              <h3 className="mb-3 text-[0.875rem] font-semibold">Where you will use this</h3>
               <div className="flex flex-wrap gap-2">
                 {usedIn.map((p) => (
                   <Link
                     key={p.slug}
                     href={`/problems/${p.slug}`}
-                    className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[13.5px] font-medium transition hover:opacity-70"
+                    className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[0.8438rem] font-medium transition hover:opacity-70"
                     style={{ borderColor: 'var(--border-strong)' }}
                   >
                     {p.title}

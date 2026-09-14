@@ -32,13 +32,13 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
   return (
     <div className="card overflow-hidden">
       <div className="border-b px-5 py-3.5" style={{ background: 'var(--surface-2)' }}>
-        <div className="text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+        <div className="text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
           60-second self-check
         </div>
       </div>
 
       <div className="p-5">
-        <p className="prose mb-5 text-[17px] leading-snug font-semibold" style={{ fontFamily: 'var(--font-ui)' }}>
+        <p className="prose mb-5 text-[1.0625rem] leading-snug font-semibold" style={{ fontFamily: 'var(--font-ui)' }}>
           <Rich text={concept.selfCheck.q} />
         </p>
 
@@ -48,7 +48,7 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
           readOnly={revealed}
           rows={revealed ? 4 : 6}
           placeholder="Answer from memory before you look. This is the whole point."
-          className="w-full resize-y rounded-xl border px-4 py-3 text-[15px] leading-relaxed outline-none"
+          className="w-full resize-y rounded-xl border px-4 py-3 text-[0.9375rem] leading-relaxed outline-none"
           style={{
             borderColor: 'var(--border-strong)',
             background: revealed ? 'var(--surface-2)' : 'var(--surface)',
@@ -57,7 +57,7 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
 
         {!revealed ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-            <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
+            <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
               {enough ? 'Ready.' : `${answer.trim().length} / ${MIN_CHARS} characters`}
             </span>
             <Button onClick={() => setRevealed(true)} disabled={!enough}>
@@ -67,17 +67,17 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
         ) : (
           <div className="fade-up mt-5">
             <div className="rounded-xl border p-4" style={{ borderLeftWidth: 3, borderLeftColor: 'var(--ok)' }}>
-              <div className="mb-1.5 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--ok)' }}>
+              <div className="mb-1.5 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--ok)' }}>
                 A good answer
               </div>
-              <p className="prose text-[15px]">
+              <p className="prose text-[0.9375rem]">
                 <Rich text={concept.selfCheck.answer} />
               </p>
             </div>
 
             <div className="mt-5 border-t pt-4">
-              <h4 className="mb-1 text-[15px] font-semibold">How close were you?</h4>
-              <p className="mb-3.5 text-[13px]" style={{ color: 'var(--muted)' }}>
+              <h4 className="mb-1 text-[0.9375rem] font-semibold">How close were you?</h4>
+              <p className="mb-3.5 text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
                 This decides when this concept comes back. Rate it low and it returns tomorrow.
               </p>
               <div className="flex flex-wrap gap-2">
@@ -103,17 +103,17 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
                       background: rated === v ? 'var(--accent-soft)' : 'var(--surface)',
                     }}
                   >
-                    <div className="text-[13.5px] font-semibold" style={{ color: rated === v ? 'var(--accent)' : 'var(--text)' }}>
+                    <div className="text-[0.8438rem] font-semibold" style={{ color: rated === v ? 'var(--accent)' : 'var(--text)' }}>
                       {label}
                     </div>
-                    <div className="text-[11.5px]" style={{ color: 'var(--faint)' }}>
+                    <div className="text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                       {when}
                     </div>
                   </button>
                 ))}
               </div>
               {rated ? (
-                <p className="fade-up mt-4 text-[13.5px]" style={{ color: 'var(--ok)' }}>
+                <p className="fade-up mt-4 text-[0.8438rem]" style={{ color: 'var(--ok)' }}>
                   Saved. Scheduled for review — you will find it on your home screen when it is due.
                 </p>
               ) : null}
@@ -122,7 +122,7 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
         )}
 
         {prev && !revealed ? (
-          <p className="mt-4 border-t pt-3 text-[12.5px]" style={{ color: 'var(--faint)' }}>
+          <p className="mt-4 border-t pt-3 text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
             You have done this {prev.reps} time{prev.reps === 1 ? '' : 's'}. Last time you rated yourself{' '}
             {['', 'missed it', 'partly', 'mostly', 'had it'][prev.lastRating]}.
           </p>

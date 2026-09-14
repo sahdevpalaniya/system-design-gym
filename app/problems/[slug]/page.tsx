@@ -56,12 +56,12 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
           style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
         >
           <div className="mb-2 flex flex-wrap items-center gap-2">
-            <h2 className="text-[19px] font-bold tracking-[-0.01em]">Where&rsquo;s the slack?</h2>
+            <h2 className="text-[1.1875rem] font-bold tracking-[-0.01em]">Where&rsquo;s the slack?</h2>
             <Badge tone="accent">{p.slack.budget}</Badge>
           </div>
-          <p className="mb-4 text-[16.5px] leading-snug font-semibold">{p.slack.headline}</p>
-          <Prose paragraphs={p.slack.body} className="text-[15px]" />
-          <p className="mt-4 border-t pt-4 text-[14.5px] leading-relaxed" style={{ borderColor: 'var(--accent-line)' }}>
+          <p className="mb-4 text-[1.0312rem] leading-snug font-semibold">{p.slack.headline}</p>
+          <Prose paragraphs={p.slack.body} className="text-[0.9375rem]" />
+          <p className="mt-4 border-t pt-4 text-[0.9062rem] leading-relaxed" style={{ borderColor: 'var(--accent-line)' }}>
             <strong>So: </strong>
             {p.slack.consequence}
           </p>
@@ -71,8 +71,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
       {/* ---------- the gated walkthrough ---------- */}
       <section className="mb-14">
         <div className="mb-5">
-          <h2 className="text-[22px] font-bold tracking-[-0.01em]">Work it through</h2>
-          <p className="mt-2 text-[15px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <h2 className="text-[1.375rem] font-bold tracking-[-0.01em]">Work it through</h2>
+          <p className="mt-2 text-[0.9375rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Five stages, gated. You write your answer for each stage before the model answer unlocks — that is
             the entire method, and it is the only thing this app will not let you skip.
           </p>
@@ -82,7 +82,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
 
       {/* ---------- reference material, after the work ---------- */}
       <section className="border-t pt-10">
-        <p className="mb-8 text-[13.5px]" style={{ color: 'var(--faint)' }}>
+        <p className="mb-8 text-[0.8438rem]" style={{ color: 'var(--faint)' }}>
           Reference material for this problem. The diagrams below are here to check your own against once you
           have drawn it — not to read first.
         </p>
@@ -122,7 +122,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
                   href={`/drills?q=${id}`}
                   className="card flex items-center justify-between gap-4 p-4 transition hover:-translate-y-px"
                 >
-                  <span className="text-[15px] font-medium">
+                  <span className="text-[0.9375rem] font-medium">
                     <Rich text={f.q} />
                   </span>
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--faint)" strokeWidth="1.6" className="shrink-0" aria-hidden>
@@ -136,11 +136,11 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
 
         <Section title="Same shape, other products">
           <Card>
-            <p className="text-[15px] leading-relaxed">{group.shape}</p>
-            <p className="mt-3 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="text-[0.9375rem] leading-relaxed">{group.shape}</p>
+            <p className="mt-3 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               {group.tell}
             </p>
-            <p className="mt-3 text-[13.5px]" style={{ color: 'var(--faint)' }}>
+            <p className="mt-3 text-[0.8438rem]" style={{ color: 'var(--faint)' }}>
               Others with this shape: {group.examples.join(' · ')}
             </p>
           </Card>
@@ -157,17 +157,17 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
           style={{ borderColor: 'var(--border-strong)' }}
         >
           <span className="min-w-0">
-            <span className="mb-1 block text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
+            <span className="mb-1 block text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
               Stuck, or new to this?
             </span>
-            <span className="block text-[17px] font-semibold">Read the full worked solution</span>
-            <span className="mt-1 block text-[13.5px]" style={{ color: 'var(--muted)' }}>
+            <span className="block text-[1.125rem] font-semibold">Read the full worked solution</span>
+            <span className="mt-1 block text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
               All five stages end to end, with every diagram and every cost named — written out the way you
               would actually say it. Best read after you have had a go.
             </span>
           </span>
           <span
-            className="shrink-0 rounded-lg border px-4 py-2.5 text-[14px] font-semibold"
+            className="shrink-0 rounded-lg border px-4 py-2.5 text-[0.875rem] font-semibold"
             style={{ borderColor: 'var(--border-strong)' }}
           >
             Read it →

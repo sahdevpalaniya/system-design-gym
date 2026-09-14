@@ -93,7 +93,7 @@ export default function Home() {
   if (!ready) {
     return (
       <Page wide>
-        <div className="py-24 text-center text-[14px]" style={{ color: 'var(--faint)' }}>
+        <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
           Loading your progress…
         </div>
       </Page>
@@ -113,15 +113,15 @@ export default function Home() {
           <div className="grid gap-0 md:grid-cols-[1.5fr_1fr]">
             <div className="p-6 sm:p-8">
               <div className="mb-2 flex flex-wrap items-center gap-2">
-                <span className="text-[12px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+                <span className="text-[0.75rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
                   Today
                 </span>
                 <Badge>{view.action.minutes} min</Badge>
               </div>
-              <h1 className="text-[26px] leading-tight font-bold tracking-[-0.015em] sm:text-[30px]">
+              <h1 className="text-[1.625rem] leading-tight font-bold tracking-[-0.015em] sm:text-[1.875rem]">
                 {view.action.title}
               </h1>
-              <p className="mt-3 mb-6 max-w-md text-[15.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="mt-3 mb-6 max-w-md text-[0.9688rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {view.action.body}
               </p>
               <Button href={view.action.href} size="lg">
@@ -153,8 +153,8 @@ export default function Home() {
         {/* ---- skill profile ---- */}
         <section>
           <div className="mb-3 flex items-baseline justify-between gap-3">
-            <h2 className="text-[19px] font-semibold">Your six-axis profile</h2>
-            <Link href="/progress" className="text-[13px] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+            <h2 className="text-[1.1875rem] font-semibold">Your six-axis profile</h2>
+            <Link href="/progress" className="text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
               Full progress →
             </Link>
           </div>
@@ -165,7 +165,7 @@ export default function Home() {
               </div>
               <div className="min-w-0 flex-1">
                 {view.problemsTouched === 0 ? (
-                  <p className="text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                  <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                     Empty until you attempt something. Each stage of a problem feeds one axis — requirements,
                     lifecycle, numbers, design, tradeoffs — and follow-up drills feed defence.
                   </p>
@@ -173,7 +173,7 @@ export default function Home() {
                   <WeakestNote scores={view.scores} />
                 )}
                 {view.before ? (
-                  <p className="mt-3 text-[12.5px]" style={{ color: 'var(--faint)' }}>
+                  <p className="mt-3 text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
                     The dashed outline is where you were earlier. Watching one axis move is the point.
                   </p>
                 ) : null}
@@ -185,8 +185,8 @@ export default function Home() {
         {/* ---- gap log patterns ---- */}
         <section>
           <div className="mb-3 flex items-baseline justify-between gap-3">
-            <h2 className="text-[19px] font-semibold">Your recurring gaps</h2>
-            <Link href="/progress#gaps" className="text-[13px] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+            <h2 className="text-[1.1875rem] font-semibold">Your recurring gaps</h2>
+            <Link href="/progress#gaps" className="text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
               Gap log →
             </Link>
           </div>
@@ -195,18 +195,18 @@ export default function Home() {
               <div className="space-y-4">
                 {view.gaps.map((g) => (
                   <div key={g.tag}>
-                    <p className="text-[15.5px] leading-snug font-semibold">
+                    <p className="text-[0.9688rem] leading-snug font-semibold">
                       You missed <span style={{ color: 'var(--accent)' }}>{g.tag}</span> in {g.count} of your last{' '}
                       {g.total} attempts.
                     </p>
                     {g.recent[0] ? (
-                      <p className="mt-1 text-[13px] italic" style={{ color: 'var(--muted)' }}>
+                      <p className="mt-1 text-[0.8125rem] italic" style={{ color: 'var(--muted)' }}>
                         &ldquo;{g.recent[0]}&rdquo;
                       </p>
                     ) : null}
                   </div>
                 ))}
-                <p className="border-t pt-3 text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                <p className="border-t pt-3 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                   Nobody can fix &ldquo;I am bad at system design&rdquo;. Anybody can fix &ldquo;I always forget
                   idempotency&rdquo;.
                 </p>
@@ -224,7 +224,7 @@ export default function Home() {
       {/* ---- due for review ---- */}
       {view.due.length ? (
         <section className="mt-6">
-          <h2 className="mb-3 text-[19px] font-semibold">Due for review</h2>
+          <h2 className="mb-3 text-[1.1875rem] font-semibold">Due for review</h2>
           <Card>
             <div className="flex flex-wrap gap-2">
               {view.due.slice(0, 10).map((slug) => {
@@ -234,7 +234,7 @@ export default function Home() {
                   <Link
                     key={slug}
                     href={`/concepts/${slug}`}
-                    className="flex items-center gap-2 rounded-lg border px-3 py-2 text-[13.5px] font-medium transition hover:opacity-75"
+                    className="flex items-center gap-2 rounded-lg border px-3 py-2 text-[0.8438rem] font-medium transition hover:opacity-75"
                     style={{ borderColor: 'var(--border-strong)' }}
                   >
                     <StateDot state="review" />
@@ -255,15 +255,15 @@ export default function Home() {
       {/* ---- weak follow-up categories ---- */}
       {view.weakCats.length ? (
         <section className="mt-6">
-          <h2 className="mb-3 text-[19px] font-semibold">Follow-up categories that keep catching you</h2>
+          <h2 className="mb-3 text-[1.1875rem] font-semibold">Follow-up categories that keep catching you</h2>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {view.weakCats.slice(0, 3).map((c) => (
               <Card key={c.category} href={`/drills?category=${c.category}`}>
                 <div className="mb-1.5 flex items-center justify-between gap-2">
-                  <h3 className="text-[15px] font-semibold">{CATEGORY_INFO[c.category].name}</h3>
+                  <h3 className="text-[0.9375rem] font-semibold">{CATEGORY_INFO[c.category].name}</h3>
                   <Badge tone="bad">{c.rate.toFixed(1)}/3</Badge>
                 </div>
-                <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                   {CATEGORY_INFO[c.category].tell}
                 </p>
               </Card>
@@ -274,7 +274,7 @@ export default function Home() {
 
       {/* ---- shortcuts ---- */}
       <section className="mt-10">
-        <h2 className="mb-3 text-[19px] font-semibold">Other ways in</h2>
+        <h2 className="mb-3 text-[1.1875rem] font-semibold">Other ways in</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {[
             { href: '/practice/mock', t: 'Timed mock', d: '45 minutes, all five stages, nothing revealed until the end.' },
@@ -283,8 +283,8 @@ export default function Home() {
             { href: '/practice/blank', t: 'Blank page', d: 'Empty canvas, five-stage scaffold, no help.' },
           ].map((s) => (
             <Card key={s.href} href={s.href}>
-              <h3 className="text-[15px] font-semibold">{s.t}</h3>
-              <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <h3 className="text-[0.9375rem] font-semibold">{s.t}</h3>
+              <p className="mt-1.5 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {s.d}
               </p>
             </Card>
@@ -295,13 +295,13 @@ export default function Home() {
       {/* ---- group reminder ---- */}
       <section className="mt-10">
         <div className="mb-3 flex items-baseline justify-between gap-3">
-          <h2 className="text-[19px] font-semibold">Problems are grouped by shape, not by product</h2>
-          <Link href="/problems" className="text-[13px] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+          <h2 className="text-[1.1875rem] font-semibold">Problems are grouped by shape, not by product</h2>
+          <Link href="/problems" className="text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
             All problems →
           </Link>
         </div>
         <Card>
-          <p className="mb-4 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="mb-4 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Two different-looking products are often the same problem. Ride hailing and food delivery look
             identical and get opposite designs — because one has fifteen minutes of cooking to hide latency
             inside and the other has a person standing on a street.
@@ -314,7 +314,7 @@ export default function Home() {
                 <Link
                   key={g.id}
                   href={`/problems#${g.id}`}
-                  className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[13px] font-medium transition hover:opacity-75"
+                  className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[0.8125rem] font-medium transition hover:opacity-75"
                   style={{ borderColor: 'var(--border)' }}
                 >
                   <StateDot state={touched > 0 ? 'attempted' : 'untouched'} size={7} />
@@ -335,13 +335,13 @@ function WeakestNote({ scores }: { scores: ReturnType<typeof axisScores> }) {
   const weakest = entries.reduce((m, e) => (e[1] < m[1] ? e : m), entries[0])
   return (
     <div>
-      <p className="text-[15px] leading-relaxed">
+      <p className="text-[0.9375rem] leading-relaxed">
         <strong>Weakest axis: {AXIS_LABEL[weakest[0]]}</strong> at {weakest[1].toFixed(1)} out of 10.
       </p>
-      <p className="mt-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+      <p className="mt-2 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
         Earns points for: {AXIS_EARNS[weakest[0]].toLowerCase()}
       </p>
-      <p className="mt-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+      <p className="mt-3 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
         Most people have one axis that is always red, and just seeing that is most of the fix.
       </p>
     </div>
@@ -355,11 +355,11 @@ function Tracks() {
   return (
     <section className="mb-8 grid gap-3 sm:grid-cols-2">
       <Card href="/learn">
-        <div className="mb-1 text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
+        <div className="mb-1 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
           Track 1
         </div>
-        <h2 className="text-[18px] font-bold">System Design</h2>
-        <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <h2 className="text-[1.125rem] font-bold">System Design</h2>
+        <p className="mt-1.5 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           Interview-ready design from nothing. Five gated stages, {CONCEPTS.length} concepts and{' '}
           {PROBLEMS.length} worked problems — you answer first, then compare.
         </p>
@@ -367,11 +367,11 @@ function Tracks() {
 
       {go ? (
         <Card href={`/languages/${go.id}`}>
-          <div className="mb-1 text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
+          <div className="mb-1 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
             Track 2
           </div>
-          <h2 className="text-[18px] font-bold">{go.name}</h2>
-          <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <h2 className="text-[1.125rem] font-bold">{go.name}</h2>
+          <p className="mt-1.5 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             {go.lessons.length} topics from your first line to three deployed APIs. Runnable examples,
             step-by-step projects and {go.quizzes?.reduce((n, q) => n + q.questions.length, 0) ?? 0} test
             questions.
@@ -389,12 +389,12 @@ function Welcome() {
         className="rounded-2xl border px-6 py-6 sm:px-8"
         style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
       >
-        <h2 className="text-[20px] font-bold tracking-[-0.01em]">One rule, above all others</h2>
-        <p className="mt-2.5 max-w-2xl text-[15.5px] leading-relaxed">
+        <h2 className="text-[1.25rem] font-bold tracking-[-0.01em]">One rule, above all others</h2>
+        <p className="mt-2.5 max-w-2xl text-[0.9688rem] leading-relaxed">
           You write your own answer before you see ours. Every screen works that way, and none of them will show
           you a model answer until you have submitted something.
         </p>
-        <p className="mt-3 max-w-2xl text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <p className="mt-3 max-w-2xl text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           Reading solutions feels like learning but only builds recognition. Writing first, then comparing,
           builds the thing you actually need — the ability to produce an answer on a blank whiteboard. Your
           thinking is what gets graded here. Never your grammar or your spelling.

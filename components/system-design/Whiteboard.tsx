@@ -830,7 +830,7 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
     background: active ? 'var(--accent-soft)' : 'transparent',
     color: active ? 'var(--accent)' : 'var(--text)',
   })
-  const B = 'rounded-lg border px-2.5 py-1 text-[12.5px] font-semibold transition'
+  const B = 'rounded-lg border px-2.5 py-1 text-[0.7812rem] font-semibold transition'
   const Divider = () => <span className="mx-0.5 h-6 w-px shrink-0" style={{ background: 'var(--border-strong)' }} />
 
   const toggle = (id: Exclude<MenuId, null>) => {
@@ -914,23 +914,23 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
               <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => { if (e.key !== 'Escape') e.stopPropagation() }}
                 placeholder="Search — redis, kafka, oauth…"
-                className="w-full rounded-lg border px-2.5 py-1.5 text-[13px] outline-none"
+                className="w-full rounded-lg border px-2.5 py-1.5 text-[0.8125rem] outline-none"
                 style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }} />
             </div>
             <div className="max-h-[300px] overflow-y-auto py-1">
               {results.length === 0 ? (
-                <div className="px-3 py-4 text-center text-[13px]" style={{ color: 'var(--faint)' }}>
+                <div className="px-3 py-4 text-center text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
                   Nothing matches “{query}”.
                 </div>
               ) : null}
               {groupStencils(results).map(([group, items]) => (
                 <div key={group}>
-                  <div className="px-3 pt-2 pb-1 text-[10px] font-bold tracking-[0.07em] uppercase"
+                  <div className="px-3 pt-2 pb-1 text-[0.625rem] font-bold tracking-[0.07em] uppercase"
                     style={{ color: 'var(--faint)' }}>{group}</div>
                   {items.map((st) => (
                     <button key={st.id} type="button" role="menuitem" aria-label={st.label}
                       onClick={() => { setStencil(st.id); setLastStencil(st.id); setToolRaw('select'); setMenu(null); setQuery('') }}
-                      className="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13.5px] transition"
+                      className="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[0.8438rem] transition"
                       style={{
                         background: stencil === st.id ? 'var(--accent-soft)' : 'transparent',
                         color: stencil === st.id ? 'var(--accent)' : 'var(--text)',
@@ -959,13 +959,13 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
               {SHAPES.map((s) => (
                 <button key={s.id} type="button" role="menuitem"
                   onClick={() => { setShape(s.id); setTool(s.id); setMenu(null) }}
-                  className="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13.5px]"
+                  className="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[0.8438rem]"
                   style={{ background: shape === s.id ? 'var(--accent-soft)' : 'transparent' }}>
                   <span style={{ fontSize: 15, width: 18 }}>{s.label}</span>{s.name}
                 </button>
               ))}
               <div className="mt-1 border-t px-3 py-2">
-                <label className="flex cursor-pointer items-center gap-2 text-[13px]">
+                <label className="flex cursor-pointer items-center gap-2 text-[0.8125rem]">
                   <input type="checkbox" checked={filled} onChange={(e) => setFilled(e.target.checked)} />
                   Filled
                 </label>
@@ -985,7 +985,7 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
               {ARROWS.map((a) => (
                 <button key={a.id} type="button" role="menuitem"
                   onClick={() => { setArrowKind(a.id); setTool('arrow'); setMenu(null) }}
-                  className="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[13.5px]"
+                  className="flex w-full items-center gap-2.5 px-3 py-1.5 text-left text-[0.8438rem]"
                   style={{ background: arrowKind === a.id ? 'var(--accent-soft)' : 'transparent' }}>
                   <span style={{ fontSize: 15, width: 18 }}>{a.label}</span>{a.name}
                 </button>
@@ -1021,7 +1021,7 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
                   style={{ background: c, outline: ink === c ? '2px solid var(--accent)' : '1px solid rgba(0,0,0,.12)', outlineOffset: 1 }} />
               ))}
             </div>
-            <label className="flex items-center justify-between gap-2 border-t px-3 py-2 text-[12.5px]">
+            <label className="flex items-center justify-between gap-2 border-t px-3 py-2 text-[0.7812rem]">
               Custom
               <input type="color" value={ink} onChange={(e) => setInk(e.target.value)}
                 className="h-6 w-10 cursor-pointer border-0 bg-transparent p-0" />
@@ -1042,7 +1042,7 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
               {WIDTHS.map((x) => (
                 <button key={x.w} type="button" role="menuitem"
                   onClick={() => { setWidth(x.w); setMenu(null) }}
-                  className="flex w-full items-center gap-3 px-3 py-2 text-left text-[13px]"
+                  className="flex w-full items-center gap-3 px-3 py-2 text-left text-[0.8125rem]"
                   style={{ background: width === x.w ? 'var(--accent-soft)' : 'transparent' }}>
                   <span className="rounded-full" style={{ width: x.w + 2, height: x.w + 2, background: 'var(--text)' }} />
                   {x.label}
@@ -1056,13 +1056,13 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
           <div className="flex items-center overflow-hidden rounded-lg border" style={{ borderColor: 'var(--border-strong)' }}>
             <button type="button" onClick={() => stepZoom(-1)} disabled={zoom <= ZOOMS[0]}
               aria-label="Zoom out" title="Zoom out — see more of the board"
-              className="px-2 py-1 text-[15px] leading-none font-bold disabled:opacity-40">−</button>
+              className="px-2 py-1 text-[0.9375rem] leading-none font-bold disabled:opacity-40">−</button>
             <button type="button" onClick={fitToDrawing} title="Fit the whole drawing in view"
-              className="tabular border-x px-1.5 py-1 text-[11.5px] font-semibold"
+              className="tabular border-x px-1.5 py-1 text-[0.7188rem] font-semibold"
               style={{ borderColor: 'var(--border-strong)', minWidth: 46 }}>{Math.round(zoom * 100)}%</button>
             <button type="button" onClick={() => stepZoom(1)} disabled={zoom >= ZOOMS[ZOOMS.length - 1]}
               aria-label="Zoom in" title="Zoom in"
-              className="px-2 py-1 text-[15px] leading-none font-bold disabled:opacity-40">+</button>
+              className="px-2 py-1 text-[0.9375rem] leading-none font-bold disabled:opacity-40">+</button>
           </div>
           {selected !== null ? (
             <button type="button" onClick={duplicate} title="Duplicate (Ctrl+D) · Copy is Ctrl+C"
@@ -1120,7 +1120,7 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
       </div>
 
       <div
-        className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t px-4 py-2 text-[12px]"
+        className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-t px-4 py-2 text-[0.75rem]"
         style={{ color: 'var(--faint)' }}
       >
         <span>

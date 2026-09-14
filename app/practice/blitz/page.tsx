@@ -56,7 +56,7 @@ export default function BlitzPage() {
           lede="Six questions, ninety seconds each. Interviews are lost in follow-ups, not in the first diagram — and Defence is the axis almost nobody trains deliberately."
         />
         <Card>
-          <h2 className="mb-3 text-[16px] font-semibold">This round will lean toward</h2>
+          <h2 className="mb-3 text-[1rem] font-semibold">This round will lean toward</h2>
           <div className="mb-5 flex flex-wrap gap-2">
             {weak.length ? (
               weak.slice(0, 3).map((c) => (
@@ -65,14 +65,14 @@ export default function BlitzPage() {
                 </Badge>
               ))
             ) : (
-              <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
+              <span className="text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
                 A spread across all seven categories — you have not answered enough yet for the app to know
                 where you are weak.
               </span>
             )}
             {archetype ? <Badge tone="accent">{archetype.name}&rsquo;s categories</Badge> : null}
           </div>
-          <p className="mb-5 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="mb-5 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Answer as if someone just said it to you and is waiting. Do not plan — talk. Then you see what a
             weak answer sounds like, what a strong one sounds like, and the trap hidden in the question.
           </p>
@@ -99,14 +99,14 @@ export default function BlitzPage() {
         <PageHeader eyebrow="Follow-up blitz" title="Round finished" />
         <Card>
           <div className="mb-4 flex items-baseline gap-3">
-            <span className="tabular text-[36px] leading-none font-bold" style={{ color: 'var(--accent)' }}>
+            <span className="tabular text-[2.25rem] leading-none font-bold" style={{ color: 'var(--accent)' }}>
               {avg.toFixed(1)}
             </span>
-            <span className="text-[14px]" style={{ color: 'var(--muted)' }}>
+            <span className="text-[0.875rem]" style={{ color: 'var(--muted)' }}>
               average self-rating out of 3 across {round.length} questions
             </span>
           </div>
-          <p className="mb-5 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="mb-5 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             {avg >= 2.5
               ? 'Strong. Push into the categories you have not touched yet rather than repeating this one.'
               : avg >= 2

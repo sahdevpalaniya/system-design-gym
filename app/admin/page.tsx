@@ -10,10 +10,10 @@ export const metadata = { robots: { index: false, follow: false } }
 function Stat({ value, label, tone }: { value: number | string; label: string; tone?: string }) {
   return (
     <div className="card p-4">
-      <div className="tabular text-[26px] leading-none font-bold" style={{ color: tone ?? 'var(--accent)' }}>
+      <div className="tabular text-[1.625rem] leading-none font-bold" style={{ color: tone ?? 'var(--accent)' }}>
         {value}
       </div>
-      <div className="mt-1.5 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+      <div className="mt-1.5 text-[0.7812rem]" style={{ color: 'var(--muted)' }}>
         {label}
       </div>
     </div>
@@ -34,11 +34,11 @@ function DayBars({ data, label }: { data: { day: string; count: number }[]; labe
 
   return (
     <div className="card p-5">
-      <h3 className="mb-4 text-[15px] font-semibold">{label}</h3>
+      <h3 className="mb-4 text-[0.9375rem] font-semibold">{label}</h3>
       <div className="flex h-28 items-end gap-1.5">
         {days.map((d) => (
           <div key={d.day} className="flex flex-1 flex-col items-center gap-1.5">
-            <span className="tabular text-[10px]" style={{ color: 'var(--faint)' }}>
+            <span className="tabular text-[0.625rem]" style={{ color: 'var(--faint)' }}>
               {d.count || ''}
             </span>
             <div
@@ -49,13 +49,13 @@ function DayBars({ data, label }: { data: { day: string; count: number }[]; labe
                 background: d.count ? 'var(--accent)' : 'var(--surface-2)',
               }}
             />
-            <span className="text-[9.5px]" style={{ color: 'var(--faint)' }}>
+            <span className="text-[0.5938rem]" style={{ color: 'var(--faint)' }}>
               {d.day.slice(8)}
             </span>
           </div>
         ))}
       </div>
-      <p className="mt-3 text-[12px]" style={{ color: 'var(--faint)' }}>
+      <p className="mt-3 text-[0.75rem]" style={{ color: 'var(--faint)' }}>
         Last 14 days
       </p>
     </div>
@@ -67,8 +67,8 @@ export default async function AdminPage() {
     return (
       <main className="mx-auto max-w-lg px-5 py-20">
         <div className="card p-6">
-          <h1 className="mb-2 text-[20px] font-bold">Admin is not configured</h1>
-          <p className="text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <h1 className="mb-2 text-[1.25rem] font-bold">Admin is not configured</h1>
+          <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Set <code>ADMIN_USERNAME</code>, <code>ADMIN_PASSWORD_HASH</code> and{' '}
             <code>AUTH_SECRET</code> in the environment to enable this page.
           </p>
@@ -83,8 +83,8 @@ export default async function AdminPage() {
     return (
       <main className="mx-auto max-w-lg px-5 py-20">
         <div className="card p-6">
-          <h1 className="mb-2 text-[20px] font-bold">No database configured</h1>
-          <p className="text-[14px]" style={{ color: 'var(--muted)' }}>
+          <h1 className="mb-2 text-[1.25rem] font-bold">No database configured</h1>
+          <p className="text-[0.875rem]" style={{ color: 'var(--muted)' }}>
             <code>DATABASE_URL</code> is not set, so there is nothing to report on.
           </p>
         </div>
@@ -100,8 +100,8 @@ export default async function AdminPage() {
     return (
       <main className="mx-auto max-w-lg px-5 py-20">
         <div className="card p-6">
-          <h1 className="mb-2 text-[20px] font-bold">Could not load stats</h1>
-          <p className="text-[14px]" style={{ color: 'var(--muted)' }}>
+          <h1 className="mb-2 text-[1.25rem] font-bold">Could not load stats</h1>
+          <p className="text-[0.875rem]" style={{ color: 'var(--muted)' }}>
             The database is configured but the query failed. Check the deployment logs.
           </p>
         </div>
@@ -121,16 +121,16 @@ export default async function AdminPage() {
     <main className="w-full px-5 py-10 sm:px-8">
       <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
         <div>
-          <div className="text-[12px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+          <div className="text-[0.75rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
             Admin
           </div>
-          <h1 className="mt-1 text-[28px] font-bold tracking-[-0.015em]">Who is using this</h1>
+          <h1 className="mt-1 text-[1.75rem] font-bold tracking-[-0.015em]">Who is using this</h1>
         </div>
         <AdminLogout />
       </header>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-[17px] font-semibold">Accounts</h2>
+        <h2 className="mb-3 text-[1.125rem] font-semibold">Accounts</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat value={stats.totalUsers} label="registered users" />
           <Stat value={stats.totalLogins} label="total sign-ins" />
@@ -140,7 +140,7 @@ export default async function AdminPage() {
       </section>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-[17px] font-semibold">Activity</h2>
+        <h2 className="mb-3 text-[1.125rem] font-semibold">Activity</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Stat value={stats.activeToday} label="active today" tone="var(--ok)" />
           <Stat value={stats.activeThisWeek} label="active this week" tone="var(--ok)" />
@@ -161,7 +161,7 @@ export default async function AdminPage() {
       </section>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-[17px] font-semibold">What they are doing</h2>
+        <h2 className="mb-3 text-[1.125rem] font-semibold">What they are doing</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
           <Stat value={stats.usage.problemsAttempted} label="problems attempted" tone="var(--text)" />
           <Stat value={stats.usage.conceptsReviewed} label="concepts reviewed" tone="var(--text)" />
@@ -171,17 +171,17 @@ export default async function AdminPage() {
           <Stat value={stats.usage.blankAttempts} label="blank-page attempts" tone="var(--text)" />
           <Stat value={stats.usage.whiteboards} label="whiteboards drawn" tone="var(--text)" />
         </div>
-        <p className="mt-2 text-[12.5px]" style={{ color: 'var(--faint)' }}>
+        <p className="mt-2 text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
           Totals across all accounts. Counts only what has synced to the server — anonymous,
           signed-out use is never recorded anywhere.
         </p>
       </section>
 
       <section>
-        <h2 className="mb-3 text-[17px] font-semibold">Most recent registrations</h2>
+        <h2 className="mb-3 text-[1.125rem] font-semibold">Most recent registrations</h2>
         {stats.recent.length ? (
           <div className="card overflow-x-auto">
-            <table className="w-full text-[13.5px]">
+            <table className="w-full text-[0.8438rem]">
               <thead>
                 <tr style={{ color: 'var(--muted)' }}>
                   <th className="border-b px-4 py-2.5 text-left font-semibold">Name</th>
@@ -212,7 +212,7 @@ export default async function AdminPage() {
           </div>
         ) : (
           <div
-            className="rounded-xl border border-dashed px-5 py-10 text-center text-[14px]"
+            className="rounded-xl border border-dashed px-5 py-10 text-center text-[0.875rem]"
             style={{ color: 'var(--faint)', borderColor: 'var(--border-strong)' }}
           >
             Nobody has signed in yet.

@@ -44,7 +44,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
       <Card className="my-8">
         <div
-          className="mb-3 text-[11px] font-bold tracking-[0.07em] uppercase"
+          className="mb-3 text-[0.6875rem] font-bold tracking-[0.07em] uppercase"
           style={{ color: 'var(--faint)' }}
         >
           The short version
@@ -53,7 +53,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
       </Card>
 
       <div
-        className="mb-10 rounded-xl px-5 py-4 text-[16px] leading-relaxed"
+        className="mb-10 rounded-xl px-5 py-4 text-[1rem] leading-relaxed"
         style={{ background: 'var(--say-bg)' }}
       >
         <span className="font-semibold" style={{ color: 'var(--say)' }}>
@@ -71,8 +71,8 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <Link href={`/learn/${prev.slug}`} className="card flex min-w-0 flex-1 items-center gap-3 p-4 transition hover:-translate-y-px">
             <span style={{ color: 'var(--accent)' }} aria-hidden>←</span>
             <span className="min-w-0">
-              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>Previous</span>
-              <span className="block truncate text-[14px] font-semibold">{prev.title}</span>
+              <span className="block text-[0.7188rem]" style={{ color: 'var(--faint)' }}>Previous</span>
+              <span className="block truncate text-[0.875rem] font-semibold">{prev.title}</span>
             </span>
           </Link>
         ) : (
@@ -81,16 +81,16 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         {next ? (
           <Link href={`/learn/${next.slug}`} className="card flex min-w-0 flex-1 items-center justify-end gap-3 p-4 text-right transition hover:-translate-y-px">
             <span className="min-w-0">
-              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>Next</span>
-              <span className="block truncate text-[14px] font-semibold">{next.title}</span>
+              <span className="block text-[0.7188rem]" style={{ color: 'var(--faint)' }}>Next</span>
+              <span className="block truncate text-[0.875rem] font-semibold">{next.title}</span>
             </span>
             <span style={{ color: 'var(--accent)' }} aria-hidden>→</span>
           </Link>
         ) : firstConcept ? (
           <Link href={`/concepts/${firstConcept.slug}`} className="card flex min-w-0 flex-1 items-center justify-end gap-3 p-4 text-right transition hover:-translate-y-px" style={{ background: 'var(--accent-soft)' }}>
             <span className="min-w-0">
-              <span className="block text-[11.5px]" style={{ color: 'var(--accent)' }}>Groundwork done — first topic</span>
-              <span className="block truncate text-[14px] font-semibold">{firstConcept.title}</span>
+              <span className="block text-[0.7188rem]" style={{ color: 'var(--accent)' }}>Groundwork done — first topic</span>
+              <span className="block truncate text-[0.875rem] font-semibold">{firstConcept.title}</span>
             </span>
             <span style={{ color: 'var(--accent)' }} aria-hidden>→</span>
           </Link>

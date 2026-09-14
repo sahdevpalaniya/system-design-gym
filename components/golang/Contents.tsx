@@ -39,7 +39,7 @@ export function Contents({ headings }: { headings: string[] }) {
       style={{ borderColor: 'var(--border)', background: 'var(--surface-2)' }}
     >
       <div
-        className="mb-2 text-[11px] font-bold tracking-[0.07em] uppercase"
+        className="mb-2 text-[0.6875rem] font-bold tracking-[0.07em] uppercase"
         style={{ color: 'var(--faint)' }}
       >
         On this page · {headings.length} sections
@@ -49,7 +49,7 @@ export function Contents({ headings }: { headings: string[] }) {
           const id = headingSlug(h)
           const on = active === id
           return (
-            <li key={id} className="flex gap-2 text-[13.5px] leading-snug">
+            <li key={id} className="flex gap-2 text-[0.8438rem] leading-snug">
               <span className="tabular shrink-0" style={{ color: 'var(--dim)' }}>
                 {i + 1}.
               </span>

@@ -38,12 +38,12 @@ export function Sketchpad({
     <div className="card mt-5 overflow-hidden">
       <div className="border-b px-5 py-3.5" style={{ background: 'var(--surface-2)' }}>
         <div
-          className="text-[11.5px] font-bold tracking-[0.06em] uppercase"
+          className="text-[0.7188rem] font-bold tracking-[0.06em] uppercase"
           style={{ color: 'var(--accent)' }}
         >
           {title}
         </div>
-        <p className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <p className="mt-1 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           {blurb}
         </p>
       </div>
@@ -55,10 +55,10 @@ export function Sketchpad({
           rows={rows}
           spellCheck={false}
           placeholder={PLACEHOLDER}
-          className="w-full resize-y rounded-xl border px-4 py-3 font-mono text-[13.5px] leading-relaxed outline-none"
+          className="w-full resize-y rounded-xl border px-4 py-3 font-mono text-[0.8438rem] leading-relaxed outline-none"
           style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}
         />
-        <p className="mt-2 text-[12px]" style={{ color: 'var(--faint)' }}>
+        <p className="mt-2 text-[0.75rem]" style={{ color: 'var(--faint)' }}>
           One arrow chain per line. Add <code>: label</code> at the end to name the last arrow. Names
           containing cache, queue, db or user are drawn as that kind of box.
         </p>
@@ -72,7 +72,7 @@ export function Sketchpad({
         {notes.length ? (
           <ul className="mt-3 space-y-1.5">
             {notes.map((n, i) => (
-              <li key={i} className="flex gap-2 text-[13px] leading-relaxed" style={{ color: 'var(--cost)' }}>
+              <li key={i} className="flex gap-2 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--cost)' }}>
                 <span aria-hidden>·</span>
                 <span>{n}</span>
               </li>

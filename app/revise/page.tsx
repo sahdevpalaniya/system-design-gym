@@ -89,7 +89,7 @@ export default function RevisePage() {
         title="Quick revision"
         lede="Every topic on one page, shortest version first. Read the one-liners top to bottom, open the ones that feel shaky, and go back to the full page only where you need to."
         meta={
-          <span className="text-[13px]" style={{ color: 'var(--muted)' }}>
+          <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
             {ready ? `${doneCount} of ${ALL.length} read` : ''}
           </span>
         }
@@ -101,7 +101,7 @@ export default function RevisePage() {
             key={f.id}
             type="button"
             onClick={() => setFilter(f.id)}
-            className="rounded-lg border px-3 py-1.5 text-[13px] font-semibold transition hover:opacity-80"
+            className="rounded-lg border px-3 py-1.5 text-[0.8125rem] font-semibold transition hover:opacity-80"
             style={{
               borderColor: filter === f.id ? 'var(--accent)' : 'var(--border-strong)',
               background: filter === f.id ? 'var(--accent-soft)' : 'transparent',
@@ -118,7 +118,7 @@ export default function RevisePage() {
             setAllOpen(next)
             setOpen(next ? Object.fromEntries(ALL.map((r) => [r.id, true])) : {})
           }}
-          className="ml-auto text-[13px] font-semibold hover:opacity-70"
+          className="ml-auto text-[0.8125rem] font-semibold hover:opacity-70"
           style={{ color: 'var(--accent)' }}
         >
           {allOpen ? 'Collapse all' : 'Expand all'}
@@ -126,14 +126,14 @@ export default function RevisePage() {
       </div>
 
       {shown.length === 0 ? (
-        <p className="text-[15px]" style={{ color: 'var(--muted)' }}>
+        <p className="text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
           Nothing here right now. Try another filter.
         </p>
       ) : null}
 
       {groups.map((g) => (
         <section key={g} className="mb-8">
-          <h2 className="mb-2 text-[12px] font-bold tracking-[0.08em] uppercase" style={{ color: 'var(--faint)' }}>
+          <h2 className="mb-2 text-[0.75rem] font-bold tracking-[0.08em] uppercase" style={{ color: 'var(--faint)' }}>
             {g}
           </h2>
           <div className="space-y-2">
@@ -161,18 +161,18 @@ export default function RevisePage() {
                       )}
                       <span className="min-w-0 flex-1">
                         <span className="flex flex-wrap items-center gap-2">
-                          <span className="text-[15.5px] font-semibold">{r.title}</span>
+                          <span className="text-[0.9688rem] font-semibold">{r.title}</span>
                           {cs === 'review' ? (
-                            <span className="rounded px-1.5 py-0.5 text-[10px] font-bold" style={{ background: 'var(--bad)', color: '#fff' }}>
+                            <span className="rounded px-1.5 py-0.5 text-[0.625rem] font-bold" style={{ background: 'var(--bad)', color: '#fff' }}>
                               REVIEW
                             </span>
                           ) : null}
                         </span>
-                        <span className="mt-0.5 block text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                        <span className="mt-0.5 block text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                           {r.oneLine}
                         </span>
                       </span>
-                      <span className="mt-1 shrink-0 text-[12px]" style={{ color: 'var(--faint)' }} aria-hidden>
+                      <span className="mt-1 shrink-0 text-[0.75rem]" style={{ color: 'var(--faint)' }} aria-hidden>
                         {isOpen ? '−' : '+'}
                       </span>
                     </button>
@@ -181,7 +181,7 @@ export default function RevisePage() {
                       <div className="border-t px-4 py-4">
                         <ul className="mb-3 space-y-2">
                           {r.points.map((p, i) => (
-                            <li key={i} className="flex gap-2 text-[14px] leading-relaxed">
+                            <li key={i} className="flex gap-2 text-[0.875rem] leading-relaxed">
                               <span style={{ color: 'var(--accent)' }} aria-hidden>·</span>
                               <span>
                                 <Rich text={p} />
@@ -190,12 +190,12 @@ export default function RevisePage() {
                           ))}
                         </ul>
                         {r.say ? (
-                          <p className="rounded-lg px-3.5 py-2.5 text-[14px] leading-relaxed" style={{ background: 'var(--say-bg)' }}>
+                          <p className="rounded-lg px-3.5 py-2.5 text-[0.875rem] leading-relaxed" style={{ background: 'var(--say-bg)' }}>
                             <span className="font-semibold" style={{ color: 'var(--say)' }}>Say this: </span>
                             <Rich text={r.say} />
                           </p>
                         ) : null}
-                        <Link href={r.href} className="mt-3 inline-block text-[13.5px] font-semibold hover:opacity-70" style={{ color: 'var(--accent)' }}>
+                        <Link href={r.href} className="mt-3 inline-block text-[0.8438rem] font-semibold hover:opacity-70" style={{ color: 'var(--accent)' }}>
                           Open the full page →
                         </Link>
                       </div>
@@ -209,8 +209,8 @@ export default function RevisePage() {
 
       {staleProblems.length ? (
         <section className="mb-8 border-t pt-8">
-          <h2 className="mb-1 text-[16px] font-semibold">Problems worth running again</h2>
-          <p className="mb-4 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <h2 className="mb-1 text-[1rem] font-semibold">Problems worth running again</h2>
+          <p className="mb-4 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             You worked through these a while ago. A design you did once in March is a design you have
             forgotten by May — and the second attempt is where it sticks.
           </p>
@@ -222,7 +222,7 @@ export default function RevisePage() {
                 <Link
                   key={slug}
                   href={`/problems/${slug}`}
-                  className="rounded-lg border px-3 py-1.5 text-[13.5px] font-medium transition hover:opacity-70"
+                  className="rounded-lg border px-3 py-1.5 text-[0.8438rem] font-medium transition hover:opacity-70"
                   style={{ borderColor: 'var(--border-strong)' }}
                 >
                   {p.title}
@@ -234,7 +234,7 @@ export default function RevisePage() {
       ) : null}
 
       <div className="border-t pt-6">
-        <Link href="/practice/check" className="text-[14px] font-semibold hover:opacity-70" style={{ color: 'var(--accent)' }}>
+        <Link href="/practice/check" className="text-[0.875rem] font-semibold hover:opacity-70" style={{ color: 'var(--accent)' }}>
           Now test yourself — concept check · 5 min →
         </Link>
       </div>

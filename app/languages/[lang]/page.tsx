@@ -33,15 +33,15 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
 
       <div className="mb-8 grid gap-3 sm:grid-cols-2">
         <Card href={`/languages/${l.id}/revise`}>
-          <div className="text-[15px] font-semibold">Quick revision</div>
-          <div className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <div className="text-[0.9375rem] font-semibold">Quick revision</div>
+          <div className="mt-1 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             The main points from all {l.lessons.length} topics on one page. Good for a quick reread.
           </div>
         </Card>
         {l.quizzes?.length ? (
           <Card href={`/languages/${l.id}/quiz`}>
-            <div className="text-[15px] font-semibold">Multiple choice tests</div>
-            <div className="mt-1 text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <div className="text-[0.9375rem] font-semibold">Multiple choice tests</div>
+            <div className="mt-1 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               {l.quizzes.reduce((n, q) => n + q.questions.length, 0)} questions, one test per section
               plus a mixed final.
             </div>
@@ -49,7 +49,7 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
         ) : null}
       </div>
 
-      <p className="mb-8 text-[14.5px]" style={{ color: 'var(--muted)' }}>
+      <p className="mb-8 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
         Read the sections in order. Each one builds on the ones before it. There is no timetable, so go
         as fast or as slow as you like. Every topic ends with something to build, plus a few short tasks
         to try in your own editor. Official docs:{' '}
@@ -65,15 +65,15 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
           return l.sections.map((s, si) => (
             <section key={s.id} id={s.id} className="scroll-mt-24">
               <div className="mb-1 flex items-baseline gap-2.5">
-                <span className="tabular text-[12px] font-bold" style={{ color: 'var(--accent)' }}>
+                <span className="tabular text-[0.75rem] font-bold" style={{ color: 'var(--accent)' }}>
                   {String(si + 1).padStart(2, '0')}
                 </span>
-                <h2 className="text-[19px] font-bold tracking-[-0.01em]">{s.name}</h2>
-                <span className="tabular shrink-0 text-[12px]" style={{ color: 'var(--faint)' }}>
+                <h2 className="text-[1.1875rem] font-bold tracking-[-0.01em]">{s.name}</h2>
+                <span className="tabular shrink-0 text-[0.75rem]" style={{ color: 'var(--faint)' }}>
                   {humanMinutes(sectionMinutes(s, l.lessons))}
                 </span>
               </div>
-              <p className="mb-3.5 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="mb-3.5 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {s.blurb}
               </p>
               <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
@@ -86,15 +86,15 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
                     <Card key={slug} href={`/languages/${l.id}/${slug}`}>
                       <div className="flex gap-2.5">
                         <span
-                          className="tabular mt-[1px] shrink-0 text-[12px] font-bold"
+                          className="tabular mt-[1px] shrink-0 text-[0.75rem] font-bold"
                           style={{ color: 'var(--faint)' }}
                         >
                           {String(step).padStart(2, '0')}
                         </span>
                         <span className="min-w-0">
-                          <span className="block text-[14.5px] leading-snug font-semibold">{t.title}</span>
+                          <span className="block text-[0.9062rem] leading-snug font-semibold">{t.title}</span>
                           <span
-                            className="mt-1 block text-[12.5px] leading-relaxed"
+                            className="mt-1 block text-[0.7812rem] leading-relaxed"
                             style={{ color: 'var(--muted)' }}
                           >
                             {t.oneLine}

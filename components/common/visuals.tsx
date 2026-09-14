@@ -39,7 +39,7 @@ export function Figure({
         ) : null}
       </div>
       {caption ? (
-        <figcaption className="mt-2 px-1 text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <figcaption className="mt-2 px-1 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           {caption}
         </figcaption>
       ) : null}
@@ -1146,7 +1146,7 @@ ${pathKeyframes(t.points)}
         <button
           type="button"
           onClick={() => setPaused((p) => !p)}
-          className="rounded-md px-2.5 py-1 text-[12px] font-medium transition hover:opacity-70"
+          className="rounded-md px-2.5 py-1 text-[0.75rem] font-medium transition hover:opacity-70"
           style={{ color: 'var(--muted)' }}
           aria-pressed={paused}
         >
@@ -1232,7 +1232,7 @@ ${pathKeyframes(t.points)}
 
       <div className="mt-3 flex flex-wrap gap-x-5 gap-y-1.5">
         {def.legend.map((l, i) => (
-          <span key={i} className="flex items-center gap-2 text-[12px]" style={{ color: 'var(--muted)' }}>
+          <span key={i} className="flex items-center gap-2 text-[0.75rem]" style={{ color: 'var(--muted)' }}>
             <span
               className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
               style={{ background: TONE[l.tone] }}
@@ -1257,16 +1257,16 @@ export function CompareCards({ spec }: { spec: CompareSpec }) {
           <div key={i} className="card p-4">
             <div className="mb-2.5 flex items-center gap-2">
               <span
-                className="flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-bold"
+                className="flex h-5 w-5 items-center justify-center rounded-full text-[0.6875rem] font-bold"
                 style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
               >
                 {i === 0 ? 'A' : 'B'}
               </span>
-              <h4 className="text-[14.5px] font-semibold">{side.title}</h4>
+              <h4 className="text-[0.9062rem] font-semibold">{side.title}</h4>
             </div>
             <ul className="space-y-1.5">
               {side.points.map((p, j) => (
-                <li key={j} className="flex gap-2 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                <li key={j} className="flex gap-2 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                   <span style={{ color: 'var(--border-strong)' }}>—</span>
                   <span>{p}</span>
                 </li>
@@ -1276,13 +1276,13 @@ export function CompareCards({ spec }: { spec: CompareSpec }) {
         ))}
       </div>
       <div
-        className="mt-3 rounded-lg border px-4 py-3 text-[13.5px] leading-relaxed"
+        className="mt-3 rounded-lg border px-4 py-3 text-[0.8438rem] leading-relaxed"
         style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
       >
         <strong style={{ color: 'var(--text)' }}>Which one: </strong>
         {spec.verdict}
       </div>
-      <figcaption className="mt-2 px-1 text-[13px]" style={{ color: 'var(--faint)' }}>
+      <figcaption className="mt-2 px-1 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
         {spec.caption}
       </figcaption>
     </figure>
@@ -1310,10 +1310,10 @@ export function NumbersBar({ spec }: { spec: NumbersBarSpec }) {
             return (
               <div key={i}>
                 <div className="mb-1 flex items-baseline justify-between gap-3">
-                  <span className="text-[13px]" style={{ color: 'var(--muted)' }}>
+                  <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
                     {it.label}
                   </span>
-                  <span className="tabular text-[13px] font-semibold">{it.display}</span>
+                  <span className="tabular text-[0.8125rem] font-semibold">{it.display}</span>
                 </div>
                 <div
                   className="h-2.5 w-full overflow-hidden rounded-full"
@@ -1329,12 +1329,12 @@ export function NumbersBar({ spec }: { spec: NumbersBarSpec }) {
           })}
         </div>
         {spec.note ? (
-          <p className="mt-4 border-t pt-3 text-[13px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="mt-4 border-t pt-3 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             {spec.note}
           </p>
         ) : null}
       </div>
-      <figcaption className="mt-2 px-1 text-[13px]" style={{ color: 'var(--faint)' }}>
+      <figcaption className="mt-2 px-1 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
         {spec.caption}
       </figcaption>
     </figure>
@@ -1400,10 +1400,10 @@ export function Callout({
     >
       <div className="mb-1.5 flex items-center gap-1.5" style={{ color: c.color }}>
         {c.icon}
-        <span className="text-[11px] font-bold tracking-[0.07em] uppercase">{title ?? c.label}</span>
+        <span className="text-[0.6875rem] font-bold tracking-[0.07em] uppercase">{title ?? c.label}</span>
       </div>
       <div
-        className={variant === 'say-this' ? 'prose text-[15px] italic' : 'prose text-[15px]'}
+        className={variant === 'say-this' ? 'prose text-[0.9375rem] italic' : 'prose text-[0.9375rem]'}
         style={{ color: 'var(--text)' }}
       >
         {children}

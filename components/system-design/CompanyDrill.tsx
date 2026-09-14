@@ -51,19 +51,19 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
         style={{ background: 'var(--surface-2)' }}
       >
         <div
-          className="mb-1.5 text-[11px] font-bold tracking-[0.06em] uppercase"
+          className="mb-1.5 text-[0.6875rem] font-bold tracking-[0.06em] uppercase"
           style={{ color: 'var(--accent)' }}
         >
           What they are actually testing
         </div>
-        <p className="text-[14.5px] leading-relaxed">
+        <p className="text-[0.9062rem] leading-relaxed">
           <Rich text={question.whatTheyWant} />
         </p>
       </div>
 
       {/* ---- your answer ---- */}
       <div className="mb-5">
-        <label htmlFor="answer" className="mb-2 block text-[14px] font-semibold">
+        <label htmlFor="answer" className="mb-2 block text-[0.875rem] font-semibold">
           Your answer
         </label>
         <textarea
@@ -73,14 +73,14 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
           readOnly={submitted}
           rows={submitted ? 6 : 14}
           placeholder="Work through it the way you would out loud. Requirements, then the lifecycle, then the numbers, then the design. Use the hints below if you get stuck — they will not give you the answer."
-          className="w-full resize-y rounded-xl border px-4 py-3.5 text-[15px] leading-relaxed outline-none"
+          className="w-full resize-y rounded-xl border px-4 py-3.5 text-[0.9375rem] leading-relaxed outline-none"
           style={{
             borderColor: 'var(--border-strong)',
             background: submitted ? 'var(--surface-2)' : 'var(--surface)',
           }}
         />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
+          <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
             {submitted
               ? 'Submitted and saved.'
               : enough
@@ -99,12 +99,12 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
       {!submitted ? (
         <div className="card mb-6 p-5">
           <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="text-[15.5px] font-semibold">Stuck? Take one hint at a time</h3>
-            <span className="tabular text-[12.5px]" style={{ color: 'var(--faint)' }}>
+            <h3 className="text-[0.9688rem] font-semibold">Stuck? Take one hint at a time</h3>
+            <span className="tabular text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
               {shown} of {question.hints.length} used
             </span>
           </div>
-          <p className="mb-4 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="mb-4 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Each one is a question to ask yourself, not an answer. Think about it before taking the
             next — the point is to get further on your own each time.
           </p>
@@ -116,10 +116,10 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
                 className="fade-up rounded-xl border-l-2 py-2.5 pr-3 pl-4"
                 style={{ borderLeftColor: 'var(--accent)', background: 'var(--accent-soft)' }}
               >
-                <div className="mb-1 text-[11.5px] font-bold" style={{ color: 'var(--accent)' }}>
+                <div className="mb-1 text-[0.7188rem] font-bold" style={{ color: 'var(--accent)' }}>
                   Hint {i + 1} — {h.label}
                 </div>
-                <p className="text-[14.5px] leading-relaxed">
+                <p className="text-[0.9062rem] leading-relaxed">
                   <Rich text={h.text} />
                 </p>
               </div>
@@ -133,7 +133,7 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
               </Button>
             </div>
           ) : (
-            <p className="mt-4 text-[13px]" style={{ color: 'var(--faint)' }}>
+            <p className="mt-4 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
               That is every hint. Write what you have — an incomplete answer you reasoned your way to
               is worth far more than reading ours.
             </p>
@@ -143,7 +143,7 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
 
       {!submitted ? (
         <div
-          className="rounded-xl border border-dashed px-4 py-6 text-center text-[13.5px]"
+          className="rounded-xl border border-dashed px-4 py-6 text-center text-[0.8438rem]"
           style={{ borderColor: 'var(--border-strong)', color: 'var(--faint)' }}
         >
           The model answer is locked until you submit.
@@ -156,7 +156,7 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
           <div className="mb-3 flex items-center gap-2">
             <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
             <span
-              className="text-[11.5px] font-bold tracking-[0.07em] uppercase"
+              className="text-[0.7188rem] font-bold tracking-[0.07em] uppercase"
               style={{ color: 'var(--accent)' }}
             >
               A model answer
@@ -170,12 +170,12 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
 
           <div className="card mb-6 p-5">
             <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
-              <h4 className="text-[15px] font-semibold">Which of these did you have?</h4>
-              <span className="tabular text-[14px] font-bold" style={{ color: 'var(--accent)' }}>
+              <h4 className="text-[0.9375rem] font-semibold">Which of these did you have?</h4>
+              <span className="tabular text-[0.875rem] font-bold" style={{ color: 'var(--accent)' }}>
                 {checked.length} / {question.checklist.length} → {score}/10
               </span>
             </div>
-            <p className="mb-4 text-[13px]" style={{ color: 'var(--muted)' }}>
+            <p className="mb-4 text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
               Be honest. Half-having it does not count.
             </p>
             <div className="space-y-1">
@@ -195,7 +195,7 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
                       style={{ accentColor: 'var(--accent)' }}
                     />
                     <span
-                      className="text-[14px] leading-relaxed"
+                      className="text-[0.875rem] leading-relaxed"
                       style={{ color: on ? 'var(--text)' : 'var(--muted)' }}
                     >
                       {c}
@@ -210,22 +210,22 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
           <div className="card mb-6 p-5">
             <div className="mb-2 flex flex-wrap items-center gap-2">
               <Badge tone="accent">Follow-up</Badge>
-              <span className="text-[13px]" style={{ color: 'var(--muted)' }}>
+              <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
                 They will ask this next.
               </span>
             </div>
-            <p className="mb-4 text-[16.5px] leading-snug font-semibold">
+            <p className="mb-4 text-[1.0312rem] leading-snug font-semibold">
               <Rich text={question.followUp.q} />
             </p>
             {showFollowUp ? (
               <div className="fade-up rounded-xl border-l-2 p-4" style={{ borderLeftColor: 'var(--ok)' }}>
                 <div
-                  className="mb-1.5 text-[11.5px] font-bold tracking-[0.05em] uppercase"
+                  className="mb-1.5 text-[0.7188rem] font-bold tracking-[0.05em] uppercase"
                   style={{ color: 'var(--ok)' }}
                 >
                   What a strong answer sounds like
                 </div>
-                <p className="prose text-[15px]">
+                <p className="prose text-[0.9375rem]">
                   <Rich text={question.followUp.answer} />
                 </p>
               </div>

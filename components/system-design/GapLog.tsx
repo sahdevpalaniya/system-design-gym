@@ -18,7 +18,7 @@ export function GapLog({
   if (done)
     return (
       <div
-        className="fade-up rounded-xl border px-5 py-4 text-[14.5px]"
+        className="fade-up rounded-xl border px-5 py-4 text-[0.9062rem]"
         style={{ background: 'var(--say-bg)', color: 'var(--say)' }}
       >
         <strong>Logged.</strong> Once you have a few of these, the home screen starts telling you which mistake
@@ -29,8 +29,8 @@ export function GapLog({
 
   return (
     <div className="card p-5">
-      <h3 className="text-[16px] font-semibold">One line: what did you miss?</h3>
-      <p className="mt-1.5 mb-4 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+      <h3 className="text-[1rem] font-semibold">One line: what did you miss?</h3>
+      <p className="mt-1.5 mb-4 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
         In your own words. This is the smallest feature in the app and the one with the biggest effect — it turns
         a vague weakness into a checklist.
       </p>
@@ -39,7 +39,7 @@ export function GapLog({
         onChange={(e) => setText(e.target.value)}
         rows={3}
         placeholder="e.g. I forgot to say what the cache costs, and I never mentioned what happens when it is empty."
-        className="w-full resize-y rounded-xl border px-4 py-3 text-[15px] leading-relaxed outline-none"
+        className="w-full resize-y rounded-xl border px-4 py-3 text-[0.9375rem] leading-relaxed outline-none"
         style={{ borderColor: 'var(--border-strong)' }}
       />
       <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
@@ -49,7 +49,7 @@ export function GapLog({
             .map((t) => (
               <span
                 key={t}
-                className="rounded-full px-2.5 py-1 text-[11.5px] font-semibold"
+                className="rounded-full px-2.5 py-1 text-[0.7188rem] font-semibold"
                 style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
               >
                 {t}

@@ -37,7 +37,7 @@ function Clock({ left }: { left: number }) {
   const s = abs % 60
   return (
     <span
-      className="tabular rounded-md px-2 py-1 text-[12.5px] font-semibold"
+      className="tabular rounded-md px-2 py-1 text-[0.7812rem] font-semibold"
       style={{
         color: over ? 'var(--bad)' : left < 60 ? 'var(--warn)' : 'var(--muted)',
         background: 'var(--surface-2)',
@@ -80,7 +80,7 @@ function Stepper({
               onClick={() => reachable && onJump(id)}
               disabled={!reachable}
               aria-current={isActive ? 'step' : undefined}
-              className="flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[12.5px] font-medium transition disabled:cursor-not-allowed"
+              className="flex items-center gap-2 rounded-lg border px-2.5 py-1.5 text-[0.7812rem] font-medium transition disabled:cursor-not-allowed"
               style={{
                 background: isActive ? 'var(--accent-soft)' : 'var(--surface)',
                 borderColor: isActive ? 'var(--accent-line)' : 'var(--border)',
@@ -89,7 +89,7 @@ function Stepper({
               }}
             >
               <span
-                className="flex h-4.5 w-4.5 items-center justify-center rounded-full text-[10px] font-bold"
+                className="flex h-4.5 w-4.5 items-center justify-center rounded-full text-[0.625rem] font-bold"
                 style={{
                   width: 18,
                   height: 18,
@@ -155,21 +155,21 @@ function StageBlock({
     <div className="fade-up">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <div className="text-[12px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+          <div className="text-[0.75rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
             Stage {stageId} of 5 · {def.minutes} min
           </div>
-          <h2 className="mt-1 text-[22px] font-bold tracking-[-0.01em]">{def.name}</h2>
+          <h2 className="mt-1 text-[1.375rem] font-bold tracking-[-0.01em]">{def.name}</h2>
         </div>
         {timed ? <Clock left={left} /> : null}
       </div>
 
-      <p className="prose mb-5 text-[16px]">
+      <p className="prose mb-5 text-[1rem]">
         <Rich text={ps.ask} />
       </p>
 
       {archetypeNote ? (
         <div
-          className="mb-5 rounded-xl border px-4 py-3 text-[13.5px]"
+          className="mb-5 rounded-xl border px-4 py-3 text-[0.8438rem]"
           style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
         >
           <span className="font-semibold" style={{ color: 'var(--text)' }}>
@@ -181,14 +181,14 @@ function StageBlock({
 
       {/* method reminder — never gives the answer away */}
       <details className="mb-5 rounded-xl border" style={{ background: 'var(--surface-2)' }} open={!submitted}>
-        <summary className="cursor-pointer px-4 py-3 text-[13.5px] font-semibold select-none">
+        <summary className="cursor-pointer px-4 py-3 text-[0.8438rem] font-semibold select-none">
           How this stage works
         </summary>
         <div className="px-4 pb-4">
           <Bullets items={def.method} />
           {ps.nudges.length ? (
             <div className="mt-4 border-t pt-3">
-              <div className="mb-2 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
+              <div className="mb-2 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
                 Things to consider — not answers
               </div>
               <Bullets items={ps.nudges} />
@@ -199,7 +199,7 @@ function StageBlock({
 
       {/* the writing box — the gate */}
       <div className="mb-4">
-        <label htmlFor={`answer-${stageId}`} className="mb-2 block text-[13.5px] font-semibold">
+        <label htmlFor={`answer-${stageId}`} className="mb-2 block text-[0.8438rem] font-semibold">
           Your answer
         </label>
         <textarea
@@ -210,14 +210,14 @@ function StageBlock({
           readOnly={submitted}
           rows={submitted ? 6 : 11}
           placeholder="Write it as you would say it out loud. Spelling and grammar are never graded — only your reasoning."
-          className="w-full resize-y rounded-xl border px-4 py-3.5 text-[15px] leading-relaxed outline-none transition"
+          className="w-full resize-y rounded-xl border px-4 py-3.5 text-[0.9375rem] leading-relaxed outline-none transition"
           style={{
             borderColor: 'var(--border-strong)',
             background: submitted ? 'var(--surface-2)' : 'var(--surface)',
           }}
         />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
-          <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
+          <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
             {submitted
               ? 'Submitted and saved. You can reread this any time from your answer history.'
               : enough
@@ -236,7 +236,7 @@ function StageBlock({
 
       {!submitted ? (
         <div
-          className="rounded-xl border border-dashed px-4 py-6 text-center text-[13.5px]"
+          className="rounded-xl border border-dashed px-4 py-6 text-center text-[0.8438rem]"
           style={{ borderColor: 'var(--border-strong)', color: 'var(--faint)' }}
         >
           <svg
@@ -259,7 +259,7 @@ function StageBlock({
         <ModelAnswer ps={ps} checked={checked} onCheck={onCheck} answer={answer} />
       ) : (
         <div
-          className="rounded-xl border px-4 py-5 text-center text-[13.5px]"
+          className="rounded-xl border px-4 py-5 text-center text-[0.8438rem]"
           style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
         >
           Locked until the end of the mock. Keep going — nothing is revealed until all five stages are done.
@@ -289,7 +289,7 @@ function ModelAnswer({
     <div className="fade-up mt-6">
       <div className="mb-3 flex items-center gap-2">
         <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
-        <span className="text-[11.5px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
+        <span className="text-[0.7188rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
           A model answer
         </span>
         <span className="h-px flex-1" style={{ background: 'var(--border)' }} />
@@ -300,12 +300,12 @@ function ModelAnswer({
 
         {ps.tradeoffs?.length ? (
           <div className="mt-5 border-t pt-4">
-            <div className="mb-3 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
+            <div className="mb-3 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
               Tradeoffs named in this answer
             </div>
             <div className="space-y-2.5">
               {ps.tradeoffs.map((t, i) => (
-                <div key={i} className="text-[14px] leading-relaxed">
+                <div key={i} className="text-[0.875rem] leading-relaxed">
                   <span className="font-semibold">{t.decision}</span>
                   <span style={{ color: 'var(--cost)' }}> → costs: </span>
                   <span style={{ color: 'var(--muted)' }}>{t.cost}</span>
@@ -330,18 +330,18 @@ function ModelAnswer({
       {/* self-grade */}
       <div className="card mt-5 p-5">
         <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2">
-          <h4 className="text-[15px] font-semibold">Which of these did you actually have?</h4>
-          <span className="tabular text-[14px] font-bold" style={{ color: 'var(--accent)' }}>
+          <h4 className="text-[0.9375rem] font-semibold">Which of these did you actually have?</h4>
+          <span className="tabular text-[0.875rem] font-bold" style={{ color: 'var(--accent)' }}>
             {checked.length} / {ps.checklist.length} → {score}/10
           </span>
         </div>
-        <p className="mb-3 text-[13px]" style={{ color: 'var(--muted)' }}>
+        <p className="mb-3 text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
           Be honest — this is the number that drives your profile. Half-having it does not count, and
           thinking it does not count either. If you did not write it down, you did not say it.
         </p>
         {unsupported.size ? (
           <p
-            className="mb-4 rounded-lg px-3 py-2 text-[13px] leading-relaxed"
+            className="mb-4 rounded-lg px-3 py-2 text-[0.8125rem] leading-relaxed"
             style={{ background: 'var(--say-bg)', color: 'var(--cost)' }}
           >
             {unsupported.size === 1 ? 'One ticked item does' : `${unsupported.size} ticked items do`} not
@@ -365,13 +365,13 @@ function ModelAnswer({
                   style={{ accentColor: 'var(--accent)' }}
                 />
                 <span
-                  className="text-[14px] leading-relaxed"
+                  className="text-[0.875rem] leading-relaxed"
                   style={{ color: on ? 'var(--text)' : 'var(--muted)' }}
                 >
                   {c}
                   {unsupported.has(i) ? (
                     <span
-                      className="ml-2 rounded px-1.5 py-0.5 text-[10.5px] font-bold whitespace-nowrap"
+                      className="ml-2 rounded px-1.5 py-0.5 text-[0.6562rem] font-bold whitespace-nowrap"
                       style={{ background: 'var(--say-bg)', color: 'var(--cost)' }}
                       title="Nothing in your written answer mentions this"
                     >
@@ -410,10 +410,10 @@ function ReportCard({
     <div className="fade-up">
       <div className="card mb-6 overflow-hidden">
         <div className="border-b px-6 py-5" style={{ background: 'var(--surface-2)' }}>
-          <div className="text-[12px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+          <div className="text-[0.75rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
             Report card
           </div>
-          <h2 className="mt-1 text-[24px] font-bold">{problem.title}</h2>
+          <h2 className="mt-1 text-[1.5rem] font-bold">{problem.title}</h2>
         </div>
 
         <div className="flex flex-col items-center gap-6 p-6 sm:flex-row sm:items-start">
@@ -422,8 +422,8 @@ function ReportCard({
           </div>
           <div className="min-w-0 flex-1">
             <div className="mb-4 flex items-baseline gap-3">
-              <span className="tabular text-[38px] leading-none font-bold">{avg.toFixed(1)}</span>
-              <span className="text-[14px]" style={{ color: 'var(--muted)' }}>
+              <span className="tabular text-[2.375rem] leading-none font-bold">{avg.toFixed(1)}</span>
+              <span className="text-[0.875rem]" style={{ color: 'var(--muted)' }}>
                 average across the stages you did
               </span>
             </div>
@@ -433,17 +433,17 @@ function ReportCard({
                 const tone = v < 5 ? 'var(--bad)' : v < 7 ? 'var(--warn)' : 'var(--ok)'
                 return (
                   <div key={a} className="flex items-center gap-3">
-                    <span className="w-[92px] shrink-0 text-[13px] font-medium">{AXIS_LABEL[a]}</span>
+                    <span className="w-[92px] shrink-0 text-[0.8125rem] font-medium">{AXIS_LABEL[a]}</span>
                     <div className="h-2 flex-1 overflow-hidden rounded-full" style={{ background: 'var(--surface-2)' }}>
                       <div className="h-full rounded-full" style={{ width: `${v * 10}%`, background: tone }} />
                     </div>
-                    <span className="tabular w-9 shrink-0 text-right text-[13px] font-semibold">{v}</span>
+                    <span className="tabular w-9 shrink-0 text-right text-[0.8125rem] font-semibold">{v}</span>
                   </div>
                 )
               })}
             </div>
             {weakest ? (
-              <p className="mt-5 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="mt-5 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 <strong style={{ color: 'var(--text)' }}>Weakest axis: {AXIS_LABEL[weakest]}.</strong>{' '}
                 {scores[weakest] < 5
                   ? 'This is the one to attack. Most people have one axis that is always red, and just seeing it is most of the fix.'
@@ -595,7 +595,7 @@ export function StageEngine({
 
   if (!ready) {
     return (
-      <div className="py-16 text-center text-[14px]" style={{ color: 'var(--faint)' }}>
+      <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
         Loading your progress…
       </div>
     )
@@ -607,8 +607,8 @@ export function StageEngine({
 
       {revealMode === 'end' && allSubmitted && !graded ? (
         <div className="card fade-up mb-6 p-6 text-center">
-          <h3 className="text-[19px] font-bold">All five stages submitted.</h3>
-          <p className="mx-auto mt-2 mb-5 max-w-md text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <h3 className="text-[1.1875rem] font-bold">All five stages submitted.</h3>
+          <p className="mx-auto mt-2 mb-5 max-w-md text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Nothing has been revealed yet — that was the point. Now go back through each stage, read the model
             answer, and mark honestly what you actually had.
           </p>
@@ -635,7 +635,7 @@ export function StageEngine({
       {/* move on */}
       {submitted[active] && reveal ? (
         <div className="mt-7 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
-          <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
+          <span className="text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
             {stageIds.indexOf(active) < stageIds.length - 1
               ? 'Marked what you had? Next stage.'
               : 'That is the last stage.'}
@@ -655,10 +655,10 @@ export function StageEngine({
           {followUp ? (
             <div className="mt-10">
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <h3 className="text-[19px] font-semibold">One follow-up before you go</h3>
+                <h3 className="text-[1.1875rem] font-semibold">One follow-up before you go</h3>
                 {archetype ? <Badge tone="accent">{archetype.name} would ask this</Badge> : null}
               </div>
-              <p className="mb-4 text-[14.5px]" style={{ color: 'var(--muted)' }}>
+              <p className="mb-4 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
                 Interviews are lost in follow-ups, not in the first diagram. Defend what you just designed.
               </p>
               <FollowUpDrill followUp={followUp} />

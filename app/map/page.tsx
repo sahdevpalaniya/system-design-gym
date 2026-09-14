@@ -14,7 +14,7 @@ function Node({ href, label, state }: { href: string; label: string; state: Node
     <Link
       href={href}
       title={`${label} — ${info.label}`}
-      className="flex items-center gap-2 rounded-lg border px-2.5 py-2 text-[12.5px] leading-tight font-medium transition hover:-translate-y-px"
+      className="flex items-center gap-2 rounded-lg border px-2.5 py-2 text-[0.7812rem] leading-tight font-medium transition hover:-translate-y-px"
       style={{
         borderColor: state === 'untouched' ? 'var(--border)' : info.color,
         background: state === 'untouched' ? 'var(--surface)' : 'var(--surface)',
@@ -49,7 +49,7 @@ export default function MapPage() {
         meta={
           <>
             {(['untouched', 'attempted', 'solid', 'review'] as const).map((s) => (
-              <span key={s} className="flex items-center gap-1.5 text-[12.5px]" style={{ color: 'var(--muted)' }}>
+              <span key={s} className="flex items-center gap-1.5 text-[0.7812rem]" style={{ color: 'var(--muted)' }}>
                 <StateDot state={s} size={7} />
                 {STATE_INFO[s].label}
               </span>
@@ -66,10 +66,10 @@ export default function MapPage() {
           [`${counts.groups}/${GROUPS.length}`, 'shapes covered'],
         ].map(([v, l]) => (
           <Card key={l} className="text-center">
-            <div className="tabular text-[24px] leading-none font-bold" style={{ color: 'var(--accent)' }}>
+            <div className="tabular text-[1.5rem] leading-none font-bold" style={{ color: 'var(--accent)' }}>
               {v}
             </div>
-            <div className="mt-1.5 text-[12px]" style={{ color: 'var(--muted)' }}>
+            <div className="mt-1.5 text-[0.75rem]" style={{ color: 'var(--muted)' }}>
               {l}
             </div>
           </Card>
@@ -78,8 +78,8 @@ export default function MapPage() {
 
       {/* ---- track A ---- */}
       <section className="mb-12">
-        <h2 className="mb-1 text-[20px] font-bold tracking-[-0.01em]">Track A — Fundamentals</h2>
-        <p className="mb-5 text-[14px]" style={{ color: 'var(--muted)' }}>
+        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Track A — Fundamentals</h2>
+        <p className="mb-5 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
           Three tiers. Tier 1 is used by everything; Tier 2 decides senior interviews; Tier 3 is the specific
           answers that keep coming up.
         </p>
@@ -90,8 +90,8 @@ export default function MapPage() {
             return (
               <div key={tier}>
                 <div className="mb-2.5 flex flex-wrap items-baseline justify-between gap-2">
-                  <h3 className="text-[15px] font-semibold">{TIER_INFO[tier].name}</h3>
-                  <span className="tabular text-[12.5px]" style={{ color: 'var(--faint)' }}>
+                  <h3 className="text-[0.9375rem] font-semibold">{TIER_INFO[tier].name}</h3>
+                  <span className="tabular text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
                     {done}/{list.length} solid
                   </span>
                 </div>
@@ -108,8 +108,8 @@ export default function MapPage() {
 
       {/* ---- track B ---- */}
       <section className="mb-12">
-        <h2 className="mb-1 text-[20px] font-bold tracking-[-0.01em]">Track B — Problem shapes</h2>
-        <p className="mb-5 text-[14px]" style={{ color: 'var(--muted)' }}>
+        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Track B — Problem shapes</h2>
+        <p className="mb-5 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
           Ten shapes. Covering a new shape teaches you more than a second problem inside one you already know.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -126,18 +126,18 @@ export default function MapPage() {
                 }}
               >
                 <div className="mb-2 flex items-baseline justify-between gap-2">
-                  <h3 className="text-[14.5px] font-semibold">{g.name}</h3>
+                  <h3 className="text-[0.9062rem] font-semibold">{g.name}</h3>
                   {touched ? (
-                    <span className="tabular text-[11.5px]" style={{ color: 'var(--faint)' }}>
+                    <span className="tabular text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                       {touched}/{list.length}
                     </span>
                   ) : (
-                    <span className="text-[11.5px]" style={{ color: 'var(--faint)' }}>
+                    <span className="text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                       untouched
                     </span>
                   )}
                 </div>
-                <p className="mb-3 text-[12.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                <p className="mb-3 text-[0.7812rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                   {g.shape}
                 </p>
                 <div className="grid gap-2">
@@ -153,8 +153,8 @@ export default function MapPage() {
 
       {/* ---- track C ---- */}
       <section>
-        <h2 className="mb-1 text-[20px] font-bold tracking-[-0.01em]">Track C — Interviewers</h2>
-        <p className="mb-5 text-[14px]" style={{ color: 'var(--muted)' }}>
+        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Track C — Interviewers</h2>
+        <p className="mb-5 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
           Six styles. Each weights the same rubric differently, so the same design scores differently.
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
@@ -176,40 +176,40 @@ export default function MapPage() {
         </div>
       </section>
       <section className="mt-12 border-t pt-8">
-        <h2 className="mb-1 text-[20px] font-bold tracking-[-0.01em]">What the bar actually is</h2>
-        <p className="mb-5 text-[14.5px]" style={{ color: 'var(--muted)' }}>
+        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">What the bar actually is</h2>
+        <p className="mb-5 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
           The same answer scores differently depending on the level. Most people practise to one bar and
           are surprised by the gap — so know which column you are being measured against.
         </p>
         <div className="grid gap-4 lg:grid-cols-3">
           {LEVELS.map((l) => (
             <Card key={l.level}>
-              <div className="mb-1 text-[16px] font-semibold">{l.level}</div>
-              <div className="tabular mb-3 text-[12px]" style={{ color: 'var(--faint)' }}>
+              <div className="mb-1 text-[1rem] font-semibold">{l.level}</div>
+              <div className="tabular mb-3 text-[0.75rem]" style={{ color: 'var(--faint)' }}>
                 {l.titles}
               </div>
-              <div className="mb-1.5 text-[11px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--ok)' }}>
+              <div className="mb-1.5 text-[0.6875rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--ok)' }}>
                 Passes
               </div>
               <ul className="mb-3 space-y-1.5">
                 {l.passes.map((x, i) => (
-                  <li key={i} className="text-[13.5px] leading-relaxed">
+                  <li key={i} className="text-[0.8438rem] leading-relaxed">
                     {x}
                   </li>
                 ))}
               </ul>
-              <div className="mb-1.5 text-[11px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--bad)' }}>
+              <div className="mb-1.5 text-[0.6875rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--bad)' }}>
                 Fails
               </div>
               <ul className="mb-3 space-y-1.5">
                 {l.fails.map((x, i) => (
-                  <li key={i} className="text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                  <li key={i} className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                     {x}
                   </li>
                 ))}
               </ul>
               <p
-                className="rounded-lg px-3 py-2 text-[13px] leading-relaxed"
+                className="rounded-lg px-3 py-2 text-[0.8125rem] leading-relaxed"
                 style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
               >
                 {l.tell}

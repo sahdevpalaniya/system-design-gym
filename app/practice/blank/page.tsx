@@ -24,7 +24,7 @@ export default function BlankPage() {
       />
 
       <div className="mb-8">
-        <label htmlFor="blank-title" className="mb-2 block text-[13.5px] font-semibold">
+        <label htmlFor="blank-title" className="mb-2 block text-[0.8438rem] font-semibold">
           What are you designing?
         </label>
         <input
@@ -32,7 +32,7 @@ export default function BlankPage() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. A system for scheduling and delivering push notifications"
-          className="w-full rounded-xl border px-4 py-3 text-[16px] outline-none"
+          className="w-full rounded-xl border px-4 py-3 text-[1rem] outline-none"
           style={{ borderColor: 'var(--border-strong)' }}
         />
       </div>
@@ -40,15 +40,15 @@ export default function BlankPage() {
       <section className="mb-10">
         <div className="mb-2 flex flex-wrap items-baseline gap-2">
           <span
-            className="flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-bold"
+            className="flex h-6 w-6 items-center justify-center rounded-full text-[0.75rem] font-bold"
             style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
             aria-hidden
           >
             ✎
           </span>
-          <h2 className="text-[17px] font-semibold">The whiteboard</h2>
+          <h2 className="text-[1.125rem] font-semibold">The whiteboard</h2>
         </div>
-        <p className="mb-3 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <p className="mb-3 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           Draw it the way you would in the room — boxes, arrows, whatever your hand does. Interviews
           happen at a whiteboard and this is the only part of the app that makes you use one.
         </p>
@@ -60,24 +60,24 @@ export default function BlankPage() {
           <div key={s.id}>
             <div className="mb-2 flex flex-wrap items-baseline gap-2">
               <span
-                className="flex h-6 w-6 items-center justify-center rounded-full text-[12px] font-bold"
+                className="flex h-6 w-6 items-center justify-center rounded-full text-[0.75rem] font-bold"
                 style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
               >
                 {s.id}
               </span>
-              <h2 className="text-[17px] font-semibold">{s.name}</h2>
-              <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
+              <h2 className="text-[1.125rem] font-semibold">{s.name}</h2>
+              <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
                 {s.minutes} min
               </span>
             </div>
-            <p className="mb-2.5 text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="mb-2.5 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               {s.ask}
             </p>
             <textarea
               value={values[s.id] ?? ''}
               onChange={(e) => setValues((v) => ({ ...v, [s.id]: e.target.value }))}
               rows={8}
-              className="w-full resize-y rounded-xl border px-4 py-3.5 text-[15px] leading-relaxed outline-none"
+              className="w-full resize-y rounded-xl border px-4 py-3.5 text-[0.9375rem] leading-relaxed outline-none"
               style={{ borderColor: 'var(--border-strong)' }}
             />
           </div>
@@ -85,7 +85,7 @@ export default function BlankPage() {
       </div>
 
       <div className="mt-8 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
-        <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
+        <span className="text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
           {filled} of 5 stages written{drawing ? ', whiteboard drawn' : ''}.
         </span>
         <Button
@@ -100,21 +100,21 @@ export default function BlankPage() {
       </div>
 
       {saved ? (
-        <p className="fade-up mt-3 text-right text-[13.5px]" style={{ color: 'var(--ok)' }}>
+        <p className="fade-up mt-3 text-right text-[0.8438rem]" style={{ color: 'var(--ok)' }}>
           Saved. It will keep — reread it in a week and see what you would change.
         </p>
       ) : null}
 
       {ready && state.blank.length ? (
         <section className="mt-12 border-t pt-8">
-          <h2 className="mb-4 text-[19px] font-semibold">Your saved blank-page attempts</h2>
+          <h2 className="mb-4 text-[1.1875rem] font-semibold">Your saved blank-page attempts</h2>
           <div className="space-y-3">
             {state.blank.map((b) => (
               <details key={b.savedAt} className="card overflow-hidden">
                 <summary className="flex cursor-pointer items-center justify-between gap-3 px-5 py-4 select-none">
                   <span>
-                    <span className="text-[15px] font-semibold">{b.title}</span>
-                    <span className="ml-2 text-[12.5px]" style={{ color: 'var(--faint)' }}>
+                    <span className="text-[0.9375rem] font-semibold">{b.title}</span>
+                    <span className="ml-2 text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
                       {new Date(b.savedAt).toLocaleDateString()}
                     </span>
                   </span>
@@ -123,7 +123,7 @@ export default function BlankPage() {
                   {b.drawing ? (
                     <div>
                       <div
-                        className="mb-1 text-[11.5px] font-bold tracking-[0.05em] uppercase"
+                        className="mb-1 text-[0.7188rem] font-bold tracking-[0.05em] uppercase"
                         style={{ color: 'var(--faint)' }}
                       >
                         The whiteboard
@@ -134,10 +134,10 @@ export default function BlankPage() {
                   {STAGES.map((s) =>
                     b.stages[s.id]?.trim() ? (
                       <div key={s.id}>
-                        <div className="mb-1 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
+                        <div className="mb-1 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
                           {s.id}. {s.name}
                         </div>
-                        <p className="prose text-[14.5px] whitespace-pre-wrap">{b.stages[s.id]}</p>
+                        <p className="prose text-[0.9062rem] whitespace-pre-wrap">{b.stages[s.id]}</p>
                       </div>
                     ) : null,
                   )}

@@ -34,7 +34,7 @@ export default function ConceptCheckPage() {
   if (!ready) {
     return (
       <Page>
-        <div className="py-24 text-center text-[14px]" style={{ color: 'var(--faint)' }}>
+        <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
           Loading…
         </div>
       </Page>
@@ -58,7 +58,7 @@ export default function ConceptCheckPage() {
 
           {due.length ? (
             <>
-              <p className="mb-4 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="mb-4 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {due.length} concept{due.length === 1 ? '' : 's'} came back today. Rate yourself honestly — a
                 low rating brings it back tomorrow, a high one pushes it out three weeks. The schedule only
                 works if the ratings are true.
@@ -70,7 +70,7 @@ export default function ConceptCheckPage() {
               </div>
             </>
           ) : (
-            <p className="mb-5 text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="mb-5 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               Nothing is due right now — good. This round will pull in concepts you have not touched yet
               instead, so it still counts as work.
             </p>
@@ -89,7 +89,7 @@ export default function ConceptCheckPage() {
       <Page>
         <PageHeader eyebrow="Concept check" title="Round finished" />
         <Card>
-          <p className="mb-5 text-[15px] leading-relaxed">
+          <p className="mb-5 text-[0.9375rem] leading-relaxed">
             {round.length} concept{round.length === 1 ? '' : 's'} reviewed. Anything you rated low will come
             back tomorrow; anything you had cold will not bother you for three weeks.
           </p>
@@ -125,7 +125,7 @@ export default function ConceptCheckPage() {
       <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href={`/concepts/${c.slug}`}
-          className="text-[13.5px] font-medium hover:opacity-70"
+          className="text-[0.8438rem] font-medium hover:opacity-70"
           style={{ color: 'var(--accent)' }}
         >
           Read the full page on {c.title.toLowerCase()} →

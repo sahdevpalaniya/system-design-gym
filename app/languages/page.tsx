@@ -13,12 +13,12 @@ export default function LanguagesPage() {
         {LANGUAGES.map((l) => (
           <Card key={l.id} href={`/languages/${l.id}`}>
             <div className="mb-1.5 flex items-baseline gap-2">
-              <h2 className="text-[17px] font-bold">{l.name}</h2>
-              <span className="tabular text-[12px]" style={{ color: 'var(--faint)' }}>
+              <h2 className="text-[1.125rem] font-bold">{l.name}</h2>
+              <span className="tabular text-[0.75rem]" style={{ color: 'var(--faint)' }}>
                 {l.lessons.length} topics
               </span>
             </div>
-            <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               {l.tagline}
             </p>
           </Card>

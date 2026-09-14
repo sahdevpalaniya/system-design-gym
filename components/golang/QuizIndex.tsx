@@ -14,7 +14,7 @@ export function QuizIndex({ lang }: { lang: Language }) {
 
   return (
     <>
-      <p className="mb-7 text-[14.5px]" style={{ color: 'var(--muted)' }}>
+      <p className="mb-7 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
         {totalQs} questions across {sets.length} tests, one for each section. Every wrong option is a
         mistake people really make, so getting one wrong teaches you something.
         {ready && taken > 0 ? ` You have taken ${taken} of ${sets.length}.` : ''}
@@ -29,12 +29,12 @@ export function QuizIndex({ lang }: { lang: Language }) {
           return (
             <Link key={s.id} href={`/languages/${lang.id}/quiz/${s.id}`} className="card p-5 transition hover:-translate-y-px">
               <div className="mb-1.5 flex items-baseline gap-2">
-                <h2 className="min-w-0 flex-1 text-[16px] font-semibold">{s.name}</h2>
-                <span className="tabular shrink-0 text-[13px] font-bold" style={{ color: tone }}>
+                <h2 className="min-w-0 flex-1 text-[1rem] font-semibold">{s.name}</h2>
+                <span className="tabular shrink-0 text-[0.8125rem] font-bold" style={{ color: tone }}>
                   {r ? `${r.best}/${r.total}` : `${s.questions.length} Q`}
                 </span>
               </div>
-              <p className="text-[13.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {s.blurb}
               </p>
               {r ? (
@@ -43,7 +43,7 @@ export function QuizIndex({ lang }: { lang: Language }) {
                 </div>
               ) : null}
               {r && r.attempts > 1 ? (
-                <div className="mt-1.5 text-[11.5px]" style={{ color: 'var(--faint)' }}>
+                <div className="mt-1.5 text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                   {r.attempts} attempts
                 </div>
               ) : null}

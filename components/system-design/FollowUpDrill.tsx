@@ -57,7 +57,7 @@ export function FollowUpDrill({
         <Badge tone="accent">{info.name}</Badge>
         {started && !submitted ? (
           <span
-            className="tabular text-[13px] font-semibold"
+            className="tabular text-[0.8125rem] font-semibold"
             style={{ color: over ? 'var(--bad)' : left < 20 ? 'var(--warn)' : 'var(--muted)' }}
           >
             {over ? 'over by ' : ''}
@@ -67,13 +67,13 @@ export function FollowUpDrill({
       </div>
 
       <div className="p-5">
-        <p className="prose mb-5 text-[18px] leading-snug font-semibold" style={{ fontFamily: 'var(--font-ui)' }}>
+        <p className="prose mb-5 text-[1.125rem] leading-snug font-semibold" style={{ fontFamily: 'var(--font-ui)' }}>
           <Rich text={followUp.q} />
         </p>
 
         {!started ? (
           <div className="text-center">
-            <p className="mx-auto mb-4 max-w-md text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <p className="mx-auto mb-4 max-w-md text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               Ninety seconds. Answer as if someone just said this to you and is waiting. Do not plan — talk.
             </p>
             <Button onClick={() => setStarted(true)} size="lg">
@@ -89,7 +89,7 @@ export function FollowUpDrill({
               readOnly={submitted}
               rows={submitted ? 4 : 7}
               placeholder="Defend it. Name the cost. Do not bluff — 'I would measure that' is a strong answer."
-              className="w-full resize-y rounded-xl border px-4 py-3 text-[15px] leading-relaxed outline-none"
+              className="w-full resize-y rounded-xl border px-4 py-3 text-[0.9375rem] leading-relaxed outline-none"
               style={{
                 borderColor: 'var(--border-strong)',
                 background: submitted ? 'var(--surface-2)' : 'var(--surface)',
@@ -98,7 +98,7 @@ export function FollowUpDrill({
 
             {!submitted ? (
               <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-                <span className="text-[12.5px]" style={{ color: 'var(--faint)' }}>
+                <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
                   {enough ? 'Ready.' : `${answer.trim().length} / ${MIN_CHARS} characters`}
                 </span>
                 <Button onClick={() => setSubmitted(true)} disabled={!enough}>
@@ -116,8 +116,8 @@ export function FollowUpDrill({
             <Reveal label="The trap hidden in the question" tone="warn" text={followUp.trap} />
 
             <div className="card mt-5 p-5">
-              <h4 className="mb-1 text-[15px] font-semibold">Honestly — where was yours?</h4>
-              <p className="mb-4 text-[13px]" style={{ color: 'var(--muted)' }}>
+              <h4 className="mb-1 text-[0.9375rem] font-semibold">Honestly — where was yours?</h4>
+              <p className="mb-4 text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
                 This feeds the Defence axis and tells the app which categories keep catching you.
               </p>
               <div className="flex flex-wrap gap-2">
@@ -136,7 +136,7 @@ export function FollowUpDrill({
                       saveFollowUp(followUp.id, followUp.category, answer, v)
                     }}
                     disabled={rated !== null}
-                    className="rounded-lg border px-3.5 py-2 text-[13.5px] font-medium transition disabled:opacity-50"
+                    className="rounded-lg border px-3.5 py-2 text-[0.8438rem] font-medium transition disabled:opacity-50"
                     style={{
                       borderColor: rated === v ? 'var(--accent)' : 'var(--border-strong)',
                       background: rated === v ? 'var(--accent-soft)' : 'var(--surface)',
@@ -174,10 +174,10 @@ function Reveal({
   const colors = { bad: 'var(--bad)', ok: 'var(--ok)', warn: 'var(--warn)' }
   return (
     <div className="rounded-xl border p-4" style={{ borderLeftWidth: 3, borderLeftColor: colors[tone] }}>
-      <div className="mb-1.5 text-[11.5px] font-bold tracking-[0.05em] uppercase" style={{ color: colors[tone] }}>
+      <div className="mb-1.5 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: colors[tone] }}>
         {label}
       </div>
-      <p className="prose text-[15px]">
+      <p className="prose text-[0.9375rem]">
         <Rich text={text} />
       </p>
     </div>

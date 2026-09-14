@@ -27,13 +27,13 @@ function Block({ b }: { b: LangBlock }) {
       {b.heading ? (
         <h2
           id={headingSlug(b.heading)}
-          className="mt-9 mb-3 scroll-mt-24 text-[19px] font-bold tracking-[-0.01em]"
+          className="mt-9 mb-3 scroll-mt-24 text-[1.1875rem] font-bold tracking-[-0.01em]"
         >
           {b.heading}
         </h2>
       ) : null}
 
-      {b.body ? <Prose paragraphs={b.body} className="text-[16.5px]" /> : null}
+      {b.body ? <Prose paragraphs={b.body} className="text-[1.0312rem]" /> : null}
 
       {b.tree ? <FolderTree tree={b.tree} /> : null}
 
@@ -47,13 +47,13 @@ function Block({ b }: { b: LangBlock }) {
 
       {b.table ? (
         <div className="my-6 overflow-x-auto rounded-xl border" style={{ borderColor: 'var(--border-strong)' }}>
-          <table className="w-full border-collapse text-[14px]">
+          <table className="w-full border-collapse text-[0.875rem]">
             <thead>
               <tr style={{ background: 'var(--surface-2)' }}>
                 {b.table.headers.map((h, i) => (
                   <th
                     key={i}
-                    className="border-b px-3.5 py-2.5 text-left text-[12px] font-bold tracking-[0.05em] uppercase"
+                    className="border-b px-3.5 py-2.5 text-left text-[0.75rem] font-bold tracking-[0.05em] uppercase"
                     style={{ color: 'var(--faint)' }}
                   >
                     {h}
@@ -78,7 +78,7 @@ function Block({ b }: { b: LangBlock }) {
 
       {b.callout ? (
         <div
-          className="my-6 rounded-xl px-5 py-4 text-[15.5px] leading-relaxed"
+          className="my-6 rounded-xl px-5 py-4 text-[0.9688rem] leading-relaxed"
           style={{ background: CALLOUT[b.callout.tone].bg }}
         >
           <span className="font-semibold" style={{ color: CALLOUT[b.callout.tone].fg }}>
@@ -128,7 +128,7 @@ export default async function LangLessonPage({
         title={t.title}
         lede={t.oneLine}
         meta={
-          <span className="tabular text-[12.5px]" style={{ color: 'var(--faint)' }}>
+          <span className="tabular text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
             Topic {i + 1} of {order.length} · {humanMinutes(readMinutes(t))} to read
             {practiceMinutes(t) ? ` · ${humanMinutes(practiceMinutes(t))} to build` : ''}
           </span>
@@ -142,13 +142,13 @@ export default async function LangLessonPage({
       ))}
 
       <Card className="my-8">
-        <div className="mb-3 text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
+        <div className="mb-3 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
           The short version
         </div>
         <Bullets items={t.keyPoints} />
       </Card>
 
-      <div className="mb-8 rounded-xl px-5 py-4 text-[16px] leading-relaxed" style={{ background: 'var(--say-bg)' }}>
+      <div className="mb-8 rounded-xl px-5 py-4 text-[1rem] leading-relaxed" style={{ background: 'var(--say-bg)' }}>
         <span className="font-semibold" style={{ color: 'var(--say)' }}>
           Remember:{' '}
         </span>
@@ -157,10 +157,10 @@ export default async function LangLessonPage({
 
       {t.task ? (
         <div
-          className="mb-8 rounded-xl border-l-[3px] px-5 py-4 text-[15.5px] leading-relaxed"
+          className="mb-8 rounded-xl border-l-[3px] px-5 py-4 text-[0.9688rem] leading-relaxed"
           style={{ background: 'var(--surface-2)', borderLeftColor: 'var(--accent)' }}
         >
-          <div className="mb-1.5 text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
+          <div className="mb-1.5 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
             Build this before moving on
           </div>
           <Rich text={t.task} />
@@ -170,7 +170,7 @@ export default async function LangLessonPage({
       {t.exercises?.length ? (
         <div className="mb-8">
           <div
-            className="mb-2.5 text-[11px] font-bold tracking-[0.07em] uppercase"
+            className="mb-2.5 text-[0.6875rem] font-bold tracking-[0.07em] uppercase"
             style={{ color: 'var(--faint)' }}
           >
             Then try these in your own editor
@@ -181,7 +181,7 @@ export default async function LangLessonPage({
 
       {t.refs?.length ? (
         <div className="mb-8">
-          <div className="mb-2 text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
+          <div className="mb-2 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
             Official documentation
           </div>
           <ul className="space-y-1.5">
@@ -191,7 +191,7 @@ export default async function LangLessonPage({
                   href={r.href}
                   target="_blank"
                   rel="noreferrer"
-                  className="text-[14.5px] font-medium hover:opacity-70"
+                  className="text-[0.9062rem] font-medium hover:opacity-70"
                   style={{ color: 'var(--accent)' }}
                 >
                   {r.label} ↗
@@ -213,10 +213,10 @@ export default async function LangLessonPage({
           style={{ background: 'var(--accent-soft)' }}
         >
           <span className="min-w-0 flex-1">
-            <span className="block text-[11px] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
+            <span className="block text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--accent)' }}>
               Check yourself
             </span>
-            <span className="block text-[14.5px] font-semibold">
+            <span className="block text-[0.9062rem] font-semibold">
               Take the {section.name} test
             </span>
           </span>
@@ -236,10 +236,10 @@ export default async function LangLessonPage({
               ←
             </span>
             <span className="min-w-0">
-              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>
+              <span className="block text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                 Previous
               </span>
-              <span className="block truncate text-[14px] font-semibold">{prev.title}</span>
+              <span className="block truncate text-[0.875rem] font-semibold">{prev.title}</span>
             </span>
           </Link>
         ) : (
@@ -251,10 +251,10 @@ export default async function LangLessonPage({
             className="card flex min-w-0 flex-1 items-center justify-end gap-3 p-4 text-right transition hover:-translate-y-px"
           >
             <span className="min-w-0">
-              <span className="block text-[11.5px]" style={{ color: 'var(--faint)' }}>
+              <span className="block text-[0.7188rem]" style={{ color: 'var(--faint)' }}>
                 Next
               </span>
-              <span className="block truncate text-[14px] font-semibold">{next.title}</span>
+              <span className="block truncate text-[0.875rem] font-semibold">{next.title}</span>
             </span>
             <span style={{ color: 'var(--accent)' }} aria-hidden>
               →

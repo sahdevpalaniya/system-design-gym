@@ -82,10 +82,10 @@ export function Quiz({
     return (
       <div>
         <div className="card mb-6 p-6 text-center">
-          <div className="tabular text-[44px] leading-none font-bold" style={{ color: tone }}>
+          <div className="tabular text-[2.75rem] leading-none font-bold" style={{ color: tone }}>
             {correct}/{questions.length}
           </div>
-          <div className="mt-2 text-[14.5px]" style={{ color: 'var(--muted)' }}>
+          <div className="mt-2 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
             {pct >= 80
               ? 'Solid. Reread anything you got wrong and move on.'
               : pct >= 55
@@ -93,7 +93,7 @@ export function Quiz({
                 : 'Worth another pass through these topics before you retake it.'}
           </div>
           {prev && prev.best > correct ? (
-            <div className="mt-2 text-[13px]" style={{ color: 'var(--faint)' }}>
+            <div className="mt-2 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
               Your best on this set is still {prev.best}/{prev.total}.
             </div>
           ) : null}
@@ -102,14 +102,14 @@ export function Quiz({
             {nextSet ? (
               <Link
                 href={`/languages/${langID}/quiz/${nextSet.id}`}
-                className="card px-4 py-2 text-[14px] font-semibold transition hover:-translate-y-px"
+                className="card px-4 py-2 text-[0.875rem] font-semibold transition hover:-translate-y-px"
               >
                 Next test: {nextSet.name} →
               </Link>
             ) : null}
             <Link
               href={`/languages/${langID}/quiz`}
-              className="px-3 py-2 text-[13.5px] font-medium transition hover:opacity-70"
+              className="px-3 py-2 text-[0.8438rem] font-medium transition hover:opacity-70"
               style={{ color: 'var(--muted)' }}
             >
               All tests
@@ -119,26 +119,26 @@ export function Quiz({
 
         {wrong.length ? (
           <>
-            <h2 className="mb-3 text-[17px] font-bold">What you missed</h2>
+            <h2 className="mb-3 text-[1.125rem] font-bold">What you missed</h2>
             <div className="space-y-3">
               {wrong.map((a) => (
                 <div key={a.q.id} className="card p-4">
-                  <p className="mb-2 text-[15px] leading-snug font-semibold">
+                  <p className="mb-2 text-[0.9375rem] leading-snug font-semibold">
                     <Rich text={a.q.q} />
                   </p>
-                  <p className="mb-1 text-[14px]" style={{ color: 'var(--bad)' }}>
+                  <p className="mb-1 text-[0.875rem]" style={{ color: 'var(--bad)' }}>
                     You picked: <Rich text={a.q.options[a.picked]} />
                   </p>
-                  <p className="mb-2.5 text-[14px]" style={{ color: 'var(--ok)' }}>
+                  <p className="mb-2.5 text-[0.875rem]" style={{ color: 'var(--ok)' }}>
                     Correct: <Rich text={a.q.options[a.q.answer]} />
                   </p>
-                  <p className="text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                  <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                     <Rich text={a.q.why} />
                   </p>
                   {a.q.from ? (
                     <Link
                       href={`/languages/${langID}/${a.q.from}`}
-                      className="mt-2.5 inline-block text-[13px] font-medium hover:opacity-70"
+                      className="mt-2.5 inline-block text-[0.8125rem] font-medium hover:opacity-70"
                       style={{ color: 'var(--accent)' }}
                     >
                       Reread the topic →
@@ -149,7 +149,7 @@ export function Quiz({
             </div>
           </>
         ) : (
-          <p className="text-center text-[15px]" style={{ color: 'var(--ok)' }}>
+          <p className="text-center text-[0.9375rem]" style={{ color: 'var(--ok)' }}>
             Every one correct.
           </p>
         )}
@@ -167,12 +167,12 @@ export function Quiz({
             style={{ width: `${(i / questions.length) * 100}%`, background: 'var(--accent)' }}
           />
         </div>
-        <span className="tabular shrink-0 text-[12.5px]" style={{ color: 'var(--faint)' }}>
+        <span className="tabular shrink-0 text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
           {i + 1} / {questions.length}
         </span>
       </div>
 
-      <p className="mb-5 text-[19px] leading-snug font-semibold">
+      <p className="mb-5 text-[1.1875rem] leading-snug font-semibold">
         <Rich text={q.q} />
       </p>
 
@@ -198,11 +198,11 @@ export function Quiz({
               type="button"
               onClick={() => commit(oi)}
               disabled={show}
-              className="flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-[15px] leading-relaxed transition"
+              className="flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-[0.9375rem] leading-relaxed transition"
               style={{ borderColor: border, background: bg, cursor: show ? 'default' : 'pointer' }}
             >
               <span
-                className="mt-[1px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold"
+                className="mt-[1px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[0.6875rem] font-bold"
                 style={{ borderColor: border, color: 'var(--muted)' }}
               >
                 {String.fromCharCode(65 + oi)}
@@ -218,7 +218,7 @@ export function Quiz({
       {picked !== null ? (
         <div className="mt-5">
           <div
-            className="rounded-xl px-4 py-3.5 text-[14.5px] leading-relaxed"
+            className="rounded-xl px-4 py-3.5 text-[0.9062rem] leading-relaxed"
             style={{ background: 'var(--surface-2)' }}
           >
             <span
@@ -231,7 +231,7 @@ export function Quiz({
             {q.from ? (
               <Link
                 href={`/languages/${langID}/${q.from}`}
-                className="mt-2 block text-[13px] font-medium hover:opacity-70"
+                className="mt-2 block text-[0.8125rem] font-medium hover:opacity-70"
                 style={{ color: 'var(--accent)' }}
               >
                 Read the topic →
@@ -239,7 +239,7 @@ export function Quiz({
             ) : null}
           </div>
           <div className="mt-4 flex items-center justify-between">
-            <span className="tabular text-[13px]" style={{ color: 'var(--faint)' }}>
+            <span className="tabular text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
               {correct} correct so far
             </span>
             <Button onClick={next}>{i + 1 >= questions.length ? 'See results' : 'Next question'}</Button>

@@ -11,14 +11,14 @@ export default function CompanyIndex() {
         title="Company-wise practice"
         lede="Real questions in the style each company actually asks. You write your answer first; **hints are available one at a time** if you get stuck, and the model answer only unlocks after you submit."
         meta={
-          <span className="text-[13px]" style={{ color: 'var(--muted)' }}>
+          <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
             {COMPANY_QUESTIONS.length} questions across {COMPANIES.length} companies
           </span>
         }
       />
 
       <div
-        className="mb-8 rounded-xl border px-5 py-4 text-[14.5px] leading-relaxed"
+        className="mb-8 rounded-xl border px-5 py-4 text-[0.9062rem] leading-relaxed"
         style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
       >
         <strong style={{ color: 'var(--text)' }}>A warning about company-specific prep.</strong>{' '}
@@ -36,11 +36,11 @@ export default function CompanyIndex() {
             <Card key={co.id}>
               <div className="mb-2 flex items-start justify-between gap-3">
                 <Link href={`/company/${co.id}`} className="hover:opacity-70">
-                  <h2 className="text-[19px] font-bold tracking-[-0.01em]">{co.name}</h2>
+                  <h2 className="text-[1.1875rem] font-bold tracking-[-0.01em]">{co.name}</h2>
                 </Link>
                 <Badge>{qs.length} question{qs.length === 1 ? '' : 's'}</Badge>
               </div>
-              <p className="mb-3 text-[14px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+              <p className="mb-3 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {co.style}
               </p>
               <div className="mb-4 flex flex-wrap gap-1.5">
@@ -52,7 +52,7 @@ export default function CompanyIndex() {
                   <Link
                     key={q.id}
                     href={`/company/${co.id}/${q.id}`}
-                    className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 text-[14px] transition hover:opacity-70"
+                    className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 text-[0.875rem] transition hover:opacity-70"
                   >
                     <span className="font-medium">{q.title}</span>
                     <Badge tone={q.difficulty === 'hard' ? 'bad' : 'accent'}>{q.difficulty}</Badge>

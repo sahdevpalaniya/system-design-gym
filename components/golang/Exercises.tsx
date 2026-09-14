@@ -16,9 +16,9 @@ export function Exercises({ items }: { items: (string | LangExercise)[] }) {
   return (
     <ol className="space-y-2.5">
       {rows.map((ex, i) => (
-        <li key={i} className="flex gap-3 text-[15px] leading-relaxed">
+        <li key={i} className="flex gap-3 text-[0.9375rem] leading-relaxed">
           <span
-            className="tabular mt-[2px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
+            className="tabular mt-[2px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[0.6875rem] font-bold"
             style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
           >
             {i + 1}
@@ -30,7 +30,7 @@ export function Exercises({ items }: { items: (string | LangExercise)[] }) {
             {ex.answer ? (
               open[i] ? (
                 <span
-                  className="mt-2 block rounded-lg px-3.5 py-2.5 text-[14px] leading-relaxed"
+                  className="mt-2 block rounded-lg px-3.5 py-2.5 text-[0.875rem] leading-relaxed"
                   style={{ background: 'var(--say-bg)' }}
                 >
                   <span className="font-semibold" style={{ color: 'var(--say)' }}>
@@ -42,7 +42,7 @@ export function Exercises({ items }: { items: (string | LangExercise)[] }) {
                 <button
                   type="button"
                   onClick={() => setOpen((o) => ({ ...o, [i]: true }))}
-                  className="mt-1 block text-[12.5px] font-medium transition hover:opacity-70"
+                  className="mt-1 block text-[0.7812rem] font-medium transition hover:opacity-70"
                   style={{ color: 'var(--accent)' }}
                 >
                   Stuck? Show what you should see →

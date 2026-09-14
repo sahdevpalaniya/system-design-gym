@@ -98,7 +98,7 @@ export function CodeBlock({
     <figure className="my-6">
       <div className="overflow-hidden rounded-xl border" style={{ borderColor: 'var(--border-strong)' }}>
         <div
-          className="flex items-center gap-2 border-b px-3.5 py-2 text-[11.5px] font-semibold"
+          className="flex items-center gap-2 border-b px-3.5 py-2 text-[0.7188rem] font-semibold"
           style={{ background: 'var(--surface-2)', color: 'var(--faint)' }}
         >
           <span className="min-w-0 flex-1 truncate">{label ?? 'Go'}</span>
@@ -129,7 +129,7 @@ export function CodeBlock({
           </button>
         </div>
         <pre
-          className="overflow-x-auto px-3.5 py-3 text-[13px] leading-[1.65]"
+          className="overflow-x-auto px-3.5 py-3 text-[0.8125rem] leading-[1.65]"
           style={{ background: 'var(--code-bg)', fontFamily: 'var(--font-mono)' }}
         >
           <code>
@@ -151,7 +151,7 @@ export function CodeBlock({
         {output !== null ? (
           <div className="border-t" style={{ borderColor: 'var(--border-strong)' }}>
             <div
-              className="flex items-center gap-2 px-3.5 py-1.5 text-[11px] font-bold tracking-wide uppercase"
+              className="flex items-center gap-2 px-3.5 py-1.5 text-[0.6875rem] font-bold tracking-wide uppercase"
               style={{ background: 'var(--surface-2)', color: failed ? 'var(--bad)' : 'var(--ok)' }}
             >
               {failed ? 'Error' : 'Output'}
@@ -165,7 +165,7 @@ export function CodeBlock({
               </button>
             </div>
             <pre
-              className="overflow-x-auto px-3.5 py-2.5 text-[13px] leading-[1.6]"
+              className="overflow-x-auto px-3.5 py-2.5 text-[0.8125rem] leading-[1.6]"
               style={{
                 background: 'var(--code-bg)',
                 fontFamily: 'var(--font-mono)',
@@ -178,7 +178,7 @@ export function CodeBlock({
         ) : null}
       </div>
       {note ? (
-        <figcaption className="mt-2 text-[12.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+        <figcaption className="mt-2 text-[0.7812rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           {note}
         </figcaption>
       ) : null}

@@ -50,12 +50,12 @@ export default async function QuestionPage({
 
       {q.relatedProblem ? (
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t pt-6">
-          <span className="text-[13.5px]" style={{ color: 'var(--muted)' }}>
+          <span className="text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
             Want the full five-stage version of this problem?
           </span>
           <Link
             href={`/problems/${q.relatedProblem}`}
-            className="rounded-lg border px-4 py-2 text-[14px] font-semibold transition hover:opacity-75"
+            className="rounded-lg border px-4 py-2 text-[0.875rem] font-semibold transition hover:opacity-75"
             style={{ borderColor: 'var(--border-strong)' }}
           >
             Open the gated walkthrough →

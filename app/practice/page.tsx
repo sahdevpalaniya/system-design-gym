@@ -56,15 +56,15 @@ export default function PracticePage() {
             className={`card block p-6 transition hover:-translate-y-px ${i === 0 ? 'md:col-span-2' : ''}`}
           >
             <div className="mb-2 flex flex-wrap items-center gap-2">
-              <span className="text-[11.5px] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+              <span className="text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
                 {m.tag}
               </span>
-              <span className="text-[12px]" style={{ color: 'var(--faint)' }}>
+              <span className="text-[0.75rem]" style={{ color: 'var(--faint)' }}>
                 · {m.minutes}
               </span>
             </div>
-            <h2 className="text-[20px] font-bold tracking-[-0.01em]">{m.name}</h2>
-            <p className="mt-2 max-w-2xl text-[14.5px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            <h2 className="text-[1.25rem] font-bold tracking-[-0.01em]">{m.name}</h2>
+            <p className="mt-2 max-w-2xl text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               {m.body}
             </p>
           </Link>
@@ -73,7 +73,7 @@ export default function PracticePage() {
 
       <section className="mt-10">
         <Card>
-          <h2 className="mb-3 text-[17px] font-semibold">The five stages, in case you want them cold</h2>
+          <h2 className="mb-3 text-[1.125rem] font-semibold">The five stages, in case you want them cold</h2>
           <ol className="space-y-3">
             {[
               ['Requirements', 'State assumptions, ask one or two questions that change a box, propose the scope yourself.'],
@@ -84,12 +84,12 @@ export default function PracticePage() {
             ].map(([t, d], i) => (
               <li key={t} className="flex gap-3">
                 <span
-                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[12px] font-bold"
+                  className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[0.75rem] font-bold"
                   style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
                 >
                   {i + 1}
                 </span>
-                <span className="text-[14.5px] leading-relaxed">
+                <span className="text-[0.9062rem] leading-relaxed">
                   <strong>{t}.</strong> <span style={{ color: 'var(--muted)' }}>{d}</span>
                 </span>
               </li>
