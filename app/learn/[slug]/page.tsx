@@ -38,7 +38,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         lede={l.oneLine}
       />
 
-      <Prose paragraphs={l.body} className="text-[17px]" />
+      <Prose paragraphs={l.body} />
 
       {l.visual ? <ConceptVisualBlock visual={l.visual} /> : null}
 

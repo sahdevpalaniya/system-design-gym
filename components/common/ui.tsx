@@ -57,9 +57,13 @@ export function Bullets({ items, marker }: { items: string[]; marker?: ReactNode
 
 /* ---------- layout ---------- */
 
-export function Page({ children }: { children: ReactNode; wide?: boolean }) {
-  // full width — the sidebar is the only fixed column; content fills the rest
-  return <main className="w-full px-5 pt-7 pb-20 sm:px-8">{children}</main>
+export function Page({ children, wide }: { children: ReactNode; wide?: boolean }) {
+  // capped reading column — full width is unreadable on a wide monitor
+  return (
+    <main className={`mx-auto w-full px-5 pt-7 pb-20 sm:px-8 ${wide ? 'max-w-[1180px]' : 'max-w-[820px]'}`}>
+      {children}
+    </main>
+  )
 }
 
 export function PageHeader({
