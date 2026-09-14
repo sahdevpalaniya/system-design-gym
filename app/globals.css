@@ -2,73 +2,77 @@
 
 /* ---------- design tokens ---------- */
 :root {
-  --bg: #faf8f4;
+  --bg: #ffffff;
   --surface: #ffffff;
-  --surface-2: #f3f0e9;
-  --border: #e4dfd4;
-  --border-strong: #cfc8b8;
-  --text: #22201c;
-  --muted: #6b6559;
-  --faint: #98917f;
-  --accent: #b45309;
-  --accent-soft: #fdf1de;
+  --surface-2: #f4f4f5;
+  --border: #e6e6e7;
+  --border-strong: #cfcfd2;
+  --text: #111111;
+  --muted: #5f6368;
+  --faint: #8b8f94;
+  --accent: #111111;
+  --accent-soft: #f2f2f3;
   --on-accent: #ffffff;
-  --accent-line: #e6c48f;
-  --cost: #8a5a00;
-  --cost-bg: #fdf5e3;
-  --trap: #a02c1f;
-  --trap-bg: #fceeeb;
-  --say: #145c52;
-  --say-bg: #e6f4f0;
-  --ok: #2f7a4f;
-  --warn: #b06a12;
-  --bad: #b03a2b;
-  --dim: #a8a094;
-  --shadow: 0 1px 2px rgba(30, 25, 15, 0.05), 0 8px 24px -12px rgba(30, 25, 15, 0.14);
-  --font-body: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --accent-line: #cfcfd2;
+  --cost: #3f4144;
+  --cost-bg: #f6f6f7;
+  --trap: #3f4144;
+  --trap-bg: #f6f6f7;
+  --say: #3f4144;
+  --say-bg: #f6f6f7;
+  --ok: #3f7d55;
+  --warn: #8a6d2f;
+  --bad: #a4483c;
+  --dim: #a9adb2;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --font-body: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-ui: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  --code-bg: #fcfaf5;
-  --code-gutter: #c9c2b1;
-  --code-comment: #8b8574;
-  --code-string: #1f6b4f;
-  --code-key: #a4460c;
-  --code-type: #2a5f8f;
-  --code-num: #8a5a00;
+  --code-bg: #fafafa;
+  --code-gutter: #c4c7ca;
+  --code-comment: #8b8f94;
+  --code-string: #4a6b57;
+  --code-key: #3f4144;
+  --code-type: #4c5b6b;
+  --code-num: #6b625a;
+  --read: 880px;
+  --read-wide: 1240px;
+  --ui-size: 17px;
+  --prose-size: 1.125rem;
   color-scheme: light;
 }
 
 html[data-theme="dark"] {
-  --bg: #14130f;
-  --surface: #1c1a16;
-  --surface-2: #23211b;
-  --border: #322e26;
-  --border-strong: #474236;
-  --text: #ece7dc;
-  --muted: #a49c8c;
-  --faint: #7d7565;
-  --accent: #e8a13c;
-  --accent-soft: #2a2213;
-  --on-accent: #14130f;
-  --accent-line: #6b5527;
-  --cost: #e0aa4e;
-  --cost-bg: #2a2214;
-  --trap: #ef8878;
-  --trap-bg: #2e1a16;
-  --say: #63c7b1;
-  --say-bg: #122723;
-  --ok: #6cc48d;
-  --warn: #ddaa4e;
-  --bad: #e07a68;
-  --dim: #5d564a;
-  --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 10px 30px -14px rgba(0, 0, 0, 0.6);
-  --code-bg: #191712;
-  --code-gutter: #4a4438;
-  --code-comment: #7d7565;
-  --code-string: #79c9a4;
-  --code-key: #e8a13c;
-  --code-type: #8ab8e2;
-  --code-num: #ddaa4e;
+  --bg: #0f0f10;
+  --surface: #161617;
+  --surface-2: #1d1d1f;
+  --border: #2a2a2c;
+  --border-strong: #3d3d40;
+  --text: #ededee;
+  --muted: #a0a2a6;
+  --faint: #77797d;
+  --accent: #ededee;
+  --accent-soft: #232325;
+  --on-accent: #0f0f10;
+  --accent-line: #3d3d40;
+  --cost: #c3c5c8;
+  --cost-bg: #1d1d1f;
+  --trap: #c3c5c8;
+  --trap-bg: #1d1d1f;
+  --say: #c3c5c8;
+  --say-bg: #1d1d1f;
+  --ok: #6fae85;
+  --warn: #c2a163;
+  --bad: #d3796c;
+  --dim: #56585c;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --code-bg: #151516;
+  --code-gutter: #45474a;
+  --code-comment: #77797d;
+  --code-string: #8fb79e;
+  --code-key: #c3c5c8;
+  --code-type: #9aabbb;
+  --code-num: #bdb2a6;
   color-scheme: dark;
 }
 
@@ -95,6 +99,16 @@ html[data-theme="dark"] {
   --font-mono: var(--font-mono);
 }
 
+/* one knob per screen class: the big monitor gets a bigger column and bigger type */
+@media (min-width: 1700px) {
+  :root {
+    --read: 960px;
+    --read-wide: 1360px;
+    --ui-size: 18px;
+    --prose-size: 1.25rem;
+  }
+}
+
 /* ---------- base ---------- */
 * {
   border-color: var(--border);
@@ -108,7 +122,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font-family: var(--font-ui);
-  font-size: 17px;
+  font-size: var(--ui-size);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
@@ -132,8 +146,8 @@ a {
 /* ---------- prose ---------- */
 .prose {
   font-family: var(--font-body);
-  font-size: 1.1875rem;
-  line-height: 1.8;
+  font-size: var(--prose-size);
+  line-height: 1.7;
   color: var(--text);
 }
 

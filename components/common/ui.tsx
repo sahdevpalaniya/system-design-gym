@@ -60,7 +60,7 @@ export function Bullets({ items, marker }: { items: string[]; marker?: ReactNode
 export function Page({ children, wide }: { children: ReactNode; wide?: boolean }) {
   // capped reading column — full width is unreadable on a wide monitor
   return (
-    <main className={`mx-auto w-full px-5 pt-7 pb-20 sm:px-8 ${wide ? 'max-w-[1180px]' : 'max-w-[820px]'}`}>
+    <main className={`mx-auto w-full px-5 pt-7 pb-20 sm:px-8 ${wide ? 'max-w-[var(--read-wide)]' : 'max-w-[var(--read)]'}`}>
       {children}
     </main>
   )
