@@ -6,11 +6,28 @@ import { Callout } from '@/components/common/visuals'
 import { getDeepDive, getExample } from '@/content/system-design/deep'
 import { WorkedExampleBlock } from '@/components/system-design/DeepDive'
 import { ConceptCheck, ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
+import { AnimatedFlow } from '@/components/common/visuals'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
+import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, pageMeta, subject, withUtm } from '@/lib/seo'
+import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return CONCEPTS.map((c) => ({ slug: c.slug }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const c = getConcept((await params).slug)
+  if (!c) return {}
+  const short = c.searchTitle ?? c.navTitle ?? c.title
+  // the searcher is not looking up "caching" — they are preparing for an
+  // interview, so the intent modifier is the keyword that can actually rank
+  return pageMeta(
+    `${short} — system design interview`,
+    `${short} explained for a system design interview: ${c.oneLine} What it costs you, when to use it, when not to, and the follow-up interviewers ask.`,
+    `/concepts/${c.slug}`,
+    true,
+  )
 }
 
 export default async function ConceptPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -18,6 +35,9 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
   const c = getConcept(slug)
   if (!c) notFound()
 
+  // headings name the topic, so they match how people actually search:
+  // "when not to use caching" rather than a generic "when to use it"
+  const subj = c.subject ?? subject(c.navTitle ?? c.title)
   const related = (c.related ?? []).map(getConcept).filter(Boolean)
   const usedIn = PROBLEMS.filter((p) => p.concepts.includes(c.slug))
   const deep = getDeepDive(c.slug)
@@ -28,6 +48,33 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
 
   return (
     <Page>
+      {/* the Q&A already on the page, in the shape Google reads for rich results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            [
+              faqJsonLd([
+                { q: c.followUp.q, a: c.followUp.answer },
+                { q: c.selfCheck.q, a: c.selfCheck.answer },
+              ]),
+              breadcrumbJsonLd([
+                { name: 'System design', path: '/' },
+                { name: 'Concepts', path: '/concepts' },
+                { name: c.navTitle ?? c.title, path: `/concepts/${c.slug}` },
+              ]),
+              articleJsonLd({
+                headline: c.title,
+                description: c.oneLine,
+                path: `/concepts/${c.slug}`,
+                published: CONTENT_PUBLISHED,
+                modified: CONTENT_MODIFIED,
+                section: TIER_INFO[c.tier].name,
+              }),
+            ],
+          ),
+        }}
+      />
       <PageHeader
         eyebrow={
           <>
@@ -40,11 +87,11 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         lede={c.oneLine}
       />
 
-      <Section n="1" title="What problem does this solve?">
+      <Section n="1" title={`What problem does ${subj} solve?`}>
         <Prose paragraphs={c.problem} />
       </Section>
 
-      <Section n="2" title="What does it cost you?">
+      <Section n="2" title={`What ${subj} costs you`}>
         <Callout variant="cost">
           <Rich text={c.cost} />
         </Callout>
@@ -54,7 +101,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         </p>
       </Section>
 
-      <Section n="3" title="When to use it, when not to">
+      <Section n="3" title={`When to reach for ${subj}, and when not to`}>
         <div className="grid gap-4 sm:grid-cols-2">
           <Card>
             <h3 className="mb-3 flex items-center gap-2 text-[0.875rem] font-semibold" style={{ color: 'var(--ok)' }}>
@@ -77,9 +124,14 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         </div>
       </Section>
 
-      <Section n="4" title="How it actually works">
+      <Section n="4" title={`How ${subj} actually works`}>
         <ConceptVisualBlock visual={c.visual} />
         {c.body?.length ? <Prose paragraphs={c.body} /> : null}
+        {c.animation ? (
+          <div className="my-8">
+            <AnimatedFlow scenario={c.animation.scenario} caption={c.animation.caption} />
+          </div>
+        ) : null}
         {c.traps?.length ? (
           <Callout variant="trap">
             <ul>
@@ -126,7 +178,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         </section>
       ) : null}
 
-      <Section n="5" title="The follow-up an interviewer will ask">
+      <Section n="5" title={`The ${subj} follow-up an interviewer will ask`}>
         <Card>
           <p className="mb-4 text-[1.0625rem] leading-snug font-semibold">
             <Rich text={c.followUp.q} />
@@ -150,6 +202,35 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         <div className="mb-10">
           <WorkedExampleBlock example={example} />
         </div>
+      ) : null}
+
+      {c.refs?.length ? (
+        <Section n="7" title="Learn it from the source">
+          <p className="mb-4 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
+            This page gets you interview-ready. These take you to where the idea
+            is actually specified or measured — read them when you want the real depth.
+          </p>
+          <ul className="space-y-3">
+            {c.refs.map((r) => (
+              <li key={r.href}>
+                <a
+                  href={withUtm(r.href)}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-[0.9375rem] font-semibold hover:opacity-70"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  {r.label} ↗
+                </a>
+                {r.note ? (
+                  <span className="mt-0.5 block text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
+                    {r.note}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </Section>
       ) : null}
 
       <div className="mb-8">

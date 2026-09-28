@@ -59,6 +59,18 @@ export const TIER3: Concept[] = [
     sayThis:
       '"Token bucket at the gateway, keyed by API key with a per-IP fallback, counters in Redis with a sliding window. Burst of 100, sustained 20 a second. If Redis is unavailable I allow the traffic and rely on a rough per-server limit — a limiter outage should not take the API down, and I am accepting the abuse window that creates."',
     related: ['load-balancing', 'circuit-breakers', 'distributed-counter'],
+    refs: [
+      {
+        label: "RFC 6585 \u2014 Additional HTTP Status Codes",
+        href: "https://datatracker.ietf.org/doc/html/rfc6585",
+        note: "Where 429 Too Many Requests is defined, along with Retry-After.",
+      },
+    ],
+    hints: [
+      "Draw the window boundary. Put requests at the very end of one window and the very start of the next.",
+      "Both bursts are legal in their own window. How far apart in real time are they?",
+      "The fix stops treating time as fixed buckets.",
+    ],
   },
 
   {
@@ -115,6 +127,21 @@ export const TIER3: Concept[] = [
     sayThis:
       '"Consistent hashing with about 150 virtual nodes per server, so adding a cache node moves roughly a fifth of the keys instead of all of them, and losing one spreads its load across everyone rather than doubling its neighbour. Cost: a ring the clients have to agree on, and it still does not help if one single key is hot."',
     related: ['partitioning', 'caching', 'load-balancing'],
+    refs: [
+      {
+        label: "Consistent hashing",
+        href: "https://en.wikipedia.org/wiki/Consistent_hashing",
+        note: "The original technique and the virtual-node refinement that makes it usable.",
+      },
+    ],
+    animation: {
+      scenario: "consistent-hash-ring",
+      caption: "The ring: adding a node moves only the keys between it and its neighbour, instead of reshuffling everything.",
+    },
+    hints: [
+      "Put three nodes on a ring by hashing their names. Are the gaps between them equal?",
+      "Now remove one node. Who inherits all of its keys, and how loaded is that neighbour now?",
+    ],
   },
 
   {
@@ -180,10 +207,27 @@ export const TIER3: Concept[] = [
     sayThis:
       '"A bloom filter of existing ids in front of the cache, about 1.2 MB per million keys at a 1% error rate, so lookups for ids that never existed die in memory instead of hitting the database. Cost: 1% of real lookups do a pointless query, and new ids must be added to the filter on write."',
     related: ['caching', 'indexes', 'search-indexing'],
+    refs: [
+      {
+        label: "Redis \u2014 Bloom filters",
+        href: "https://redis.io/docs/latest/develop/data-types/probabilistic/bloom-filter/",
+        note: "A production implementation, with the error-rate and capacity knobs exposed.",
+      },
+      {
+        label: "Bloom filter",
+        href: "https://en.wikipedia.org/wiki/Bloom_filter",
+        note: "The maths for choosing size and hash count against a false-positive rate.",
+      },
+    ],
+    hints: [
+      "Think about what a set bit means, and whether a bit can ever be un-set by accident.",
+      "One direction of the answer is certain and the other is a guess. Which is which decides whether you can use it as a gate.",
+    ],
   },
 
   {
     slug: 'write-ahead-log',
+    searchTitle: "Write-ahead log (WAL)",
     title: 'Write-ahead logs',
     tier: 3,
     oneLine: 'Write down what you are about to do, before you do it, so a crash cannot lose it.',
@@ -245,10 +289,26 @@ export const TIER3: Concept[] = [
     sayThis:
       '"Writes go to an append-only log, fsynced with group commit, then applied. Cost: every byte is written twice, and I have to checkpoint or recovery time grows without limit. The bonus is that the log is already the replication stream and the CDC feed."',
     related: ['replication', 'change-data-capture', 'bloom-filters'],
+    refs: [
+      {
+        label: "PostgreSQL \u2014 Write-Ahead Logging",
+        href: "https://www.postgresql.org/docs/current/wal-intro.html",
+        note: "WAL as actually implemented, including why it makes both durability and replication possible.",
+      },
+    ],
+    hints: [
+      "Ask what state the data file is in if the machine loses power halfway through updating it.",
+      "The log is append-only and sequential. Why does that make it both faster and safer to write first?",
+    ],
+    animation: {
+      scenario: "wal-append",
+      caption: "Why writing twice is faster, not slower: the sequential log append is what makes the write durable, so the client is told yes long before the data file is touched.",
+    },
   },
 
   {
     slug: 'cdn',
+    searchTitle: "CDN (content delivery network)",
     title: 'CDNs',
     tier: 3,
     oneLine: 'Put copies of your static content near users, so most requests never reach you.',
@@ -313,6 +373,26 @@ export const TIER3: Concept[] = [
     sayThis:
       '"Static files get a content hash in the filename and a one-year immutable cache, so I never purge. The HTML has a 60-second TTL with stale-while-revalidate. Logged-in responses are no-store. Cost: bandwidth, and any mistake on a non-versioned path takes minutes to undo worldwide."',
     related: ['caching', 'latency-numbers', 'realtime-transports'],
+    refs: [
+      {
+        label: "MDN \u2014 HTTP Caching",
+        href: "https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Caching",
+        note: "Cache-Control, s-maxage and stale-while-revalidate explained header by header.",
+      },
+      {
+        label: "RFC 9111 \u2014 HTTP Caching",
+        href: "https://www.rfc-editor.org/rfc/rfc9111.html",
+        note: "The specification behind those headers, for when a colleague insists otherwise.",
+      },
+    ],
+    animation: {
+      scenario: "cdn-pull",
+      caption: "Pull CDN: the first request for an object misses and fetches from origin; every later request in that region is served at the edge.",
+    },
+    hints: [
+      "Ask what the cache key is. Usually just the URL \u2014 so what happens when two different people request the same URL?",
+      "The damage here is not staleness. Say out loud what the second user sees.",
+    ],
   },
 
   {
@@ -379,10 +459,23 @@ export const TIER3: Concept[] = [
     sayThis:
       '"Geohash at 6 characters, roughly a kilometre, with current driver positions in a Redis sorted set per cell. A search reads my cell plus the eight neighbours, then ranks the candidates by estimated arrival time, not straight-line distance. Cost: positions are a few seconds old, and I need to widen the search in empty areas."',
     related: ['indexes', 'partitioning', 'caching'],
+    refs: [
+      {
+        label: "H3 \u2014 Hexagonal hierarchical geospatial indexing",
+        href: "https://h3geo.org/docs/",
+        note: "Uber's grid system, built for exactly the matching problems this concept serves.",
+      },
+    ],
+    hints: [
+      "An index on two columns can narrow one range efficiently. What does it do with the second range?",
+      "Picture the rows that satisfy the latitude range alone \u2014 a band across the whole world. How many are they?",
+    ],
   },
 
   {
     slug: 'realtime-transports',
+    searchTitle: "WebSockets vs SSE vs polling",
+    subject: "WebSockets",
     title: 'Long polling vs WebSockets vs SSE',
     navTitle: 'Polling, WebSockets, SSE',
     tier: 3,
@@ -456,6 +549,22 @@ export const TIER3: Concept[] = [
     sayThis:
       '"SSE, because updates only flow server to client and reconnection with last-event-id is built in. Connections are grouped by channel so one server holds the subscribers for a topic. Cost: I now have long-lived connections, so deploys need a slow roll and clients need randomised reconnect delays, or every restart is a self-inflicted spike."',
     related: ['load-balancing', 'message-queues', 'caching'],
+    refs: [
+      {
+        label: "MDN \u2014 WebSockets API",
+        href: "https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API",
+        note: "The transport, its lifecycle, and what breaks through proxies.",
+      },
+      {
+        label: "WHATWG \u2014 Server-sent events",
+        href: "https://html.spec.whatwg.org/multipage/server-sent-events.html",
+        note: "The SSE specification, including automatic reconnection and Last-Event-ID.",
+      },
+    ],
+    hints: [
+      "Once a minute is not a lot. Ask what a persistent connection is costing you between updates.",
+      "Then ask which direction the data actually flows here. Do you ever need the client to push?",
+    ],
   },
 
   {
@@ -527,6 +636,21 @@ export const TIER3: Concept[] = [
     sayThis:
       '"The search index is fed by CDC off the database log, so it cannot miss a write, including ones made outside the application. Indexing is safe to repeat because it writes the whole document. Cost: about a second of lag, a tie to the schema, and I need a reconciliation job, because any long-running pipeline eventually drifts."',
     related: ['write-ahead-log', 'distributed-transactions', 'search-indexing'],
+    refs: [
+      {
+        label: "Debezium \u2014 Architecture",
+        href: "https://debezium.io/documentation/reference/stable/architecture.html",
+        note: "The most widely used CDC implementation, reading the database log directly.",
+      },
+    ],
+    hints: [
+      "Two systems, two writes, no transaction across them. What happens when the second one fails?",
+      "Now ask who else might write to that database \u2014 a migration, an admin script, another service.",
+    ],
+    animation: {
+      scenario: "cdc-stream",
+      caption: "One write by the application. Everything downstream is derived from the database log, which is why the search index cannot silently drift out of step with the table.",
+    },
   },
 
   {
@@ -594,10 +718,31 @@ export const TIER3: Concept[] = [
     sayThis:
       '"Every outbound call gets a timeout just above p99, two retries with growing delays and full jitter, and a breaker that opens on a failure rate rather than a raw count. Recommendations have their own connection pool and fall back to a cached list. Cost: during an incident, some requests that would have succeeded are rejected — I am trading a few requests to keep the service up."',
     related: ['idempotency', 'connection-pooling', 'rate-limiting'],
+    refs: [
+      {
+        label: "Martin Fowler \u2014 CircuitBreaker",
+        href: "https://martinfowler.com/bliki/CircuitBreaker.html",
+        note: "The pattern as originally written up, with the state machine drawn out.",
+      },
+      {
+        label: "Timeouts, retries and backoff with jitter",
+        href: "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/",
+        note: "Why retries without jitter turn a blip into an outage.",
+      },
+    ],
+    animation: {
+      scenario: "circuit-breaker",
+      caption: "The breaker opens after repeated failures and fails fast instead of queueing. One probe request tests whether the dependency is back.",
+    },
+    hints: [
+      "A thousand clients all fail at the same instant and all back off by exactly the same amount. When do they retry?",
+      "Picture the traffic graph: not a recovery, but a series of spikes. Jitter breaks what property of that group?",
+    ],
   },
 
   {
     slug: 'search-indexing',
+    subject: "a search index",
     title: 'Search indexing basics',
     tier: 3,
     oneLine: 'An index from words to documents, so "find me things containing this" is not a full scan.',
@@ -664,10 +809,27 @@ export const TIER3: Concept[] = [
     sayThis:
       '"Postgres stays the source of truth. The search index is fed by CDC and holds whole documents, so re-indexing is safe to repeat. Ranking is BM25 plus popularity and stock. Cost: about a second of lag, so a user searching for something they just created may not find it — I read their own items from the database instead."',
     related: ['indexes', 'change-data-capture', 'caching'],
+    refs: [
+      {
+        label: "Apache Lucene \u2014 Documentation",
+        href: "https://lucene.apache.org/core/documentation.html",
+        note: "The inverted-index engine underneath Elasticsearch and Solr.",
+      },
+      {
+        label: "Elasticsearch \u2014 Reference",
+        href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/index.html",
+        note: "Analysis, mapping and relevance scoring as operational concerns.",
+      },
+    ],
+    hints: [
+      "Ask what the index stores. Is it the original words, or something done to them first?",
+      "LIKE compares characters. What would you have to do to the words before storing them to make these match?",
+    ],
   },
 
   {
     slug: 'distributed-counter',
+    subject: "a sharded counter",
     title: 'Distributed counters',
     tier: 3,
     oneLine: 'Counting is easy until everyone counts the same thing at once.',
@@ -721,5 +883,16 @@ export const TIER3: Concept[] = [
     sayThis:
       '"View counts batch in memory per server, flush every second into one of 50 shard rows, and the displayed total is a cached sum refreshed every few seconds. Cost: the number is a couple of seconds old, and a crash loses under a second of counts. I would not use any of this for remaining tickets — that needs one row and a conditional update."',
     related: ['rate-limiting', 'partitioning', 'caching'],
+    refs: [
+      {
+        label: "Redis \u2014 Bloom filters and probabilistic types",
+        href: "https://redis.io/docs/latest/develop/data-types/probabilistic/bloom-filter/",
+        note: "The same family of structures used when an exact count is too expensive.",
+      },
+    ],
+    hints: [
+      "Sharding a counter means the true total is only known when you add the shards up.",
+      "So ask what breaks when you must reject the very next request based on the exact current value.",
+    ],
   },
 ]

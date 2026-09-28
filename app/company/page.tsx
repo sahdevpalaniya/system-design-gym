@@ -3,6 +3,14 @@ import { COMPANIES, COMPANY_QUESTIONS, questionsFor } from '@/content/system-des
 import { getArchetype } from '@/content/system-design/archetypes'
 import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
 
+import { pageMeta } from '@/lib/seo'
+
+export const metadata = pageMeta(
+  'Company-wise system design practice',
+  'What Google, Amazon, Meta, Microsoft, Netflix and Uber actually press on in a system design round, and the questions to rehearse for each.',
+  '/company',
+)
+
 export default function CompanyIndex() {
   return (
     <Page wide>

@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const NOTIFICATION_SYSTEM: Problem = {
   slug: 'notification-system',
+  searchTitle: "Design a notification system",
   title: 'Notification system',
   group: 'write-heavy',
   difficulty: 'starter',
@@ -199,6 +200,13 @@ export const NOTIFICATION_SYSTEM: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Avoiding insurmountable queue backlogs",
+      href: "https://aws.amazon.com/builders-library/avoiding-insurmountable-queue-backlogs/",
+      note: "What happens when the notification queue falls behind and never catches up.",
+    },
+  ],
   lifecycle: {
     caption:
       'Your responsibility ends at "provider accepted". Everything after that is a report you receive, not an outcome you control — and saying so is part of the answer.',

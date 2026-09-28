@@ -160,7 +160,8 @@ export default function MockPage() {
     <Suspense
       fallback={
         <Page>
-          <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
+          <PageHeader eyebrow={'Timed mock'} title={'Timed mock · 45 minutes'} lede={'A full problem under interview conditions, timed, with the clock visible.'} />
+          <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>
         </Page>

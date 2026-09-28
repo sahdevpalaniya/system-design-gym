@@ -558,13 +558,6 @@ export function axisScoresBefore(state: ProgressState, recent = 12): Scores | nu
   return any ? out : null
 }
 
-export function weakestAxis(state: ProgressState): Axis | null {
-  const s = axisScores(state)
-  const touched = AXES.filter((a) => s[a] > 0)
-  if (touched.length < 2) return null
-  return touched.reduce((min, a) => (s[a] < s[min] ? a : min), touched[0])
-}
-
 export function isRead(state: ProgressState, id: string): boolean {
   return Boolean(state.read?.[id])
 }
@@ -663,10 +656,6 @@ export function streakCount(state: ProgressState): number {
     else break
   }
   return n
-}
-
-export function activeDaysSet(state: ProgressState): Set<string> {
-  return new Set(state.streak.days)
 }
 
 export function failingCategories(state: ProgressState): { category: FollowUpCategory; rate: number; n: number }[] {

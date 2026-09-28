@@ -5,9 +5,23 @@ import { DEEP_DIVES, getDeepDive, getExample } from '@/content/system-design/dee
 import { DeepDiveBody, WorkedExampleBlock } from '@/components/system-design/DeepDive'
 import { Page, PageHeader } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
+import { pageMeta } from '@/lib/seo'
 
 export function generateStaticParams() {
   return Object.keys(DEEP_DIVES).map((slug) => ({ slug }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const c = getConcept(slug)
+  if (!c) return {}
+  const short = c.navTitle ?? c.title
+  return pageMeta(
+    `${short} explained in depth — system design`,
+    `How ${short.toLowerCase()} actually behaves under load: the mechanism, the failure modes, the numbers and a worked example.`,
+    `/concepts/${slug}/deep`,
+    true,
+  )
 }
 
 export default async function DeepDivePage({ params }: { params: Promise<{ slug: string }> }) {

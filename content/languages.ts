@@ -8,10 +8,6 @@ export function getLanguage(id: string): Language | undefined {
   return LANGUAGES.find((l) => l.id === id)
 }
 
-export function getLangLesson(langID: string, slug: string): LangLesson | undefined {
-  return getLanguage(langID)?.lessons.find((l) => l.slug === slug)
-}
-
 /** The lessons of a language in section order, flattened — for prev/next links. */
 export function orderedLessons(lang: Language): LangLesson[] {
   const bySlug = new Map(lang.lessons.map((l) => [l.slug, l]))

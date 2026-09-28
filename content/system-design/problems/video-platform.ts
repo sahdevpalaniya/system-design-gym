@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const VIDEO_PLATFORM: Problem = {
   slug: 'video-platform',
+  searchTitle: "Design a video streaming platform",
   title: 'Video upload and playback',
   navTitle: 'Video platform',
   group: 'big-files',
@@ -217,6 +218,13 @@ export const VIDEO_PLATFORM: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "MDN \u2014 WebSockets API",
+      href: "https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API",
+      note: "For the live side of a video platform; segments themselves are ordinary cacheable files.",
+    },
+  ],
   lifecycle: {
     caption:
       'A video\'s life. "Stuck in processing forever" is the branch that generates the most support tickets and the one most often missing from a whiteboard.',

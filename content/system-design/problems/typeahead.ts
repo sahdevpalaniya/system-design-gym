@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const TYPEAHEAD: Problem = {
   slug: 'typeahead',
+  searchTitle: "Design search autocomplete",
   title: 'Search typeahead',
   navTitle: 'Typeahead',
   group: 'search',
@@ -216,6 +217,13 @@ export const TYPEAHEAD: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Elasticsearch \u2014 Suggesters",
+      href: "https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html",
+      note: "Prefix completion as an actual implementation, with its memory cost.",
+    },
+  ],
   lifecycle: {
     caption:
       'A suggestion, from logged queries to a dropdown. The out-of-order response branch is a design problem that shows up as a UI bug.',

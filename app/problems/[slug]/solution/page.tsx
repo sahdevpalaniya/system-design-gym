@@ -13,9 +13,23 @@ import {
   NumbersBar,
 } from '@/components/common/visuals'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
+import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
+import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return PROBLEMS.map((p) => ({ slug: p.slug }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const p = getProblem((await params).slug)
+  if (!p) return {}
+  const search = p.searchTitle ?? `Design ${(p.navTitle ?? p.title).toLowerCase()}`
+  return pageMeta(
+    `${search} — full worked solution`,
+    `${search}: the complete answer stage by stage — requirements, lifecycle, capacity numbers, the architecture and every tradeoff named out loud.`,
+    `/problems/${p.slug}/solution`,
+    true,
+  )
 }
 
 /** what each stage is for, in one line a beginner can hold on to */
@@ -36,6 +50,28 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
   return (
     <Page>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            breadcrumbJsonLd([
+              { name: 'System design', path: '/' },
+              { name: 'Problems', path: '/problems' },
+              { name: p.navTitle ?? p.title, path: `/problems/${p.slug}` },
+              { name: 'Solution', path: `/problems/${p.slug}/solution` },
+            ]),
+            articleJsonLd({
+              headline: `${p.searchTitle ?? p.title} — worked solution`,
+              description: p.prompt,
+              path: `/problems/${p.slug}/solution`,
+              published: CONTENT_PUBLISHED,
+              modified: CONTENT_MODIFIED,
+              section: 'Worked solutions',
+            }),
+          ]),
+        }}
+      />
       <PageHeader
         eyebrow={
           <>

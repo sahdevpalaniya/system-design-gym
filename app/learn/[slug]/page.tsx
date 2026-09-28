@@ -5,9 +5,24 @@ import { PATH, getConcept } from '@/content/system-design/concepts'
 import { ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
 import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
+import { pageMeta } from '@/lib/seo'
 
 export function generateStaticParams() {
   return LESSONS.map((l) => ({ slug: l.slug }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const l = getLesson((await params).slug)
+  if (!l) return {}
+  return pageMeta(
+    // the lesson titles already say "system design"; do not say it twice
+    /^What is system design/.test(l.title)
+      ? 'What is system design? A beginner\u2019s introduction'
+      : `${l.navTitle ?? l.title} — system design basics`,
+    `${l.oneLine} ${l.body[0] ?? ''}`,
+    `/learn/${l.slug}`,
+    true,
+  )
 }
 
 export default async function LessonPage({ params }: { params: Promise<{ slug: string }> }) {

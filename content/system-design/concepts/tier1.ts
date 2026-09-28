@@ -9,6 +9,7 @@ import type { Concept } from '@/lib/types'
 export const TIER1: Concept[] = [
   {
     slug: 'latency-numbers',
+    subject: "the latency numbers",
     title: 'Latency numbers worth memorising',
     navTitle: 'Latency numbers',
     tier: 1,
@@ -63,10 +64,28 @@ export const TIER1: Concept[] = [
     sayThis:
       '"A round trip inside one datacenter is well under a millisecond, so I am not worried about lots of small calls there. Across regions it is over 100 ms, so I will allow exactly one of those per request and design around it."',
     related: ['back-of-envelope', 'caching', 'cdn'],
+    refs: [
+      {
+        label: "Latency Numbers Every Programmer Should Know",
+        href: "https://gist.github.com/jboner/2841832",
+        note: "Jeff Dean's original table. The source of every version of this list you have seen.",
+      },
+      {
+        label: "Interactive latency numbers by year",
+        href: "https://colin-scott.github.io/personal_website/research/interactive_latency.html",
+        note: "The same numbers on a slider from 1990 to today \u2014 worth it to see which ones stopped improving.",
+      },
+    ],
+    hints: [
+      "Write both numbers in the same unit before you compare them. 100 ns and 150 ms.",
+      "Once you have the ratio, ask what you routinely do thousands of times per request \u2014 and whether you could do that across the world.",
+    ],
   },
 
   {
     slug: 'back-of-envelope',
+    searchTitle: "Back-of-the-envelope estimation",
+    subject: "back-of-envelope maths",
     title: 'Back-of-envelope estimation',
     navTitle: 'Back-of-envelope maths',
     tier: 1,
@@ -120,6 +139,23 @@ export const TIER1: Concept[] = [
     sayThis:
       '"Ten million daily users, twenty actions each, so about two thousand per second on average and call it six thousand at peak. Reads are maybe fifty to one against writes. So the hard part here is read fan-out, not durability."',
     related: ['latency-numbers', 'caching', 'partitioning'],
+    refs: [
+      {
+        label: "Back-of-the-envelope calculation",
+        href: "https://en.wikipedia.org/wiki/Back-of-the-envelope_calculation",
+        note: "The general technique, outside software. Useful for seeing why the method works at all.",
+      },
+      {
+        label: "MDN \u2014 Understanding latency",
+        href: "https://developer.mozilla.org/en-US/docs/Web/Performance/Guides/Understanding_latency",
+        note: "The browser-side numbers you will be estimating against.",
+      },
+    ],
+    hints: [
+      "Start with total actions per day, not per second. Multiply first, divide later.",
+      "There are about 86,400 seconds in a day. Round that to 100,000 and the arithmetic gets easy.",
+      "Traffic is never flat. Pick a peak multiplier and say it out loud as an assumption rather than hiding it.",
+    ],
   },
 
   {
@@ -176,6 +212,26 @@ export const TIER1: Concept[] = [
     sayThis:
       '"Cache-aside in Redis, five minute TTL with jitter, and I delete the key on write. Cost: on the rare path where the delete fails, a user can see data up to five minutes old. And if Redis dies the database takes the full read load, so I will coalesce misses to make one key mean one database read."',
     related: ['latency-numbers', 'cdn', 'bloom-filters', 'consistency-models'],
+    refs: [
+      {
+        label: "Redis \u2014 Key eviction",
+        href: "https://redis.io/docs/latest/develop/reference/eviction/",
+        note: "LRU, LFU and the rest as real policies you configure, not just interview words.",
+      },
+      {
+        label: "RFC 9111 \u2014 HTTP Caching",
+        href: "https://www.rfc-editor.org/rfc/rfc9111.html",
+        note: "The specification for TTLs, revalidation and stale-while-revalidate.",
+      },
+    ],
+    hints: [
+      "Ask which single number in a booking system, if it were a few seconds stale, would let you sell something twice.",
+      "The cost of being wrong is not a slow page here. Say what the user actually experiences.",
+    ],
+    animation: {
+      scenario: "write-through",
+      caption: "Write-through: every write pays the cache and the database before it returns. Slower writes, but the cache is never stale.",
+    },
   },
 
   {
@@ -230,10 +286,32 @@ export const TIER1: Concept[] = [
     sayThis:
       '"Layer 7 balancer, least-connections, active health checks on a cheap endpoint that does not touch the database. Servers hold no session state, so any server can take any request. Cost: an extra hop, and I need at least two balancers, or the balancer is the single point of failure I just drew."',
     related: ['circuit-breakers', 'consistent-hashing', 'rate-limiting'],
+    refs: [
+      {
+        label: "Google SRE Book \u2014 Load Balancing at the Frontend",
+        href: "https://sre.google/sre-book/load-balancing-frontend/",
+        note: "How this works at a scale where the load balancer is itself a distributed system.",
+      },
+      {
+        label: "nginx \u2014 HTTP Load Balancing",
+        href: "https://nginx.org/en/docs/http/load_balancing.html",
+        note: "Round robin, least connections and hashing as real configuration directives.",
+      },
+    ],
+    hints: [
+      "Walk through what the health check returns when the database is slow. Now ask what the load balancer concludes about that server.",
+      "Every server shares that database. So what does the load balancer conclude about all of them at once?",
+      "For the fix, ask what a health check should really be answering: 'is my whole world healthy' or 'can I serve a request'?",
+    ],
+    animation: {
+      scenario: "round-robin",
+      caption: "Round robin in motion: each request goes to the next server in turn, whether or not that server is already busy.",
+    },
   },
 
   {
     slug: 'sql-vs-nosql',
+    subject: "a relational database",
     title: 'SQL vs NoSQL — and why, not just names',
     navTitle: 'SQL vs NoSQL',
     tier: 1,
@@ -303,10 +381,27 @@ export const TIER1: Concept[] = [
     sayThis:
       '"Postgres for the core, because bookings need a real transaction. The event stream is 50k writes a second and only ever read by device id, so that goes in a partitioned key-value store. Cost: two systems to run, and no transaction covers both — so I will make the stream safe to repeat instead."',
     related: ['indexes', 'partitioning', 'distributed-transactions'],
+    refs: [
+      {
+        label: "PostgreSQL \u2014 Indexes",
+        href: "https://www.postgresql.org/docs/current/indexes.html",
+        note: "What a relational database actually gives you, written by the people who implement it.",
+      },
+      {
+        label: "Jepsen \u2014 Consistency models",
+        href: "https://jepsen.io/consistency",
+        note: "The guarantees different databases really provide, tested rather than claimed.",
+      },
+    ],
+    hints: [
+      "Write out what must be true after money moves from one account to another. All of it, or none of it?",
+      "The deciding word is the guarantee you cannot give up. It is a single word, and it starts with a T.",
+    ],
   },
 
   {
     slug: 'indexes',
+    subject: "an index",
     title: 'Indexes and what makes a query slow',
     navTitle: 'Indexes and slow queries',
     tier: 1,
@@ -362,6 +457,22 @@ export const TIER1: Concept[] = [
     sayThis:
       '"That query filters by user and sorts by time, so a composite index on (user_id, created_at desc) serves both the filter and the sort. Cost: another index to maintain on a write-heavy table, and it will not help any query that filters on time alone."',
     related: ['sql-vs-nosql', 'search-indexing', 'geospatial-indexing'],
+    refs: [
+      {
+        label: "Use The Index, Luke!",
+        href: "https://use-the-index-luke.com/",
+        note: "Markus Winand's free book on SQL indexing. The best explanation of why your index is not being used.",
+      },
+      {
+        label: "PostgreSQL \u2014 Index Types",
+        href: "https://www.postgresql.org/docs/current/indexes.html",
+        note: "B-tree, hash, GiST, GIN and BRIN, and what each one is for.",
+      },
+    ],
+    hints: [
+      "Think of a phone book sorted by surname, then first name. Can you find everyone called Patel quickly?",
+      "Now find everyone whose first name is Rohan, any surname. What do you have to do?",
+    ],
   },
 
   {
@@ -424,5 +535,16 @@ export const TIER1: Concept[] = [
     sayThis:
       '"Pooled connections, sized at roughly four times the database core count, with a two-second timeout on getting one so we fail fast instead of piling up. With autoscaling I would put pgbouncer in front, so total connections stay flat no matter how many app servers we run."',
     related: ['load-balancing', 'circuit-breakers', 'indexes'],
+    refs: [
+      {
+        label: "PostgreSQL \u2014 Connection Settings",
+        href: "https://www.postgresql.org/docs/current/runtime-config-connection.html",
+        note: "What max_connections costs on the server side, which is the reason pooling exists.",
+      },
+    ],
+    hints: [
+      "The database is not busy, so the work is not the problem. Where else could the request be waiting?",
+      "Count the things a request needs before it can talk to the database at all. Is there a finite supply of any of them?",
+    ],
   },
 ]

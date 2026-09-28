@@ -8,9 +8,25 @@ import { AnimatedFlow, Callout, CompareCards, Diagram, LifecycleChain, NumbersBa
 import { StageEngine } from '@/components/system-design/StageEngine'
 import { Badge, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
 import type { StageId } from '@/lib/types'
+import { articleJsonLd, breadcrumbJsonLd, pageMeta, withUtm } from '@/lib/seo'
+import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return PROBLEMS.map((p) => ({ slug: p.slug }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
+  const p = getProblem((await params).slug)
+  if (!p) return {}
+  // "design a url shortener" is the phrase people actually type, so it is
+  // written out per problem rather than derived from the display title
+  const search = p.searchTitle ?? `Design ${(p.navTitle ?? p.title).toLowerCase()}`
+  return pageMeta(
+    `${search} — system design interview`,
+    `${search} in a system design interview: requirements, the lifecycle, the numbers, the architecture and the tradeoffs, worked in five stages. ${p.prompt}`,
+    `/problems/${p.slug}`,
+    true,
+  )
 }
 
 const ALL_STAGES: StageId[] = [1, 2, 3, 4, 5]
@@ -24,6 +40,29 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
 
   return (
     <Page>
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            [
+              breadcrumbJsonLd([
+                { name: 'System design', path: '/' },
+                { name: 'Problems', path: '/problems' },
+                { name: p.navTitle ?? p.title, path: `/problems/${p.slug}` },
+              ]),
+              articleJsonLd({
+                headline: p.searchTitle ?? p.title,
+                description: p.prompt,
+                path: `/problems/${p.slug}`,
+                published: CONTENT_PUBLISHED,
+                modified: CONTENT_MODIFIED,
+                section: 'Worked problems',
+              }),
+            ],
+          ),
+        }}
+      />
       <PageHeader
         eyebrow={
           <Link href={`/problems#${group.id}`} className="hover:opacity-70">
@@ -174,6 +213,36 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
           </span>
         </Link>
       </section>
+      {p.refs?.length ? (
+        <section className="mb-10">
+          <h2 className="mb-2 text-[1.0625rem] font-semibold">How it is really built</h2>
+          <p className="mb-4 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
+            Write your own answer first. Then read how the teams who run this at scale describe it —
+            their constraints were real, and the write-ups say what it cost them.
+          </p>
+          <ul className="space-y-3">
+            {p.refs.map((r) => (
+              <li key={r.href}>
+                <a
+                  href={withUtm(r.href, 'problem')}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="text-[0.9375rem] font-semibold hover:opacity-70"
+                  style={{ color: 'var(--accent)' }}
+                >
+                  {r.label} ↗
+                </a>
+                {r.note ? (
+                  <span className="mt-0.5 block text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
+                    {r.note}
+                  </span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
     </Page>
   )
 }

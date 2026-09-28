@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const CLICK_ANALYTICS: Problem = {
   slug: 'click-analytics',
+  searchTitle: "Design a click analytics pipeline",
   title: 'Click analytics pipeline',
   navTitle: 'Click analytics',
   group: 'pipelines',
@@ -224,6 +225,13 @@ export const CLICK_ANALYTICS: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Apache Kafka \u2014 Design",
+      href: "https://kafka.apache.org/documentation/#design",
+      note: "The ingestion log every analytics pipeline is built on.",
+    },
+  ],
   lifecycle: {
     caption:
       'An event, browser to dashboard. The late-arrival branch is the one that defines this group, and the "job was wrong" branch is what raw retention exists for.',

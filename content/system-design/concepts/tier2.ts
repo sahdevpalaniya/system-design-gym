@@ -58,6 +58,17 @@ export const TIER2: Concept[] = [
     sayThis:
       '"Single leader with two async followers, plus one semi-sync follower so a failover does not lose committed writes. Reads go to followers, except within ten seconds of a user\'s own write, which go to the leader. Cost: the leader is still my write ceiling, and failover means a few seconds of write errors."',
     related: ['partitioning', 'consistency-models', 'cap-pacelc', 'consensus'],
+    refs: [
+      {
+        label: "PostgreSQL \u2014 High Availability and Replication",
+        href: "https://www.postgresql.org/docs/current/high-availability.html",
+        note: "Synchronous versus asynchronous replication, and exactly what you lose on failover.",
+      },
+    ],
+    hints: [
+      "Ask what a read replica is allowed to accept. Can you send a write to one?",
+      "If every write still lands on the same single machine, what did you actually relieve?",
+    ],
   },
 
   {
@@ -113,10 +124,24 @@ export const TIER2: Concept[] = [
     sayThis:
       '"Hash-partition by conversation id into 1024 logical partitions mapped onto 16 machines, so growing means moving partitions rather than re-hashing. Cost: any query not scoped to a conversation has to ask every shard, and a very large group chat can still make one partition hot — I would handle those specifically rather than change the scheme."',
     related: ['consistent-hashing', 'replication', 'sql-vs-nosql'],
+    refs: [
+      {
+        label: "MongoDB \u2014 Sharding",
+        href: "https://www.mongodb.com/docs/manual/sharding/",
+        note: "Shard keys, chunk splitting and balancing, including how a bad shard key ruins you.",
+      },
+    ],
+    hints: [
+      "Picture where the messages of one conversation land when the shard key is the message id.",
+      "Now try to read that conversation in order. How many shards do you have to ask?",
+      "A good shard key puts the things you read together in the same place. What do you always read together here?",
+    ],
   },
 
   {
     slug: 'cap-pacelc',
+    searchTitle: "CAP theorem and PACELC",
+    subject: "the CAP tradeoff",
     title: 'CAP and PACELC as real tradeoffs',
     navTitle: 'CAP and PACELC',
     tier: 2,
@@ -161,7 +186,7 @@ export const TIER2: Concept[] = [
       },
     },
     body: [
-      'The exact statement: when the network splits, you cannot have both consistency and availability. It is not "pick two of three". Splits are not optional, they happen to you. So the real choice is between the other two, and only while the split lasts.',
+      'The exact statement of the CAP theorem: when the network splits, you cannot have both consistency and availability. It is not "pick two of three". Splits are not optional, they happen to you. So the real choice is between the other two, and only while the split lasts.',
       'PACELC finishes the thought, and its second half is the more useful one day to day. If there is a Partition, choose Availability or Consistency. Else — the 99.9% of the time when nothing is broken — choose Latency or Consistency. That second part is where systems actually differ. A store that confirms a write on one node is fast, and can serve old reads. A store that confirms only after a majority agrees is slower on every single write, forever, split or no split. Most people learn only the first half, and then cannot explain why a strongly consistent database is slow on a good day.',
       'Be clear about this: strong consistency costs speed permanently, not only during failures. That is the cost you name when you choose it.',
     ],
@@ -183,10 +208,22 @@ export const TIER2: Concept[] = [
     sayThis:
       '"During a network split I would keep browse and cart available and let them reconcile, and I would make checkout refuse rather than risk overselling. And even with no split, that checkout path pays a few extra milliseconds per write for majority agreement — that is the price of never selling the same seat twice."',
     related: ['consistency-models', 'replication', 'consensus'],
+    refs: [
+      {
+        label: "Please stop calling databases CP or AP",
+        href: "https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html",
+        note: "Martin Kleppmann on why the CAP classification is less useful than it looks.",
+      },
+    ],
+    hints: [
+      "Ask what it costs the business if an add-to-cart is briefly wrong or lost.",
+      "Now ask the same about taking someone's money twice, or taking it and losing the order.",
+    ],
   },
 
   {
     slug: 'consistency-models',
+    subject: "a stronger consistency model",
     title: 'Consistency models',
     tier: 2,
     oneLine: 'Exact words for how out of date a read is allowed to be.',
@@ -250,6 +287,27 @@ export const TIER2: Concept[] = [
     sayThis:
       '"Feed and counts are eventually consistent, a couple of seconds of lag nobody notices. A user\'s own posts are read-your-own-writes, so I pin their reads to the leader for ten seconds after they write. The balance check at payment is strongly consistent, and I accept the extra latency there, because being wrong costs real money."',
     related: ['replication', 'cap-pacelc', 'idempotency'],
+    refs: [
+      {
+        label: "Jepsen \u2014 Consistency models",
+        href: "https://jepsen.io/consistency",
+        note: "The definitive map of the guarantees, with the relationships between them drawn out.",
+      },
+      {
+        label: "Jepsen \u2014 Database analyses",
+        href: "https://jepsen.io/analyses",
+        note: "Real databases tested against their own marketing. Sobering and very specific.",
+      },
+    ],
+    hints: [
+      "The user is asking about something they themselves just did. Is that the same as needing everyone to agree?",
+      "You do not need the whole system consistent \u2014 only this one user's own view of their own writes.",
+      "The cheap fix is about where that one user's next read is sent.",
+    ],
+    animation: {
+      scenario: "read-your-writes",
+      caption: "Read-your-writes, or the lack of it: the user posts and reloads faster than replication can copy the row. Nothing is broken \u2014 the read simply went to a machine that has not heard yet.",
+    },
   },
 
   {
@@ -319,6 +377,17 @@ export const TIER2: Concept[] = [
     sayThis:
       '"Leadership is a lease in etcd, renewed every few seconds. Only the lease holder runs the job. Cost: a majority round trip per renewal, and if etcd is unreachable nobody runs the job — which I prefer to two nodes running it. And the job itself is safe to repeat, so even an overlapping lease is survivable."',
     related: ['replication', 'idempotency', 'cap-pacelc'],
+    refs: [
+      {
+        label: "The Raft Consensus Algorithm",
+        href: "https://raft.github.io/",
+        note: "The paper, plus a visualisation you can step through leader election with.",
+      },
+    ],
+    hints: [
+      "Consensus needs a strict majority of the original cluster, not of the survivors.",
+      "What is a majority of 5? Count what is left in each case and compare.",
+    ],
   },
 
   {
@@ -386,6 +455,21 @@ export const TIER2: Concept[] = [
     sayThis:
       '"Every write endpoint takes an Idempotency-Key. I insert it with a unique constraint in the same transaction as the work, so a retry hits the constraint and I replay the stored response. Cost: an extra table on the write path and a retention window to manage — worth it, because at-least-once is the only delivery I can actually get."',
     related: ['message-queues', 'distributed-transactions', 'circuit-breakers'],
+    refs: [
+      {
+        label: "Making retries safe with idempotent APIs",
+        href: "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/",
+        note: "The Amazon Builders' Library on idempotency tokens in production.",
+      },
+    ],
+    hints: [
+      "One approach remembers that this exact request already happened. What would you need to remember it by?",
+      "The other makes doing it twice indistinguishable from doing it once. Which operations are naturally like that?",
+    ],
+    animation: {
+      scenario: "duplicate-delivery",
+      caption: "The same message delivered twice. The second one gets as far as the service, finds its key already recorded, and stops \u2014 so the database only ever sees one write.",
+    },
   },
 
   {
@@ -445,6 +529,17 @@ export const TIER2: Concept[] = [
     sayThis:
       '"Order confirmation is synchronous, because the user needs a real answer. Everything after it goes on a queue, partitioned by order id so one order\'s events stay in sequence. Consumers are idempotent on message id, five retries with backoff, then a dead letter queue with an alert. Cost: the receipt email can be a minute late, which is fine, and I need to watch backlog growth rather than size."',
     related: ['idempotency', 'distributed-transactions', 'circuit-breakers'],
+    refs: [
+      {
+        label: "Apache Kafka \u2014 Design",
+        href: "https://kafka.apache.org/documentation/#design",
+        note: "The log-based design, partitions and consumer groups, from the source.",
+      },
+    ],
+    hints: [
+      "A queue makes something asynchronous. Ask what the user is staring at while it is queued.",
+      "Which single step in a checkout must the customer get a true answer to before the page can move on?",
+    ],
   },
 
   {
@@ -512,5 +607,21 @@ export const TIER2: Concept[] = [
     sayThis:
       '"I would avoid a distributed transaction. Reserve stock and create the order in one local transaction, write the event to an outbox in that same transaction, and let a relay publish it. Payment is a saga step after that, with a refund as the undo. Cost: for a few seconds an order exists that is not paid for, so the UI shows it as pending, and I need a reconciliation job for the stuck cases."',
     related: ['idempotency', 'message-queues', 'change-data-capture'],
+    refs: [
+      {
+        label: "Saga pattern",
+        href: "https://microservices.io/patterns/data/saga.html",
+        note: "Chris Richardson on sagas and compensating transactions, with the tradeoffs listed.",
+      },
+    ],
+    animation: {
+      scenario: "two-phase-commit",
+      caption: "Two-phase commit: everyone promises first, then everyone commits. Notice what happens to the others while one participant is still deciding.",
+    },
+    hints: [
+      "Imagine the process dies between the two steps. Do that twice \u2014 once after each step.",
+      "One ordering loses the event; the other announces something that never happened.",
+      "The fix makes the event part of the same write, and something else delivers it afterwards.",
+    ],
   },
 ]

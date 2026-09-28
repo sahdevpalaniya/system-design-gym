@@ -84,7 +84,7 @@ export const PATH: PathStage[] = [
     id: 'request-path',
     name: 'How a request reaches you',
     blurb: 'Follow one request from a browser to your code and back, layer by layer.',
-    concepts: ['dns', 'communication-protocols', 'api-design', 'reverse-proxy', 'load-balancing', 'cdn'],
+    concepts: ['dns', 'communication-protocols', 'api-design', 'reverse-proxy', 'load-balancing'],
   },
   {
     id: 'storing',
@@ -123,6 +123,8 @@ export const PATH: PathStage[] = [
       'idempotency',
       'fan-out',
       'distributed-transactions',
+      // the log comes before the thing that reads the log
+      'write-ahead-log',
       'change-data-capture',
       'batch-vs-stream',
     ],
@@ -132,10 +134,10 @@ export const PATH: PathStage[] = [
     name: 'Common patterns',
     blurb: 'Specific reusable answers. Most of these appear as the follow-up rather than the first question.',
     concepts: [
+      'cdn',
       'rate-limiting',
       'consistent-hashing',
       'bloom-filters',
-      'write-ahead-log',
       'distributed-counter',
       'geospatial-indexing',
       'search-indexing',
@@ -157,15 +159,3 @@ export const PATH: PathStage[] = [
     ],
   },
 ]
-
-/** flat ordered list of concept slugs, for prev/next through the path */
-export const PATH_ORDER: string[] = PATH.flatMap((s) => s.concepts ?? [])
-
-export function pathNeighbours(slug: string): { prev?: Concept; next?: Concept } {
-  const i = PATH_ORDER.indexOf(slug)
-  if (i < 0) return {}
-  return {
-    prev: i > 0 ? getConcept(PATH_ORDER[i - 1]) : undefined,
-    next: i < PATH_ORDER.length - 1 ? getConcept(PATH_ORDER[i + 1]) : undefined,
-  }
-}

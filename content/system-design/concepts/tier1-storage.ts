@@ -77,10 +77,22 @@ export const TIER1_STORAGE: Concept[] = [
     sayThis:
       '"The file goes straight to object storage over a presigned multipart URL — my servers only sign it and never touch the bytes. The database row is created as pending and flipped to ready on the completion event, with a sweeper for anything still pending after an hour. Cost: the row and the object can disagree, so that sweeper is not optional."',
     related: ['cdn', 'sql-vs-nosql', 'message-queues', 'auth-and-security'],
+    refs: [
+      {
+        label: "Amazon S3 \u2014 User Guide",
+        href: "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+        note: "The service that defined the category, including its consistency and durability guarantees.",
+      },
+    ],
+    hints: [
+      "Follow the bytes of a 2 GB upload through your API server. What is that process holding while it streams?",
+      "Now ask who pays for that bandwidth twice, and what happens to your deploy when one upload is half finished.",
+    ],
   },
 
   {
     slug: 'api-design',
+    subject: "these API rules",
     title: 'API design — pagination, versioning, errors',
     navTitle: 'API design',
     tier: 1,
@@ -152,5 +164,16 @@ export const TIER1_STORAGE: Concept[] = [
     sayThis:
       '"List endpoints are cursor-paginated, with the cursor opaque so I can change what is inside it. Changes are additive by default, and I only version when the meaning of a field changes. Errors carry a stable code plus Retry-After on 429 and 503, so clients know what is safe to retry. Cost: no jumping to page 500, and no total count without a separate query."',
     related: ['communication-protocols', 'idempotency', 'rate-limiting', 'search-indexing'],
+    refs: [
+      {
+        label: "RFC 9110 \u2014 HTTP Semantics",
+        href: "https://www.rfc-editor.org/rfc/rfc9110.html",
+        note: "Status codes and methods, defined rather than guessed at. Settles most API arguments.",
+      },
+    ],
+    hints: [
+      "Picture the rows as a list. A new item arrives at the front. What happens to the item that was at position 5000?",
+      "Offset counts positions. A cursor remembers a place. Which one survives the list shifting underneath it?",
+    ],
   },
 ]

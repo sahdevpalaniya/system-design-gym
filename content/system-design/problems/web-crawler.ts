@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const WEB_CRAWLER: Problem = {
   slug: 'web-crawler',
+  searchTitle: "Design a web crawler",
   title: 'Web crawler',
   group: 'crawling',
   difficulty: 'core',
@@ -199,6 +200,13 @@ export const WEB_CRAWLER: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Google Research \u2014 publications",
+      href: "https://research.google/pubs/pub36726/",
+      note: "Crawling and indexing at web scale, from the people who did it.",
+    },
+  ],
   lifecycle: {
     caption:
       'A URL\'s life. Almost every branch below is a failure that happens millions of times a day at this scale — and each one is a limit you have to set explicitly.',

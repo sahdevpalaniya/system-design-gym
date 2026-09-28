@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const NEARBY_PLACES: Problem = {
   slug: 'nearby-places',
+  searchTitle: "Design a nearby-places search",
   title: 'Nearby places',
   group: 'location',
   difficulty: 'core',
@@ -218,6 +219,13 @@ export const NEARBY_PLACES: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "H3 \u2014 indexing the globe",
+      href: "https://h3geo.org/docs/highlights/indexing",
+      note: "Turning two coordinates into one indexable cell id.",
+    },
+  ],
   lifecycle: {
     caption:
       'A place, from ingestion to being served. Deduplication and the permanently-closed branch are the two that users notice most.',

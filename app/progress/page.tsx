@@ -53,7 +53,12 @@ export default function ProgressPage() {
   if (!ready) {
     return (
       <Page wide>
-        <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
+        <PageHeader
+          eyebrow="Progress"
+          title="Progress and gap log"
+          lede="What you have covered, which axis is weakest, and the mistake you keep repeating."
+        />
+        <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
           Loading your progress…
         </div>
       </Page>

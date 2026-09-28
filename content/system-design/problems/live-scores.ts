@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const LIVE_SCORES: Problem = {
   slug: 'live-scores',
+  searchTitle: "Design a live score feed",
   title: 'Live score push',
   navTitle: 'Live scores',
   group: 'live-push',
@@ -217,6 +218,13 @@ export const LIVE_SCORES: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "MDN \u2014 WebSockets API",
+      href: "https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API",
+      note: "The transport choice this problem lives or dies on.",
+    },
+  ],
   lifecycle: {
     caption:
       'A score event, provider to phone. The correction branch is what forces full-state pushes — and that one decision simplifies three other branches.',

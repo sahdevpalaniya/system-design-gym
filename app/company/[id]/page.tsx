@@ -3,9 +3,21 @@ import { notFound } from 'next/navigation'
 import { COMPANIES, getCompany, questionsFor } from '@/content/system-design/companies'
 import { getArchetype } from '@/content/system-design/archetypes'
 import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
+import { pageMeta } from '@/lib/seo'
 
 export function generateStaticParams() {
   return COMPANIES.map((c) => ({ id: c.id }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const co = getCompany((await params).id)
+  if (!co) return {}
+  return pageMeta(
+    `${co.name} system design interview — what they test`,
+    co.style,
+    `/company/${co.id}`,
+    true,
+  )
 }
 
 export default async function CompanyPage({ params }: { params: Promise<{ id: string }> }) {

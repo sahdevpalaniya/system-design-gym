@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const URL_SHORTENER: Problem = {
   slug: 'url-shortener',
+  searchTitle: "Design a URL shortener",
   title: 'Link shortener',
   navTitle: 'URL shortener',
   group: 'read-heavy',
@@ -209,6 +210,13 @@ export const URL_SHORTENER: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Amazon Dynamo paper",
+      href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
+      note: "The key-value store this problem usually ends at, and why it chose availability over consistency.",
+    },
+  ],
   lifecycle: {
     caption:
       'A link\'s life. The solid path is what everyone draws; the branches below are where the design decisions actually are.',

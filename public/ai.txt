@@ -1,0 +1,15 @@
+# ai.txt — training-data policy for this site
+# Spawning's proposed format: https://site.spawning.ai/spawning-ai-txt
+# Not a standard, and not enforced by anyone. robots.txt is the file that is
+# actually obeyed; this one states intent for crawlers that choose to read it.
+
+User-Agent: *
+
+# Reading a page to answer a question and cite it: fine.
+Allow: /
+
+# Bulk collection into a training corpus, with no link back: not fine.
+Disallow-AI-Training: /
+
+Contact: sahdevsinhpalaniya98@gmail.com
+Sitemap: https://devlearning-app.vercel.app/sitemap.xml

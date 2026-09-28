@@ -39,20 +39,12 @@ function DrillsInner() {
   const archetype = ready && state.archetype ? getArchetype(state.archetype) : null
 
   return (
-    <Page wide>
-      <PageHeader
-        eyebrow="The follow-up engine"
-        title="Defence drills"
-        lede="Interviews are lost in follow-ups, not in the first diagram. Ninety seconds each: the question, your defence, then **what a weak answer sounds like, what a strong one sounds like, and the trap hidden in the question**."
-        meta={
-          <>
-            <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
-              {FOLLOW_UPS.length} questions across {CATEGORIES.length} categories
-            </span>
-            {archetype ? <Badge tone="accent">{archetype.name} favours their categories</Badge> : null}
-          </>
-        }
-      />
+    <>
+      {archetype ? (
+        <div className="mb-6">
+          <Badge tone="accent">{archetype.name} favours their categories</Badge>
+        </div>
+      ) : null}
 
       {weak.length ? (
         <div
@@ -186,22 +178,34 @@ function DrillsInner() {
           </Card>
         </aside>
       </div>
-    </Page>
+    </>
   )
 }
 
 export default function DrillsPage() {
   return (
-    <Suspense
-      fallback={
-        <Page wide>
-          <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
+    <Page wide>
+      {/* static, so the page is crawlable and readable before the drill engine
+          hydrates — only the interactive part waits on Suspense */}
+      <PageHeader
+        eyebrow="The follow-up engine"
+        title="Defence drills"
+        lede="Interviews are lost in follow-ups, not in the first diagram. Ninety seconds each: the question, your defence, then **what a weak answer sounds like, what a strong one sounds like, and the trap hidden in the question**."
+        meta={
+          <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
+            {FOLLOW_UPS.length} questions across {CATEGORIES.length} categories
+          </span>
+        }
+      />
+      <Suspense
+        fallback={
+          <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading drills…
           </div>
-        </Page>
-      }
-    >
-      <DrillsInner />
-    </Suspense>
+        }
+      >
+        <DrillsInner />
+      </Suspense>
+    </Page>
   )
 }

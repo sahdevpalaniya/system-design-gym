@@ -25,6 +25,7 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
   const { saveConcept, state } = useProgress()
   const [answer, setAnswer] = useState('')
   const [revealed, setRevealed] = useState(false)
+  const [hintsShown, setHintsShown] = useState(0)
   const [rated, setRated] = useState<1 | 2 | 3 | 4 | null>(null)
   const enough = answer.trim().length >= MIN_CHARS
   const prev = state.concepts[concept.slug]
@@ -54,6 +55,49 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
             background: revealed ? 'var(--surface-2)' : 'var(--surface)',
           }}
         />
+
+        {/* nudges before the answer — same contract as the company drills:
+            each one is a question to ask yourself, never the answer */}
+        {!revealed && concept.hints?.length ? (
+          <div className="mt-4 border-t pt-4">
+            <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-[0.875rem] font-semibold">Stuck? Take one hint at a time</span>
+              <span className="tabular text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
+                {hintsShown} of {concept.hints.length} used
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              {concept.hints.slice(0, hintsShown).map((h, i) => (
+                <div
+                  key={i}
+                  className="fade-up rounded-xl border-l-2 py-2.5 pr-3 pl-4"
+                  style={{ borderLeftColor: 'var(--accent)', background: 'var(--accent-soft)' }}
+                >
+                  <div className="mb-1 text-[0.7188rem] font-bold" style={{ color: 'var(--accent)' }}>
+                    Hint {i + 1}
+                  </div>
+                  <p className="text-[0.9062rem] leading-relaxed">
+                    <Rich text={h} />
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            {hintsShown < concept.hints.length ? (
+              <div className="mt-3">
+                <Button variant="secondary" size="sm" onClick={() => setHintsShown((n) => n + 1)}>
+                  {hintsShown === 0 ? 'Give me a nudge' : 'I am still stuck — next hint'}
+                </Button>
+              </div>
+            ) : (
+              <p className="mt-3 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
+                That is every hint. Write what you have — a partial answer you reasoned your way to
+                beats a perfect one you read.
+              </p>
+            )}
+          </div>
+        ) : null}
 
         {!revealed ? (
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3">

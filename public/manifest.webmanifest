@@ -1,0 +1,12 @@
+{
+  "name": "Dev Learning — system design interview preparation",
+  "short_name": "Dev Learning",
+  "description": "Learn the method for answering system design interviews: requirements, lifecycle, numbers, design, tradeoffs. Write your own answer first, then compare.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0f0f10",
+  "theme_color": "#0f0f10",
+  "categories": ["education", "productivity"],
+  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

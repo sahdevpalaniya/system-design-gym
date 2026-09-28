@@ -4,6 +4,14 @@ import { PATH } from '@/content/system-design/concepts'
 import { getConcept } from '@/content/system-design/concepts'
 import { Card, Page, PageHeader } from '@/components/common/ui'
 
+import { pageMeta } from '@/lib/seo'
+
+export const metadata = pageMeta(
+  'Learn system design from nothing',
+  'Start from zero: what system design actually is, how the interview works, the vocabulary, the five stages, and where the slack hides.',
+  '/learn',
+)
+
 export default function LearnPage() {
   return (
     <Page wide>

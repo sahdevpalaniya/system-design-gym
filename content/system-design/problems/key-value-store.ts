@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const KEY_VALUE_STORE: Problem = {
   slug: 'key-value-store',
+  searchTitle: "Design a distributed key-value store",
   title: 'Distributed key-value store',
   navTitle: 'Key-value store',
   group: 'storage-engine',
@@ -204,6 +205,18 @@ export const KEY_VALUE_STORE: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Amazon Dynamo paper",
+      href: "https://www.allthingsdistributed.com/files/amazon-dynamo-sosp2007.pdf",
+      note: "Consistent hashing, vector clocks and quorums in the paper that popularised them.",
+    },
+    {
+      label: "Please stop calling databases CP or AP",
+      href: "https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html",
+      note: "Read after the paper, as a corrective to the classification.",
+    },
+  ],
   lifecycle: {
     caption:
       'A write\'s life inside the store. The log entry before the acknowledgement is what makes this a database rather than a cache.',

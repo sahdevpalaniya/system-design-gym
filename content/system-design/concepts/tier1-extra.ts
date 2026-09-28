@@ -8,6 +8,7 @@ import type { Concept } from '@/lib/types'
 export const TIER1_EXTRA: Concept[] = [
   {
     slug: 'performance-vs-scalability',
+    subject: "the scalability question",
     title: 'Performance vs scalability',
     tier: 1,
     oneLine: 'Fast for one person is not the same as staying fast for a million.',
@@ -72,10 +73,27 @@ export const TIER1_EXTRA: Concept[] = [
     sayThis:
       '"Is it slow with one user, or only when busy? If it is slow when quiet, that is a performance problem and more machines will not help. If it gets worse with load, something shared is running out and I want to know what before I spend money."',
     related: ['latency-vs-throughput', 'back-of-envelope', 'load-balancing'],
+    refs: [
+      {
+        label: "A Word on Scalability",
+        href: "https://www.allthingsdistributed.com/2006/03/a_word_on_scalability.html",
+        note: "Werner Vogels, Amazon CTO, 2006. The definition this page uses, from the person who had to live with it.",
+      },
+      {
+        label: "Google SRE Book \u2014 Service Level Objectives",
+        href: "https://sre.google/sre-book/service-level-objectives/",
+        note: "How Google turns \"is it fast enough\" into a number you can be held to.",
+      },
+    ],
+    hints: [
+      "Ask what actually changed when the extra 999 people arrived. Did the time get worse, or was it always that bad?",
+      "If one user alone is already slow, what would a second identical machine be doing for that one user?",
+    ],
   },
 
   {
     slug: 'latency-vs-throughput',
+    subject: "the throughput argument",
     title: 'Latency vs throughput',
     tier: 1,
     oneLine: 'How long one thing takes, versus how many things you finish per second.',
@@ -127,10 +145,27 @@ export const TIER1_EXTRA: Concept[] = [
     sayThis:
       '"Latency is one request. Throughput is requests per second. I would batch here, because nothing is waiting on any single write — that raises throughput and adds a little latency nobody can feel. On the checkout path I would not, because there one person is watching their one request."',
     related: ['performance-vs-scalability', 'latency-numbers', 'back-of-envelope'],
+    refs: [
+      {
+        label: "Google SRE Book \u2014 Monitoring Distributed Systems",
+        href: "https://sre.google/sre-book/monitoring-distributed-systems/",
+        note: "The four golden signals: latency, traffic, errors, saturation. Where the distinction earns its keep.",
+      },
+      {
+        label: "Brendan Gregg \u2014 The USE Method",
+        href: "https://www.brendangregg.com/usemethod.html",
+        note: "Utilisation, saturation, errors. The method for finding which resource is actually the bottleneck.",
+      },
+    ],
+    hints: [
+      "Follow one single write through the batch. How long does the first write in the group wait before it is committed?",
+      "Now count the whole group: how many writes completed per second compared with sending them one at a time?",
+    ],
   },
 
   {
     slug: 'availability-patterns',
+    subject: "failover",
     title: 'Availability, failover and the nines',
     navTitle: 'Availability and failover',
     tier: 1,
@@ -186,6 +221,26 @@ export const TIER1_EXTRA: Concept[] = [
     sayThis:
       '"Three nines is nearly nine hours a year, four nines is under an hour. I would aim for three on this path, and be honest that my payment provider caps me anyway. Active-active rather than active-passive, because a standby that never takes traffic is a standby I do not trust."',
     related: ['replication', 'load-balancing', 'circuit-breakers'],
+    refs: [
+      {
+        label: "Google SRE Book \u2014 Embracing Risk",
+        href: "https://sre.google/sre-book/embracing-risk/",
+        note: "Why 100% is the wrong availability target, and how error budgets replace it.",
+      },
+      {
+        label: "PostgreSQL \u2014 High Availability",
+        href: "https://www.postgresql.org/docs/current/high-availability.html",
+        note: "Failover and standby as concrete configuration rather than a diagram.",
+      },
+    ],
+    animation: {
+      scenario: "active-passive",
+      caption: "Active-passive failover: the standby takes over only after the health check gives up on the primary. Watch the gap \u2014 that gap is your downtime.",
+    },
+    hints: [
+      "For the first case, both must be up at the same moment. What do you do with two probabilities when both must hold?",
+      "For the second, work out the chance they are *both* down instead, then take what is left.",
+    ],
   },
   {
     slug: 'dns',
@@ -252,6 +307,18 @@ export const TIER1_EXTRA: Concept[] = [
     sayThis:
       '"DNS routes users to the nearest region, not to a specific server — that is the load balancer\'s job. I would not rely on DNS for failover, because cached answers mean minutes of users still hitting the dead address. Anycast or a global load balancer handles that properly."',
     related: ['load-balancing', 'cdn', 'availability-patterns'],
+    refs: [
+      {
+        label: "RFC 1034 \u2014 Domain Names, Concepts and Facilities",
+        href: "https://datatracker.ietf.org/doc/html/rfc1034",
+        note: "The actual specification. Section 3 is the part worth reading for a design discussion.",
+      },
+    ],
+    hints: [
+      "Ask who is holding a copy of the answer. Is it only your server?",
+      "You lower the TTL to 60 seconds. Does every resolver on the internet actually honour that?",
+      "For the fix, think about what is already in the request path and can redirect without anyone re-asking for the name.",
+    ],
   },
 
   {
@@ -319,10 +386,22 @@ export const TIER1_EXTRA: Concept[] = [
     sayThis:
       '"One reverse proxy in front doing TLS, compression and rate limiting, so no service repeats that work. It is also the load balancer — same box — and I will run at least two of them, because it is now in front of everything."',
     related: ['load-balancing', 'rate-limiting', 'cdn'],
+    refs: [
+      {
+        label: "nginx \u2014 HTTP Load Balancing",
+        href: "https://nginx.org/en/docs/http/load_balancing.html",
+        note: "The configuration for the thing this page describes, from the most widely deployed implementation.",
+      },
+    ],
+    hints: [
+      "Think about the things every single service would otherwise implement identically, and probably slightly differently.",
+      "For the one that does not belong: what happens if that logic needs to know which user is allowed to do what in this specific domain?",
+    ],
   },
 
   {
     slug: 'communication-protocols',
+    subject: "each protocol",
     title: 'HTTP, TCP, UDP, REST and RPC',
     navTitle: 'HTTP, TCP, UDP, RPC',
     tier: 1,
@@ -393,5 +472,21 @@ export const TIER1_EXTRA: Concept[] = [
     sayThis:
       '"REST over HTTP at the edge, because anything can use it and GETs are cacheable by the CDN. gRPC between internal services, because I control both ends and want the compact encoding and a schema. And I would group these calls before I worry about either — twenty round trips costs more than the format does."',
     related: ['realtime-transports', 'reverse-proxy', 'latency-numbers'],
+    refs: [
+      {
+        label: "RFC 9110 \u2014 HTTP Semantics",
+        href: "https://www.rfc-editor.org/rfc/rfc9110.html",
+        note: "The current HTTP specification, replacing the old RFC 2616 everyone still cites.",
+      },
+      {
+        label: "What is gRPC?",
+        href: "https://grpc.io/docs/what-is-grpc/introduction/",
+        note: "The official introduction, including when its authors think you should not use it.",
+      },
+    ],
+    hints: [
+      "Ask what the user sees when TCP stops to retransmit a lost packet during a live stream.",
+      "A frame from two seconds ago has arrived, perfectly intact. What is it worth to the viewer now?",
+    ],
   },
 ]

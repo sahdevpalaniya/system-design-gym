@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const SOCIAL_TIMELINE: Problem = {
   slug: 'social-timeline',
+  searchTitle: "Design a news feed",
   title: 'Follower timeline',
   group: 'write-heavy',
   difficulty: 'core',
@@ -210,6 +211,13 @@ export const SOCIAL_TIMELINE: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Engineering at Meta",
+      href: "https://engineering.fb.com/",
+      note: "Fan-out and the celebrity problem, from the people who hit it first at this size.",
+    },
+  ],
   lifecycle: {
     caption:
       'A post\'s life. Every branch below is a real production failure mode — the fan-out job dying partway through is the one people forget.',

@@ -3,12 +3,13 @@ import { PROBLEMS } from '@/content/system-design/problems'
 import { GROUPS } from '@/content/system-design/method'
 import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
 import { Callout } from '@/components/common/visuals'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata = {
-  title: 'Worked solutions — Dev Learning',
-  description:
-    'Every practice problem answered end to end, the way you would say it in an interview.',
-}
+export const metadata = pageMeta(
+  'Worked solutions to every system design problem',
+  'Every practice problem answered end to end, the way you would say it in an interview.',
+  '/solutions',
+)
 
 export default function SolutionsPage() {
   return (

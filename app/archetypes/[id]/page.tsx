@@ -5,9 +5,16 @@ import { AXES, AXIS_LABEL, type ArchetypeId } from '@/lib/types'
 import { Callout } from '@/components/common/visuals'
 import { ArchetypeDrill, PractiseButton } from './drill'
 import { Badge, Bullets, Card, Page, PageHeader, Rich, Section } from '@/components/common/ui'
+import { pageMeta } from '@/lib/seo'
 
 export function generateStaticParams() {
   return ARCHETYPES.map((a) => ({ id: a.id }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
+  const a = getArchetype((await params).id as ArchetypeId)
+  if (!a) return {}
+  return pageMeta(`${a.name} — interviewer archetype`, a.tagline, `/archetypes/${a.id}`)
 }
 
 export default async function ArchetypePage({ params }: { params: Promise<{ id: string }> }) {

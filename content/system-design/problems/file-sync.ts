@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const FILE_SYNC: Problem = {
   slug: 'file-sync',
+  searchTitle: "Design a file sync service",
   title: 'File sync across devices',
   navTitle: 'File sync',
   group: 'sync',
@@ -201,6 +202,13 @@ export const FILE_SYNC: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Dropbox \u2014 Infrastructure",
+      href: "https://dropbox.tech/infrastructure",
+      note: "Chunking, deduplication and sync conflicts, written up by the team that runs it.",
+    },
+  ],
   lifecycle: {
     caption:
       'A file\'s life across devices. The failed conditional commit is not an error — it is the mechanism that turns a silent overwrite into a visible conflict.',

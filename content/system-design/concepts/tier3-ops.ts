@@ -8,6 +8,8 @@ import type { Concept } from '@/lib/types'
 export const TIER3_OPS: Concept[] = [
   {
     slug: 'auth-and-security',
+    searchTitle: "Authentication and authorization",
+    subject: "these controls",
     title: 'Authentication, authorization and secrets',
     navTitle: 'Auth and secrets',
     tier: 3,
@@ -84,6 +86,22 @@ export const TIER3_OPS: Concept[] = [
     sayThis:
       '"Short-lived signed access tokens so services verify without a lookup, plus an opaque refresh token in a session store so logout actually works within fifteen minutes. Authorization is checked at data access — every query is scoped by the caller, not just by the gateway. Secrets come from a secret manager and are rotatable without a deploy."',
     related: ['api-design', 'reverse-proxy', 'rate-limiting', 'observability'],
+    refs: [
+      {
+        label: "OWASP Top Ten",
+        href: "https://owasp.org/www-project-top-ten/",
+        note: "The ten failures that actually cause breaches, ranked. Read before any security answer.",
+      },
+      {
+        label: "RFC 6749 \u2014 The OAuth 2.0 Authorization Framework",
+        href: "https://datatracker.ietf.org/doc/html/rfc6749",
+        note: "What the flows really are, rather than what a diagram implies.",
+      },
+    ],
+    hints: [
+      "A valid token proves who you are. Ask whether it proves anything about which invoice id you just typed in the URL.",
+      "Authentication and authorization are different questions. Which one is the gateway answering?",
+    ],
   },
 
   {
@@ -154,10 +172,27 @@ export const TIER3_OPS: Concept[] = [
     sayThis:
       '"Request rate, error rate, p50 and p99, and saturation per endpoint, with an SLO of 99.9% under 300 ms and an error budget that governs whether we keep shipping. Alerts fire on those symptoms, not on CPU. Traces carry an id through HTTP and queue messages, sampled but always kept for errors and slow requests. Cost: logs are the expensive signal, so they are structured, sampled, and scrubbed of personal data."',
     related: ['circuit-breakers', 'deploys-and-releases', 'availability-patterns', 'auth-and-security'],
+    refs: [
+      {
+        label: "OpenTelemetry \u2014 Observability primer",
+        href: "https://opentelemetry.io/docs/concepts/observability-primer/",
+        note: "Traces, metrics and logs defined by the project that standardised them.",
+      },
+      {
+        label: "Google SRE Book \u2014 Practical Alerting",
+        href: "https://sre.google/sre-book/practical-alerting/",
+        note: "How to alert on symptoms rather than causes, and why paging on CPU is wrong.",
+      },
+    ],
+    hints: [
+      "Ask which of the two the user can actually feel. Has anyone ever been paged by a customer about CPU?",
+      "Now the failure modes: high CPU with everything working, versus everything broken while CPU is low.",
+    ],
   },
 
   {
     slug: 'deploys-and-releases',
+    subject: "a staged rollout",
     title: 'Deploys, migrations and safe releases',
     navTitle: 'Deploys and releases',
     tier: 3,
@@ -226,10 +261,28 @@ export const TIER3_OPS: Concept[] = [
     sayThis:
       '"Rolling deploys with connection draining, and a canary at 1% comparing error rate and p99 against the current version, with an automatic stop. Schema changes are expand-and-contract across separate releases, backfilled in batches, so code can roll back without the data being stuck. Cost: a rename takes three deploys and several days instead of one."',
     related: ['load-balancing', 'observability', 'availability-patterns', 'backups-and-recovery'],
+    refs: [
+      {
+        label: "Martin Fowler \u2014 BlueGreenDeployment",
+        href: "https://martinfowler.com/bliki/BlueGreenDeployment.html",
+        note: "The pattern, including the database problem everyone skips.",
+      },
+      {
+        label: "Google SRE Workbook \u2014 Canarying Releases",
+        href: "https://sre.google/workbook/canarying-releases/",
+        note: "Choosing canary size and duration so the signal is real.",
+      },
+    ],
+    hints: [
+      "Redundancy assumes the other copy is healthy. What do you ship to every copy at once?",
+      "If the bad thing is identical everywhere, what is the only thing that saves you \u2014 and it is about pace, not copies.",
+    ],
   },
 
   {
     slug: 'backups-and-recovery',
+    searchTitle: "Backups, RPO and RTO",
+    subject: "backups",
     title: 'Backups, disaster recovery, RPO and RTO',
     navTitle: 'Backups and DR',
     tier: 3,
@@ -287,10 +340,22 @@ export const TIER3_OPS: Concept[] = [
     sayThis:
       '"Nightly snapshots plus continuous log archiving, so point-in-time recovery gives an RPO of about five minutes. Backups live in a separate account the application cannot reach. We restore to a scratch environment weekly and time it, which is how I know the RTO is around 90 minutes — and user-facing deletes are soft, so the common case is an update rather than a restore."',
     related: ['replication', 'write-ahead-log', 'deploys-and-releases', 'availability-patterns'],
+    refs: [
+      {
+        label: "Google SRE Book \u2014 Data Integrity",
+        href: "https://sre.google/sre-book/data-integrity/",
+        note: "Why a backup you have never restored is not a backup. The defining chapter on this.",
+      },
+    ],
+    hints: [
+      "Replication copies writes faithfully. Ask what happens when the write is DELETE FROM orders.",
+      "How long does it take for that to reach all three replicas? Backups differ on one axis: time.",
+    ],
   },
 
   {
     slug: 'capacity-and-cost',
+    subject: "capacity planning",
     title: 'Capacity planning and cost',
     tier: 3,
     oneLine: 'What the design costs per month, and which line of the bill you would attack first.',
@@ -349,10 +414,23 @@ export const TIER3_OPS: Concept[] = [
     sayThis:
       '"Bandwidth dominates this bill by an order of magnitude, so the CDN is a cost decision before it is a latency one — a 95% hit rate takes the origin down to a twentieth of the traffic. Raw uploads move to cold storage after 30 days. Each region is sized to absorb another one failing, which is why utilisation looks low. I would track cost per video minute served rather than the total."',
     related: ['back-of-envelope', 'cdn', 'object-storage', 'multi-region'],
+    refs: [
+      {
+        label: "Reliability and constant work",
+        href: "https://aws.amazon.com/builders-library/reliability-and-constant-work/",
+        note: "Designing so load spikes do not change how much work the system does.",
+      },
+    ],
+    hints: [
+      "When one region dies, where does its traffic go? All of it.",
+      "Add the two loads together and compare against what one region can serve. Then work backwards to the number that survives it.",
+    ],
   },
 
   {
     slug: 'batch-vs-stream',
+    searchTitle: "Batch vs stream processing",
+    subject: "stream processing",
     title: 'Batch and stream processing',
     navTitle: 'Batch and stream',
     tier: 3,
@@ -428,5 +506,16 @@ export const TIER3_OPS: Concept[] = [
     sayThis:
       '"Events land in object storage raw and also feed a stream that aggregates into tumbling hourly windows by event time, with a five minute watermark and late events sent to a side output. Aggregates are keyed by window so a re-run overwrites rather than double-counts. Cost: results are five minutes behind rather than instant, and I keep raw events forever so a logic fix is a re-run rather than a permanent hole."',
     related: ['message-queues', 'distributed-counter', 'object-storage', 'change-data-capture'],
+    refs: [
+      {
+        label: "Apache Kafka \u2014 Design",
+        href: "https://kafka.apache.org/documentation/#design",
+        note: "The log abstraction that lets the same data be read as a batch or as a stream.",
+      },
+    ],
+    hints: [
+      "There are two different clocks here: when it happened, and when you saw it. Which one is the truth?",
+      "If you use event time you must wait for stragglers. If you use arrival time you get the wrong hour. Name what each choice costs.",
+    ],
   },
 ]

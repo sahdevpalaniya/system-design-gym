@@ -129,6 +129,10 @@ export type FlowScenario =
   | 'two-phase-commit'
   | 'saga'
   | 'circuit-breaker'
+  | 'read-your-writes'
+  | 'duplicate-delivery'
+  | 'wal-append'
+  | 'cdc-stream'
 
 // ---------- concepts ----------
 
@@ -168,6 +172,18 @@ export interface Concept {
   traps?: string[]
   sayThis?: string
   related?: string[]
+  /** where to go and learn this properly — primary sources, not blog rehashes */
+  refs?: { label: string; href: string; note?: string }[]
+  /** the form people actually search for, when it differs from the nav title —
+   *  an abbreviation spelled out, or the commoner phrasing */
+  searchTitle?: string
+  /** how the topic is named inside a sentence, when the nav title does not fit
+   *  a heading like "When to reach for ___" — e.g. "a relational database" */
+  subject?: string
+  /** progressive nudges for the self-check, revealed one at a time */
+  hints?: string[]
+  /** a second, moving visual — shows the mechanism the static one only labels */
+  animation?: { scenario: FlowScenario; caption: string }
 }
 
 // ---------- problems ----------
@@ -242,6 +258,10 @@ export interface Problem {
     consequence: string
   }
   stages: ProblemStage[]
+  /** the phrase people actually search for, e.g. "Design a URL shortener" */
+  searchTitle?: string
+  /** where this problem is solved for real — engineering write-ups and papers */
+  refs?: { label: string; href: string; note?: string }[]
   lifecycle: LifecycleSpec
   architecture: DiagramSpec
   numbers: NumbersBarSpec

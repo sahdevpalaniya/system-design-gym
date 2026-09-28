@@ -402,11 +402,4 @@ export function AxisBars({ scores }: { scores: Scores }) {
   )
 }
 
-export function axisTone(v: number): 'ok' | 'warn' | 'bad' | 'neutral' {
-  if (v === 0) return 'neutral'
-  if (v < 5) return 'bad'
-  if (v < 7) return 'warn'
-  return 'ok'
-}
-
 export type { Axis }

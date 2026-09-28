@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const CHAT_MESSAGING: Problem = {
   slug: 'chat-messaging',
+  searchTitle: "Design a chat application",
   title: 'Chat and messaging',
   group: 'write-heavy',
   difficulty: 'core',
@@ -198,6 +199,13 @@ export const CHAT_MESSAGING: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Slack Engineering",
+      href: "https://slack.engineering/",
+      note: "Real write-ups on message delivery, presence and fan-out at scale.",
+    },
+  ],
   lifecycle: {
     caption:
       'A message\'s life. The ticks a user sees map onto three of these states — and every branch below is a real failure that happens constantly at this scale.',

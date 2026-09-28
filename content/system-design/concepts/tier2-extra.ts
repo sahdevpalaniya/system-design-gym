@@ -8,6 +8,7 @@ import type { Concept } from '@/lib/types'
 export const TIER2_EXTRA: Concept[] = [
   {
     slug: 'transactions-and-locking',
+    subject: "a transaction",
     title: 'Transactions, isolation and locking',
     navTitle: 'Transactions and locking',
     tier: 2,
@@ -83,10 +84,29 @@ export const TIER2_EXTRA: Concept[] = [
     sayThis:
       '"The reservation is one conditional update — set the seat to held where it is still free — so there is no gap between checking and writing, and the loser gets zero rows changed. Holds expire after ten minutes. Cost: that row is a serialisation point, so a single hot event has a write ceiling on it, which I accept because the inventory is finite anyway."',
     related: ['consistency-models', 'idempotency', 'distributed-transactions', 'sql-vs-nosql'],
+    refs: [
+      {
+        label: "PostgreSQL \u2014 Transaction Isolation",
+        href: "https://www.postgresql.org/docs/current/transaction-iso.html",
+        note: "Read committed, repeatable read and serializable, with the anomalies each one still allows.",
+      },
+      {
+        label: "Jepsen \u2014 Consistency models",
+        href: "https://jepsen.io/consistency",
+        note: "The map showing how isolation levels and distributed consistency relate.",
+      },
+    ],
+    hints: [
+      "Draw two copies of that code running at the same instant. Put both SELECTs before either UPDATE.",
+      "Both read the same balance and both believe there is enough. What is the balance afterwards?",
+      "One fix stops them overlapping. Another makes the check and the write a single statement the database does atomically.",
+    ],
   },
 
   {
     slug: 'fan-out',
+    searchTitle: "Fan-out on write vs read",
+    subject: "fan-out on write",
     title: 'Fan-out — push vs pull',
     tier: 2,
     oneLine: 'Do the work when one person writes, or when a million people read. This one choice designs the system.',
@@ -160,10 +180,27 @@ export const TIER2_EXTRA: Concept[] = [
     sayThis:
       '"Fan out on write into a capped inbox of post ids, because reads beat writes twenty to one. Above ten thousand followers I stop fanning out and merge those accounts in at read time from a heavily cached list. Cost: two code paths forever, and a threshold I tune from queue lag rather than guess."',
     related: ['partitioning', 'message-queues', 'caching', 'consistency-models'],
+    refs: [
+      {
+        label: "Apache Kafka \u2014 Design",
+        href: "https://kafka.apache.org/documentation/#design",
+        note: "Consumer groups and partitions, the machinery fan-out is usually built on.",
+      },
+    ],
+    animation: {
+      scenario: "fan-out-write",
+      caption: "Fan-out on write: one post is copied into every follower timeline at write time. Cheap to read, expensive when the writer has millions of followers.",
+    },
+    hints: [
+      "Work out the two totals: writes per day, and reads per day. Actually multiply them.",
+      "300 followed accounts and 20 opens a day against one post a day. Which side is enormous?",
+      "The expensive side is the one you want to pay for in advance.",
+    ],
   },
 
   {
     slug: 'clocks-and-ordering',
+    subject: "logical clocks",
     title: 'Clocks, ordering and why timestamps lie',
     navTitle: 'Clocks and ordering',
     tier: 2,
@@ -232,6 +269,23 @@ export const TIER2_EXTRA: Concept[] = [
     sayThis:
       '"I would not order these by wall clock, because two servers never agree and the loser is discarded silently. All writes for one conversation go through one partition, so the order is just arrival order. Where I really need cross-machine ordering I would use a hybrid logical clock, so the value still looks like real time but the causal order is correct."',
     related: ['replication', 'consistency-models', 'consensus', 'partitioning'],
+    refs: [
+      {
+        label: "Time, Clocks, and the Ordering of Events",
+        href: "https://lamport.azurewebsites.net/pubs/time-clocks.pdf",
+        note: "Lamport's 1978 paper. The origin of happens-before and logical clocks.",
+      },
+      {
+        label: "CockroachDB \u2014 Architecture Overview",
+        href: "https://www.cockroachlabs.com/docs/stable/architecture/overview.html",
+        note: "A production system built around clock uncertainty, and what it costs.",
+      },
+    ],
+    hints: [
+      "Two machines both say 14:00:00.000. Is there any guarantee those are the same instant?",
+      "Clocks drift, and they also get corrected backwards. What does that do to your ordering?",
+      "The cheapest escape is to stop needing a global order at all \u2014 where could the ordering come from instead?",
+    ],
   },
 
   {
@@ -311,5 +365,20 @@ export const TIER2_EXTRA: Concept[] = [
     sayThis:
       '"Each user has a home region where their writes happen, chosen at signup, with replicas elsewhere for reads and disaster recovery — so no two regions ever write the same row. Global uniqueness stays in one authoritative region and pays the cross-region hop. Cost: a routing layer, a migration path for users who move, and every region sized to absorb another one failing."',
     related: ['replication', 'cap-pacelc', 'dns', 'cdn'],
+    refs: [
+      {
+        label: "CockroachDB \u2014 Architecture Overview",
+        href: "https://www.cockroachlabs.com/docs/stable/architecture/overview.html",
+        note: "How a database spanning regions handles the latency you cannot remove.",
+      },
+    ],
+    animation: {
+      scenario: "multi-leader",
+      caption: "Multi-leader: both regions accept writes locally and reconcile afterwards. Fast for the user, and the reason you now need conflict resolution.",
+    },
+    hints: [
+      "List what is now shared between the two regions. Is the database one of them?",
+      "Then ask honestly what caused your last few outages. Was it really a datacenter dying?",
+    ],
   },
 ]

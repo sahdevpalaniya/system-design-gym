@@ -38,7 +38,3 @@ export const PROBLEMS: Problem[] = [
 export function getProblem(slug: string): Problem | undefined {
   return PROBLEMS.find((p) => p.slug === slug)
 }
-
-export function problemsByGroup(id: GroupId): Problem[] {
-  return PROBLEMS.filter((p) => p.group === id)
-}

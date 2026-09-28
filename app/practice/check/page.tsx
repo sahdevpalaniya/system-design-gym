@@ -34,7 +34,12 @@ export default function ConceptCheckPage() {
   if (!ready) {
     return (
       <Page>
-        <div className="py-24 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
+        <PageHeader
+          eyebrow="Practice"
+          title="Concept check"
+          lede="Spaced repetition over every concept you have read. Answer from memory, then compare."
+        />
+        <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
           Loading…
         </div>
       </Page>

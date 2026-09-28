@@ -1,6 +1,14 @@
 import { Card, Page, PageHeader } from '@/components/common/ui'
 import Link from 'next/link'
 
+import { pageMeta } from '@/lib/seo'
+
+export const metadata = pageMeta(
+  'Practice modes — daily reps to timed mocks',
+  'Four ways to practise system design: a 15-minute daily rep, a 45-minute timed mock, a 10-minute follow-up blitz, and a blank page.',
+  '/practice',
+)
+
 const MODES = [
   {
     href: '/practice/daily',

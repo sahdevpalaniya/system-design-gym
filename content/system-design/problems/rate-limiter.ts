@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const RATE_LIMITER: Problem = {
   slug: 'rate-limiter',
+  searchTitle: "Design a rate limiter",
   title: 'Distributed API rate limiter',
   navTitle: 'Rate limiter',
   group: 'limits',
@@ -224,6 +225,18 @@ export const RATE_LIMITER: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Using load shedding to avoid overload",
+      href: "https://aws.amazon.com/builders-library/using-load-shedding-to-avoid-overload/",
+      note: "The Amazon Builders' Library on rejecting work early, which is what a limiter really is.",
+    },
+    {
+      label: "Google SRE Book \u2014 Handling Overload",
+      href: "https://sre.google/sre-book/handling-overload/",
+      note: "Graceful degradation when the limit is reached.",
+    },
+  ],
   lifecycle: {
     caption:
       'A request through the limiter. The counter-store-down branch is the one that decides whether this component protects your API or takes it down.',

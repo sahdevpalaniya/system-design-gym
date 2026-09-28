@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const RIDE_MATCHING: Problem = {
   slug: 'ride-matching',
+  searchTitle: "Design a ride-hailing app",
   title: 'Ride matching',
   group: 'matching',
   difficulty: 'hard',
@@ -221,6 +222,13 @@ export const RIDE_MATCHING: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "H3 \u2014 indexing the globe",
+      href: "https://h3geo.org/docs/highlights/indexing",
+      note: "Uber's hexagonal grid, built for exactly this matching problem.",
+    },
+  ],
   lifecycle: {
     caption:
       'The trip request. Every branch below happens routinely at peak — "nobody accepted" is not an edge case, it is a daily occurrence.',

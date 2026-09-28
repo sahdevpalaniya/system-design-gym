@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const TICKET_BOOKING: Problem = {
   slug: 'ticket-booking',
+  searchTitle: "Design a ticket booking system",
   title: 'Ticket booking',
   group: 'contested',
   difficulty: 'core',
@@ -217,6 +218,13 @@ export const TICKET_BOOKING: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "PostgreSQL \u2014 Transaction Isolation",
+      href: "https://www.postgresql.org/docs/current/transaction-iso.html",
+      note: "The isolation levels that decide whether you can sell the same seat twice.",
+    },
+  ],
   lifecycle: {
     caption:
       'Follow the seat, not the buyer. The seat is the contested resource, and every interesting failure is a branch off its life.',

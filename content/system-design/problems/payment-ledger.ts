@@ -2,6 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const PAYMENT_LEDGER: Problem = {
   slug: 'payment-ledger',
+  searchTitle: "Design a payment ledger",
   title: 'Payments and ledger',
   navTitle: 'Payment ledger',
   group: 'money',
@@ -202,6 +203,18 @@ export const PAYMENT_LEDGER: Problem = {
     },
   ],
 
+  refs: [
+    {
+      label: "Stripe \u2014 Idempotent requests",
+      href: "https://stripe.com/docs/api/idempotent_requests",
+      note: "How a real payments API stops you charging someone twice.",
+    },
+    {
+      label: "PostgreSQL \u2014 Transaction Isolation",
+      href: "https://www.postgresql.org/docs/current/transaction-iso.html",
+      note: "The guarantees a ledger actually depends on.",
+    },
+  ],
   lifecycle: {
     caption:
       'A payment\'s life. Note the unknown branch and the chargeback arriving months after settlement — both are states, not errors, and both must exist in the model.',

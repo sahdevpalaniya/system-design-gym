@@ -468,6 +468,115 @@ const TONE: Record<Trip['tone'], string> = {
 }
 
 const FLOWS: Record<FlowScenario, FlowDef> = {
+  /* The user's own write, then their own read landing on a replica that has
+     not caught up yet. The gap between trip 2 and trip 4 is the whole lesson. */
+  'read-your-writes': {
+    w: 460,
+    h: 215,
+    nodes: [
+      { id: 'c', label: 'User', x: 20, y: 82, kind: 'client' },
+      { id: 'l', label: 'Leader', sub: 'takes writes', x: 200, y: 20, kind: 'store' },
+      { id: 'r', label: 'Replica', sub: 'serves reads', x: 200, y: 144, kind: 'store' },
+    ],
+    links: [
+      [130, 108, 170, 108],
+      [170, 108, 170, 46],
+      [170, 46, 200, 46],
+      [170, 108, 170, 170],
+      [170, 170, 200, 170],
+      [255, 72, 255, 144],
+    ],
+    trips: [
+      { points: [[130, 108], [170, 108], [170, 46], [202, 46]], dur: 1.0, delay: 0, tone: 'accent' },
+      { points: [[130, 108], [170, 108], [170, 170], [202, 170]], dur: 1.0, delay: 1.2, tone: 'accent' },
+      { points: [[202, 170], [170, 170], [170, 108], [130, 108]], dur: 1.0, delay: 2.3, tone: 'bad' },
+      { points: [[255, 74], [255, 142]], dur: 1.2, delay: 2.6, tone: 'muted' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'the user posts, then immediately reloads' },
+      { tone: 'bad', text: 'the replica answers before the copy arrives — their own comment is missing' },
+      { tone: 'muted', text: 'replication catches up a moment too late' },
+    ],
+  },
+  /* Same message twice. The second one reaches the service and stops there. */
+  'duplicate-delivery': {
+    w: 480,
+    h: 165,
+    nodes: [
+      { id: 'q', label: 'Queue', sub: 'at least once', x: 20, y: 56, kind: 'queue' },
+      { id: 's', label: 'Service', sub: 'key seen?', x: 190, y: 56, kind: 'service' },
+      { id: 'd', label: 'Database', x: 350, y: 56, kind: 'store' },
+    ],
+    links: [
+      [130, 82, 190, 82],
+      [300, 82, 350, 82],
+    ],
+    trips: [
+      { points: [[130, 82], [192, 82]], dur: 0.9, delay: 0, tone: 'accent' },
+      { points: [[300, 82], [352, 82]], dur: 0.9, delay: 1.0, tone: 'ok' },
+      { points: [[130, 82], [192, 82]], dur: 0.9, delay: 2.2, tone: 'bad' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'first delivery — the key is new' },
+      { tone: 'ok', text: 'applied once, and the key is recorded' },
+      { tone: 'bad', text: 'the same message again — it stops here, nothing reaches the database' },
+    ],
+  },
+  /* Why writing twice is faster: the log append is what makes it durable, and
+     the client is told yes before the data file has been touched. */
+  'wal-append': {
+    w: 460,
+    h: 205,
+    nodes: [
+      { id: 'c', label: 'Client', x: 20, y: 72, kind: 'client' },
+      { id: 'w', label: 'Log', sub: 'append-only', x: 200, y: 20, kind: 'store' },
+      { id: 'd', label: 'Data file', sub: 'random writes', x: 200, y: 124, kind: 'store' },
+    ],
+    links: [
+      [130, 98, 170, 98],
+      [170, 98, 170, 46],
+      [170, 46, 200, 46],
+      [170, 98, 170, 150],
+      [170, 150, 200, 150],
+      [255, 72, 255, 124],
+    ],
+    trips: [
+      { points: [[130, 98], [170, 98], [170, 46], [202, 46]], dur: 1.0, delay: 0, tone: 'accent' },
+      { points: [[202, 46], [170, 46], [170, 98], [130, 98]], dur: 0.9, delay: 1.1, tone: 'ok' },
+      { points: [[255, 74], [255, 122]], dur: 1.3, delay: 2.2, tone: 'muted' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'the write goes to the log first — one sequential append' },
+      { tone: 'ok', text: 'durable already, so the client can be told yes' },
+      { tone: 'muted', text: 'the data file catches up afterwards, at its own pace' },
+    ],
+  },
+  /* One write by the app, everything downstream derived from the log. */
+  'cdc-stream': {
+    w: 545,
+    h: 160,
+    nodes: [
+      { id: 'a', label: 'App', x: 8, y: 52, kind: 'service' },
+      { id: 'd', label: 'Database', sub: 'log', x: 148, y: 52, kind: 'store' },
+      { id: 'k', label: 'Connector', x: 288, y: 52, kind: 'service' },
+      { id: 'i', label: 'Search index', x: 428, y: 52, kind: 'external' },
+    ],
+    links: [
+      [118, 78, 148, 78],
+      [258, 78, 288, 78],
+      [398, 78, 428, 78],
+    ],
+    trips: [
+      { points: [[118, 78], [150, 78]], dur: 0.9, delay: 0, tone: 'accent' },
+      { points: [[258, 78], [290, 78]], dur: 0.9, delay: 1.0, tone: 'muted' },
+      { points: [[398, 78], [430, 78]], dur: 0.9, delay: 2.0, tone: 'ok' },
+    ],
+    legend: [
+      { tone: 'accent', text: 'the app writes to one place only — no second write to keep in sync' },
+      { tone: 'muted', text: 'the connector reads the database log' },
+      { tone: 'ok', text: 'the index is derived, so it cannot silently drift out of step' },
+    ],
+  },
   'cache-hit': {
     w: 460,
     h: 150,
@@ -1262,7 +1371,10 @@ export function CompareCards({ spec }: { spec: CompareSpec }) {
               >
                 {i === 0 ? 'A' : 'B'}
               </span>
-              <h4 className="text-[0.9062rem] font-semibold">{side.title}</h4>
+              {/* a panel label, not a document section — this widget is embedded
+                  at different depths, so any fixed heading level skips a rank
+                  somewhere and adds noise to screen-reader heading navigation */}
+              <div className="text-[0.9062rem] font-semibold">{side.title}</div>
             </div>
             <ul className="space-y-1.5">
               {side.points.map((p, j) => (

@@ -38,12 +38,22 @@ function trackFor(pathname: string): Track {
   return TRACKS.find((t) => t.id === m?.[1]) ?? TRACKS[0]
 }
 
+/** True when the track tab row is rendered, i.e. on a language route. */
+function hasTabs(pathname: string) {
+  return trackFor(pathname).id !== TRACKS[0].id
+}
+
 export function Shell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
+  const pathname = usePathname()
   return (
     <SidebarCtx.Provider value={{ open, setOpen }}>
       <Header />
-      <div className="mx-auto flex w-full max-w-[var(--shell)] flex-1">
+      <div
+        className="mx-auto flex w-full max-w-[var(--shell)] flex-1"
+        // the header loses the tab row when only one track is shown
+        style={{ '--header-h': hasTabs(pathname) ? '5.95rem' : '3.32rem' } as React.CSSProperties}
+      >
         <Sidebar />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
@@ -140,10 +150,14 @@ function Header() {
 function TrackTabs() {
   const pathname = usePathname()
   const active = trackFor(pathname)
+  // Launch scope is System Design only: language tabs stay hidden until you are
+  // actually on a language route, which still loads fine when linked directly.
+  const shown = TRACKS.filter((t) => t.id === TRACKS[0].id || t.id === active.id)
+  if (!hasTabs(pathname)) return null
 
   return (
     <nav aria-label="Tracks" className="mx-auto flex w-full max-w-[var(--shell)] gap-1 overflow-x-auto px-3">
-      {TRACKS.map((t) => {
+      {shown.map((t) => {
         const on = t.id === active.id
         return (
           <Link
@@ -534,9 +548,23 @@ export function Footer() {
             ? 'Type every example yourself. Reading code is not the same as writing it.'
             : 'Write your own answer before you read ours.'}
         </p>
-        <Link href="/progress" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
-          Export or clear your data →
-        </Link>
+        <nav aria-label="Site information" className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <Link href="/about" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+            About
+          </Link>
+          <Link href="/privacy" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+            Privacy
+          </Link>
+          <Link href="/terms" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+            Terms
+          </Link>
+          <Link href="/contact" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+            Contact
+          </Link>
+          <Link href="/progress" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+            Export or clear your data →
+          </Link>
+        </nav>
       </div>
     </footer>
   )
