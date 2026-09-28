@@ -62,7 +62,7 @@ export default function PrivacyPage() {
         <Prose
           paragraphs={[
             'Your theme choice and progress live in localStorage, which is not a cookie and is not transmitted anywhere.',
-            '**Google Analytics** sets its own cookies (`_ga`, `_ga_*`) to count visits and see which pages are read. It records pages viewed, rough location, device and browser — never your answers or progress. You can block it with any tracker blocker and the site works the same.',
+            '**Google Analytics** sets its own cookies (`_ga`, `_ga_*`) to count visits and see which pages are read. It records pages viewed, rough location, device and browser — never your answers or progress. You can block it with any tracker blocker and the site works the same. See [how Google uses information from sites that use its services](https://policies.google.com/technologies/partner-sites).',
             'Signed in, there is one session cookie so the site knows it is still you between page loads. It is strictly necessary for sign-in to work and does nothing else.',
           ]}
         />

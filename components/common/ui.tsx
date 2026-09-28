@@ -6,12 +6,19 @@ import { AXES, AXIS_LABEL, type Axis, type NodeState, type Scores } from '@/lib/
 
 /* ---------- inline markdown-lite ---------- */
 
-/** Renders **bold**, `code` and _italic_ inside a plain string. Nothing else — content is ours. */
+/** Renders **bold**, `code`, _italic_ and [links](/path) inside a plain string. Nothing else — content is ours. */
 export function Rich({ text }: { text: string }) {
-  const parts = text.split(/(\*\*[^*]+\*\*|`[^`]+`|_[^_]+_)/g)
+  const parts = text.split(/(\[[^\]]+\]\([^)\s]+\)|\*\*[^*]+\*\*|`[^`]+`|_[^_]+_)/g)
   return (
     <>
       {parts.map((p, i) => {
+        const link = p.match(/^\[([^\]]+)\]\(([^)\s]+)\)$/)
+        if (link)
+          return link[2].startsWith('/') ? (
+            <Link key={i} href={link[2]} style={{ color: 'var(--accent)' }}>{link[1]}</Link>
+          ) : (
+            <a key={i} href={link[2]} target="_blank" rel="noopener noreferrer" style={{ color: 'var(--accent)' }}>{link[1]}</a>
+          )
         if (p.startsWith('**') && p.endsWith('**'))
           return <strong key={i}>{p.slice(2, -2)}</strong>
         if (p.startsWith('`') && p.endsWith('`')) return <code key={i}>{p.slice(1, -1)}</code>
