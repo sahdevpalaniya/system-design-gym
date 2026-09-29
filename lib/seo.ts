@@ -3,6 +3,10 @@ import type { Metadata } from 'next'
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? 'https://devlearning-app.vercel.app'
 
+/** AdSense publisher id (ca-pub-XXXXXXXXXXXXXXXX). Unset, no ad code, ads.txt
+ *  or advertising section in the privacy policy is emitted at all. */
+export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
+
 /** Appended to every page title. Each page re-declares it so that nesting a
  *  titled layout (e.g. /concepts) does not strip the suffix from its children. */
 export const TITLE_TEMPLATE = '%s · Dev Learning'

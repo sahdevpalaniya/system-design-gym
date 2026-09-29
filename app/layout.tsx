@@ -3,7 +3,7 @@ import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/common/Providers'
 import { Footer, Shell } from '@/components/common/Nav'
-import { SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
+import { ADSENSE_CLIENT, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -28,6 +28,8 @@ export const metadata: Metadata = {
       ? { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION }
       : {},
   },
+  // lets AdSense verify the site during review; auto ads place the units
+  other: ADSENSE_CLIENT ? { 'google-adsense-account': ADSENSE_CLIENT } : {},
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   description:
     'Learn the method for answering system design interviews: requirements, lifecycle, numbers, design, tradeoffs. Write your own answer first, then compare. 44 topics and 16 worked problems, in dependency order.',
@@ -53,6 +55,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        {ADSENSE_CLIENT && (
+          <script
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
+            crossOrigin="anonymous"
+          />
+        )}
       </head>
       <body className="flex min-h-screen flex-col">
         <Providers>
