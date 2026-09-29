@@ -45,7 +45,7 @@ export default function MapPage() {
       <PageHeader
         eyebrow="Curriculum map"
         title="Everything, and where you are in it"
-        lede="Glance at this and you should instantly see what is solid, what needs review, and — more usefully — what is completely untouched."
+        lede="What is solid, what needs review and, more usefully, what you have not touched yet."
         meta={
           <>
             {(['untouched', 'attempted', 'solid', 'review'] as const).map((s) => (
@@ -80,7 +80,7 @@ export default function MapPage() {
       <section className="mb-12">
         <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Track A — Fundamentals</h2>
         <p className="mb-5 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
-          Three tiers. Tier 1 is used by everything; Tier 2 decides senior interviews; Tier 3 is the specific
+          Three tiers. Tier 1 is used by everything; Tier 2 is what senior interviews probe; Tier 3 is the specific
           answers that keep coming up.
         </p>
         <div className="space-y-5">
@@ -110,7 +110,7 @@ export default function MapPage() {
       <section className="mb-12">
         <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Track B — Problem shapes</h2>
         <p className="mb-5 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
-          Ten shapes. Covering a new shape teaches you more than a second problem inside one you already know.
+          Covering a new shape teaches you more than a second problem inside one you already know.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {GROUPS.map((g) => {
@@ -155,7 +155,7 @@ export default function MapPage() {
       <section>
         <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Track C — Interviewers</h2>
         <p className="mb-5 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
-          Six styles. Each weights the same rubric differently, so the same design scores differently.
+          Six styles of interviewer. Each weights the same rubric differently, so the same design can be judged differently.
         </p>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {[
@@ -178,8 +178,8 @@ export default function MapPage() {
       <section className="mt-12 border-t pt-8">
         <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">What the bar actually is</h2>
         <p className="mb-5 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
-          The same answer scores differently depending on the level. Most people practise to one bar and
-          are surprised by the gap — so know which column you are being measured against.
+          The same answer scores differently depending on the level. It is easy to practise to one bar and
+          be measured against another, so know which column applies to you.
         </p>
         <div className="grid gap-4 lg:grid-cols-3">
           {LEVELS.map((l) => (

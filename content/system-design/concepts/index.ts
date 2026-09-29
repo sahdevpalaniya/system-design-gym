@@ -26,12 +26,12 @@ export const TIER_INFO: Record<Tier, { name: string; blurb: string }> = {
   2: {
     name: 'Tier 2 — distributed',
     blurb:
-      'The part that decides senior interviews. Once data lives on more than one machine, everything here starts applying at once.',
+      'The core of most senior interviews. Once data lives on more than one machine, all of this starts to apply at once.',
   },
   3: {
     name: 'Tier 3 — common patterns',
     blurb:
-      'Specific, reusable answers. You will meet most of these in a real interview, usually as the follow-up rather than the first question.',
+      'Specific, reusable answers. You will meet many of these in interviews, usually as the follow-up rather than the first question.',
   },
 }
 
@@ -102,7 +102,7 @@ export const PATH: PathStage[] = [
   {
     id: 'more-than-one',
     name: 'More than one machine',
-    blurb: 'The moment data lives in two places, a new set of problems starts — this is the senior material.',
+    blurb: 'The moment data lives in two places, a new set of problems starts. This is the senior material.',
     concepts: [
       'availability-patterns',
       'replication',
@@ -149,7 +149,7 @@ export const PATH: PathStage[] = [
     id: 'production',
     name: 'In production',
     blurb:
-      'The part most people skip, and the part senior interviews dig into. A design you cannot deploy, watch, secure, restore or pay for is not finished.',
+      'The part candidates often skip, and the part senior interviews dig into. A design you cannot deploy, watch, secure, restore or pay for is not finished.',
     concepts: [
       'auth-and-security',
       'observability',

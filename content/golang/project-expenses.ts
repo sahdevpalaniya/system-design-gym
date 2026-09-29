@@ -9,20 +9,20 @@ export const PROJECT_EXPENSES: LangLesson[] = [
     slug: 'expenses-overview',
     title: 'Project 2 — Expense tracker: what we are building',
     navTitle: 'Overview and plan',
-    oneLine: 'A money app with accounts — which is why this is where login belongs.',
+    oneLine: 'A money app with accounts, which is why this is where login belongs.',
     blocks: [
       {
         heading: 'Why an expense tracker',
         body: [
-          'The URL shortener had no users. Anyone could create a link and anyone could list them. That was fine for learning one service end to end, and it is not fine for anything holding personal data.',
+          'The URL shortener had no users. Anyone could create a link and anyone could list them. That was fine for learning one service end to end. It is not fine for anything holding personal data.',
           'An **expense tracker** records what somebody spent, on what, and when. It is a good second project because the requirement writes itself: **I must never see your expenses, and you must never see mine.** Everything about accounts and login exists to make that sentence true.',
         ],
       },
       {
         heading: 'The architecture: package by feature',
         body: [
-          'Project 1 used a **layered** layout — a folder per kind of code. This project uses a different one, and it is the layout most experienced Go teams settle on: **package by feature**, sometimes called package-by-domain or vertical slicing.',
-          'The difference is what a folder is named after. Layered folders are named after a job (`store`, `service`). Feature folders are named after a **thing your product has** (`user`, `expense`) — and everything about that thing lives inside: its type, its rules, its SQL, its HTTP handlers, its tests.',
+          'Project 1 used a **layered** layout: a folder per kind of code. This project uses a layout many Go teams settle on once a service grows: **package by feature**, sometimes called package-by-domain or vertical slicing.',
+          'The difference is what a folder is named after. Layered folders are named after a job (`store`, `service`). Feature folders are named after a **thing your product has** (`user`, `expense`), and everything about that thing lives inside: its type, its rules, its SQL, its HTTP handlers, its tests.',
         ],
         code: {
           label: 'the same code, two ways of grouping it',
@@ -48,15 +48,15 @@ four folders                      top to bottom`,
       {
         heading: 'Why the change matters here',
         body: [
-          'The shortener had one concept, so a folder per layer was clear. This project has three — users, expenses, and sessions — and that is where layered layouts start to hurt.',
-          'With layers, adding expenses means editing `model`, `store`, `service` and `transport`. Every folder grows with every feature, no feature can be read in one place, and `service` eventually needs something from `transport` — which is an import cycle.',
-          'With feature folders, adding expenses is **one new folder**. Removing it is deleting that folder and one line in `main.go`. That is the whole test of the layout.',
+          'The shortener had one concept, so a folder per layer was clear. This project has three (users, expenses and sessions), and that is where layered layouts start to hurt.',
+          'With layers, adding expenses means editing `model`, `store`, `service` and `transport`. Every folder grows with every feature, no feature can be read in one place, and sooner or later two packages need each other, which Go rejects as an import cycle.',
+          'With feature folders, adding expenses is **one new folder**. Removing it is deleting that folder and its wiring in `main.go`. That is a good test of the layout.',
         ],
       },
       {
         heading: 'The layers did not disappear',
         body: [
-          'This is the part people miss. Package-by-feature does not throw the layers away — it turns them into **files inside each folder**, so you get the same separation with better locality.',
+          'Package-by-feature does not throw the layers away. It turns them into **files inside each folder**, so you keep the separation and gain locality.',
         ],
         table: {
           headers: ['File in each feature folder', 'Responsible for', 'Knows about'],
@@ -80,7 +80,7 @@ four folders                      top to bottom`,
       {
         callout: {
           tone: 'note',
-          text: 'Use this when the service has more than about two concepts and is expected to grow — which is most real services. It is the default worth reaching for unless you have a specific reason not to. Project 3 shows that reason.',
+          text: 'Use this when the service has more than about two concepts and is expected to grow, which describes most real services. It is a sensible default unless you have a specific reason to choose otherwise. Project 3 shows one such reason.',
         },
       },
       {
@@ -105,7 +105,7 @@ four folders                      top to bottom`,
       {
         callout: {
           tone: 'note',
-          text: 'The paths start with `/v1`. Adding that now costs nothing; adding it after other people are using your API is close to impossible. Do it in every project from here on.',
+          text: 'The paths start with `/v1`. Adding that now costs nothing. Adding it once other people use your API means every client has to change its URLs, or you serve both paths for a long time. Do it in every project from here on.',
         },
       },
       {
@@ -140,7 +140,7 @@ refresh_tokens  ← one per active session, so logout can end it`,
         heading: 'Two words you will need',
         body: [
           '**Authentication** is *who are you*. Checking an email and password, and handing back a token that proves it for later requests.',
-          '**Authorisation** is *what are you allowed to do*. In this project it is one rule — you may only touch rows where `user_id` is yours — but it is a separate question, and mixing the two up is how security bugs happen.',
+          '**Authorisation** is *what are you allowed to do*. In this project it is one rule (you may only touch rows where `user_id` is yours), but it is a separate question. Treating "logged in" as "allowed to touch anything" is how the IDOR bugs in step 5 happen.',
         ],
       },
     ],
@@ -162,7 +162,7 @@ refresh_tokens  ← one per active session, so logout can end it`,
       {
         task: 'Decide what should happen when somebody registers with an email that already exists.',
         answer:
-          '409 Conflict with a generic message. Do not say whether the account is active — that would confirm the email is registered.',
+          '409 Conflict is the simple answer, but it tells anyone that the email has an account. Where that matters, return the same response as a successful sign-up and email the real owner instead.',
       },
       {
         task: 'Decide whether an expense amount should be stored as a float. Then look up why the answer is no.',
@@ -222,8 +222,8 @@ JWT_SECRET=short go run ./cmd/api        # must refuse to start`,
       {
         heading: 'What config means here',
         body: [
-          '**Configuration** is everything that changes between your laptop and a server: the database address, the port, the secret used to sign tokens. It does not belong in the code, because then it is in your git history forever.',
-          'It comes from **environment variables** — values the operating system hands your process when it starts. Read them once, at startup, check them, and pass the result down. Nothing deeper in the program should ever call `os.Getenv`.',
+          '**Configuration** is everything that changes between your laptop and a server: the database address, the port, the secret used to sign tokens. It does not belong in the code: a secret committed once stays in your git history forever, and a new database address should not need a rebuild.',
+          'It comes from **environment variables**: values the operating system hands your process when it starts. Read them once, at startup, check them, and pass the result down. Nothing deeper in the program should ever call `os.Getenv`.',
         ],
       },
       {
@@ -272,7 +272,7 @@ func env(key, fallback string) string {
 \t}
 \treturn fallback
 }`,
-          note: 'A short JWT secret is a real weakness, so it is checked rather than trusted. Refusing to start is the correct response.',
+          note: 'A short HMAC secret can be brute-forced offline from a single token, so it is checked rather than trusted. Refusing to start is the right response.',
         },
       },
       {
@@ -338,7 +338,7 @@ CREATE INDEX ON expenses (user_id, spent_on DESC);`,
       {
         callout: {
           tone: 'warn',
-          text: 'Never store money in a `float64`. It is the classic beginner bug and it is invisible until an accountant finds it. Integer cents, or a proper decimal type — nothing else.',
+          text: 'Never store money in a `float64`. Each rounding error is tiny, and nobody notices until totals stop matching. Use integer cents, or a proper decimal type.',
         },
       },
       {
@@ -357,7 +357,7 @@ go get github.com/joho/godotenv           # .env in development`,
       'Read config once at startup, check it, and refuse to start when something is missing.',
       'Store money as whole cents in an integer. Never a float.',
       'Let the database enforce what it can: foreign keys, cascades, unique and check constraints.',
-      'Index the query you will actually run — here, `(user_id, spent_on DESC)`.',
+      'Index the query you will actually run: here, `(user_id, spent_on DESC)`.',
     ],
     remember:
       'A rule the database enforces cannot be forgotten by a handler you write six months from now.',
@@ -376,7 +376,7 @@ go get github.com/joho/godotenv           # .env in development`,
       {
         task: 'Insert `A@x.com` then `a@x.com` and see CITEXT treat them as the same email.',
         answer:
-          'The second is rejected as a duplicate. That is `CITEXT` — without it you would get two accounts for one person.',
+          'The second is rejected as a duplicate. That is `CITEXT`. Without it you would get two accounts for one person.',
       },
       {
         task: 'Set `JWT_SECRET` to five characters and confirm startup fails with a clear message.',
@@ -425,14 +425,14 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT email, password_h
         heading: 'The problem registration has to solve',
         body: [
           'You need to check a password later, but you must never be able to read it. Those sound contradictory. Databases get stolen, backups get left on laptops, and people reuse the same password on their bank.',
-          'The answer is **hashing**. A hash function turns any input into a fixed-size jumble, and it only works one way — you cannot go from the jumble back to the password. To check a login you hash the attempt and compare the two hashes. If your database is stolen, the passwords are not in it.',
+          'The answer is **hashing**. A hash function turns any input into a fixed-size jumble, and it only works one way: you cannot go from the jumble back to the password. To check a login you hash the attempt and compare the two hashes. If your database is stolen, the passwords are not in it.',
         ],
       },
       {
         heading: 'Why bcrypt and not SHA-256',
         body: [
-          'A normal hash like SHA-256 is designed to be **fast**, which is exactly wrong here. An attacker with your table can try billions of guesses a second.',
-          '**bcrypt** is designed to be **slow** on purpose, and you can tune how slow. At its default setting one hash takes around 100 milliseconds. That is nothing when a person logs in, and it turns billions of guesses per second into a few thousand.',
+          'A normal hash like SHA-256 is designed to be **fast**, which is wrong for passwords. An attacker with your table and a GPU can try billions of guesses a second.',
+          '**bcrypt** is designed to be **slow** on purpose, and you can tune how slow. At the default cost of 10, one hash takes roughly 50–100 milliseconds. A person logging in does not notice, and an attacker’s billions of guesses per second drop to thousands.',
           'It also handles the **salt** for you. A salt is random data mixed into each password before hashing, so two people with the same password get different hashes, and a precomputed table of common passwords is useless. bcrypt generates one and stores it inside the hash string.',
         ],
       },
@@ -469,7 +469,7 @@ var (
 \tErrInvalidCredentials = errors.New("invalid credentials")
 \tErrValidation         = errors.New("invalid input")
 )`,
-          note: 'The `json:"-"` on PasswordHash is not a nicety. It makes leaking the hash in a response impossible by accident rather than something you have to remember.',
+          note: 'The `json:"-"` on PasswordHash means encoding a User can never include the hash, so nobody has to remember to strip it from each response.',
         },
       },
       {
@@ -491,7 +491,7 @@ var (
 \t}
 \treturn nil
 }`,
-          note: 'The 72 is not arbitrary: bcrypt ignores anything past 72 bytes. Without this check a long password is silently cut short, and the user never knows.',
+          note: 'The 72 is not arbitrary: bcrypt only uses the first 72 bytes. Older versions of x/crypto/bcrypt silently ignored the rest; current ones return ErrPasswordTooLong, which without this check becomes a 500. len counts bytes, so 72 non-ASCII characters are more than 72.',
         },
       },
       {
@@ -544,7 +544,7 @@ func (s *Service) Register(ctx context.Context, req RegisterRequest) (*User, err
       {
         heading: 'File 4 — the repository, and letting the database decide',
         body: [
-          'A tempting mistake: `SELECT` to check the email is free, then `INSERT`. Two requests can both pass that check and both insert. The **unique constraint** is the only thing that actually guarantees it, so insert and translate the failure.',
+          'A tempting mistake: `SELECT` to check the email is free, then `INSERT`. Without a constraint, two requests can both pass that check and both insert. The **unique constraint** is what guarantees one account per email, so insert directly and translate the failure.',
         ],
         code: {
           label: 'internal/user/repository.go — create this file',
@@ -604,34 +604,34 @@ func isUniqueViolation(err error) bool {
       {
         callout: {
           tone: 'warn',
-          text: 'Never log the request body on this endpoint, not even at debug level. A log line containing a plaintext password is a breach, and log stores are usually readable by far more people than the database is.',
+          text: 'Never log the request body on this endpoint, not even at debug level. A log line containing a plaintext password is a breach, and log stores are often readable by far more people than the database is.',
         },
       },
     ],
     keyPoints: [
       'Hashing is one-way. You store the hash and compare hashes; you never read the password back.',
       'bcrypt is slow on purpose and salts for you. Never use SHA-256 or anything reversible for passwords.',
-      '`json:"-"` on the hash makes leaking it impossible rather than something to remember.',
+      '`json:"-"` on the hash keeps it out of every JSON response without anyone having to remember.',
       'Let the unique constraint decide, then translate error 23505. Check-then-insert is a race.',
     ],
     remember:
-      'After `Register` returns, the plaintext password should exist nowhere — not in a variable you kept, not in a log, not in the response.',
+      'After `Register` returns, the plaintext password should exist nowhere: not in a variable you kept, not in a log, not in the response.',
     task: 'Build all five files and register a user with curl. Then register the same email again and confirm you get a clean 409, not a raw Postgres error.',
     exercises: [
       {
-        task: 'Print the bcrypt hash of the same password twice and see that they differ — that is the salt.',
+        task: 'Print the bcrypt hash of the same password twice and see that they differ. That is the salt.',
         answer:
-          'Two different strings. The salt is generated per hash and stored inside it — which is why rainbow tables do not work.',
+          'Two different strings. The salt is generated per hash and stored inside it, which is why precomputed (rainbow) tables do not work.',
       },
       {
         task: 'Time `bcrypt.GenerateFromPassword` at cost 10, 12 and 14.',
         answer:
-          'Roughly 60ms, 250ms, 1s — each step doubles. That cost is the feature; do not lower it to make a benchmark look good.',
+          'Roughly 60ms, 250ms and 1s on a typical machine. Each +1 in cost doubles the work, so each +2 step here is four times slower. That cost is the feature; do not lower it to make a benchmark look good.',
       },
       {
-        task: 'Send a 100-character password and confirm your validation rejects it instead of bcrypt quietly cutting it short.',
+        task: 'Send a 100-character password and confirm your validation rejects it before it reaches bcrypt.',
         answer:
-          'Your validation rejects it. Without that check bcrypt silently ignores everything past 72 bytes, so the extra characters do nothing.',
+          'Your validation returns a 422. Without that check, older bcrypt versions silently ignore everything past 72 bytes, and newer ones return an error that surfaces as a 500.',
       },
       {
         task: 'Check the register response body and confirm no hash appears anywhere in it.',
@@ -679,29 +679,29 @@ time curl -s -o /dev/null -X POST localhost:8080/v1/auth/login -d '{"email":"no@
       {
         heading: 'Why a token is needed at all',
         body: [
-          'HTTP has no memory. Each request arrives on its own, and the server has no idea it is the same person who logged in a moment ago. Without something to carry, every single request would have to include the password — which means the client stores it, and every request pays the bcrypt cost.',
+          'HTTP has no memory. Each request arrives on its own, and the server has no idea it is the same person who logged in a moment ago. Without something to carry, every request would have to include the password. The client would have to store it, and every request would pay the bcrypt cost.',
           'So logging in hands back a **token**: a piece of text the client sends with later requests to prove who it is.',
         ],
       },
       {
         heading: 'What a JWT is',
         body: [
-          'This project uses a **JWT** — a JSON Web Token. It is three chunks of base64 joined by dots: a header, a payload, and a signature.',
-          'The **payload** holds a few facts, called **claims** — here, the user id and an expiry time. The **signature** is made from the first two parts plus a secret only your server knows. Change any part of the token and the signature no longer matches, so your server can trust it without looking anything up.',
-          'That last part is the appeal. Checking a session in a database costs a query on every request; checking a signature costs nothing.',
+          'This project uses a **JWT** (JSON Web Token): three chunks of base64url joined by dots: a header, a payload, and a signature.',
+          'The **payload** holds a few facts, called **claims**: here, the user id and an expiry time. The **signature** is made from the first two parts plus a secret only your server knows. Change any part of the token and the signature no longer matches, so your server can trust it without looking anything up.',
+          'That last part is the appeal. Checking a session in a database costs a query on every request; checking an HMAC signature costs microseconds of CPU and no network round trip.',
         ],
         code: {
           label: 'what a token looks like',
           src: `eyJhbGciOiJIUzI1NiJ9  .  eyJzdWIiOiI0MiIsImV4cCI6MTc...  .  4pRXK9Bv2hZ...
 └──── header ────┘      └──────── payload ────────┘      └── signature ──┘
   which algorithm            the claims: sub, exp          proof of the above`,
-          note: 'Paste the middle chunk into any base64 decoder and you can read it. That is not a bug — see the warning below.',
+          note: 'Paste the middle chunk into any base64 decoder and you can read it. That is not a bug; see the warning below.',
         },
       },
       {
         callout: {
           tone: 'warn',
-          text: 'A JWT is **signed, not encrypted**. Anyone holding it can read the payload. The signature only proves nobody changed it. Put an id in there and nothing else — never a password, never an email you would not want leaked, never anything secret.',
+          text: 'A JWT is **signed, not encrypted**. Anyone holding it can read the payload. The signature only proves nobody changed it. Put an id and an expiry in there, nothing more: never a password, never an email you would not want leaked, never anything secret.',
         },
       },
       {
@@ -730,8 +730,8 @@ time curl -s -o /dev/null -X POST localhost:8080/v1/auth/login -d '{"email":"no@
       {
         heading: 'Why both failures must look the same',
         body: [
-          'If "no such account" and "wrong password" give different messages, anyone can feed your login a list of emails and learn which ones have accounts here. That is a privacy leak on its own, and it is the first step of a targeted attack.',
-          'Timing counts too. If a missing account returns instantly while a wrong password takes 100ms of bcrypt, the difference is measurable — so you hash against a throwaway value in the missing case as well.',
+          'If "no such account" and "wrong password" give different messages, anyone can feed your login a list of emails and learn which ones have accounts here. That is a privacy leak on its own, and it hands an attacker a list of accounts to target.',
+          'Timing counts too. If a missing account returns instantly while a wrong password takes 100ms of bcrypt, the difference is easy to measure, so you hash against a throwaway value in the missing case as well.',
         ],
       },
       {
@@ -761,8 +761,8 @@ func (s *Service) issueToken(userID int64) (string, error) {
       {
         heading: 'Why only fifteen minutes',
         body: [
-          'Here is the catch with JWTs: **you cannot cancel one.** Once signed it stays valid until it expires. There is no list to remove it from — and if you added one, you would be doing a database lookup on every request, which is the thing the JWT was meant to avoid.',
-          'So the token is short-lived. Fifteen minutes means a stolen token is useful for fifteen minutes. Step 7 adds a **refresh token**: long-lived, stored in the database, and therefore cancellable. The short token does the work; the long one can be revoked.',
+          'The catch with JWTs: **you cannot cancel one.** Once signed, it stays valid until it expires. There is no list to remove it from, and if you added one, you would be doing a database lookup on every request, which is the thing the JWT was meant to avoid.',
+          'So the token is short-lived. Fifteen minutes means a stolen token is useful for at most fifteen minutes. Step 7 adds a **refresh token**: long-lived, stored in the database, and therefore cancellable. The short token does the work; the long one can be revoked.',
         ],
       },
       {
@@ -819,13 +819,13 @@ curl -s -X POST localhost:8080/v1/auth/login -d '{"email":"nope@x.c","password":
       'A JWT cannot be cancelled, so it is short-lived. Revoking is the refresh token’s job.',
     ],
     remember:
-      'You never unhash a password. You hash the attempt and compare — which is why a stolen database gives an attacker very little.',
+      'You never unhash a password. You hash the attempt and compare, which is why a stolen database leaves an attacker with slow, expensive guessing.',
     task: 'Add login and get a token back. Decode the payload yourself and read the claims. Then check that a wrong password and an unknown email give byte-identical responses.',
     exercises: [
       {
         task: 'Set the expiry to 10 seconds, wait, and confirm the token stops working.',
         answer:
-          '`token is expired`. The middleware rejects it with 401 — expiry is checked by the library, not by you.',
+          '`token is expired`. The middleware rejects it with 401. The library checks `exp` for you.',
       },
       {
         task: 'Change one character in the middle of a token and confirm it is rejected.',
@@ -878,7 +878,7 @@ curl -si -H "Authorization: Bearer $BAD" localhost:8080/v1/me | head -1     # 40
       {
         heading: 'The problem',
         body: [
-          'Every protected route has the same four questions: is a token present, is the signature valid, has it expired, and which user is it? Writing that in ten handlers means repeating it ten times and forgetting it once — and forgetting it once is a security hole, not a bug.',
+          'Every protected route has the same four questions: is a token present, is the signature valid, has it expired, and which user is it? Writing that in ten handlers means repeating it ten times and, sooner or later, forgetting it once. A forgotten check raises no error; it makes a route public.',
           'So it goes in **middleware**: one function that wraps a handler, runs before it, and either rejects the request or lets it through.',
         ],
       },
@@ -948,14 +948,14 @@ func UserID(ctx context.Context) (int64, bool) {
       {
         callout: {
           tone: 'warn',
-          text: 'That signing-method check is not optional. Without it an attacker sends a token whose header says `"alg": "none"`, the library accepts an unsigned token, and they can log in as any user they like. It is a complete authentication bypass and it has shipped in real products more than once.',
+          text: 'That signing-method check is not optional: it stops the token from choosing how it is verified. golang-jwt already refuses `"alg": "none"` unless you opt in, but other libraries and older versions have accepted unsigned tokens. A server that also holds RSA keys can be tricked into checking an HS256 signature using its public key as the secret. Either mistake is a complete authentication bypass, and both have shipped in real libraries.',
         },
       },
       {
         heading: 'Why the context key is a struct',
         body: [
-          'Context values live in an untyped map. If the key were the string `"userID"`, any other package — including a library you did not write — could use the same string and either read your value or overwrite it.',
-          'An unexported type fixes it completely. `ctxKey{}` from your package is a different key from `ctxKey{}` in anyone else’s, because the types differ. Export a typed function like `UserID` and never export the key itself.',
+          'Context values are looked up by key, and a key can be any comparable value. If the key were the string `"userID"`, any other package, including a library you did not write, could use the same string and read or shadow your value.',
+          'An unexported type fixes it. `ctxKey{}` from your package is a different key from `ctxKey{}` in anyone else’s, because the types differ. Export a typed function like `UserID` and never export the key itself.',
         ],
       },
       {
@@ -972,7 +972,7 @@ mux.HandleFunc("POST /v1/auth/login", userH.Login)
 mux.Handle("GET /v1/me", protect(http.HandlerFunc(userH.Me)))
 mux.Handle("POST /v1/expenses", protect(http.HandlerFunc(expH.Create)))
 mux.Handle("GET /v1/expenses", protect(http.HandlerFunc(expH.List)))`,
-          note: 'Wrapping route by route is on purpose. "Protect everything under /v1 except these two" is easy to get subtly wrong, and a route that ends up public by accident is the worst bug in the file.',
+          note: 'Wrapping route by route is on purpose. "Protect everything under /v1 except these two" is easy to get subtly wrong, and a route that is public by accident is the most damaging bug this file can have.',
         },
       },
       {
@@ -1017,7 +1017,7 @@ curl -si -H "Authorization: Bearer $BAD" localhost:8080/v1/me | head -1
     ],
     keyPoints: [
       'Check the token once, in middleware, so no handler can forget to.',
-      'Always assert the signing method, or `alg: none` gives an attacker any account.',
+      'Always assert the signing method, so a token cannot choose how it is verified.',
       'Use an unexported struct type as the context key, and export a typed accessor.',
       'Wrap protected routes individually so nothing becomes public by accident.',
     ],
@@ -1028,12 +1028,12 @@ curl -si -H "Authorization: Bearer $BAD" localhost:8080/v1/me | head -1
       {
         task: 'Hand-craft a token with `"alg":"none"` and confirm yours rejects it.',
         answer:
-          '401, because the key function asserts HMAC. Remove that check and the same token is accepted as whoever it claims to be.',
+          '401. Your key function rejects it, and golang-jwt v5 would too: it refuses `none` unless the key is `jwt.UnsafeAllowNoneSignatureType`.',
       },
       {
-        task: 'Remove the signing-method check, try the same token, and see the bypass for yourself. Then put it back.',
+        task: 'Remove the signing-method check, try the same token again, and work out what is still protecting you. Then put the check back.',
         answer:
-          'It is accepted. That is a complete authentication bypass — then put the check back.',
+          'It is still rejected, but only because golang-jwt refuses `none` by default. Your own check is what keeps you safe if you change library, or add RSA keys and meet an algorithm-confusion token.',
       },
       {
         task: 'Register a route without `protect` and see how easy that is to miss in a diff.',
@@ -1043,7 +1043,7 @@ curl -si -H "Authorization: Bearer $BAD" localhost:8080/v1/me | head -1
       {
         task: 'Call `middleware.UserID` from a handler that is not behind the middleware and handle the `false`.',
         answer:
-          '`ok` is false and the id is zero. Always check the bool — a zero user id would silently read row 0.',
+          '`ok` is false and the id is zero. Always check the bool: a query scoped to user 0 matches nothing, so the bug hides behind empty results instead of an error.',
       },
     ],
     refs: [
@@ -1056,7 +1056,7 @@ curl -si -H "Authorization: Bearer $BAD" localhost:8080/v1/me | head -1
     slug: 'expenses-step-5-crud',
     title: 'Step 5 — Expenses, locked to their owner',
     navTitle: 'Step 5 — Owner-scoped CRUD',
-    oneLine: 'CRUD again — but now every single query has to know whose data it is.',
+    oneLine: 'CRUD again, but now every query has to know whose data it is.',
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1086,7 +1086,7 @@ curl -si -X DELETE -H "Authorization: Bearer $B" localhost:8080/v1/expenses/1 | 
       {
         heading: 'The rule this whole project exists for',
         body: [
-          'Requests now carry a user id. Every query must use it. There are two places you could do that check, and only one of them actually works.',
+          'Requests now carry a user id. Every query must use it. There are two places you could do that check, and only one of them holds up.',
         ],
         code: {
           label: 'the wrong way and the right way',
@@ -1103,13 +1103,13 @@ SELECT id, amount_cents, category FROM expenses WHERE id = $1 AND user_id = $2`,
       {
         callout: {
           tone: 'warn',
-          text: 'The wrong version has a name: **IDOR**, Insecure Direct Object Reference. Someone changes `/expenses/41` to `/expenses/42` and reads a stranger’s spending. It is one of the most common real vulnerabilities in web APIs, and putting `AND user_id = $2` in the SQL means you cannot forget it.',
+          text: 'The wrong version has a name: **IDOR**, Insecure Direct Object Reference. Someone changes `/expenses/41` to `/expenses/42` and reads a stranger’s spending. Under the name Broken Object Level Authorization it is first on the OWASP API Security Top 10. Putting `AND user_id = $2` in the SQL means you cannot forget it.',
         },
       },
       {
         heading: 'Why 404 and not 403',
         body: [
-          'When somebody asks for an expense that is not theirs, return **404 Not Found**, not 403 Forbidden. A 403 confirms the row exists — so an attacker can map out which ids are real even without reading them. Not yours and not there should be indistinguishable.',
+          'When somebody asks for an expense that is not theirs, return **404 Not Found**, not 403 Forbidden. A 403 confirms the row exists, so an attacker can map out which ids are real without reading any of them. Not yours and not there should be indistinguishable.',
         ],
       },
       {
@@ -1206,7 +1206,7 @@ func (r *Repository) Delete(ctx context.Context, id, userID int64) error {
 \t}
 \treturn e, s.repo.Create(ctx, e)
 }`,
-          note: 'The Go date layout really is "2006-01-02" — it is a reference date, not a format string. It reads oddly and you will look it up more than once.',
+          note: 'The Go date layout is "2006-01-02": you write the reference time (Mon Jan 2 15:04:05 MST 2006) in the shape you want, instead of codes like %Y. It reads oddly and you will look it up more than once.',
         },
       },
       {
@@ -1239,7 +1239,7 @@ func (r *Repository) Delete(ctx context.Context, id, userID int64) error {
       {
         heading: 'Partial updates and why they need pointers',
         body: [
-          '**PUT** replaces a whole resource. **PATCH** changes some of it. The problem in Go is telling "the client set the note to empty" apart from "the client did not mention the note" — both arrive as `""`.',
+          '**PUT** replaces a whole resource. **PATCH** changes some of it. The problem in Go is telling "the client set the note to empty" apart from "the client did not mention the note". Both arrive as `""`.',
           'A pointer answers it. `nil` means the field was absent from the JSON; a pointer to an empty string means they sent it and meant it.',
         ],
         code: {
@@ -1294,17 +1294,17 @@ curl -si -X DELETE -H "Authorization: Bearer $B" localhost:8080/v1/expenses/$ID 
       {
         task: 'Remove `AND user_id = $2` from one query and re-run that test to watch it fail.',
         answer:
-          'The cross-user test fails immediately with a 200 where you expected 404. That test is the only thing standing between you and an IDOR.',
+          'The cross-user test fails immediately with a 200 where you expected 404. That test is what catches an IDOR before a user does.',
       },
       {
         task: 'Try to create an expense with someone else’s `user_id` in the JSON body and confirm it is ignored.',
         answer:
-          'Ignored. The user id comes from the token, and `CreateRequest` has no such field — that is why the request type is not the model.',
+          'Ignored. The user id comes from the token, and `CreateRequest` has no such field. That is why the request type is not the model.',
       },
       {
         task: 'Send a future date and confirm it is rejected.',
         answer:
-          '422 with your message. Whether future expenses are valid is a product decision — the point is that you decided.',
+          '422 with your message. Whether future expenses are valid is a product decision; what matters is that you made it on purpose.',
       },
       {
         task: 'PATCH with `{}`, then `{"note":""}`, then `{"note":"x"}` — three different outcomes from one pointer field.',
@@ -1349,7 +1349,7 @@ docker exec -it exp-pg psql -U postgres -d expenses -c \\
         heading: 'What pagination is and why it is not optional',
         body: [
           '**Pagination** means returning one page of results instead of everything. `limit` says how many, `offset` says how many to skip.',
-          'It is not a feature you add when the data grows. An endpoint with no limit works perfectly with fifty rows and takes the server down at fifty thousand — and by then it is in production and other people depend on the response shape.',
+          'It is not a feature you add when the data grows. By then the endpoint is in production, clients expect the full list, and adding a limit changes what they get back. Until then, every call builds one response holding every row the user has.',
         ],
         code: {
           label: 'internal/httpx/params.go — create this file',
@@ -1365,13 +1365,13 @@ func IntParam(r *http.Request, key string, def, min, max int) int {
 // in the handler:
 limit := httpx.IntParam(r, "limit", 20, 1, 100)      // hard ceiling of 100
 offset := httpx.IntParam(r, "offset", 0, 0, 1_000_000)`,
-          note: 'Clamp rather than reject. A client asking for 5000 gets 100 back, not a 400 they have to write code to handle.',
+          note: 'Clamping means a client asking for 5000 gets 100 rows, not a 400. The cost: it may not notice it got fewer than it asked for, so document the ceiling.',
         },
       },
       {
         heading: 'Filtering without opening a hole',
         body: [
-          'Users will want expenses by category and by date range. The tempting way to build a query with optional filters is to join strings together — and that is exactly how SQL injection happens.',
+          'Users will want expenses by category and by date range. The tempting way to build a query with optional filters is to paste the values into the SQL string, and that is how SQL injection happens.',
           'Build the **conditions** as fixed strings and collect the **values** separately, so every value still travels as a placeholder.',
         ],
         code: {
@@ -1401,19 +1401,19 @@ offset := httpx.IntParam(r, "offset", 0, 0, 1_000_000)`,
 \trows, err := r.db.QueryContext(ctx, q, args...)
 \t...
 }`,
-          note: 'The Sprintf here only ever inserts placeholder numbers like $2 and $3 — never a user value. Every actual value still goes through args.',
+          note: 'The Sprintf here only ever inserts placeholder numbers like $2 and $3, never a user value. Every actual value still goes through args.',
         },
       },
       {
         callout: {
           tone: 'warn',
-          text: 'Read that code twice. `fmt.Sprintf` near SQL is normally the injection warning sign — it is safe here **only** because the pieces being formatted in are `$2`, `$3` and fixed column names that you wrote. The moment a value from the request goes into that Sprintf, you have a vulnerability. If in doubt, do not do it.',
+          text: 'Read that code twice. `fmt.Sprintf` near SQL is normally the injection warning sign. It is safe here **only** because the pieces being formatted in are `$2`, `$3` and fixed column names that you wrote. The moment a value from the request goes into that Sprintf, you have a vulnerability. If in doubt, do not do it.',
         },
       },
       {
         heading: 'The monthly report',
         body: [
-          'A report is a question: how much did I spend per category last month? You could load every row and add them up in Go. Do not — the database can do it in one query, and it will do it faster than you can transfer the rows.',
+          'A report is a question: how much did I spend per category last month? You could load every row and add them up in Go. Do not. The database can do it in one query, faster than it could send you the rows.',
         ],
         code: {
           label: 'internal/expense/repository.go — add this',
@@ -1454,8 +1454,8 @@ func (r *Repository) MonthlyReport(ctx context.Context, userID int64, month time
       {
         heading: 'The mistake to avoid: N+1',
         body: [
-          'Suppose you list twenty expenses and then, for each one, run a query to fetch something extra. That is 1 + 20 = 21 round trips. At two hundred expenses it is 201, and your endpoint takes seconds for reasons invisible in the Go code — the loop looks perfectly innocent.',
-          'This is called the **N+1 problem**, and it is the most common real performance bug in web applications in every language. The fix is a `JOIN`, or one extra query that fetches everything at once with `WHERE id = ANY($1)`.',
+          'Suppose you list twenty expenses and then, for each one, run a query to fetch something extra. That is 1 + 20 = 21 round trips. At two hundred expenses it is 201, and at a millisecond or two per round trip the endpoint gets slow for reasons you cannot see in the Go code. The loop looks innocent.',
+          'This is called the **N+1 problem**, and it is one of the most common performance bugs in database-backed applications. The fix is a `JOIN`, or one extra query that fetches everything at once with `WHERE id = ANY($1)`.',
         ],
       },
     ],
@@ -1463,7 +1463,7 @@ func (r *Repository) MonthlyReport(ctx context.Context, userID int64, month time
       'Paginate from the first version, with a hard maximum, and clamp instead of rejecting.',
       'Build optional filters as fixed condition strings with the values in a separate args slice.',
       'Let the database aggregate. `GROUP BY` and `SUM` beat loading rows and looping.',
-      'A query inside a loop is N+1 — the most common real performance bug there is.',
+      'A query inside a loop is N+1, one of the most common performance bugs there is.',
     ],
     remember:
       'Every list endpoint needs a ceiling, and every total belongs in the database. Both are much harder to add once people depend on your API.',
@@ -1475,7 +1475,7 @@ func (r *Repository) MonthlyReport(ctx context.Context, userID int64, month time
           'With the index it stays sub-millisecond; without it Postgres scans the whole table and sorts. `EXPLAIN ANALYZE` shows which.',
       },
       {
-        task: 'Write the report the wrong way — load all rows, sum in Go — and time both.',
+        task: 'Write the report the wrong way (load all rows, sum in Go) and time both.',
         answer:
           'Loading every row and summing in Go is slower and uses far more memory, because thousands of rows cross the network first.',
       },
@@ -1530,7 +1530,7 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
         heading: 'The gap left in step 3',
         body: [
           'Your access token cannot be cancelled. If somebody steals it, or a user clicks "log out", the token keeps working until it expires. Fifteen minutes limits that, but "log out" doing nothing is not acceptable.',
-          'The standard answer is **two tokens**. A short **access token** — the JWT you already have, never checked against the database. And a long **refresh token**: random, stored in the database, cancellable, and useful for exactly one thing, getting a new access token.',
+          'The standard answer is **two tokens**. A short **access token**: the JWT you already have, never checked against the database. And a long **refresh token**: random, stored in the database, cancellable, and useful for exactly one thing, getting a new access token.',
         ],
         table: {
           headers: ['', 'Access token', 'Refresh token'],
@@ -1570,20 +1570,20 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
       {
         callout: {
           tone: 'warn',
-          text: 'Use `crypto/rand`, never `math/rand`. `math/rand` is predictable — given enough output an attacker can work out the seed and then generate every token you will ever issue. This applies to session ids, password reset codes, and anything else that must be unguessable.',
+          text: 'Use `crypto/rand`, never `math/rand`. `math/rand` is not built to resist prediction. With its classic generator, enough output lets an attacker recover the internal state and predict every token you issue after that. This applies to session ids, password reset codes, and anything else that must be unguessable.',
         },
       },
       {
         heading: 'Why SHA-256 here but bcrypt for passwords',
         body: [
-          'A reasonable question. bcrypt is slow so that guessing *human* passwords is expensive — people choose short, predictable ones.',
-          'A refresh token is 32 random bytes. There is nothing to guess: an attacker would have to try more combinations than there are atoms in reach. So a fast hash is fine, and being fast matters because this runs on every refresh.',
+          'bcrypt is slow so that guessing *human* passwords is expensive, because people choose short, predictable ones.',
+          'A refresh token is 32 random bytes: 2^256 possibilities. No amount of guessing gets through that, slow hash or fast, so SHA-256 is enough, and it keeps every refresh cheap.',
         ],
       },
       {
         heading: 'File 2 — rotation',
         body: [
-          '**Rotation** means each refresh token can be used once. Using it gives you a new pair and cancels the old one.',
+          '**Rotation** means each refresh token can be used once. Using it gives you a new pair and cancels the old one. The check and the cancel have to be one statement; a SELECT followed by an UPDATE would let two requests with the same token both get through.',
         ],
         code: {
           label: 'internal/auth/service.go — create this file',
@@ -1591,10 +1591,13 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
 \tsum := sha256.Sum256([]byte(token))
 \thash := hex.EncodeToString(sum[:])
 
+\t// Check and cancel in ONE statement, so two requests racing with the same
+\t// token cannot both succeed. A refresh token works exactly once.
 \tvar userID int64
 \terr = s.db.QueryRowContext(ctx,
-\t\t\`SELECT user_id FROM refresh_tokens
-\t\t  WHERE token_hash = $1 AND revoked_at IS NULL AND expires_at > now()\`,
+\t\t\`UPDATE refresh_tokens SET revoked_at = now()
+\t\t  WHERE token_hash = $1 AND revoked_at IS NULL AND expires_at > now()
+\t\t RETURNING user_id\`,
 \t\thash,
 \t).Scan(&userID)
 
@@ -1602,12 +1605,6 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
 \t\treturn "", "", ErrInvalidCredentials    // wrong, expired, or already used
 \t}
 \tif err != nil {
-\t\treturn "", "", err
-\t}
-
-\t// Cancel the one just used — a refresh token works exactly once.
-\tif _, err = s.db.ExecContext(ctx,
-\t\t\`UPDATE refresh_tokens SET revoked_at = now() WHERE token_hash = $1\`, hash); err != nil {
 \t\treturn "", "", err
 \t}
 
@@ -1623,7 +1620,7 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
         heading: 'Why single-use matters',
         body: [
           'Rotation is what makes theft **detectable**. If a refresh token is ever used twice, one of two things happened: your client has a bug, or somebody stole it and both parties are now using it.',
-          'The safe response is to cancel every refresh token for that user and force a fresh login. Without rotation you cannot detect the theft at all — the attacker just keeps refreshing alongside the real user, indefinitely.',
+          'The safe response is to cancel every refresh token for that user and force a fresh login. The `Refresh` above only rejects the reused token; to react to reuse, look the hash up again when the UPDATE matches nothing. Without rotation you cannot detect the theft at all: the attacker keeps refreshing alongside the real user for as long as the token lives.',
         ],
       },
       {
@@ -1647,7 +1644,7 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
       {
         callout: {
           tone: 'note',
-          text: 'Be honest about what logout does. The refresh token stops working immediately, but the **access token** keeps working until it expires — up to fifteen minutes. That is the price of not checking the database on every request, and it is why fifteen minutes and not eight hours.',
+          text: 'Be clear about what logout does. The refresh token stops working immediately, but the **access token** keeps working until it expires, up to fifteen minutes later. That is the price of not checking the database on every request, and it is why the lifetime is fifteen minutes and not eight hours.',
         },
       },
     ],
@@ -1655,16 +1652,16 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
       'Two tokens: a short JWT that does the work, and a long stored token that can be cancelled.',
       'Store the SHA-256 of the refresh token, never the token.',
       'Rotate on every refresh. Single use is what makes theft detectable.',
-      '`crypto/rand` for anything that must be unguessable. `math/rand` is a real vulnerability.',
+      '`crypto/rand` for anything that must be unguessable. `math/rand` there is a vulnerability.',
     ],
     remember:
-      'You cannot cancel a JWT. You cancel the refresh token and wait out the access token — which is exactly why it is short.',
+      'You cannot cancel a JWT. You cancel the refresh token and wait out the access token, which is why it is short.',
     task: 'Add refresh and logout. Then use one refresh token twice and confirm the second attempt fails.',
     exercises: [
       {
         task: 'Log out, then keep using the access token. Time how long it keeps working.',
         answer:
-          'It keeps working until it expires — up to fifteen minutes. That window is the price of not checking the database per request.',
+          'It keeps working until it expires, up to fifteen minutes. That window is the price of not checking the database per request.',
       },
       {
         task: 'Look at the `refresh_tokens` table and confirm nothing in it can be used to log in.',
@@ -1679,7 +1676,7 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
       {
         task: 'Write the cleanup job that deletes tokens expired more than 30 days ago, and give its goroutine a way to stop.',
         answer:
-          'It needs `case <-ctx.Done(): return` in its select, or the goroutine outlives the server and blocks shutdown.',
+          'It needs `case <-ctx.Done(): return` in its select, or nothing can stop it when the server shuts down.',
       },
     ],
     refs: [
@@ -1692,7 +1689,7 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
     slug: 'expenses-step-8-tests',
     title: 'Step 8 — Test that the walls actually hold',
     navTitle: 'Step 8 — Tests',
-    oneLine: 'One test here matters more than all the others put together.',
+    oneLine: 'One test here matters more than the rest: the one that proves users are kept apart.',
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1734,7 +1731,7 @@ go test ./... -coverprofile=c.out && go tool cover -html=c.out`,
       {
         heading: 'The test that matters most',
         body: [
-          'Everything in this project exists to stop one user reading another user’s data. So the most valuable test in the whole codebase is the one that proves it.',
+          'Everything in this project exists to stop one user reading another user’s data. So the most valuable test in the codebase is the one that proves it.',
         ],
         code: {
           label: 'internal/expense/handler_test.go — create this file',
@@ -1807,7 +1804,7 @@ go test ./... -coverprofile=c.out && go tool cover -html=c.out`,
       {
         heading: 'A fake, not a mocking library',
         body: [
-          'Because Go interfaces are implicit and small, a hand-written fake is fifteen lines and reads better than any generated mock. You almost never need a mocking library.',
+          'Because Go interfaces are implicit and small, a hand-written fake is a few lines and is often easier to read than a generated mock. You rarely need a mocking library.',
         ],
         code: {
           label: 'internal/expense/service_test.go',
@@ -1854,7 +1851,7 @@ func (f *fakeRepo) GetByID(_ context.Context, id, userID int64) (*Expense, error
 
 # -race finds data races that only appear under concurrency.
 # Run it in CI, always.`,
-          note: 'Coverage tells you what is definitely untested. It does not tell you what is well tested — chasing 100% produces tests that assert nothing.',
+          note: 'Coverage tells you what is definitely untested. It does not tell you what is well tested, and chasing 100% tends to produce tests that assert nothing.',
         },
       },
       {
@@ -1887,7 +1884,7 @@ func (f *fakeRepo) GetByID(_ context.Context, id, userID int64) (*Expense, error
       {
         task: 'Check coverage with `go tool cover -html` and find one error path nothing reaches.',
         answer:
-          'The red lines are almost always error branches. Those are the ones worth covering — the happy path is exercised by everything.',
+          'The red lines are usually error branches. Those are worth covering, because the happy path is exercised by everything else.',
       },
       {
         task: 'Delete the `t.Helper()` line and see how much worse the failure message gets.',

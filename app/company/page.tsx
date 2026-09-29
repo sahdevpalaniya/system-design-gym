@@ -7,7 +7,7 @@ import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
   'Company-wise system design practice',
-  'What Google, Amazon, Meta, Microsoft, Netflix and Uber actually press on in a system design round, and the questions to rehearse for each.',
+  'What Google, Amazon, Meta, Microsoft, Netflix and Uber press on in a system design round, and the questions to rehearse for each.',
   '/company',
 )
 
@@ -17,7 +17,7 @@ export default function CompanyIndex() {
       <PageHeader
         eyebrow="Practice · company questions"
         title="Company-wise practice"
-        lede="Real questions in the style each company actually asks. You write your answer first; **hints are available one at a time** if you get stuck, and the model answer only unlocks after you submit."
+        lede="Practice questions written in the style of each company's round. You write your answer first; **hints are available one at a time** if you get stuck, and the model answer only unlocks after you submit."
         meta={
           <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
             {COMPANY_QUESTIONS.length} questions across {COMPANIES.length} companies
@@ -30,10 +30,10 @@ export default function CompanyIndex() {
         style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
       >
         <strong style={{ color: 'var(--text)' }}>A warning about company-specific prep.</strong>{' '}
-        Learning &ldquo;the answer Google wants&rdquo; falls apart the moment an interviewer goes off
-        script. What actually transfers is recognising the <em>style</em> of the round — what this
-        company pushes on, and which axis they weight. That is what these pages teach. The core
-        curriculum stays deliberately company-agnostic.
+        Learning &ldquo;the answer Google wants&rdquo; falls apart once an interviewer goes off
+        script. What transfers is recognising the <em>style</em> of the round: what this
+        company pushes on, and which axis they weight. That is what these pages cover. The rest of
+        the site is deliberately company-agnostic.
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">

@@ -11,8 +11,8 @@ export const FUNDAMENTALS: LangLesson[] = [
       {
         heading: 'What syntax means here',
         body: [
-          '**Syntax** is the set of rules for how Go code must be written down — where the braces go, what counts as a statement, what the compiler will and will not accept. Every language has its own, and Go keeps its set small on purpose: there is usually one way to write something.',
-          'This topic covers the shape every Go file takes, how to write comments, and how to print things. Printing is worth a whole topic because it is how you will inspect your program before you ever touch a debugger.',
+          '**Syntax** is the set of rules for how Go code must be written down: where the braces go, what counts as a statement, what the compiler will and will not accept. Go keeps its set small on purpose, so there is usually one way to write something.',
+          'This topic covers the shape every Go file takes and how to write comments. The next one covers printing and naming. Printing gets that much space because it is how you will inspect your program before you ever touch a debugger.',
         ],
       },
       {
@@ -33,17 +33,17 @@ func main() {         // 3. the code
       {
         heading: 'Things that surprise people on day one',
         bullets: [
-          '**Semicolons are inserted for you.** You never type one. This is also why the opening brace must be on the *same* line — `func main()` followed by `{` on the next line does not compile.',
+          '**Semicolons are inserted for you.** You almost never type one. This is also why the opening brace must be on the *same* line: `func main()` followed by `{` on the next line does not compile.',
           '**Tabs, not spaces.** `gofmt` decides, and it chooses tabs. Do not fight it.',
           '**Unused imports and unused variables are compile errors**, not warnings.',
-          '**Capitalisation is access control.** `Println` is exported; `println` would be private.',
+          '**Capitalisation is access control.** `fmt.Println` is exported. A lowercase function inside `fmt` could not be called from your code.',
         ],
       },
       {
         heading: 'Comments',
         code: {
           label: 'comments.go',
-          src: `// A line comment. This is what you use 99% of the time.
+          src: `// A line comment. This is what you use nearly all the time.
 
 /*
 A block comment.
@@ -68,7 +68,7 @@ func Add(a, b int) int { return a + b }`,
 \t"os"
 \t"strings"
 
-\t"github.com/jackc/pgx/v5/stdlib"     // gofmt groups third-party separately
+\t"github.com/jackc/pgx/v5/stdlib"     // third-party in its own group (goimports does this)
 )
 
 import _ "net/http/pprof"    // blank import: run its init(), use nothing from it
@@ -78,18 +78,18 @@ import f "fmt"               // alias, when two packages share a name`,
       {
         callout: {
           tone: 'note',
-          text: 'Learn `%+v` early. When something is wrong with a struct, `fmt.Printf("%+v\\n", x)` shows every field with its name, and it is the fastest debugging tool in Go.',
+          text: 'Learn `%+v` early. When something is wrong with a struct, `fmt.Printf("%+v\\n", x)` shows every field with its name. It is often the quickest way to see what your program is holding.',
         },
       },
     ],
     keyPoints: [
-      'Package, imports, code — in that order, in every file. Semicolons are automatic.',
+      'Package, imports, code: in that order, in every file. Semicolons are automatic.',
       'The opening brace must be on the same line, because Go inserts semicolons for you.',
       'Unused imports and unused variables are compile errors, not warnings.',
       'MixedCaps naming, capital means exported, and never repeat the package name in a type.',
     ],
     remember:
-      'Capitalisation is not style in Go — it is the access modifier.',
+      'Capitalisation is not style in Go. It is the access modifier.',
     task: 'Write a two-file package with one exported and one unexported function. Try calling the unexported one from the other file, then from a different package.',
     exercises: [
       {
@@ -100,12 +100,12 @@ import f "fmt"               // alias, when two packages share a name`,
       {
         task: 'Add an unused import and an unused variable, and read both errors.',
         answer:
-          '`"os" imported and not used` and `declared and not used: x`. Both are errors, not warnings — that is on purpose.',
+          '`"os" imported and not used` and `declared and not used: x`. Both are errors, not warnings, on purpose.',
       },
       {
         task: 'Write a doc comment on an exported function, then run `go doc ./yourpackage`.',
         answer:
-          '`go doc` prints your comment under the function signature. That is the documentation — there is no separate doc format.',
+          '`go doc` prints your comment under the function signature. That comment is the documentation; there is no separate doc format.',
       },
     ],
     refs: [
@@ -163,7 +163,7 @@ fmt.Fprintln(os.Stderr, "goes to stderr")          // writes to any io.Writer`,
           'Letters, digits, and underscore. Must not start with a digit. Case-sensitive.',
           '**MixedCaps, never under_scores.** `userID`, not `user_id`.',
           '**Capital = exported.** `Name` is visible outside the package, `name` is not.',
-          '**Short names for short lives.** `i` in a loop, `r` for a reader, `u` for a user — but a package-level name gets a full word.',
+          '**Short names for short lives.** `i` in a loop, `r` for a reader, `u` for a user. A package-level name gets a full word.',
           '**Do not stutter.** In package `user`, the type is `Service`, so callers write `user.Service`, not `user.UserService`.',
           'Initialisms stay uppercase: `URL`, `ID`, `HTTP`. So `userID` and `parseURL`, never `userId` or `parseUrl`.',
         ],
@@ -205,7 +205,7 @@ func main() {
       'The `S` and `F` prefixes work across the whole `fmt` package: `Sprintf`, `Fprintln`.',
     ],
     remember:
-      '`%+v` is the fastest debugging tool in Go. Learn it before you learn a debugger.',
+      '`%+v` shows a struct with its field names. Learn it before you learn a debugger.',
     task: 'Print the same struct with `%v`, `%+v`, `%#v` and `%T` and compare all four outputs.',
     exercises: [
       {
@@ -216,12 +216,12 @@ func main() {
       {
         task: 'Format a float to two decimal places, and print a literal percent sign.',
         answer:
-          '`fmt.Printf("%.2f%%\\\\n", 62.5)` prints `62.50%`. `%%` is how you get one literal percent sign.',
+          '`fmt.Printf("%.2f%%\\n", 62.5)` prints `62.50%`. `%%` is how you get one literal percent sign.',
       },
       {
         task: 'Print a string with `%s` and `%q` and see which one shows the whitespace.',
         answer:
-          '`%q` wraps it in quotes, so leading and trailing spaces become visible. That is why `%q` is the better choice when debugging strings.',
+          '`%q` wraps it in quotes and escapes tabs and newlines, so leading and trailing whitespace becomes visible. Use it when debugging strings.',
       },
     ],
     refs: [
@@ -240,8 +240,8 @@ func main() {
       {
         heading: 'What a type is, and why there are so many',
         body: [
-          'A **type** tells Go two things: what kind of value a variable holds, and what you are allowed to do with it. `int` holds whole numbers and can be added; `string` holds text and can be joined. The compiler checks this before your program ever runs, which is how it catches a whole class of mistakes for free.',
-          'Go\'s built-in types are called **basic types**. There are more of them than in a language like Python because Go lets you say exactly how big a number is — 8 bits or 64 — which matters when you are talking to a database, a file format, or another machine.',
+          'A **type** tells Go two things: what kind of value a variable holds, and what you are allowed to do with it. `int` holds whole numbers and can be added; `string` holds text and can be joined. The compiler checks this before your program runs, so passing a `string` where an `int` is expected never reaches production.',
+          'Go\'s built-in types are called **basic types**. There are more of them than in a language like Python because Go lets you say how big a number is, 8 bits or 64. That matters when you are talking to a database, a file format, or another machine.',
           'A **constant** is a value fixed when the program is compiled and never changed afterwards. It is not a variable you promise not to touch; the compiler enforces it.',
         ],
       },
@@ -252,7 +252,7 @@ func main() {
           rows: [
             ['`bool`', '`true` or `false`', '`false`'],
             ['`string`', 'immutable bytes, usually UTF-8 text', '`""`'],
-            ['`int`, `uint`', 'whole numbers, 64-bit on modern machines', '`0`'],
+            ['`int`, `uint`', 'whole numbers, 64-bit on 64-bit platforms', '`0`'],
             ['`int8` `int16` `int32` `int64`', 'signed, exact size', '`0`'],
             ['`uint8` `uint16` `uint32` `uint64`', 'unsigned, exact size', '`0`'],
             ['`byte`', 'alias for `uint8` — one byte of data', '`0`'],
@@ -265,10 +265,10 @@ func main() {
       {
         heading: 'Which one do I actually use?',
         bullets: [
-          '**`int` for counting anything.** It is the default, it is 64-bit on any machine you care about, and using `int32` "to save memory" on a loop counter is not an optimisation.',
+          '**`int` for counting anything.** It is the default, it is 64-bit on the servers and laptops you will deploy to, and using `int32` "to save memory" on a loop counter saves nothing.',
           '**`int64` for database ids** and anything crossing a wire format where the size must be fixed.',
           '**`float64` for decimals.** `float32` only when you have a specific reason, like graphics.',
-          '**Never `float` for money.** `0.1 + 0.2 != 0.3` in binary floating point. Use integer cents, or a decimal library.',
+          '**Never a float for money.** `0.1 + 0.2 != 0.3` in binary floating point. Use integer cents, or a decimal library.',
           '**`byte` for raw data, `rune` for characters.** They are the same thing as `uint8` and `int32`, but the alias tells the reader your intent.',
         ],
       },
@@ -284,7 +284,7 @@ var u uint8 = 0
 u--
 fmt.Println(u)          // 255
 
-// Go 1.21+ gives you the limits
+// the math package has the limits
 fmt.Println(math.MaxInt64, math.MinInt64)`,
           run: `package main
 
@@ -302,11 +302,11 @@ func main() {
 	u--
 	fmt.Println(u)          // 255
 
-	// Go 1.21+ gives you the limits
+	// the math package has the limits
 	fmt.Println(math.MaxInt64, math.MinInt64)
 }
 `,
-          note: 'This is exactly why Go refuses to convert between sizes implicitly — you have to write int8(x) and think about it.',
+          note: 'Converting to a smaller type truncates the same way: `int8(200)` on a variable gives -56. Go makes you write `int8(x)` so the narrowing is visible in the code.',
         },
       },
       {
@@ -329,7 +329,7 @@ s3 := strconv.FormatInt(255, 16)         // "ff"`,
       {
         callout: {
           tone: 'warn',
-          text: '`string(65)` gives you `"A"`, not `"65"`. It converts a code point to a character. To turn a number into its text form you need `strconv.Itoa`. `go vet` catches the common version of this mistake.',
+          text: '`string(65)` gives you `"A"`, not `"65"`. It converts a code point to a character. To turn a number into its text form you need `strconv.Itoa`. `go vet` flags `string(n)` on an int for this reason, which is why the code above writes `string(rune(65))`.',
         },
       },
       {
@@ -377,7 +377,7 @@ func main() {
     keyPoints: [
       '`int` for counting, `int64` for ids, `float64` for decimals, never a float for money.',
       'Overflow wraps silently. That is why every conversion between sizes is explicit.',
-      '`byte` is `uint8` and `rune` is `int32` — the aliases exist to show intent.',
+      '`byte` is `uint8` and `rune` is `int32`. The aliases exist to show intent.',
       '`strconv` converts between numbers and text. `string(65)` gives "A", not "65".',
     ],
     remember:
@@ -387,7 +387,7 @@ func main() {
       {
         task: 'Print `math.MaxInt64` and `math.MinInt64`, then add one to each.',
         answer:
-          '9223372036854775807 and -9223372036854775808. Adding one wraps to the other end — silently, with no panic.',
+          '9223372036854775807 and -9223372036854775808. Held in an `int64` variable, max plus one wraps to the min with no panic, and min plus one is simply -9223372036854775807. Written as a constant, `math.MaxInt64 + 1` does not compile: the compiler reports the overflow.',
       },
       {
         task: 'Add 0.1 and 0.2 as float64 and print the result. That is why money is not a float.',
@@ -397,7 +397,7 @@ func main() {
       {
         task: 'Convert a string to an int with `strconv.Atoi` and handle the error path.',
         answer:
-          '`strconv.Atoi: parsing "abc": invalid syntax`, and the int is 0. Always check the error — the zero would otherwise look like a real value.',
+          '`strconv.Atoi: parsing "abc": invalid syntax`, and the int is 0. Always check the error, or that 0 looks like a real value.',
       },
     ],
     refs: [
@@ -425,7 +425,7 @@ const (
 \tAppName     = "snapnotes"
 )
 
-// An UNTYPED constant adapts to where it is used — this is unusual and useful
+// An UNTYPED constant adapts to where it is used. Unusual, and useful.
 const big = 1 << 40          // no type yet
 var f float64 = big          // fine
 var i int64 = big            // also fine
@@ -494,7 +494,7 @@ func main() {
       },
     ],
     keyPoints: [
-      'A constant is fixed at compile time — the compiler enforces it, it is not a promise.',
+      'A constant is fixed at compile time. The compiler enforces it; it is not a promise.',
       'An untyped constant adapts to where it is used; a typed one does not.',
       '`iota` counts up through a const block, and it is an expression you can do maths with.',
       'A named type + iota + a `String()` method is how Go does enums.',
@@ -516,7 +516,7 @@ func main() {
       {
         task: 'Give the same constant an explicit type and watch the second assignment stop compiling.',
         answer:
-          '`cannot use typed (constant of type int32) as int64 value`. A typed constant no longer adapts.',
+          '`cannot use typed (constant 100 of type int32) as int64 value in variable declaration`. A typed constant no longer adapts.',
       },
     ],
     refs: [
@@ -530,13 +530,13 @@ func main() {
     slug: 'operators',
     title: 'Operators',
     navTitle: 'Operators',
-    oneLine: 'Arithmetic, comparison, logical, and bitwise — plus the three Go leaves out on purpose.',
+    oneLine: 'Arithmetic, comparison, logical, and bitwise, plus what Go leaves out on purpose.',
     blocks: [
       {
         heading: 'What an operator is',
         body: [
           'An **operator** is a symbol that does something to one or two values: `+` adds them, `==` compares them, `&&` combines two true-or-false answers. They are the smallest building blocks of any expression you write.',
-          'Go\'s operators are worth a proper look for two reasons. A few behave differently from other languages — integer division throws away the remainder, and `++` is a statement rather than something you can use inside an expression. And a few Go simply does not have, on purpose.',
+          'Go\'s operators are worth a proper look for two reasons. A few behave differently from other languages: integer division throws away the remainder, and `++` is a statement rather than something you can use inside an expression. And a few that other languages have, Go leaves out on purpose.',
         ],
       },
       {
@@ -555,7 +555,7 @@ float64(a) / float64(b)   // 3.333... — convert first if you want a decimal
 
 a++        // a statement, NOT an expression. "x := a++" does not compile.
 a--        // and there is no ++a either`,
-          note: 'Integer division truncating toward zero is the single most common arithmetic surprise. 7/2 is 3, not 3.5.',
+          note: 'Integer division truncates toward zero, which surprises people coming from JavaScript or Python 3. 7/2 is 3, not 3.5, and -7/2 is -3.',
         },
       },
       {
@@ -612,7 +612,7 @@ if u != nil && u.Active {        // u.Active is never reached when u is nil
 if err == nil || retries > 3 {   // retries is not read when err is nil
 \t...
 }`,
-          note: 'Short-circuiting is not a micro-optimisation — the nil check idiom above depends on it entirely.',
+          note: 'Short-circuiting is not a micro-optimisation. Without it, the nil check above would panic.',
         },
       },
       {
@@ -623,10 +623,10 @@ if err == nil || retries > 3 {   // retries is not read when err is nil
 a | b      // OR
 a ^ b      // XOR
 a &^ b     // AND NOT (bit clear) — this one is unique to Go
-a << 2     // shift left  (x * 4)
-a >> 2     // shift right (x / 4)
+a << 2     // shift left  (a * 4)
+a >> 2     // shift right (a / 4, rounding down for negatives)
 
-// The real-world use: flags packed into one integer
+// A common use: flags packed into one integer
 const (
 \tCanRead  = 1 << iota   // 1
 \tCanWrite               // 2
@@ -656,15 +656,15 @@ v := <-ch  // receive from a channel`,
         heading: 'What Go leaves out on purpose',
         bullets: [
           '**No ternary `?:`.** Write the `if`. The Go FAQ says the readability cost of nested ternaries is not worth the saved line.',
-          '**No operator overloading.** `+` on your struct will never mean something surprising. `a + b` is always addition.',
-          '**No pointer arithmetic.** You cannot do `p + 1` to walk memory. That is what makes Go memory-safe.',
-          '**No `++` as an expression.** It is a statement, so `arr[i++]` is impossible — and so is the class of bugs it causes.',
+          '**No operator overloading.** You cannot define `+` for your own struct. `a + b` is numeric addition, or concatenation for strings, and nothing else.',
+          '**No pointer arithmetic.** You cannot do `p + 1` to walk memory (outside the `unsafe` package). That is a large part of what makes Go memory-safe.',
+          '**No `++` as an expression.** It is a statement, so `arr[i++]` does not compile, and neither do the order-of-evaluation bugs it allows in C.',
         ],
       },
       {
         callout: {
           tone: 'note',
-          text: 'Precedence is simpler than in C: five levels, with `*` above `+` above comparison above `&&` above `||`. When in doubt, add brackets — `gofmt` will keep them and the next reader will thank you.',
+          text: 'Precedence is simpler than in C: five levels, with `*` above `+` above comparison above `&&` above `||`. When in doubt, add brackets. `gofmt` keeps them, and the next reader does not have to remember the table.',
         },
       },
       {
@@ -701,7 +701,7 @@ func main() {
 }
 `,
           canRun: true,
-          note: 'Integer division, short-circuiting, and bit flags — all three surprises in one program.',
+          note: 'Integer division, short-circuiting, and bit flags in one program.',
         },
       },
     ],
@@ -709,10 +709,10 @@ func main() {
       'Integer division truncates. Convert to float64 first if you want a decimal.',
       '`==` works on structs when every field is comparable; use `slices.Equal` for slices.',
       '`&&` and `||` short-circuit, which is what makes `x != nil && x.Field` safe.',
-      'No ternary, no operator overloading, no pointer arithmetic — all left out on purpose.',
+      'No ternary, no operator overloading, no pointer arithmetic. All three are left out on purpose.',
     ],
     remember:
-      'Go’s operators do exactly one thing each, and none of them can be redefined. `a + b` is addition, everywhere, always.',
+      'None of Go’s operators can be redefined. `a + b` means addition, or concatenation for strings, in every file you will ever read.',
     task: 'Build a permissions integer with `iota` bit flags: set two permissions, test for one, clear one, and print the result with `%b` to watch the bits move.',
     refs: [
       { label: 'Language Specification — Operators', href: 'https://go.dev/ref/spec#Operators' },
@@ -727,17 +727,17 @@ func main() {
     oneLine: 'Why `len("héllo")` is 6, and the string operations you will use every day.',
     blocks: [
       {
-        heading: 'What a string really is',
+        heading: 'What a string is',
         body: [
-          'A **string** in Go is a read-only sequence of **bytes**, almost always holding text encoded as UTF-8. That definition is doing a lot of work, and the two important words are *bytes* and *read-only*.',
-          '**Bytes, not characters.** In English text one character happens to be one byte, so the difference never shows. Add an accent or an emoji and one character becomes two, three or four bytes — which is why `len` on a string does not tell you how many characters it has.',
+          'A **string** in Go is a read-only sequence of **bytes**, almost always holding text encoded as UTF-8. The two important words are *bytes* and *read-only*.',
+          '**Bytes, not characters.** In plain English text one character is one byte, so the difference never shows. Add an accent or an emoji and one character becomes two, three or four bytes. That is why `len` on a string does not tell you how many characters it has.',
           '**Read-only.** A string can never be changed after it is made. Joining two strings does not extend one of them; it builds a third and copies both in. That is fine once and expensive in a loop.',
         ],
       },
       {
         heading: 'A string is immutable bytes',
         body: [
-          'A Go string is a read-only slice of bytes, almost always holding UTF-8 text. It is **not** a sequence of characters, and that difference causes every string bug a beginner hits.',
+          'Take a five-character word with one accent. Most beginner string bugs come from treating its bytes as characters.',
         ],
         code: {
           label: 'strings.go',
@@ -747,10 +747,10 @@ len(s)                        // 6  — BYTES. é takes two bytes in UTF-8.
 utf8.RuneCountInString(s)     // 5  — actual characters
 
 s[1]                          // 195 — a byte, not 'é'
-string(s[1])                  // garbage — half a character
+string(s[1])                  // "Ã" — byte 195 read as code point U+00C3, not 'é'
 
 for i, r := range s {         // range decodes UTF-8 for you
-\tfmt.Printf("%d: %c\\n", i, r)   // i jumps by 1,1,2,1,1
+\tfmt.Printf("%d: %c\\n", i, r)   // i is 0, 1, 3, 4, 5 — é takes two bytes
 }
 
 rs := []rune(s)               // convert when you need character indexing
@@ -760,7 +760,7 @@ fmt.Println(string(rs[1]))    // "é"`,
       {
         callout: {
           tone: 'warn',
-          text: 'Indexing a string gives you a byte. `s[0:3]` slices bytes and can cut a character in half. If you are doing anything per-character, convert to `[]rune` first — or use `range`, which decodes for you.',
+          text: 'Indexing a string gives you a byte. `s[0:3]` slices bytes and can cut a character in half. If you are doing anything per-character, convert to `[]rune` first, or use `range`, which decodes for you.',
         },
       },
       {
@@ -810,7 +810,7 @@ strings.Replace(s, "a", "b", 1)       // n replacements
 strings.ReplaceAll(s, "a", "b")
 strings.Repeat("ab", 3)               // "ababab"
 strings.EqualFold("Go", "GO")         // true — case-insensitive compare`,
-          note: 'Prefer `strings.EqualFold` over lowering both sides. Prefer `Cut`/`CutPrefix` over Index arithmetic — they are clearer and harder to get wrong.',
+          note: 'Prefer `strings.EqualFold` over lowering both sides. Prefer `Cut`/`CutPrefix` over Index arithmetic: they are clearer, and there is no off-by-one to get wrong.',
         },
       },
       {
@@ -820,7 +820,7 @@ strings.EqualFold("Go", "GO")         // true — case-insensitive compare`,
           src: `before, after, found := strings.Cut("key=value", "=")
 // "key", "value", true
 
-// This is exactly the shape of parsing an Authorization header
+// The same shape parses an Authorization header
 token, ok := strings.CutPrefix(header, "Bearer ")`,
         },
       },
@@ -843,7 +843,7 @@ SELECT id, name FROM users
       {
         heading: 'Bytes when performance matters',
         body: [
-          'Every `strings` function has a `bytes` twin that works on `[]byte`. Converting between `string` and `[]byte` copies, so in a hot loop reading from a network or a file, staying in `[]byte` avoids that copy. Everywhere else, use `string` — it is immutable, safe to share, and usable as a map key.',
+          'Every `strings` function has a `bytes` twin that works on `[]byte`. Converting between `string` and `[]byte` copies, so in a hot loop reading from a network or a file, staying in `[]byte` avoids that copy. Everywhere else, use `string`: it is immutable, safe to share between goroutines, and usable as a map key.',
         ],
       },
       {
@@ -879,7 +879,7 @@ func main() {
 }
 `,
           canRun: true,
-          note: 'Bytes versus characters — the reason `len` surprises everyone once.',
+          note: 'Bytes versus characters, a `strings.Builder`, and `Cut`.',
         },
       },
     ],
@@ -891,7 +891,7 @@ func main() {
     ],
     remember:
       'A string is bytes, not characters. The moment you index or slice one, ask yourself whether you meant a byte or a character.',
-    task: 'Write a function that reverses a string correctly for "héllo" and for an emoji. Do it with `[]byte` first and watch it break — that failure is the lesson.',
+    task: 'Write a function that reverses a string correctly for "héllo" and for an emoji. Do it with `[]byte` first and watch it break. That failure is the lesson.',
     refs: [
       { label: 'strings package', href: 'https://pkg.go.dev/strings' },
       { label: 'Go blog: Strings, bytes, runes and characters', href: 'https://go.dev/blog/strings' },
@@ -902,7 +902,7 @@ func main() {
     slug: 'pointers-and-memory',
     title: 'Pointers',
     navTitle: 'Pointers',
-    oneLine: 'What `&` and `*` really do, when you need them, and why Go pointers cannot hurt you the way C ones can.',
+    oneLine: 'What `&` and `*` do, when you need them, and why Go pointers cannot hurt you the way C ones can.',
     blocks: [
       {
         heading: 'What a pointer is',
@@ -976,7 +976,7 @@ fmt.Println(p.Name)      // Go rewrites this as (*p).Name
 p.Name = "changed"       // and this too
 p.Rename("again")        // methods work the same way
 
-// The only place you write * explicitly is for non-struct types
+// For non-struct types you still write * yourself
 n := &count
 *n++`,
         },
@@ -987,16 +987,16 @@ n := &count
           headers: ['Use a pointer', 'Use a value'],
           rows: [
             ['the function must change the argument', 'the struct is small and you never mutate it'],
-            ['the struct is large and copying is measurable', 'you want it usable as a map key'],
+            ['the struct is large and copying is measurable', 'you want `==` and map keys to compare contents, not addresses'],
             ['the type contains a `sync.Mutex` (never copy a lock)', 'the type is naturally a value: `time.Time`, `Point`'],
-            ['"absent" and "zero" must be different (see below)', 'you want it safe to share across goroutines'],
+            ['"absent" and "zero" must be different (see below)', 'you want each goroutine to get its own copy'],
           ],
         },
       },
       {
         heading: 'The pointer-as-optional trick',
         body: [
-          'Because a pointer can be `nil`, a pointer field distinguishes "the client did not send this" from "the client sent an empty value". That is exactly what a PATCH endpoint needs.',
+          'Because a pointer can be `nil`, a pointer field distinguishes "the client did not send this" from "the client sent an empty value". A PATCH endpoint needs that distinction: `{"title": ""}` should clear the title, while `{}` should leave it alone.',
         ],
         code: {
           label: 'optional.go',
@@ -1029,16 +1029,16 @@ ch := make(chan int, 5)
       {
         heading: 'What Go pointers cannot do',
         bullets: [
-          '**No pointer arithmetic.** You cannot do `p + 1` to walk through memory. This removes an entire class of security bugs.',
-          '**No dangling pointers.** Returning `&x` from a function is safe — the garbage collector keeps `x` alive. In C that is a use-after-free; in Go the compiler just moves it to the heap.',
+          '**No pointer arithmetic.** You cannot do `p + 1` to walk through memory, so buffer overruns through a pointer are ruled out.',
+          '**No dangling pointers.** Returning `&x` from a function is safe, because the garbage collector keeps `x` alive. In C that returns a pointer into a stack frame that no longer exists; in Go, escape analysis moves `x` to the heap.',
           '**No manual free.** The GC handles it. You cannot double-free or use-after-free.',
-          '**The one thing that can bite you: a nil dereference**, which panics rather than corrupting memory. A crash you can read beats silent corruption.',
+          '**The main thing that can bite you: a nil dereference**, which panics rather than corrupting memory. A crash with a stack trace beats silent corruption.',
         ],
       },
       {
         callout: {
           tone: 'note',
-          text: 'Do not sprinkle pointers everywhere "for performance". A copy of a small struct is often faster than a pointer, because it stays in a CPU register and creates no work for the garbage collector. Reach for a pointer when you need to mutate or when you have measured a copy cost — not by default.',
+          text: 'Do not sprinkle pointers everywhere "for performance". A copy of a small struct is often faster than a pointer, because it can stay on the stack or in registers, while a pointer can force the value onto the heap where the garbage collector has to track it. Reach for a pointer when you need to mutate or when you have measured a copy cost, not by default.',
         },
       },
       {
@@ -1086,11 +1086,11 @@ func main() {
     keyPoints: [
       '`&x` takes an address, `*p` reads through it. Go dereferences struct fields automatically.',
       'Pointers let a function mutate the caller’s value, and avoid copying large structs.',
-      'A `nil`-able pointer field separates "absent" from "empty" — the PATCH pattern.',
+      'A `nil`-able pointer field separates "absent" from "empty". PATCH handlers depend on it.',
       '`&T{}` for structs, `make` for slices/maps/channels. No pointer arithmetic, no manual free.',
     ],
     remember:
-      'A pointer is just a value holding an address. Go removes the dangerous parts — arithmetic and manual freeing — and keeps the useful part.',
+      'A pointer is a value holding an address. Go removes the dangerous parts (arithmetic and manual freeing) and keeps the useful part.',
     task: 'Write `func double(n *int)` and call it. Then write a struct with a `*string` field, unmarshal `{}` and `{"name":""}` into it, and print whether the field is nil in each case.',
     refs: [
       { label: 'A Tour of Go — Pointers', href: 'https://go.dev/tour/moretypes/1' },

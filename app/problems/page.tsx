@@ -14,7 +14,7 @@ export default function ProblemsPage() {
       <PageHeader
         eyebrow="Track B"
         title="Problem library"
-        lede="Grouped by the **shape of the problem**, not by product name. This is the most important teaching move in the app — two different-looking products are usually the same problem, and two identical-looking ones are often not."
+        lede="Grouped by the **shape of the problem**, not by product name. Two products that look different are often the same problem, and two that look alike often are not."
         meta={
           <>
             <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
@@ -37,8 +37,8 @@ export default function ProblemsPage() {
       >
         <strong style={{ color: 'var(--text)' }}>Every problem page answers &ldquo;where&rsquo;s the slack?&rdquo;</strong>{' '}
         — how much time the system has before a human notices. Food delivery has fifteen minutes of cooking to
-        hide latency inside. Ride hailing has a person standing on a street with zero slack. Same-looking
-        problems, completely different designs, and that one question is what separates them.
+        hide latency inside. Ride hailing has a person standing on a street with zero slack. The problems look
+        alike, the designs do not, and that one question is what separates them.
       </div>
 
       <div className="space-y-10">
@@ -108,7 +108,7 @@ export default function ProblemsPage() {
           <Card>
             <h3 className="text-[0.9375rem] font-semibold">Ride hailing</h3>
             <p className="mt-2 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-              A person is standing on a street. Zero slack. So matching must be greedy and immediate — take a
+              A person is standing on a street. Zero slack. So matching must be greedy and immediate: take a
               good driver now, not the best driver in forty seconds. Global optimisation is the better algorithm
               and the wrong product.
             </p>
@@ -117,8 +117,7 @@ export default function ProblemsPage() {
             <h3 className="text-[0.9375rem] font-semibold">Food delivery</h3>
             <p className="mt-2 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               The restaurant needs fifteen minutes to cook. That is fifteen minutes of slack to hide latency
-              inside — so you can batch orders, wait for a better courier, and optimise across the whole set.
-              Completely different design, same-looking problem.
+              inside, so you can batch orders, wait for a better courier, and optimise across the whole set.
             </p>
           </Card>
         </div>

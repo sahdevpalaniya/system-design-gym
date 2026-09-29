@@ -28,7 +28,7 @@ export const QUIZZES: QuizSet[] = [
           '`const pi = 3.14`',
         ],
         answer: 2,
-        why: 'Go never converts numeric types implicitly. You must write `float64(someInt)`.',
+        why: 'Go never converts between typed numeric values implicitly. You must write `float64(someInt)`. Only untyped constants like `25` adapt to the type they are assigned to.',
         from: 'control-flow',
       },
       {
@@ -49,7 +49,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'Which verb prints a struct **with its field names**?',
         options: ['`%v`', '`%+v`', '`%#v`', '`%s`'],
         answer: 1,
-        why: '`%v` gives `{1 Sahdev}`, `%+v` gives `{ID:1 Name:Sahdev}`, and `%#v` gives full Go syntax. `%+v` is the fastest debugging tool in the language.',
+        why: '`%v` gives `{1 Sahdev}`, `%+v` gives `{ID:1 Name:Sahdev}`, and `%#v` gives full Go syntax. `%+v` is the quickest way to inspect a struct while debugging.',
         from: 'printing-and-format-verbs',
       },
       {
@@ -57,7 +57,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'What does `fmt.Println(7 / 2)` print?',
         options: ['`3.5`', '`3`', '`4`', 'A compile error'],
         answer: 1,
-        why: 'Both operands are integers, so this is integer division and it truncates toward zero. Convert first — `float64(7) / 2` — if you want `3.5`.',
+        why: 'Both operands are integers, so this is integer division and it truncates toward zero. If you want `3.5`, convert first: `float64(7) / 2`.',
         from: 'operators',
       },
       {
@@ -86,7 +86,7 @@ export const QUIZZES: QuizSet[] = [
           'Only when the case has more than one statement',
         ],
         answer: 2,
-        why: 'Go does not fall through. If you actually want the C behaviour, the keyword is `fallthrough`, and you will rarely need it.',
+        why: 'Go does not fall through. If you want the C behaviour, the keyword is `fallthrough`, and you will rarely need it.',
         from: 'control-flow',
       },
       {
@@ -107,7 +107,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'What does `var i int8 = 127; i++` leave in `i`?',
         options: ['`128`', 'A runtime panic', '`-128`', 'A compile error'],
         answer: 2,
-        why: 'Integer overflow wraps around silently — no panic, no warning. This is exactly why Go forces you to write every conversion between sizes by hand.',
+        why: 'Integer overflow wraps around with no panic and no warning. Narrowing conversions truncate the same way (`int8(x)` with `x := 200` gives `-56`), so check the range before converting to a smaller type.',
         from: 'basic-data-types',
       },
     ],
@@ -175,7 +175,7 @@ export const QUIZZES: QuizSet[] = [
           'A nil pointer panic',
         ],
         answer: 1,
-        why: 'The famous nil-interface trap. An interface is nil only when **both** its type and value words are empty. Never return a typed nil — return the literal `nil`.',
+        why: 'This is the nil-interface trap. An interface is nil only when **both** its type and value words are empty. Never return a typed nil as an `error`; return the literal `nil`.',
         from: 'interfaces',
       },
       {
@@ -214,7 +214,7 @@ export const QUIZZES: QuizSet[] = [
           'The same thing as `%v`',
         ],
         answer: 1,
-        why: '`%w` preserves the error chain. `%v` flattens it to text and breaks `errors.Is`, which is sometimes what you want — to hide an internal error from callers.',
+        why: '`%w` preserves the error chain. `%v` flattens it to text and breaks `errors.Is`, which is sometimes what you want: it hides an internal error from callers.',
         from: 'interfaces',
       },
       {
@@ -227,7 +227,7 @@ export const QUIZZES: QuizSet[] = [
           '`f.Close()` runs immediately',
         ],
         answer: 1,
-        why: '`defer` fires when the **function** returns, not the block. Over 10,000 files you run out of file handles. Move the body into its own small function.',
+        why: '`defer` fires when the **function** returns, not the block. Over a large directory you hit the open-file limit (`ulimit -n`, often 1024). Move the body into its own small function.',
         from: 'packages',
       },
       {
@@ -240,7 +240,7 @@ export const QUIZZES: QuizSet[] = [
           'Returns an error',
         ],
         answer: 2,
-        why: 'Only exported fields are marshalled. A lowercase field is silently missing from your API response — a bug that looks like the frontend’s fault.',
+        why: 'Only exported fields are marshalled. A lowercase field is missing from your API response with no error, and the bug looks like the frontend’s fault.',
         from: 'packages',
       },
       {
@@ -266,7 +266,7 @@ export const QUIZZES: QuizSet[] = [
           'Assertions from a matcher library like testify',
         ],
         answer: 1,
-        why: 'Table-driven tests make the twelfth case one line, and `t.Run` lets you run exactly one with `go test -run "TestX/case_name"`.',
+        why: 'Table-driven tests make the twelfth case one line, and `t.Run` lets you run just one with `go test -run "TestX/case_name"`.',
         from: 'packages',
       },
     ],
@@ -290,7 +290,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'What happens when you send on a **closed** channel?',
         options: ['It blocks forever', 'It is a no-op', 'It **panics**', 'It returns an error'],
         answer: 2,
-        why: 'Sending on a closed channel panics. Receiving from one is fine — you get the zero value and `ok == false` immediately.',
+        why: 'Sending on a closed channel panics. Receiving from one is fine: once any buffered values are drained, you get the zero value and `ok == false` immediately.',
         from: 'channels-and-select',
       },
       {
@@ -311,7 +311,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'What does receiving from a **nil** channel do?',
         options: ['Panics', 'Returns the zero value immediately', 'Blocks forever', 'Compile error'],
         answer: 2,
-        why: 'It blocks forever — and that is useful. Setting a channel variable to `nil` inside a `select` disables that case, which is the standard way to drop a branch out of a loop.',
+        why: 'It blocks forever, and that is useful. Setting a channel variable to `nil` inside a `select` disables that case, which is the standard way to drop a branch out of a loop.',
         from: 'channels-and-select',
       },
       {
@@ -350,7 +350,7 @@ export const QUIZZES: QuizSet[] = [
           'Nothing — maps are goroutine-safe',
         ],
         answer: 1,
-        why: 'Maps are not safe for concurrent use, and the runtime crashes on purpose instead of quietly corrupting your data. A loud crash beats a quiet wrong answer.',
+        why: 'Maps are not safe for concurrent use, and the runtime crashes on purpose rather than let the map corrupt (a read racing a write reports \"concurrent map read and map write\"). The check is best-effort, so still run `-race`.',
         from: 'mutex-and-races',
       },
       {
@@ -376,7 +376,7 @@ export const QUIZZES: QuizSet[] = [
           'Sharing config with deep helper functions',
         ],
         answer: 1,
-        why: 'If a function needs it to do its job, it is a parameter. Context values are invisible to the compiler — nothing tells you one is missing until it panics.',
+        why: 'If a function needs it to do its job, it is a parameter. Context values are invisible to the compiler — nothing tells you one is missing until it fails at runtime.',
         from: 'mutex-and-races',
       },
       {
@@ -384,7 +384,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'Which command finds data races?',
         options: ['`go vet ./...`', '`go test -race ./...`', '`go build -checkrace`', '`govulncheck ./...`'],
         answer: 1,
-        why: 'The race detector adds checks to the binary and reports races that actually occur at runtime — so exercise the concurrent paths in your tests. Run it in CI.',
+        why: 'The race detector adds checks to the binary and reports races that actually occur at runtime, so exercise the concurrent paths in your tests. Run it in CI.',
         from: 'mutex-and-races',
       },
       {
@@ -447,7 +447,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'Which package should you use for random values in a security token?',
         options: ['`math/rand`', '`crypto/rand`', '`time.Now().UnixNano()`', '`rand/v2`'],
         answer: 1,
-        why: '`math/rand` is deterministic and seedable — an attacker who learns the seed can generate every token you will ever issue. That is a real vulnerability, not a nitpick.',
+        why: '`math/rand` is not cryptographically secure: its output can be predicted from earlier outputs, or reproduced outright if it was seeded with something guessable like the time. For tokens that is a real vulnerability, not a nitpick.',
         from: 'generics',
       },
       {
@@ -460,7 +460,7 @@ export const QUIZZES: QuizSet[] = [
           'Only in library code',
         ],
         answer: 1,
-        why: 'Premature generics produce error messages nobody can read and types you cannot specialise. Check `slices` and `maps` first — most of what people hand-roll is already there.',
+        why: 'Premature generics make code harder to read and often guess the wrong abstraction. Check `slices` and `maps` first: much of what people hand-roll is already there.',
         from: 'generics',
       },
     ],
@@ -572,7 +572,7 @@ export const QUIZZES: QuizSet[] = [
           'It marks code as unstable',
         ],
         answer: 1,
-        why: 'The compiler enforces it. It is not just a convention. Put everything that is not meant to be a public API under it and your boundary is free.',
+        why: 'The Go toolchain enforces it. Put everything that is not meant to be a public API under it and you get that boundary for free.',
         from: 'folder-structure-crud',
       },
       {
@@ -619,7 +619,7 @@ export const QUIZZES: QuizSet[] = [
           'A prepared statement cache only',
         ],
         answer: 1,
-        why: 'Create exactly one for the whole program, share it across goroutines, and never close it per request.',
+        why: 'Create one for the whole program, share it across goroutines, and never close it per request.',
         from: 'postgres-and-sql',
       },
       {
@@ -627,7 +627,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'What is the default value of `SetMaxOpenConns` if you never call it?',
         options: ['2', '25', '100', 'Unlimited'],
         answer: 3,
-        why: 'Unlimited — so a traffic spike opens thousands of connections and Postgres falls over. The pool limit is your backpressure. Always set it.',
+        why: 'Unlimited, so a traffic spike keeps opening connections until Postgres hits `max_connections` and refuses new ones. The pool limit is your backpressure. Always set it.',
         from: 'postgres-and-sql',
       },
       {
@@ -640,7 +640,7 @@ export const QUIZZES: QuizSet[] = [
           'Escaping quotes in the input first',
         ],
         answer: 2,
-        why: 'Placeholders send the query and the data separately, so the data can never be parsed as SQL. There is no exception to this — not even for "internal" endpoints.',
+        why: 'Placeholders send the query and the data separately, so the data can never be parsed as SQL. There is no exception to this, not even for "internal" endpoints.',
         from: 'postgres-and-sql',
       },
       {
@@ -653,7 +653,7 @@ export const QUIZZES: QuizSet[] = [
           'Nothing — the pool handles it',
         ],
         answer: 1,
-        why: 'Without `Close` you leak a pooled connection, and iteration errors surface **only** through `rows.Err()` — the loop just ends early and looks successful.',
+        why: 'Without `Close` you leak a pooled connection, and iteration errors surface **only** through `rows.Err()`: the loop just ends early and looks successful.',
         from: 'postgres-and-sql',
       },
       {
@@ -661,7 +661,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'You call `repo.GetUser` once per row inside a loop over 200 notes. What is this called?',
         options: ['Batching', 'The N+1 problem', 'Eager loading', 'A cache miss'],
         answer: 1,
-        why: '201 round trips instead of one. Fix it with a JOIN, or one batched query using `WHERE id = ANY($1)`. It is the number-one real performance bug in web code, in every language.',
+        why: '201 round trips instead of one. Fix it with a JOIN, or one batched query using `WHERE id = ANY($1)`. It is one of the most common performance bugs in web code, in any language.',
         from: 'joins-transactions-n-plus-one',
       },
       {
@@ -674,7 +674,7 @@ export const QUIZZES: QuizSet[] = [
           'To avoid shadowing',
         ],
         answer: 1,
-        why: 'This is the one place where naming a return is really worth it — `defer func() { if err != nil { tx.Rollback() } }()`.',
+        why: 'This is one of the few places where naming a return pays off: `defer func() { if err != nil { tx.Rollback() } }()`.',
         from: 'joins-transactions-n-plus-one',
       },
       {
@@ -747,7 +747,7 @@ export const QUIZZES: QuizSet[] = [
           'The `exp` claim',
         ],
         answer: 1,
-        why: 'Put an id in it, never a secret. The value of a JWT is that your server can trust it without a database lookup — not that it hides anything.',
+        why: 'Put an id in it, never a secret. The value of a JWT is that your server can trust it without a database lookup, not that it hides anything.',
         from: 'expenses-step-3-login',
       },
       {
@@ -760,7 +760,7 @@ export const QUIZZES: QuizSet[] = [
           'Nothing, the library checks it',
         ],
         answer: 2,
-        why: 'Always assert `t.Method.(*jwt.SigningMethodHMAC)` inside the key function. This has shipped in real products more than once.',
+        why: 'Assert `t.Method.(*jwt.SigningMethodHMAC)` inside the key function, or pass `jwt.WithValidMethods`. Current `golang-jwt` refuses `none` unless you opt in, but algorithm-confusion bugs have shipped in real products more than once.',
         from: 'expenses-step-4-middleware',
       },
       {
@@ -799,7 +799,7 @@ export const QUIZZES: QuizSet[] = [
           'A bcrypt hash of the token',
         ],
         answer: 2,
-        why: 'Same idea as a password: someone who steals the table gets nothing they can use. SHA-256 is fine here because the token is already high-entropy random — bcrypt’s slowness buys nothing.',
+        why: 'Same idea as a password: someone who steals the table gets nothing they can use. SHA-256 is fine here because the token is already high-entropy random, so bcrypt’s slowness buys nothing.',
         from: 'expenses-step-7-refresh',
       },
       {
@@ -846,7 +846,7 @@ export const QUIZZES: QuizSet[] = [
           'In middleware',
         ],
         answer: 2,
-        why: 'In the query it is impossible to forget and has no race. In Go, someone will eventually write a query that skips it. This is IDOR, the most common real API vulnerability.',
+        why: 'In the query it is impossible to forget and has no race. In Go, someone will eventually write a query that skips it. This is IDOR, listed first in the OWASP API Security Top 10 (as BOLA).',
         from: 'expenses-step-5-crud',
       },
       {
@@ -906,7 +906,7 @@ export const QUIZZES: QuizSet[] = [
           'The user id plus a timestamp',
         ],
         answer: 2,
-        why: 'A client filename of `../../etc/passwd` writes wherever it likes. Generate the name yourself and keep the original only as display text.',
+        why: 'Go already strips directory parts from multipart filenames, but a client name can still collide with, and overwrite, another upload, or carry characters your filesystem dislikes. Generate the name yourself and keep the original only as display text.',
         from: 'shop-step-3-uploads',
       },
       {
@@ -1083,7 +1083,7 @@ export const QUIZZES: QuizSet[] = [
           'It is part of the standard library',
         ],
         answer: 1,
-        why: 'It turns a 25-line worker pool into about 8 lines and cancels the rest on the first error. It is the clearest case in Go for taking a dependency.',
+        why: 'It turns a 25-line worker pool into about 8 lines and cancels the rest on the first error. It is one of the clearest cases in Go for taking a dependency.',
         from: 'popular-packages',
       },
       {
@@ -1096,7 +1096,7 @@ export const QUIZZES: QuizSet[] = [
           'How many features it has',
         ],
         answer: 1,
-        why: 'Stars measure a blog post from years ago. What matters is whether it is maintained and how much it drags into your build.',
+        why: 'Stars measure attention at some point in the past. What matters is whether it is maintained now and how much it drags into your build.',
         from: 'popular-packages',
       },
     ],
@@ -1143,7 +1143,7 @@ export const QUIZZES: QuizSet[] = [
           'The duration in milliseconds',
         ],
         answer: 2,
-        why: 'It is the easiest way to turn a log store into a breach — and log stores are usually readable by far more people than your database.',
+        why: 'It is the easiest way to turn a log store into a breach, and log stores are often readable by far more people than your database.',
         from: 'errors-and-logging',
       },
       {
@@ -1169,7 +1169,7 @@ export const QUIZZES: QuizSet[] = [
           'Everything equally',
         ],
         answer: 2,
-        why: 'That is where credential stuffing lands. Rate limiting turns "unlimited guesses" into "twelve a minute" — the cheapest security you will add.',
+        why: 'That is where credential stuffing lands. Rate limiting turns "unlimited guesses" into "twelve a minute". It is some of the cheapest security you can add.',
         from: 'rate-limiting-cors-headers',
       },
       {
@@ -1177,12 +1177,12 @@ export const QUIZZES: QuizSet[] = [
         q: 'What is wrong with `Access-Control-Allow-Origin: *` on an authenticated API?',
         options: [
           'Nothing, it is standard',
-          'Any site can call your API with the user’s credentials — and it is invalid combined with `Allow-Credentials: true`',
+          'Any site can read your API’s responses from a browser, and `*` is invalid combined with `Allow-Credentials: true`',
           'It breaks preflight requests',
           'It is slower',
         ],
         answer: 1,
-        why: 'Keep an explicit allowlist from config, and set `Vary: Origin` so a cache does not serve the wrong header to the wrong site.',
+        why: 'The usual bad fix is to echo back whatever `Origin` arrives, which does let any site make credentialed calls. Keep an explicit allowlist from config, and set `Vary: Origin` so a cache does not serve the wrong header to the wrong site.',
         from: 'rate-limiting-cors-headers',
       },
       {
@@ -1195,7 +1195,7 @@ export const QUIZZES: QuizSet[] = [
           '`CGO_ENABLED` and `GOFLAGS`',
         ],
         answer: 1,
-        why: 'Without `GOMEMLIMIT` the GC grows the heap until the OOM killer wins. Without `GOMAXPROCS` Go reads the **host’s** core count, not your CPU limit — 64 schedulers fighting over 2 cores of quota.',
+        why: 'Without `GOMEMLIMIT` the GC grows the heap until the OOM killer wins. Before Go 1.25, without `GOMAXPROCS` Go used the **host’s** core count, not your CPU limit: 64 schedulers sharing 2 cores of quota. Go 1.25 and later read the cgroup limit on Linux.',
         from: 'docker-and-deployment',
       },
       {
@@ -1213,7 +1213,7 @@ export const QUIZZES: QuizSet[] = [
       },
       {
         id: 'pr9',
-        q: 'What is almost always the biggest cause of slow endpoints?',
+        q: 'What is most often the biggest cause of slow endpoints?',
         options: [
           'Allocations in Go code',
           'JSON marshalling',
@@ -1247,7 +1247,7 @@ export const QUIZZES: QuizSet[] = [
           'Replacing a mutex with atomics',
         ],
         answer: 2,
-        why: 'Preallocation costs nothing in readability and is obviously right. The other three each need a benchmark proving they help in your workload, or they are just damage.',
+        why: 'Preallocation costs nothing in readability and is obviously right. The other three each need a benchmark proving they help in your workload, or they only add risk.',
         from: 'profiling-and-shipping',
       },
     ],
@@ -1280,7 +1280,7 @@ export const QUIZZES: QuizSet[] = [
           'Say "I would look it up" and stop',
         ],
         answer: 1,
-        why: 'One confident wrong answer undoes three good ones. "I have not used that, I would expect X because Y — is that close?" sounds honest and thoughtful.',
+        why: 'One confident wrong answer can undo several good ones. "I have not used that, I would expect X because Y — is that close?" sounds honest and thoughtful.',
         from: 'interview-final-checklist',
       },
       {
@@ -1306,12 +1306,12 @@ export const QUIZZES: QuizSet[] = [
           'Ask which language they prefer',
         ],
         answer: 1,
-        why: 'Half of failed rounds are a good solution to a different question. Thinking silently teaches them nothing about you.',
+        why: 'A good solution to a different question still fails the round. Thinking silently teaches them nothing about you.',
         from: 'interview-live-coding',
       },
       {
         id: 'iv5',
-        q: 'The most common Go live-coding question is some form of:',
+        q: 'One of the most common Go live-coding questions is some form of:',
         options: [
           'Reverse a linked list',
           'Fetch N URLs at the same time with a limit on how many run at once',
@@ -1345,7 +1345,7 @@ export const QUIZZES: QuizSet[] = [
           'Use UUIDs so ids cannot be guessed',
         ],
         answer: 1,
-        why: 'In the query you cannot forget it and there is no race. UUIDs only hide the problem — that is security through obscurity, not a fix.',
+        why: 'In the query you cannot forget it and there is no race. UUIDs only hide the problem: that is security through obscurity, not a fix.',
         from: 'interview-backend-and-design',
       },
       {
@@ -1358,7 +1358,7 @@ export const QUIZZES: QuizSet[] = [
           '"I would rewrite the hot loop to avoid allocations."',
         ],
         answer: 1,
-        why: 'Guessing is the wrong instinct and they are testing for it. Almost always it turns out to be N+1 queries or a missing index, not Go code.',
+        why: 'Guessing is the wrong instinct and they are testing for it. Most often it turns out to be N+1 queries or a missing index, not Go code.',
         from: 'interview-backend-and-design',
       },
       {
@@ -1413,7 +1413,7 @@ export const QUIZZES: QuizSet[] = [
         q: 'A logged-in customer tries to create a product. What status should they get?',
         options: ['401 Unauthorized', '403 Forbidden', '404 Not Found', '400 Bad Request'],
         answer: 1,
-        why: 'We know who they are — that is authentication passing — but they may not do this. 401 means we do not know you; 403 means we do, and the answer is still no.',
+        why: 'Authentication passed, so we know who they are, but they may not do this. 401 means we do not know you; 403 means we do, and the answer is still no.',
         from: 'shop-step-2-roles',
       },
       {
@@ -1452,7 +1452,7 @@ export const QUIZZES: QuizSet[] = [
           'The `filename` in the multipart header',
         ],
         answer: 2,
-        why: 'Extension and header are both set by the client, so both can lie. Sniffing reads the actual magic bytes — though it is a type check, not a malware check.',
+        why: 'Extension and header are both set by the client, so both can lie. Sniffing reads the actual magic bytes. It is a type check, not a malware check.',
         from: 'shop-step-3-uploads',
       },
       {
@@ -1504,7 +1504,7 @@ export const QUIZZES: QuizSet[] = [
           'To avoid shadowing the variable',
         ],
         answer: 1,
-        why: '`defer func() { if err != nil { tx.Rollback() } }()` needs to read the error the function is returning. This is the one place naming a return really earns its keep.',
+        why: '`defer func() { if err != nil { tx.Rollback() } }()` needs to read the error the function is returning. This is one of the few places where naming a return earns its keep.',
         from: 'shop-step-6-checkout',
       },
       {

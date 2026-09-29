@@ -6,14 +6,14 @@ export const DATABASE: LangLesson[] = [
     slug: 'postgres-and-sql',
     title: 'Postgres with database/sql',
     navTitle: 'Postgres and database/sql',
-    oneLine: 'No ORM. Learn what the queries actually do, because SQL outlives every ORM.',
+    oneLine: 'No ORM. Learn what each query does, because SQL outlives every ORM.',
     blocks: [
       {
         heading: 'What a database layer is',
         body: [
-          'So far everything your program stores disappears when it stops. A **database** keeps it, and it also enforces rules — this column cannot be empty, this email must be unique, this row must point at a real user — that your Go code would otherwise have to remember every time.',
-          'Go talks to databases through **`database/sql`**, a package in the standard library. It does not know about any particular database on its own; it defines a common interface, and a **driver** — a separate package, in our case `pgx` for Postgres — does the real talking.',
-          'There is no ORM here. An **ORM** turns database rows into objects for you and hides the SQL. That is convenient until it produces a query you have to fight. Learning `database/sql` first means you can see exactly which queries run, and SQL is a skill that outlives every ORM.',
+          'So far everything your program stores disappears when it stops. A **database** keeps it. It also enforces rules that your Go code would otherwise have to remember every time: this column cannot be empty, this email must be unique, this row must point at a real user.',
+          'Go talks to databases through **`database/sql`**, a package in the standard library. On its own it knows no particular database. It defines a common interface, and a **driver** (a separate package, here `pgx` for Postgres) speaks the database\'s wire protocol.',
+          'There is no ORM here. An **ORM** turns database rows into objects for you and hides the SQL. That is convenient until it produces a query you have to fight. With `database/sql` you write every query yourself, so you always know what runs. SQL is also a skill that outlives every ORM.',
         ],
       },
       {
@@ -31,7 +31,7 @@ go get github.com/jackc/pgx/v5/stdlib`,
       {
         heading: '*sql.DB is a pool, not a connection',
         body: [
-          'This surprises everyone once. `sql.Open` does not connect — it creates a **pool**. It is safe for concurrent use by many goroutines, you create exactly one for the whole program, and you never close it per request.',
+          '`sql.Open` does not connect. It creates a **pool**. The pool is safe for concurrent use by many goroutines, you create one for the whole program, and you never close it per request.',
         ],
         code: {
           label: 'db.go',
@@ -48,7 +48,7 @@ db.SetConnMaxIdleTime(5 * time.Minute)
 if err := db.PingContext(ctx); err != nil {   // Open is lazy — Ping actually connects
 \treturn err
 }`,
-          note: 'Unlimited connections means a traffic spike opens 4000 connections and Postgres falls over. The pool limit is your backpressure.',
+          note: 'With no limit, a traffic spike opens as many connections as there are concurrent queries. Postgres allows 100 by default (`max_connections`), so the extra ones fail with "too many clients". The pool limit makes requests queue in Go instead.',
         },
       },
       {
@@ -66,7 +66,7 @@ if errors.Is(err, sql.ErrNoRows) {
 if err != nil {
 \treturn nil, err
 }`,
-          note: 'Scan takes pointers, in exactly the column order of the SELECT.',
+          note: 'Scan takes pointers, in the same order as the columns in the SELECT.',
         },
       },
       {
@@ -95,7 +95,7 @@ return out, rows.Err()               // 3. iteration errors surface ONLY here`,
       {
         callout: {
           tone: 'warn',
-          text: 'Never `SELECT *`. Someone adds a column, every `Scan` in the codebase breaks at once, and the error tells you nothing useful. List the columns.',
+          text: 'Never `SELECT *`. Someone adds a column, and every `Scan` behind a `SELECT *` on that table fails at runtime with "sql: expected 4 destination arguments in Scan, not 3". List the columns.',
         },
       },
       {
@@ -128,8 +128,8 @@ return tx.Commit()`,
       {
         heading: 'The two rules that are not negotiable',
         bullets: [
-          '**Always use `$1, $2` placeholders. Never build SQL with `fmt.Sprintf`.** This is your entire defence against SQL injection, and it is not optional anywhere, ever, including "internal" endpoints.',
-          '**Always use the `...Context` variants.** `QueryRowContext`, not `QueryRow`. A query without a context cannot be cancelled when the client disconnects, and you end up running work nobody is waiting for.',
+          '**Always use `$1, $2` placeholders. Never build SQL with `fmt.Sprintf`.** This is your main defence against SQL injection, and it applies everywhere, including "internal" endpoints.',
+          '**Always use the `...Context` variants.** `QueryRowContext`, not `QueryRow`. A query without a context cannot be cancelled when the client disconnects, so the database keeps working for nobody.',
         ],
       },
       {
@@ -158,12 +158,12 @@ return tx.Commit()`,
     slug: 'joins-transactions-n-plus-one',
     title: 'Joins, transactions, and the N+1 problem',
     navTitle: 'Joins, transactions, N+1',
-    oneLine: 'The single performance bug that shows up in every codebase in every language.',
+    oneLine: 'A performance bug that turns up in almost any codebase that talks to a database.',
     blocks: [
       {
         heading: 'N+1: one query, then one per row',
         body: [
-          'You list twenty notes. For each one you fetch its attachment count. That is 1 + 20 = 21 round trips to the database. At two hundred notes it is 201, and your endpoint takes three seconds for no reason anyone can see in the Go code.',
+          'You list twenty notes. For each one you fetch its attachment count. That is 1 + 20 = 21 round trips to the database. At two hundred notes it is 201. At a few milliseconds per round trip, the endpoint takes most of a second, and nothing in the Go code looks slow.',
         ],
         code: {
           label: 'n-plus-one.go',
@@ -197,7 +197,7 @@ for i, n := range notes {
 
 rows, err := db.QueryContext(ctx,
 \t\`SELECT note_id, id, filename FROM attachments WHERE note_id = ANY($1)\`,
-\tpq.Array(ids))
+\tids) // pgx encodes a Go slice as a Postgres array
 
 // then group them into a map[int64][]Attachment and attach in one pass`,
         },
@@ -205,7 +205,7 @@ rows, err := db.QueryContext(ctx,
       {
         callout: {
           tone: 'note',
-          text: 'Turn on your database’s slow query log during development, or count queries in a test. N+1 is invisible when you read the Go code — the loop looks innocent — and obvious the moment you count round trips.',
+          text: 'Turn on your database’s slow query log during development, or count queries in a test. When you read the Go code, the loop looks harmless. Count the round trips and N+1 is obvious.',
         },
       },
       {
@@ -240,13 +240,13 @@ rows, err := db.QueryContext(ctx,
 
 \treturn tx.Commit()
 }`,
-          note: 'The named return value `err` is what lets the deferred function know whether to roll back. This is the one place where naming a return value is really worth it.',
+          note: 'The named return value `err` is what lets the deferred function know whether to roll back. This is one of the few places where naming a return value pays for itself.',
         },
       },
       {
         heading: 'Transaction rules',
         bullets: [
-          '**Keep them short.** A transaction holds a pooled connection for its entire life. Long transactions use up the whole pool.',
+          '**Keep them short.** A transaction holds a pooled connection for its whole life. A few slow ones at once can use up the pool.',
           '**Never make an HTTP call inside one.** A slow third party then ties up a database connection that other requests need.',
           '**Take row locks in a consistent order** across the codebase, or two transactions grabbing the same two rows in opposite orders will deadlock.',
           '**Do not wrap reads in a transaction** out of habit. A single `SELECT` is already atomic.',
@@ -261,7 +261,7 @@ SELECT id, title FROM notes WHERE user_id = 1 ORDER BY created_at DESC LIMIT 20;
 
 -- "Seq Scan on notes" means no index is being used. Add one.
 -- "Index Scan using notes_user_id_created_at_idx" is what you want.`,
-          note: 'A missing index is worth more than every Go optimisation you will write. Check the plan for every query on a table that grows.',
+          note: 'Adding a missing index usually beats any Go optimisation you could write. Check the plan for every query on a table that grows. On a tiny table, Postgres may choose a Seq Scan even when an index exists, so test with realistic row counts.',
         },
       },
     ],
@@ -269,7 +269,7 @@ SELECT id, title FROM notes WHERE user_id = 1 ORDER BY created_at DESC LIMIT 20;
       'A query inside a loop is N+1. Fix it with a JOIN, or one batched `WHERE id = ANY($1)`.',
       'A transaction is all-or-nothing. Use a named return so the deferred rollback sees the error.',
       'Transactions hold a connection: keep them short, and never call an external service inside one.',
-      '`EXPLAIN ANALYZE` every query on a growing table. A sequential scan means a missing index.',
+      '`EXPLAIN ANALYZE` every query on a growing table. A sequential scan on a large table usually means a missing index.',
     ],
     remember:
       'The database is where your latency lives. One join beats twenty round trips, and one index beats a month of Go micro-optimisation.',

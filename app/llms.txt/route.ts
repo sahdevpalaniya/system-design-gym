@@ -16,8 +16,8 @@ export function GET() {
   const lines: string[] = [
     '# Dev Learning — system design interview preparation',
     '',
-    '> Teaches the method for answering system design interviews — requirements,',
-    '> lifecycle, numbers, design, tradeoffs — rather than a catalogue of components.',
+    '> Teaches the method for answering system design interviews (requirements,',
+    '> lifecycle, numbers, design, tradeoffs) rather than a catalogue of components.',
     '> Every page asks the reader to write their own answer before revealing a model one.',
     '',
     'The topic order below is a dependency chain, not a menu: each entry assumes the',
@@ -53,7 +53,7 @@ export function GET() {
     '',
     `- ${CONCEPTS.length} concepts, ${PROBLEMS.length} problems, ${LESSONS.length} foundation lessons.`,
     '- Every concept page states what the technique costs you, not only what it does.',
-    '- Model answers are deliberately gated behind the reader writing their own first.',
+    '- On problem and concept pages, model answers are gated behind the reader writing their own first. Full worked solutions are on separate pages.',
     '',
   )
 

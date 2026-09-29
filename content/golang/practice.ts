@@ -15,7 +15,7 @@ export const PRACTICE: LangLesson[] = [
         heading: 'What CRUD means',
         body: [
           '**CRUD** stands for Create, Read, Update, Delete. They are the four things you can do to a stored item, and almost every application is mostly these four repeated over different things.',
-          'In an HTTP API each one maps to a method and a path. That mapping is a convention, not a rule, but it is followed widely enough that breaking it will confuse everyone who uses your API.',
+          'In an HTTP API each one maps to a method and a path. That mapping is a convention, not a rule, but it is followed widely enough that breaking it confuses the people who use your API.',
         ],
         table: {
           headers: ['Operation', 'Method and path', 'What it does', 'Success status'],
@@ -31,7 +31,7 @@ export const PRACTICE: LangLesson[] = [
       {
         heading: 'The point of this first version',
         body: [
-          'You are going to build the same task list three times, in three layouts. This first one exists so that you learn the four operations with nothing else in the way — no database, no folders, no packages to import.',
+          'You are going to build the same task list three times, in three layouts. This first one exists so that you learn the four operations with nothing else in the way: no database, no folders, no packages of your own.',
           'It is not a toy. A single-file program like this is the right answer for a small tool, and it is what you should write on day one of any project.',
         ],
       },
@@ -39,7 +39,7 @@ export const PRACTICE: LangLesson[] = [
         heading: 'The layout',
         tree: {
           caption:
-            'Three files, one package, one folder. Nothing imports anything, because there is nothing else to import.',
+            'Three files, one package, one folder. Only the standard library is imported, because there are no other packages.',
           nodes: [
             { depth: 0, name: 'taskapi', kind: 'dir', note: 'the whole project' },
             { depth: 1, name: 'go.mod', kind: 'file', note: 'created by `go mod init taskapi`' },
@@ -51,7 +51,7 @@ export const PRACTICE: LangLesson[] = [
       {
         heading: 'The store',
         body: [
-          'Data lives in a map in memory. A **mutex** guards it because an HTTP server handles requests in separate goroutines, so two requests can touch the map at the same time — and a map is not safe for that.',
+          'Data lives in a map in memory. A **mutex** guards it because an HTTP server handles requests in separate goroutines, so two requests can touch the map at the same time, and a map is not safe for that.',
         ],
         code: {
           label: 'main.go — the data',
@@ -73,7 +73,7 @@ type store struct {
 func newStore() *store {
 \treturn &store{tasks: map[int64]Task{}, nextID: 1}
 }`,
-          note: 'Everything is lost when the program stops. That is fine for now — persistence is the next practice project.',
+          note: 'Everything is lost when the program stops. That is fine for now. Persistence comes in the next practice project.',
         },
       },
       {
@@ -197,7 +197,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
       {
         callout: {
           tone: 'note',
-          text: 'Notice that the store methods know nothing about HTTP, and the handlers know nothing about how tasks are stored. That separation is the whole idea behind the next two practice projects — here it happens to fit in one file.',
+          text: 'The store methods know nothing about HTTP, and the handlers know nothing about how tasks are stored. The next two practice projects are built on that separation. Here it happens to fit in one file.',
         },
       },
       {
@@ -211,7 +211,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
       },
     ],
     keyPoints: [
-      'CRUD is Create, Read, Update, Delete — the four things almost every app does, repeated.',
+      'CRUD is Create, Read, Update, Delete: the four things almost every app does, repeated.',
       'A single file with one package is the right answer for something this size.',
       'A map plus a mutex is a store. Requests run in separate goroutines, so the lock is not optional.',
       'Pointer fields on an update tell "not sent" apart from "sent as empty".',
@@ -238,7 +238,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
       {
         task: 'Remove the mutex on purpose and repeat that test, so you see what a race actually looks like.',
         answer:
-          '`fatal error: concurrent map writes`, and the process dies. Go crashes rather than corrupting quietly.',
+          'Usually `fatal error: concurrent map writes`, and the process dies. The runtime crashes rather than let the map corrupt.',
       },
     ],
     refs: [
@@ -258,14 +258,14 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
         body: [
           'The one-file version works. It stops working when the file gets long enough that you cannot find anything, or when you want to test the logic without starting an HTTP server.',
           '**Splitting into layers** means separating code by the job it does: one part talks to the outside world, one part holds the rules, one part talks to storage. Each part can then be read, changed and tested without the others.',
-          'This second version keeps things simple by grouping folders **by layer** — all the storage in one folder, all the HTTP in another. It is the layout you will meet most often in other people\'s code, and it is a good step up from one file. Its limits show up in practice project three.',
+          'This second version keeps things simple by grouping folders **by layer** — all the storage in one folder, all the HTTP in another. It is a layout you will meet often in other people\'s code, and it is a good step up from one file. Its limits show up in practice project three.',
         ],
       },
       {
         heading: 'The layout',
         tree: {
           caption:
-            'Four folders. Each one has a single job, and the arrows only ever point one way: handler → store → database.',
+            'Each folder has a single job, and imports only ever point one way: handler → store → database.',
           nodes: [
             { depth: 0, name: 'taskapi', kind: 'dir', note: '' },
             { depth: 1, name: 'go.mod', kind: 'file', note: '' },
@@ -321,7 +321,7 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
       {
         heading: 'The store, now backed by Postgres',
         body: [
-          'The methods have the same names and the same jobs as the map version. Only the inside changed, which is exactly what a layer boundary is supposed to give you.',
+          'The methods do the same jobs as the map version. They are now exported and take a `context.Context`, but the shape of each call is the same. Only the inside changed, which is what a layer boundary is supposed to give you.',
         ],
         code: {
           label: 'internal/task/store.go',
@@ -436,7 +436,7 @@ func run() error {
 \t}
 \treturn srv.ListenAndServe()
 }`,
-          note: 'This is dependency injection. There is no framework doing it — you pass things into constructors, in order, by hand.',
+          note: 'This is dependency injection. There is no framework doing it: you pass things into constructors, in order, by hand.',
         },
       },
       {
@@ -445,7 +445,7 @@ func run() error {
           '**Gained:** the store can be tested against a real database with no HTTP involved, and the handlers can be tested with `httptest` and a fake store.',
           '**Gained:** data survives a restart, and the database enforces rules Go code could forget.',
           '**Gained:** `main.go` shows the whole shape of the program on one screen.',
-          '**Not gained:** with a second feature — say `users` — you now add a file to `internal/task`… no, to a new `internal/user`, plus another file in `internal/api`. That second folder is where this layout starts to strain, and it is what practice project three fixes.',
+          '**Not gained:** a second feature, say `users`, means a new `internal/user` folder plus another handler file in `internal/api`. Each feature is now spread across folders. That is where this layout starts to strain, and it is what practice project three fixes.',
         ],
       },
     ],
@@ -462,7 +462,7 @@ func run() error {
       {
         task: 'Try importing `net/http` inside `internal/task`. Nothing stops you, which is why the rule has to be a habit.',
         answer:
-          'Nothing stops you — the compiler allows it. The rule is a habit, which is why the domain layout makes it easier to keep.',
+          'It compiles. Only habit and code review enforce the rule, which is one reason the domain layout in project three makes it easier to keep.',
       },
       {
         task: 'Write a store test against a real database, and truncate the table with `t.Cleanup`.',
@@ -472,7 +472,7 @@ func run() error {
       {
         task: 'Add a `users` table and a second store, and notice how many folders you have to touch.',
         answer:
-          'You touch `internal/task`, `internal/api` and main — and the two features are now interleaved across folders. That is the strain project three fixes.',
+          'You touch `internal/task`, `internal/api` and main, and the two features are now interleaved across folders. That is the strain project three fixes.',
       },
       {
         task: 'Stop Postgres and hit the API. You should get a clean 500 and a useful log line, not a panic.',

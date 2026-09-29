@@ -10,8 +10,8 @@ export const WEB: LangLesson[] = [
     blocks: [
       {
         body: [
-          'Most Go tutorials reach for a web framework on page one. Since Go 1.22 that advice is out of date. `net/http` routes on method and path parameters by itself, which was the only real reason to add one.',
-          'Starting without a framework is not stubbornness. It means you learn what an HTTP handler actually is, and every framework you meet later makes immediate sense because they are all wrappers over this.',
+          'Most Go tutorials reach for a web framework on page one. Since Go 1.22 that advice is out of date. `net/http` routes on method and path parameters by itself, and that was the main reason most projects added one.',
+          'Starting without a framework is not stubbornness. You learn what an HTTP handler is, and frameworks you meet later are easy to read because most of them wrap this.',
         ],
       },
       {
@@ -49,7 +49,7 @@ func main() {
       {
         heading: 'A handler is one function shape',
         body: [
-          'Everything in `net/http` is built on this signature. `w` is where you write the response; `r` is everything the client sent. That is the entire interface.',
+          'Everything in `net/http` is built on this signature. `w` is where you write the response; `r` is everything the client sent.',
         ],
         code: {
           label: 'handler.go',
@@ -82,7 +82,7 @@ func createUser(w http.ResponseWriter, r *http.Request) {
       {
         callout: {
           tone: 'warn',
-          text: 'The order matters. Set headers, then call `WriteHeader`, then write the body. `WriteHeader` can only be called once — writing a body without it implies a 200. If you write an error after already writing a body you get "superfluous WriteHeader" in your logs and a corrupt response. Always `return` immediately after writing an error.',
+          text: 'The order matters. Set headers, then call `WriteHeader`, then write the body. Headers set after `WriteHeader` are ignored. `WriteHeader` takes effect only once, and writing a body without it sends a 200. If you write an error after a response has started, you get "superfluous response.WriteHeader call" in your logs, the client keeps the first status, and the error JSON is glued onto the first body. Always `return` right after writing an error.',
         },
       },
       {
@@ -100,7 +100,7 @@ curl -s -X POST localhost:8080/users -d 'not json' -i`,
       {
         heading: 'The production settings, now rather than later',
         body: [
-          '`http.ListenAndServe(":8080", mux)` is fine for a tutorial and wrong for anything you deploy. The zero-value server has **no timeouts at all**, so one slow client can hold a connection open forever.',
+          '`http.ListenAndServe(":8080", mux)` is fine for a tutorial and wrong for anything you deploy. A zero-value `http.Server` has **no timeouts at all**, so a slow or idle client can hold a connection open forever.',
         ],
         code: {
           label: 'server.go',
@@ -120,12 +120,12 @@ log.Fatal(srv.ListenAndServe())`,
     keyPoints: [
       'Go 1.22 `net/http` routes on `"GET /users/{id}"` and reads params with `r.PathValue`. No framework needed.',
       'A handler is `func(http.ResponseWriter, *http.Request)`. Everything else is a wrapper over that.',
-      'Headers, then `WriteHeader`, then body — and always `return` after writing an error.',
+      'Headers, then `WriteHeader`, then body. Always `return` after writing an error.',
       'A bare `http.ListenAndServe` has no timeouts. Configure `http.Server` yourself.',
     ],
     remember:
       'A handler reads the request and writes the response. Everything a framework adds is convenience on top of that one function shape.',
-    task: 'Build an in-memory user API: GET, POST, GET by id, DELETE. Keep the users in a map behind a mutex — you now know why the mutex is needed. Test every route with curl, including the failure cases.',
+    task: 'Build an in-memory user API: GET, POST, GET by id, DELETE. Keep the users in a map behind a mutex, because net/http runs each request in its own goroutine. Test every route with curl, including the failure cases.',
     refs: [
       { label: 'Routing Enhancements for Go 1.22', href: 'https://go.dev/blog/routing-enhancements' },
       { label: 'Go 1.22 release notes', href: 'https://go.dev/blog/go1.22' },
@@ -136,20 +136,20 @@ log.Fatal(srv.ListenAndServe())`,
     slug: 'middleware-and-shutdown',
     title: 'Middleware and graceful shutdown',
     navTitle: 'Middleware and shutdown',
-    oneLine: 'Wrap every request with logging, panic recovery, and auth — then stop the server without dropping anyone.',
+    oneLine: 'Wrap every request with logging, panic recovery, and auth. Then stop the server without dropping anyone.',
     blocks: [
       {
         heading: 'What middleware is, and what graceful shutdown means',
         body: [
-          '**Middleware** is code that runs around every request rather than inside one handler. Logging, catching panics, checking a token, limiting how often somebody can call you — none of that belongs to a single route, so it wraps all of them.',
-          'In Go there is no middleware system to learn. A middleware is a function that takes a handler and returns a handler. You compose them by nesting one inside another, and that is the entire mechanism.',
-          '**Graceful shutdown** is what happens when your server is told to stop. The default is to die instantly and drop every request that was in progress. Graceful shutdown means: stop accepting new connections, let the ones already running finish, then exit. Every deployment restarts your service, so this runs far more often than you would think.',
+          '**Middleware** is code that runs around every request rather than inside one handler. Logging, catching panics, checking a token, limiting how often somebody can call you: none of that belongs to a single route, so it wraps all of them.',
+          'In Go there is no middleware system to learn. A middleware is a function that takes a handler and returns a handler. You compose them by nesting one inside another.',
+          '**Graceful shutdown** is what happens when your server is told to stop. The default is to die instantly and drop every request that was in progress. Graceful shutdown means: stop accepting new connections, let the ones already running finish, then exit. Every deployment restarts your service, so this code runs on every release.',
         ],
       },
       {
         heading: 'Middleware is a function that wraps a handler',
         body: [
-          'There is no middleware system in Go. There does not need to be one. A middleware takes a handler and returns a handler, and you compose them by nesting. That is the entire mechanism.',
+          'A small `Chain` helper saves you from writing `Recover(RequestID(Logger(mux)))` by hand. The order matters: the outermost wrapper runs first on the way in and last on the way out, so `Recover` goes first to catch panics from everything inside it.',
         ],
         code: {
           label: 'middleware.go',
@@ -182,13 +182,13 @@ handler := Chain(mux, Recover, RequestID, Logger)`,
 \t\t)
 \t})
 }`,
-          note: 'To log the status code you need a small wrapper around ResponseWriter that records what WriteHeader was called with — ResponseWriter does not expose it.',
+          note: 'To log the status code you need a small wrapper around ResponseWriter that records what WriteHeader was called with. ResponseWriter does not expose it.',
         },
       },
       {
         heading: 'Panic recovery',
         body: [
-          'A panic in a handler would otherwise kill the connection and dump a stack trace nobody sees. Recover it, log it properly, and return a clean 500.',
+          '`net/http` already recovers a panic in a handler, but only to print the stack to the server\'s error log and close the connection. The client gets no response at all, and the trace is not in your structured logs. Recover it yourself, log it with `slog`, and return a clean 500.',
         ],
         code: {
           label: 'recover.go',
@@ -208,7 +208,7 @@ handler := Chain(mux, Recover, RequestID, Logger)`,
       {
         callout: {
           tone: 'warn',
-          text: 'This recovers panics in the **handler’s own goroutine only**. A panic inside a goroutine you started yourself is not caught by any parent recover — it kills the entire process. Every long-lived goroutine you launch needs its own `defer recover()`.',
+          text: 'This recovers panics in the **handler’s own goroutine only**. A panic inside a goroutine you started yourself is not caught by any parent recover. It kills the whole process. If a goroutine you launch can panic, it needs its own `defer recover()`.',
         },
       },
       {
@@ -221,7 +221,7 @@ handler := Chain(mux, Recover, RequestID, Logger)`,
       {
         heading: 'Graceful shutdown',
         body: [
-          'When your deployment sends SIGTERM, the default behaviour is to die instantly and drop every request in flight. Graceful shutdown stops accepting new connections and lets the current ones finish.',
+          'Deploy tools stop a process with SIGTERM, then kill it with SIGKILL if it is still running after a grace period (30 seconds by default in Kubernetes). Your drain timeout must fit inside that window, which is why the example uses 20 seconds.',
         ],
         code: {
           label: 'shutdown.go',
@@ -245,19 +245,19 @@ case <-quit:
 \tdefer cancel()
 \treturn srv.Shutdown(ctx)        // stop accepting, drain what is in flight
 }`,
-          note: 'The signal channel MUST be buffered. signal.Notify never blocks, so an unbuffered channel with nobody receiving yet silently loses the signal.',
+          note: 'The signal channel MUST be buffered. signal.Notify never blocks when it sends, so if nobody is receiving yet on an unbuffered channel, the signal is dropped with no error.',
         },
       },
     ],
     keyPoints: [
-      'Middleware is `func(http.Handler) http.Handler`. Compose by nesting — no framework required.',
+      'Middleware is `func(http.Handler) http.Handler`. Compose by nesting; no framework required.',
       'Recover panics at the edge, log the stack, return a clean 500. Panic is for broken assumptions only.',
       'A panic inside a goroutine you started is not recovered by the parent. It kills the process.',
       '`srv.Shutdown(ctx)` drains in-flight requests. Buffer the signal channel.',
     ],
     remember:
-      'A handler that wraps another handler is the only extension mechanism Go’s HTTP stack has, and it is enough for everything.',
-    task: 'Add Logger, Recover, and RequestID middleware to yesterday’s API, plus graceful shutdown. Add a route that panics on purpose and check you get a JSON 500 and a stack trace in the log — and that the server is still running afterwards.',
+      'A handler that wraps another handler is how you extend Go’s HTTP stack, and for an API it covers logging, auth, limits and recovery.',
+    task: 'Add Logger, Recover, and RequestID middleware to yesterday’s API, plus graceful shutdown. Add a route that panics on purpose. Check you get a 500 and a stack trace in the log, and that the server is still running afterwards.',
     refs: [
       { label: 'net/http docs', href: 'https://pkg.go.dev/net/http' },
       { label: 'Effective Go — defer', href: 'https://go.dev/doc/effective_go#defer' },
@@ -268,28 +268,28 @@ case <-quit:
     slug: 'project-layouts',
     title: 'How to lay a Go project out',
     navTitle: 'Project layouts',
-    oneLine: 'What a package really is, the three layouts you will meet, and what every folder is for.',
+    oneLine: 'What a package is, the three layouts you will meet, and what each common folder is for.',
     blocks: [
       {
         heading: 'First, what a package is',
         body: [
           'A **package** is a folder of `.go` files that are compiled together and share a name. Every file in one folder must declare the same package name, and that name is how other code refers to it.',
-          'Packages are the only unit of privacy Go has. A name starting with a capital letter can be used from outside the package. A lowercase name cannot. There is no `public`, `private` or `protected` keyword — the folder boundary plus capitalisation is the whole system.',
+          'Packages are the only unit of privacy Go has. A name starting with a capital letter can be used from outside the package. A lowercase name cannot. There is no `public`, `private` or `protected` keyword. The folder boundary plus capitalisation is the whole system.',
           'A **module** is one level up. It is a whole project: a folder with a `go.mod` file, containing one or more packages. The module path in `go.mod` is the prefix for every import inside it.',
         ],
       },
       {
-        heading: 'What "project layout" actually means',
+        heading: 'What "project layout" means',
         body: [
-          'Laying out a project means deciding which folders exist and what goes in each one. It is not decoration. In Go the folder structure decides three real things: **what can import what**, **what outsiders can use**, and **how much you have to read to understand one feature**.',
-          'Go has no official required layout. What it has instead is one enforced rule (`internal/`, below) and a set of conventions that most teams follow. Below are the three layouts you will actually meet, smallest first.',
+          'Laying out a project means deciding which folders exist and what goes in each one. In Go the folder structure decides three things: **what can import what**, **what outsiders can use**, and **how much you have to read to understand one feature**.',
+          'Go has no official required layout. What it has instead is one enforced rule (`internal/`, below) and a set of conventions that most teams follow. Below are the three layouts you will meet most, smallest first.',
         ],
       },
       {
         heading: 'Layout 1 — flat',
         body: [
           'Everything in one package at the top of the repository. There are no subfolders.',
-          '**Use it for:** a command-line tool, a script, a small library, or the first two days of any project. Under roughly 1,000 lines it is the right answer, and reaching for more structure than this is the most common way beginners waste time.',
+          '**Use it for:** a command-line tool, a script, a small library, or the first two days of any project. Under roughly 1,000 lines it is usually the right answer. More structure than this, this early, costs time and buys nothing.',
           '**It stops working when:** you cannot find things any more, or two unrelated parts of the file start needing the same helper with the same name.',
         ],
         tree: {
@@ -310,7 +310,7 @@ case <-quit:
         body: [
           'The next step most people take: a folder per *kind of file*. All the data types together, all the business logic together, all the HTTP handlers together.',
           'This is the layout most frameworks in other languages push you towards, so it feels familiar. It is worth understanding because you will inherit codebases built this way.',
-          '**The problem** shows up at about ten features. Adding one feature means editing five folders, every package ends up importing every other package, and nothing can be understood — or deleted — on its own. You also hit Go import cycles quickly, because `models` wants something from `services` and `services` already imports `models`.',
+          '**The problem** shows up at about ten features. Adding one feature means editing five folders, every package ends up importing every other package, and no feature can be understood, or deleted, on its own. You also hit Go import cycles quickly, because `models` wants something from `services` and `services` already imports `models`.',
         ],
         tree: {
           caption:
@@ -341,12 +341,12 @@ case <-quit:
         heading: 'Layout 3 — grouped by domain',
         body: [
           'A folder per *thing your product has*, not per kind of file. Everything about orders lives in the `order` package: its type, its rules, its SQL, its HTTP handlers, its tests.',
-          'This is what most experienced Go teams settle on, and what the rest of this track uses. One feature is one folder, so you can read it, test it, hand it to someone else, or delete it without hunting.',
-          '**Use it for:** anything that will grow — a web service, an API, a long-lived tool.',
+          'This is a common choice for Go services, and what the rest of this track uses. One feature is one folder, so you can read it, test it, hand it to someone else, or delete it without hunting.',
+          '**Use it for:** anything that will grow: a web service, an API, a long-lived tool.',
         ],
         tree: {
           caption:
-            'To delete the order feature you delete one folder and one line in main.go. That is the whole test of a good layout.',
+            'To delete the order feature you delete one folder and a few lines of wiring in main.go. That is a good test of any layout.',
           nodes: [
             { depth: 0, name: 'shop', kind: 'dir' },
             { depth: 1, name: 'go.mod', kind: 'file' },
@@ -382,13 +382,13 @@ case <-quit:
       {
         callout: {
           tone: 'note',
-          text: 'Start flat. Move to domain folders when the flat file starts to hurt. Starting at layout 3 for a 200-line program is the same mistake as staying at layout 1 for a 20,000-line one — the layout should match the size of the problem.',
+          text: 'Start flat. Move to domain folders when the flat file starts to hurt. Starting at layout 3 for a 200-line program is the same mistake as staying at layout 1 for a 20,000-line one.',
         },
       },
       {
         heading: 'The names you will hear, and where each one appears',
         body: [
-          'Those three layouts have names, and people use them loosely. Here is what they actually mean, and which project in this track builds each one — so you finish having written all three rather than having read about them.',
+          'Those layouts have names, and people use them loosely. The table shows what each name means and which project in this track builds it, so you finish having written each one rather than only read about it.',
         ],
         table: {
           headers: ['Layout', 'Also called', 'Built in', 'Reach for it when'],
@@ -423,13 +423,13 @@ case <-quit:
       {
         callout: {
           tone: 'note',
-          text: 'There is no winner here. The layout should match the size and the shape of the problem, and moving between them is a normal thing to do as a service grows. Being able to say *why* you picked one is what an interviewer is actually listening for.',
+          text: 'There is no winner here. The layout should match the size and the shape of the problem, and moving between them is a normal thing to do as a service grows. In an interview, being able to say *why* you picked one matters more than which one you picked.',
         },
       },
       {
         heading: 'What every folder means',
         body: [
-          'These names are conventions, not rules — except `internal/`, which the compiler enforces. Learn them because almost every Go repository you open will use them.',
+          'These names are conventions, not rules, except `internal/`, which the go tool enforces. Learn them because most Go repositories you open will use some of them.',
         ],
         table: {
           headers: ['Folder', 'What goes in it', 'Why it exists'],
@@ -437,17 +437,17 @@ case <-quit:
             [
               '`cmd/`',
               'One subfolder per runnable program, each with its own `main.go`.',
-              'A project often ships more than one binary — an API, a worker, a seeder. `cmd/api/` and `cmd/worker/` keep them apart. Put **no logic here**, only wiring.',
+              'A project often ships more than one binary: an API, a worker, a seeder. `cmd/api/` and `cmd/worker/` keep them apart. Put **no logic here**, only wiring.',
             ],
             [
               '`internal/`',
               'Everything private to this project.',
-              '**The compiler forbids any other module from importing it.** It is the only enforced boundary Go has, so you get a private API for free.',
+              '**The go tool refuses imports of it from outside the project.** It is the only folder rule Go enforces, so you get a private API for free.',
             ],
             [
               '`pkg/`',
               'Code you intend outsiders to import.',
-              'The opposite of `internal/`. Only add it if you are publishing a library. For a normal service it is noise — many teams skip it entirely.',
+              'The opposite of `internal/`. Only add it if you are publishing a library. For a normal service it adds a folder level and nothing else, and many teams skip it.',
             ],
             [
               '`internal/<domain>/`',
@@ -497,7 +497,7 @@ case <-quit:
             [
               '`vendor/`',
               'Copies of your dependencies.',
-              'Created by `go mod vendor`. Only needed for builds with no network access.',
+              'Created by `go mod vendor`. Mostly used for builds with no network access, or when a team wants every dependency\'s source in the repository.',
             ],
           ],
         },
@@ -506,7 +506,7 @@ case <-quit:
         heading: 'internal/ is the one that is real',
         body: [
           'Everything above is a convention you could ignore. `internal/` is not. If a package sits anywhere under a folder named `internal`, only code rooted at that folder’s parent can import it. Anyone else gets a compile error.',
-          'The practical advice: put almost everything in `internal/`. Move something out only when you have decided, on purpose, that outsiders may depend on it — because once they do, you cannot change it freely.',
+          'The practical advice: put almost everything in `internal/`. Move something out only when you have decided, on purpose, that outsiders may depend on it. Once they do, you cannot change it freely.',
         ],
         code: {
           label: 'what internal/ blocks',
@@ -528,7 +528,7 @@ github.com/other/thing                 ❌ compile error, always`,
       {
         heading: 'How to choose, in one line',
         body: [
-          'One program and under a thousand lines: flat. A service you expect to grow: one folder per domain, everything under `internal/`, `main.go` doing nothing but wiring. You will never be criticised for either of those.',
+          'One program and under a thousand lines: flat. A service you expect to grow: one folder per domain, everything under `internal/`, `main.go` doing nothing but wiring. Both are easy to defend in a review.',
         ],
       },
     ],
@@ -557,8 +557,8 @@ github.com/other/thing                 ❌ compile error, always`,
       {
         heading: 'The problem this one solves',
         body: [
-          'In practice project two, everything about tasks was split across `internal/task` and `internal/api`. That is fine with one feature. Add users, orders and payments and every folder holds a bit of everything, so no feature can be read — or removed — in one place.',
-          '**Grouping by feature** flips it. One folder holds one business concept and everything that concept needs: its type, its rules, its SQL, its HTTP handlers, its tests. The folder becomes the feature.',
+          'In practice project two, everything about tasks was split across `internal/task` and `internal/api`. That is fine with one feature. Add users, orders and payments and every folder holds a bit of everything, so no feature can be read, or removed, in one place.',
+          '**Grouping by feature** flips it. One folder holds one business concept and everything that concept needs: its type, its rules, its SQL, its HTTP handlers, its tests.',
           'The layers from practice project two do not go away. They become four files inside each feature folder, which is why building the layered version first was worth it.',
         ],
       },
@@ -601,7 +601,7 @@ github.com/other/thing                 ❌ compile error, always`,
         heading: 'The layout',
         tree: {
           caption:
-            'One folder per feature. To remove products you delete one folder and one line in main.go.',
+            'One folder per feature. To remove a feature you delete its folder and its few lines of wiring in main.go.',
           nodes: [
             { depth: 0, name: 'myapi', kind: 'dir', note: '' },
             { depth: 1, name: 'go.mod', kind: 'file', note: '' },
@@ -707,17 +707,17 @@ func (r *Repository) Delete(ctx context.Context, id int64) error {
         heading: 'service.go — the rules',
         code: {
           label: 'internal/user/service.go',
-          src: `// Repository is declared HERE, by the code that uses it — not by the package
+          src: `// Store is declared HERE, by the code that uses it — not next to the type
 // that implements it. That way it is exactly as big as this service needs,
 // and a test fake has two methods to write instead of fifteen.
-type Repository interface {
+type Store interface {
 	Create(ctx context.Context, u *User) error
 	GetByID(ctx context.Context, id int64) (*User, error)
 }
 
-type Service struct{ repo Repository }
+type Service struct{ repo Store }
 
-func NewService(r Repository) *Service { return &Service{repo: r} }
+func NewService(r Store) *Service { return &Service{repo: r} }
 
 func (s *Service) Create(ctx context.Context, req CreateRequest) (*User, error) {
 	if err := req.Validate(); err != nil {
@@ -729,7 +729,7 @@ func (s *Service) Create(ctx context.Context, req CreateRequest) (*User, error) 
 	}
 	return u, nil
 }`,
-          note: 'Lowercasing the email is a business rule, so it lives here — not in the handler and not in the SQL.',
+          note: 'Lowercasing the email is a business rule, so it lives here, not in the handler or the SQL.',
         },
       },
       {
@@ -767,7 +767,7 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
       {
         heading: 'main.go — wire it by hand',
         body: [
-          'Nothing here decides anything. It reads config, opens the database, builds each feature from the inside out, and starts the server. You do not need a dependency injection framework; you need one function that builds objects in order.',
+          'Nothing here makes a business decision. It reads config, opens the database, builds each feature from the inside out, and starts the server. You do not need a dependency injection framework; you need one function that builds objects in order.',
         ],
         code: {
           label: 'cmd/api/main.go',
@@ -798,14 +798,14 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 	handler := middleware.Chain(mux, middleware.Recover, middleware.RequestID, middleware.Logger)
 	return serve(cfg.Port, handler)
 }`,
-          note: 'Adding a feature is three lines here and one new folder. Removing one is deleting both.',
+          note: 'Adding a feature is one new folder and four lines here. Removing one is deleting both.',
         },
       },
       {
         heading: 'The habits that keep it clean',
         bullets: [
           '**No global state.** No package-level `var db *sql.DB`. Dependencies are struct fields, passed in. Globals are how a codebase becomes untestable.',
-          '**`init()` is almost always wrong.** It runs in an order you do not control and cannot fail gracefully.',
+          '**Avoid `init()` for setup.** It runs before `main`, in an order that is hard to see from the code, and it cannot return an error.',
           '**Config is read once, in main.** Never call `os.Getenv` deep inside a handler.',
           '**No `utils` or `common` package.** It becomes a dumping ground and causes import cycles.',
           '**No stuttering names.** `user.Service`, not `user.UserService`. The package name is already part of every call.',
@@ -814,7 +814,7 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
       {
         callout: {
           tone: 'note',
-          text: 'This is the layout the rest of the track uses. Everything from here — auth, uploads, tests, deployment — is added into these folders, so it is worth building once now rather than reading about it.',
+          text: 'This is the layout the rest of the track uses. Everything from here (auth, uploads, tests, deployment) is added into these folders, so it is worth building once now.',
         },
       },
     ],

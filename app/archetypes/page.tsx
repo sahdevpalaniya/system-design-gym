@@ -15,15 +15,15 @@ export default function ArchetypesPage() {
       <PageHeader
         eyebrow="Track C"
         title="Interview archetypes"
-        lede="Not company pages — six **styles of interviewer**, described by behaviour. Pick one and the app changes which follow-up questions fire and how the rubric is weighted."
+        lede="Six **styles of interviewer**, described by behaviour rather than by company. Pick one and problem pages, timed mocks and the follow-up blitz favour the follow-up questions that interviewer would ask."
       />
 
       <div
         className="mb-8 rounded-xl border px-5 py-4 text-[0.9062rem] leading-relaxed"
         style={{ background: 'var(--surface-2)', color: 'var(--muted)' }}
       >
-        Learning &ldquo;the answer a particular company wants&rdquo; falls apart the moment an interviewer goes off
-        script. Learning to recognise <em>how someone is testing you</em> works everywhere — and the same design
+        Learning &ldquo;the answer a particular company wants&rdquo; falls apart once an interviewer goes off
+        script. Learning to recognise <em>how someone is testing you</em> carries over to any interview, and the same design
         gets graded very differently by a Cost Auditor and a Scale Breaker.
       </div>
 
@@ -34,8 +34,8 @@ export default function ArchetypesPage() {
         >
           <div className="text-[0.9062rem]">
             <strong>Currently practising against: </strong>
-            {ARCHETYPES.find((a) => a.id === state.archetype)?.name}. Problem pages and drills will lean toward
-            their style.
+            {ARCHETYPES.find((a) => a.id === state.archetype)?.name}. Problem pages, mocks and the follow-up
+            blitz will lean toward their style.
           </div>
           <Button variant="secondary" size="sm" onClick={() => setArchetype(null)}>
             Clear

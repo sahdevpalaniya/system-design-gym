@@ -13,7 +13,7 @@ export const TIER1: Concept[] = [
     title: 'Latency numbers worth memorising',
     navTitle: 'Latency numbers',
     tier: 1,
-    oneLine: 'Four numbers that tell you where the time actually goes.',
+    oneLine: 'Four numbers that tell you where the time goes.',
     problem: [
       'When work moves from one machine to another, you pay for the distance. Most slow designs are slow for one reason. Something crosses a boundary far more often than anyone noticed.',
       'You do not need a table of thirty numbers. You need four. And you need to feel the gaps between them, because the gaps are what change your design.',
@@ -43,42 +43,42 @@ export const TIER1: Concept[] = [
       },
     },
     body: [
-      'Four numbers, all in nanoseconds so they compare cleanly. Reading from memory: about 100 ns. Reading from an SSD: about 100 µs, so a thousand times slower. A round trip between two machines in the same datacenter: about 0.5 ms, so five thousand times slower than memory. A round trip between continents: about 150 ms, because light in fibre only moves so fast and the cable never runs straight.',
+      'Four numbers, all in nanoseconds so they compare cleanly. Reading from memory: about 100 ns. Reading from an SSD: about 100 µs, so a thousand times slower. A round trip between two machines in the same datacenter: about 0.5 ms, so five thousand times slower than memory. A round trip between continents: about 150 ms, because light in fibre only moves so fast and cables rarely run in a straight line.',
       'That last number has a floor you cannot remove. London to Sydney and back is about 17,000 km each way. Light in glass covers about 200,000 km per second. So that is already 170 ms of pure physics, before any machine does any work. No amount of money removes it. You can only move the data closer, or stop needing the round trip at all.',
       'This gives you a simple rule. One cross-region hop per user action is a design. Ten is a bug. If you are making a remote call inside a loop over 50 items, that loop is your whole time budget.',
     ],
     followUp: {
       q: 'Your page makes 30 backend calls, and users on the other side of the world complain. Where do you look first?',
       answer:
-        'Look at two things. Are those 30 calls one after another? And do any of them cross a region? 30 calls at 0.5 ms each inside one datacenter is 15 ms, which nobody notices. The same 30 calls, each waiting on a 150 ms hop across the world, is 4.5 seconds. So the fix is not "make the calls faster". The fix is "stop making them one after another, and stop making them travel". Group them into one call, run them at the same time, or put a read replica near the user. Name the cost too. A replica near the user can be out of date, and grouping calls means one slow item delays the whole group.',
+        'Look at two things. Are those 30 calls one after another? And do any of them cross a region? 30 calls at 0.5 ms each inside one datacenter is 15 ms, which users will not notice. The same 30 calls, each waiting on a 150 ms hop across the world, is 4.5 seconds. So the fix is not "make the calls faster". The fix is "stop making them one after another, and stop making them travel". Group them into one call, run them at the same time, or put a read replica near the user. Name the cost too. A replica near the user can be out of date, and grouping calls means one slow item delays the whole group.',
     },
     selfCheck: {
       q: 'Roughly how many times slower is a round trip across the world than a read from memory — 100x, 1,000x, or a million times? And what does that ratio stop you doing?',
       answer:
-        'Roughly a million times. 100 ns against 150 ms is about 1.5 million. What it stops you doing is treating a remote call like a normal function call. In memory you can do a hundred thousand lookups inside one request. Across the world you get one, maybe two, before a person notices. That one ratio is the reason caches, CDNs and read replicas exist at all.',
+        'Roughly a million times. 100 ns against 150 ms is about 1.5 million. What it stops you doing is treating a remote call like a normal function call. In memory you can do a hundred thousand lookups inside one request. Across the world you get one, maybe two, before a person notices. That ratio is a large part of why CDNs, edge caches and regional read replicas exist.',
     },
     traps: [
       'Quoting numbers with fake precision. "About half a millisecond" is right. "0.47 ms" is a claim you cannot back up.',
       'Forgetting that a round trip crosses the distance twice. People quote the one-way number and end up half wrong.',
     ],
     sayThis:
-      '"A round trip inside one datacenter is well under a millisecond, so I am not worried about lots of small calls there. Across regions it is over 100 ms, so I will allow exactly one of those per request and design around it."',
+      '"A round trip inside one datacenter is well under a millisecond, so I am not worried about lots of small calls there. Across regions it is over 100 ms, so I will allow at most one of those per request and design around it."',
     related: ['back-of-envelope', 'caching', 'cdn'],
     refs: [
       {
         label: "Latency Numbers Every Programmer Should Know",
         href: "https://gist.github.com/jboner/2841832",
-        note: "Jeff Dean's original table. The source of every version of this list you have seen.",
+        note: "Jonas Bon\u00e9r's gist of the numbers popularised by Jeff Dean and Peter Norvig. Most copies of this list trace back to it.",
       },
       {
         label: "Interactive latency numbers by year",
         href: "https://colin-scott.github.io/personal_website/research/interactive_latency.html",
-        note: "The same numbers on a slider from 1990 to today \u2014 worth it to see which ones stopped improving.",
+        note: "The same numbers on a slider by year. Worth it to see which ones stopped improving.",
       },
     ],
     hints: [
       "Write both numbers in the same unit before you compare them. 100 ns and 150 ms.",
-      "Once you have the ratio, ask what you routinely do thousands of times per request \u2014 and whether you could do that across the world.",
+      "Once you have the ratio, ask what you routinely do thousands of times per request, and whether you could do that across the world.",
     ],
   },
 
@@ -89,7 +89,7 @@ export const TIER1: Concept[] = [
     title: 'Back-of-envelope estimation',
     navTitle: 'Back-of-envelope maths',
     tier: 1,
-    oneLine: 'Rough maths, done out loud, that tells you which problem you actually have.',
+    oneLine: 'Rough maths, done out loud, that tells you which problem you have.',
     problem: [
       'Every design has one hard part and several easy parts. They look the same until you do the maths. Without numbers you spend your best ten minutes on the easy part.',
       'The point is not the number. The point is the sentence the number lets you say: "so the hard part here is ___". If your estimate did not change what you were about to build, you did the maths wrong or you ignored the answer.',
@@ -98,7 +98,7 @@ export const TIER1: Concept[] = [
     useWhen: [
       'Right after requirements, before you draw a single box.',
       'When you feel yourself about to say "we will shard it". Check first whether you need to.',
-      'When two designs are being argued about in circles. Numbers end arguments.',
+      'When two designs are being argued about in circles. Numbers usually settle it.',
     ],
     avoidWhen: [
       'The interviewer says "assume it is huge, skip the maths". Take the offer. Say the one conclusion you would have drawn, then move on.',
@@ -112,11 +112,11 @@ export const TIER1: Concept[] = [
           { label: 'Writes — new links created', value: 40, display: '~40 / sec', tone: 'muted' },
           { label: 'Reads — links being followed', value: 4000, display: '~4,000 / sec', tone: 'accent' },
         ],
-        note: 'So the hard part is reads. Write sharding, batched inserts, a write-optimised store — all of that would have been ten wasted minutes. One cache and a read replica solve the real problem.',
+        note: 'So the hard part is reads. Write sharding, batched inserts and a write-optimised store would all have been ten wasted minutes. One cache and a read replica solve the problem you have.',
       },
     },
     body: [
-      'Here is a method that fits in your head. First, users: pick a number of daily active users, and say clearly that you picked it. Second, actions per user per day. Multiply those, then divide by 100,000. A day has 86,400 seconds, and 100,000 is close enough and much easier to divide by. That gives you the average per second.',
+      'The method has five steps. First, users: pick a number of daily active users, and say clearly that you picked it. Second, actions per user per day. Multiply those, then divide by 100,000. A day has 86,400 seconds, and 100,000 is close enough and much easier to divide by. That gives you the average per second.',
       'Third, peak traffic. Traffic is never flat. Multiply the average by 2 to 10, depending on the product. A work tool spikes hard on weekday mornings. A worldwide chat app barely spikes at all. Say which one you assumed, and why.',
       'Fourth, storage: bytes per record, times records per day, times days you keep them. Fifth, and this is the step people skip: read your answer back and finish the sentence "so the hard part here is ___."',
       'Useful anchors. One million seconds is about 11 days. A day has 86,400 seconds, call it 100,000. A kilobyte of text is a paragraph. A megabyte is a small photo. A terabyte fits on one disk you can hold in your hand, so "a few terabytes" is not a scale problem. That is a normal database.',
@@ -124,7 +124,7 @@ export const TIER1: Concept[] = [
     followUp: {
       q: 'You estimated 500 GB of data. The interviewer asks: "so how many machines?"',
       answer:
-        'The honest answer is one, and that is the interesting part. 500 GB fits easily on a single normal server. So the size of the data is not what forces you to split it up. Something else does: a request rate one machine cannot serve, an uptime promise one machine cannot keep, or a blast radius you cannot accept. Say which one applies. If none of them do, say that: "at this size I would run one primary with a replica for failover, and I would look again when we are 20 times bigger." Choosing not to split, out loud, with a reason, scores better than splitting out of habit.',
+        'Probably one, and that is the interesting part. 500 GB fits easily on a single normal server. So the size of the data is not what forces you to split it up. Something else does: a request rate one machine cannot serve, an uptime promise one machine cannot keep, or a blast radius you cannot accept. Say which one applies. If none of them do, say that: "at this size I would run one primary with a replica for failover, and I would look again when we are 20 times bigger." Choosing not to split, out loud, with a reason, scores better than splitting out of habit.',
     },
     selfCheck: {
       q: 'A service has 10 million daily active users, each doing 20 actions a day. What is the rough average requests per second, and what is a reasonable peak?',
@@ -165,16 +165,16 @@ export const TIER1: Concept[] = [
     oneLine: 'Keep a copy of the answer near whoever keeps asking for it.',
     problem: [
       'Databases are good at storing things. They are slow at answering the same question ten thousand times a second. A cache keeps that answer somewhere faster and closer, so most requests never reach the database at all.',
-      'It is the single biggest win in read-heavy systems. It is also where most stale-data bugs come from.',
+      'In a read-heavy system it is often the biggest single win. It is also a common source of stale-data bugs.',
     ],
     cost: 'You now have two copies of the truth, and they can disagree. Users may see old data. You have added a part that can fail, and when it fails, everything it was protecting gets hit at once. And from now on you have to decide, for every item, when it stops being true.',
     useWhen: [
       'Reads are far more common than writes. This is the main reason.',
       'The same items get asked for again and again (a popular product, a hot post).',
-      'The answer is expensive to work out, and slightly old data is really fine.',
+      'The answer is expensive to work out, and slightly old data is acceptable.',
     ],
     avoidWhen: [
-      'The data must be exactly right this instant: account balances at payment time, remaining seats, stock counts.',
+      'The data must be correct at this instant: account balances at payment time, remaining seats, stock counts.',
       'Every request asks for something different. A cache that never gets a hit is pure cost.',
       'Writes happen almost as often as reads. You will spend all your time clearing the cache.',
     ],
@@ -187,25 +187,25 @@ export const TIER1: Concept[] = [
       },
     },
     body: [
-      'Where to put it. In the browser: free and closest, but you cannot take it back once you have sent it. In a CDN: great for anything shared between users. Inside the application process: fastest of all, but every server has its own copy, so they drift apart. In a shared cache like Redis or Memcached: one copy every server agrees on, at the cost of a network hop. Inside the database itself: real, but you do not control it.',
+      'Where to put it. In the browser: free and closest, but you cannot take it back once you have sent it. In a CDN: great for anything shared between users. Inside the application process: fastest of all, but every server has its own copy, so they drift apart. In a shared cache like Redis or Memcached: one copy every server agrees on, at the cost of a network hop. Inside the database itself (its buffer cache): it helps, but you do not control it.',
       'Cache-aside is the default, and the one to describe. The application asks the cache. If it is not there, the app reads the database, writes the answer into the cache, and returns it. It is simple. And if the cache goes down you get slower, not broken.',
-      'Write-through writes to the cache and the database together. The cache is never stale, but every write pays both costs, and you cache things nobody will ever read. Write-behind writes the cache now and the database shortly after. That is fast, and you can lose data in the gap. Say which one you picked, and why.',
-      'Now, clearing the cache, honestly. There are two ways and both are compromises. A TTL means the data is wrong for at most that long, and you never have to think about it. Deleting the key on every write means it is right almost always, but every piece of code that writes has to remember. One that forgets creates a bug nobody can reproduce. Most real systems use a TTL as the safety net and explicit deletion on top of it.',
+      'Write-through writes to the cache and the database together. The cache is never stale, but every write pays both costs, and you also cache items that may never be read. Write-behind writes the cache now and the database shortly after. That is fast, and you can lose data in the gap. Say which one you picked, and why.',
+      'Invalidation has two common approaches, and both are compromises. A TTL means the data is wrong for at most that long, and you never have to think about it. Deleting the key on every write means it is right almost always, but every piece of code that writes has to remember. One path that forgets creates a stale-data bug that is hard to reproduce. Many systems use a TTL as the safety net and explicit deletion on top of it.',
       'The empty-cache problem is worth knowing by name. On a cold start, or after a mass eviction, every request goes to the database at the same moment. The database falls over. And when it comes back, the cache is still empty. There are three defences. Request coalescing: when a hundred requests miss on the same key, let one go to the database and make the other ninety-nine wait for that answer. Jittered TTLs, so a million keys written together do not all expire in the same second. And warming the cache before you send traffic to it.',
-      'A related problem: a request for a key that does not exist anywhere hits the database every single time, because there is nothing to cache. If that is common, say because someone is probing random IDs, cache the "not found" answer too, briefly. Or put a bloom filter in front.',
+      'A related problem: a request for a key that does not exist anywhere hits the database every time, because there is nothing to cache. If that is common, say because someone is probing random IDs, cache the "not found" answer too, briefly. Or put a bloom filter in front.',
     ],
     followUp: {
       q: '"Your cache just died. What happens?"',
       answer:
-        'Every read that was being served from memory now goes to the database at once. So the honest answer starts with a question: does the database survive that? Usually not, at the ratios that made me add a cache in the first place. So I would not depend on the cache being up. I would coalesce requests, so one miss on a key means one database read and not ten thousand. I would put a small in-process cache on each application server as a second layer, so even with the shared cache gone we absorb the hottest keys. I would rate-limit or drop traffic at the edge instead of letting the database die, because a slow site beats a dead one. And I would bring the cache back warm, not empty. The cost of all that: more moving parts, and the in-process layer means servers can briefly disagree with each other.',
+        'Every read that was being served from memory now goes to the database at once. So the answer starts with a question: does the database survive that? Usually not, at the ratios that made me add a cache in the first place. So I would not depend on the cache being up. I would coalesce requests, so one miss on a key means one database read and not ten thousand. I would put a small in-process cache on each application server as a second layer, so even with the shared cache gone we absorb the hottest keys. I would rate-limit or drop traffic at the edge instead of letting the database die, because a slow site beats a dead one. And I would bring the cache back warm, not empty. The cost of all that: more moving parts, and the in-process layer means servers can briefly disagree with each other.',
     },
     selfCheck: {
-      q: 'Name one thing you should never cache in a booking system, and say exactly why.',
+      q: 'Name one thing you should never cache in a booking system, and say why.',
       answer:
         'Remaining seats or rooms, at the moment of booking. Most caching decisions trade speed against freshness. This one trades correctness. If two people both read a cached "1 seat left" that is two seconds old, they both book, and you have sold the same seat twice. The general rule: never cache the value a commit decision is based on, when other people are competing for that value. You can cache the search page that shows roughly what is available, because being slightly wrong there is a small annoyance. But the final check must read the real thing, inside the transaction that reserves it.',
     },
     traps: [
-      'Saying "add a cache" without saying what clears it. That is the follow-up question, every time.',
+      'Saying "add a cache" without saying what clears it. That is the obvious follow-up question.',
       'Assuming a cache makes writes faster. It does not. It usually makes them slightly slower.',
       'Ignoring what happens when it is empty. That is where the outage lives.',
     ],
@@ -240,7 +240,7 @@ export const TIER1: Concept[] = [
     tier: 1,
     oneLine: 'One address in front, many machines behind, and a way to stop sending traffic to a broken one.',
     problem: [
-      'One server can only do so much, and one day it will restart or die. A load balancer lets you put several servers behind a single address, spread requests between them, and quietly stop using any server that stops answering.',
+      'One server can only do so much, and one day it will restart or die. A load balancer lets you put several servers behind a single address, spread requests between them, and automatically stop using any server that stops answering.',
       'It is also what makes deploys boring. Take one server out, update it, put it back, repeat.',
     ],
     cost: 'It is one more hop (a fraction of a millisecond) and one more thing that can fail, so it needs a backup of its own. It also pushes you to keep no user state on your servers. If a server holds a session in memory, every request from that user has to come back to that same server, and you have lost half the benefit.',
@@ -250,7 +250,7 @@ export const TIER1: Concept[] = [
       'You want broken machines removed automatically by health checks.',
     ],
     avoidWhen: [
-      'You really do have one machine and downtime is acceptable. Then it is complexity for nothing.',
+      'You have one machine and downtime is acceptable. Then it is complexity for nothing.',
       'The thing behind it keeps important state per connection and cannot be changed. Fix that first, or accept sticky routing and what it costs.',
     ],
     visual: {
@@ -263,15 +263,15 @@ export const TIER1: Concept[] = [
     },
     body: [
       'Layer 4 balancing looks only at IP and port. It does not read the request, so it is fast and works for any protocol. Layer 7 reads the HTTP request, so it can route by path or header, handle TLS, and retry a failed request on another server. Layer 7 is the default for web traffic. Layer 4 is for raw speed and for protocols that are not HTTP.',
-      'The algorithms, in the order you should reach for them. Round robin: fine when all requests are similar. Least connections: better when some requests take much longer than others, which is most real systems. Consistent hashing on a key: use it when you want the same user or key to keep landing on the same server, usually so its cache stays useful.',
-      'Health checks are the part that really earns its place. A passive check notices failing responses. An active check calls an endpoint every couple of seconds. That endpoint should test something real, like whether it can reach the database. But not so real that one slow dependency makes every server mark itself broken at the same time and takes down the whole fleet. That failure is common and embarrassing.',
+      'The algorithms, in the order you should reach for them. Round robin: fine when all requests are similar. Least connections: better when some requests take much longer than others, which is common in real systems. Consistent hashing on a key: use it when you want the same user or key to keep landing on the same server, usually so its cache stays useful.',
+      'Health checks do much of the useful work. A passive check notices failing responses. An active check calls an endpoint every couple of seconds. That endpoint should test something real, like whether it can reach the database. But not so real that one slow dependency makes every server mark itself broken at the same time and takes down the whole fleet. That failure is common and embarrassing.',
       'Sticky sessions pin a user to one server. It solves in-memory session state, and it costs you: uneven load, a messy story when you add machines, and users losing their state when a server restarts. It is better to put session state in a shared store and keep every server interchangeable.',
       'Above the load balancer sits DNS, which spreads traffic across regions or across several balancers. Clients cache DNS for minutes, so DNS on its own is a poor way to fail over. Say that if someone suggests it.',
     ],
     followUp: {
       q: '"How do you deploy a new version with zero downtime?"',
       answer:
-        'A rolling deploy through the load balancer. Take one instance out of the pool. Wait for the requests it is already handling to finish. That waiting step is called connection draining, and forgetting it is how you drop live traffic during a "zero downtime" deploy. Then update it, wait for its health check to pass, put it back, and move to the next one. Keep enough instances in the pool the whole time to carry the traffic. Two things make this actually work. First, the new version has to run happily beside the old one, which means database changes get split across releases: add the column, deploy, backfill, then remove the old column. Second, you need a fast way out, and rolling forward to a known-good build is safer than trying to undo a migration. Cost: every schema change now takes three deploys instead of one.',
+        'A rolling deploy through the load balancer. Take one instance out of the pool. Wait for the requests it is already handling to finish. That waiting step is called connection draining, and forgetting it is how you drop live traffic during a "zero downtime" deploy. Then update it, wait for its health check to pass, put it back, and move to the next one. Keep enough instances in the pool the whole time to carry the traffic. Two things make this work. First, the new version has to run happily beside the old one, which means database changes get split across releases: add the column, deploy, backfill, then remove the old column. Second, you need a fast way out, and rolling forward to a known-good build is safer than trying to undo a migration. Cost: every schema change now takes three deploys instead of one.',
     },
     selfCheck: {
       q: 'Your health check endpoint queries the database. The database gets slow. What happens to your fleet, and what would you do differently?',
@@ -317,8 +317,8 @@ export const TIER1: Concept[] = [
     tier: 1,
     oneLine: 'Choose by how you read the data, and by what must never be wrong. Not by which word sounds bigger.',
     problem: [
-      'Relational databases give you a fixed schema, joins, and real transactions across many rows. Non-relational ones give some of that up. In return they spread across machines more easily, and they store data in exactly the shape you read it.',
-      'This choice matters because it is very hard to undo. Almost everything else in your design can be swapped in an afternoon. The data model cannot.',
+      'Relational databases give you a fixed schema, joins, and real transactions across many rows. Non-relational ones give some of that up. In return they spread across machines more easily, and they store data in the shape you read it.',
+      'This choice matters because it is very hard to undo. A cache or a queue can be swapped in a sprint. A data model that holds years of production data cannot.',
     ],
     cost: 'Choosing relational costs you work once one machine is not enough. You have to split the data yourself, and joins and transactions across those splits get painful. Choosing non-relational costs you flexibility. You must know your queries before you store the data, and any new question means rewriting the data or copying it into a second system.',
     useWhen: [
@@ -332,7 +332,7 @@ export const TIER1: Concept[] = [
     visual: {
       type: 'compare',
       compare: {
-        caption: 'The honest version of the comparison — it is about what you give up.',
+        caption: 'The comparison is about what you give up.',
         a: {
           title: 'Relational (Postgres, MySQL)',
           points: [
@@ -354,11 +354,11 @@ export const TIER1: Concept[] = [
           ],
         },
         verdict:
-          'Start relational, unless you can name the exact thing it cannot do for you. "We will have 50,000 writes a second on one table, and we only ever read by user id" is a reason. "It is web scale" is not. You are also allowed to use both: the transactional core in Postgres, the huge append-only stream somewhere else.',
+          'Start relational, unless you can name the specific thing it cannot do for you. "We will have 50,000 writes a second on one table, and we only ever read by user id" is a reason. "It is web scale" is not. You are also allowed to use both: the transactional core in Postgres, the huge append-only stream somewhere else.',
       },
     },
     body: [
-      'Here is the question that actually decides it. What is the one query this system runs ten thousand times a second? And does anything here have to be exactly right when many people compete for it?',
+      'Two questions decide it. What is the one query this system runs ten thousand times a second? And does anything here have to be correct when many people compete for it?',
       'If the hot query is "give me everything for this one key", non-relational fits well and its limits will not hurt you. If the system involves seats, stock, balances or unique names, you want real transactions. Building those yourself on top of a store that lacks them is much harder than it looks.',
       'Two things people get wrong. First, non-relational is not automatically faster. It is faster for the pattern you designed it around, and often much slower for anything else. Second, relational databases have improved a lot: replicas, partitioning, JSON columns, and hosted versions that split the data for you. The gap you may be imagining is ten years out of date.',
       'For large scale, be specific about the shard key instead of the brand name. "Cassandra" tells the interviewer nothing. "Partition by user id, sort by timestamp descending, so one user\'s recent items are one continuous read" tells them you understand the machine.',
@@ -371,7 +371,7 @@ export const TIER1: Concept[] = [
     selfCheck: {
       q: 'You are designing a system that records payments. Which do you pick, and what is the one word that decided it?',
       answer:
-        'Relational. The word is "transaction" — not the database feature, the business event. Recording a payment means several rows must change together or not at all: the ledger entry, the order status, the balance. If only half of that lands, you get a support ticket about missing money, which is the most expensive kind of bug there is. Money is also low-volume compared to almost anything else in a product, so the scale argument for the other choice usually is not there. And regulators like being able to query the data in ways nobody planned for.',
+        'Relational. The word is "transaction", in both senses: the business event, and the database guarantee that several rows change together or not at all. Recording a payment touches the ledger entry, the order status and the balance. If only half of that lands, you get a support ticket about missing money, one of the most expensive kinds of bug to have. Money is also low-volume compared to almost anything else in a product, so the scale argument for the other choice usually is not there. And auditors ask questions nobody planned for, which ad-hoc SQL answers well.',
     },
     traps: [
       'Naming a database instead of naming how you will read the data.',
@@ -379,7 +379,7 @@ export const TIER1: Concept[] = [
       'Choosing for write volume you never estimated.',
     ],
     sayThis:
-      '"Postgres for the core, because bookings need a real transaction. The event stream is 50k writes a second and only ever read by device id, so that goes in a partitioned key-value store. Cost: two systems to run, and no transaction covers both — so I will make the stream safe to repeat instead."',
+      '"Postgres for the core, because bookings need a real transaction. The event stream is 50k writes a second and only ever read by device id, so that goes in a partitioned key-value store. Cost: two systems to run, and no transaction covers both, so I will make writes to the stream safe to repeat."',
     related: ['indexes', 'partitioning', 'distributed-transactions'],
     refs: [
       {
@@ -390,7 +390,7 @@ export const TIER1: Concept[] = [
       {
         label: "Jepsen \u2014 Consistency models",
         href: "https://jepsen.io/consistency",
-        note: "The guarantees different databases really provide, tested rather than claimed.",
+        note: "The guarantees different databases provide, tested rather than claimed.",
       },
     ],
     hints: [
@@ -410,10 +410,10 @@ export const TIER1: Concept[] = [
       'Without an index, answering "find the rows where email is this" means reading the whole table. At a thousand rows nobody notices. At fifty million rows it is why your page takes nine seconds.',
       'An index is a second structure, kept in sorted order, that turns that full scan into a few jumps.',
     ],
-    cost: 'Every index makes writes slower, because each insert, update and delete has to update the index too. Indexes use disk and memory. And an index the database never chooses to use is pure cost with no benefit, which is more common than you would think.',
+    cost: 'Every index makes writes slower, because each insert, update and delete has to update the index too. Indexes use disk and memory. And an index the query planner never chooses is pure cost with no benefit.',
     useWhen: [
       'A column shows up in a WHERE, JOIN or ORDER BY, on a table big enough to matter.',
-      'You need to enforce uniqueness. A unique index is how you actually stop duplicate emails.',
+      'You need to enforce uniqueness. A unique index is how you reliably stop duplicate emails.',
       'A query reads only a few columns, and you can answer it entirely from the index without touching the table.',
     ],
     avoidWhen: [
@@ -427,22 +427,22 @@ export const TIER1: Concept[] = [
         caption: 'Same query, same table of 50 million rows, one index added.',
         items: [
           { label: 'No index — read every row', value: 50_000_000, display: '50,000,000 rows examined', tone: 'bad' },
-          { label: 'B-tree index — a few jumps', value: 26, display: '~26 rows examined', tone: 'accent' },
+          { label: 'B-tree index — a few jumps', value: 26, display: '~26 comparisons, 3–4 pages', tone: 'accent' },
         ],
-        note: 'A B-tree cuts the search area roughly in half at every level. So doubling the table adds one step, not double the work. That is why an index feels like magic, and why missing one is invisible until the table grows.',
+        note: 'log2 of 50 million is about 26, so a sorted lookup needs about 26 comparisons. A B-tree node holds hundreds of keys, so those comparisons touch only 3 or 4 pages. Doubling the table adds one comparison, not double the work. That is why an index feels like magic, and why missing one is invisible until the table grows.',
       },
     },
     body: [
       'The default index is a B-tree. It is sorted, so it handles exact matches, ranges and ORDER BY from the same structure. A hash index only handles exact matches. An inverted index maps each word to the documents that contain it, which is how text search works. A geospatial index sorts by location, so "near me" becomes answerable.',
       'Composite indexes have one rule that catches people out. An index on (country, city, name) can answer a query that filters on country, or on country and city, or on all three. It cannot answer one that filters on city alone. Think of a phone book sorted by surname then first name: it is useless for finding everyone called James. So put the column you always filter on first, and put exact-match columns before range columns.',
-      'Here are the usual reasons a query is slow, in the order to check them. There is no index on the column you filter by. There is one, but the query hides it: wrapping the column in a function, or comparing two different types, stops the database using it. The filter matches most of the table, so a full scan really is the right plan. You are sorting a large result the index cannot give you in order. You are paging with a large OFFSET, which makes the database walk past and throw away everything before it. Or the query is fine and it returns 100,000 rows over the network, which is a payload problem, not a database one.',
-      'The N+1 query is worth naming because it is so common. You fetch 100 orders, then loop and fetch each order\'s customer one at a time. That is 101 round trips where one join, or one batched lookup, would do. It is invisible while you develop and fatal in production.',
+      'The usual reasons a query is slow, in the order to check them. There is no index on the column you filter by. There is one, but the query hides it: wrapping the column in a function, or comparing two different types, stops the database using it. The filter matches most of the table, so a full scan is the right plan. You are sorting a large result the index cannot give you in order. You are paging with a large OFFSET, which makes the database walk past and throw away everything before it. Or the query is fine and it returns 100,000 rows over the network, which is a payload problem, not a database one.',
+      'The N+1 query is worth naming because it is so common. You fetch 100 orders, then loop and fetch each order\'s customer one at a time. That is 101 round trips where one join, or one batched lookup, would do. It is hard to see in development, where tables are small, and expensive in production.',
       'When asked how you would debug it, say EXPLAIN. Read the plan. Look for a full scan on a large table, and check whether the estimated row count matches reality. A plan built on out-of-date statistics chooses badly.',
     ],
     followUp: {
       q: '"One user reports a slow request. How do you debug it?"',
       answer:
-        'Work down the stack instead of guessing. First: is it slow for everyone, or only for them? A chart of that endpoint\'s p50 and p99 answers this in seconds. If p99 is bad but p50 is fine, it depends on the data, which means that user has far more rows than a typical user. Second: get a trace of the request and see where the time went. Was it one slow call, or two hundred fast ones? Two hundred fast ones is the N+1. Third: if it is one slow query, run EXPLAIN with their parameters, not with typical ones, because the plan can be different. The common outcome is that they are a heavy account, the query has no index for their combination of filters, and the database switched to a full scan once their row count passed a threshold. The fix is usually an index or a change to paging. The cost of that index is slower writes on the table.',
+        'Work down the stack instead of guessing. First: is it slow for everyone, or only for them? A chart of that endpoint\'s p50 and p99 answers this in seconds. If p99 is bad but p50 is fine, it depends on the data, which means that user has far more rows than a typical user. Second: get a trace of the request and see where the time went. Was it one slow call, or two hundred fast ones? Two hundred fast ones is the N+1. Third: if it is one slow query, run EXPLAIN with their parameters, not with typical ones, because the plan can be different. A common outcome: they are a heavy account, the query has no index for their combination of filters, and the database switched to a full scan once their row count passed a threshold. The fix is usually an index or a change to paging. The cost of that index is slower writes on the table.',
     },
     selfCheck: {
       q: 'You have an index on (user_id, created_at). Which of these two queries uses it — filtering by user_id alone, or filtering by created_at alone? Why?',
@@ -481,7 +481,7 @@ export const TIER1: Concept[] = [
     tier: 1,
     oneLine: 'Reuse a small set of open database connections, instead of opening one per request.',
     problem: [
-      'Opening a database connection is expensive. There is a TCP handshake, TLS, a login, and on some databases a whole new process. Doing that for every request wastes more time than the query itself.',
+      'Opening a database connection is expensive. There is a TCP handshake, TLS, a login, and on some databases a whole new process. Doing that for every request can take longer than the query itself.',
       'Worse, databases have a hard limit on how many connections they allow at once. Go past it and new connections are refused, which looks like a total outage even though the database is barely doing any work.',
     ],
     cost: 'The pool is a queue, so when it is full, requests wait. A pool that is too small becomes your bottleneck while the database sits idle. Pools also carry state. A connection handed back mid-transaction, or with a session setting still on, causes bugs that show up in unrelated requests later.',
@@ -490,7 +490,7 @@ export const TIER1: Concept[] = [
       'Especially when your application servers scale up and down. Each new server multiplies your connection count.',
     ],
     avoidWhen: [
-      'Serverless functions that scale to hundreds of instances, each with its own pool. There you need a separate pooler sitting between them and the database, or you will hit the limit immediately.',
+      'Serverless functions that scale to hundreds of instances, each with its own pool. There you need a separate pooler sitting between them and the database, or you will hit the limit quickly.',
     ],
     visual: {
       type: 'diagram',
@@ -513,7 +513,7 @@ export const TIER1: Concept[] = [
     },
     body: [
       'Sizing is the part worth knowing. Your instinct says a big pool. The right answer is usually a small one. A database with 8 cores cannot truly do more than a couple of dozen things at once. So 500 connections do not run side by side. They queue inside the database, where you cannot see them, and every query gets slower together. A common starting point is a few times the core count. Then measure.',
-      'The failure has a recognisable shape. Response times climb on every endpoint at once. Database CPU is not high. Errors say "timed out waiting for connection". That is pool exhaustion, and the cause is almost always one slow query holding connections, not too much traffic. One endpoint running a 10-second report can starve the whole service.',
+      'The failure has a recognisable shape. Response times climb on every endpoint at once. Database CPU is not high. Errors say "timed out waiting for connection". That is pool exhaustion. The usual cause is slow queries holding connections, rather than too much traffic. One endpoint running a 10-second report can starve the whole service.',
       'Set a timeout on getting a connection. Waiting forever turns a slow dependency into an endless pile of stuck requests. Failing fast lets you drop traffic and stay up.',
       'For serverless, or for a very large number of instances, put a dedicated pooler in front. In transaction mode it lends a real connection to a request only for the length of one transaction, so hundreds of clients share a handful of connections. The cost is that anything spanning transactions breaks, including session-level settings and some prepared-statement behaviour.',
     ],

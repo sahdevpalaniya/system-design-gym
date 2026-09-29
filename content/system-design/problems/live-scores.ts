@@ -22,15 +22,15 @@ export const LIVE_SCORES: Problem = {
 
   slack: {
     budget: 'Delivery: 1–2 seconds. Connection setup: seconds. Reconnect: seconds.',
-    headline: 'A second of slack, and it is real — but it is bounded by something outside your system: the person in the next room shouting at their television.',
+    headline: 'A second or two of slack, bounded by something outside your system: the person in the next room shouting at their television.',
     body: [
-      'The delivery budget here is not set by engineering taste, it is set by the physical world. If a neighbour with a TV feed shouts before your app updates, the product has failed in a way users notice viscerally. Broadcast feeds themselves run several seconds behind live, which gives you a little room, but not much. Call it one to two seconds end to end.',
-      'That is really more slack than it first appears, and it is worth spending on purpose. It means you do not need microsecond delivery, you can batch updates into small windows, and you can accept a message taking a couple of hundred milliseconds to traverse a fan-out layer.',
-      'Connection setup has seconds of slack — nobody minds a moment on opening the app. This matters more than it sounds, because it is what lets you stagger reconnections after a deploy instead of accepting a million simultaneous handshakes.',
-      'Historical data, statistics and commentary have minutes of slack and should be plain cached HTTP requests, not pushed. Mixing them into the live path is the most common way this design gets over-built.',
+      'The physical world sets this delivery budget, not engineering taste. If a neighbour with a TV feed shouts before your app updates, the product has failed in a way users notice viscerally. Broadcast feeds themselves run several seconds behind live, which gives you a little room, but not much. Call it one to two seconds end to end.',
+      'That is more slack than it first appears, and it is worth spending on purpose. It means you do not need microsecond delivery, you can batch updates into small windows, and you can accept a message taking a couple of hundred milliseconds to traverse a fan-out layer.',
+      'Connection setup has seconds of slack. A short pause when the app opens is fine. This matters more than it sounds, because it is what lets you stagger reconnections after a deploy instead of accepting a million simultaneous handshakes.',
+      'Historical data, statistics and commentary have minutes of slack and should be plain cached HTTP requests, not pushed. Mixing them into the live path is an easy way to over-build this design.',
     ],
     consequence:
-      'One to two seconds means you can batch updates into ~250 ms windows, which cuts fan-out work dramatically for a delay nobody perceives. And it means the live channel should carry only what is actually live — everything else is a cacheable request.',
+      'One to two seconds means you can batch updates into ~250 ms windows, which cuts fan-out work dramatically for a delay too short to notice. It also means the live channel should carry only what is actually live. Everything else is a cacheable request.',
   },
 
   stages: [
@@ -43,9 +43,9 @@ export const LIVE_SCORES: Problem = {
         'How many distinct matches are live at once?',
       ],
       model: [
-        'Assumptions: global, mobile-first. Traffic is wildly spiky and predictable — nothing happens for hours, then ten million people connect for one match final. Updates per match are infrequent: a football match has a few dozen meaningful events across ninety minutes, not thousands. Score data itself is tiny, a few hundred bytes.',
-        'First question, and it is the one that decides whether this is easy or hard: does everyone watching a match see identical data, or is it personalised — their team highlighted, their bets, their notifications? Because identical data means one message fans out unchanged to millions and can be cached and broadcast; personalised means a per-user computation for every update, which is a completely different system. I will assume identical per match, with personalisation layered on the client.',
-        'Second question: is the score feed something we own, or does it come from an external provider? Because an external provider means an ingestion path with deduplication, corrections and their outages, and provider corrections — a goal disallowed after review — are a real and interesting requirement. I will assume external providers.',
+        'Assumptions: global, mobile-first. Traffic is spiky but predictable: quiet for hours, then ten million people connect for one final. Updates per match are infrequent: a football match has a few dozen meaningful events across ninety minutes, not thousands. Score data itself is tiny, a few hundred bytes.',
+        'First question, which decides whether this is easy or hard: does everyone watching a match see identical data, or is it personalised, with their team highlighted, their bets, their notifications? Identical data means one message fans out unchanged to millions and can be cached and broadcast; personalised means a per-user computation for every update, which is a completely different system. I will assume identical per match, with personalisation layered on the client.',
+        'Second question: is the score feed something we own, or does it come from an external provider? An external provider means an ingestion path with deduplication, corrections and their outages. Provider corrections (a goal disallowed after review) are a real requirement. I will assume external providers.',
         'Scope: ingest score events, push them to everyone watching a match, and handle reconnection and catch-up. Out of scope: video streaming, betting, and the statistics pages, which are ordinary cached reads.',
       ],
       checklist: [
@@ -58,11 +58,11 @@ export const LIVE_SCORES: Problem = {
       tradeoffs: [
         {
           decision: 'Identical payload per match, personalisation on the client',
-          cost: 'Some features that would be easier server-side move to the client. In exchange one message serves millions of viewers unchanged, which is the entire reason this is affordable.',
+          cost: 'Some features that would be easier server-side move to the client. In exchange one message serves millions of viewers unchanged, which is what makes this affordable.',
         },
       ],
       sayThis:
-        '"Assuming everyone watching a match gets the same payload, with personalisation on the client. That is the assumption the design lives or dies on — identical data means one message fans out unchanged to ten million people; personalised means ten million computations per goal. And the feed comes from an external provider, so I need to handle corrections."',
+        '"Assuming everyone watching a match gets the same payload, with personalisation on the client. The design depends on that assumption. Identical data means one message fans out unchanged to ten million people; personalised means ten million computations per goal. And the feed comes from an external provider, so I need to handle corrections."',
       trap: 'Assuming personalised payloads without saying so, then designing a per-user pipeline for data that is identical for everyone. State the assumption; it is the biggest lever in this problem.',
     },
 
@@ -75,13 +75,13 @@ export const LIVE_SCORES: Problem = {
         'What if the provider sends the same goal twice, or takes one back?',
       ],
       model: [
-        'Actors: the viewer, the data provider, and the system — which decides what is a duplicate, what is a correction, which connections care about which match, and what a reconnecting client has missed.',
+        'Actors: the viewer, the data provider, and the system, which decides what is a duplicate, what is a correction, which connections care about which match, and what a reconnecting client has missed.',
         'The chain: event received from provider → validated and deduplicated → stored as the current match state → published to the fan-out layer → delivered to connected clients → rendered.',
-        'Failure branches. At received: the provider sends the same event twice, so every event needs a provider event id and deduplication — otherwise the score goes to 2-1 and then 3-1. At received: the provider sends a correction, a goal disallowed after review. This is the branch that makes the problem interesting: it means updates are not append-only, so clients must be able to handle a value going backwards, and I should push full current state rather than increments. Pushing "score is now 1-1" is idempotent and self-correcting; pushing "add one goal" is not, and any missed or duplicated message corrupts the display permanently. That is a design decision, and it belongs in the lifecycle.',
-        'At received: the provider goes down entirely — the app should show the last known state with a timestamp rather than a blank or a stale-looking score presented as live. At published: the fan-out layer is behind, so the score is late; because the payload is full state, a late message is still correct, just late.',
-        'At delivered: the client is disconnected — a tunnel, an app backgrounded. They must reconnect and catch up, and because we push full current state, catching up is simply fetching the current state, which is the same cached endpoint everyone else uses. That is a large simplification and it falls directly out of the full-state decision.',
+        'Failure branches. At received: the provider sends the same event twice, so every event needs a provider event id and deduplication. Otherwise the score goes to 2-1 and then 3-1. At received: the provider sends a correction, a goal disallowed after review. This is the branch that makes the problem interesting: it means updates are not append-only, so clients must be able to handle a value going backwards, and I should push full current state rather than increments. Pushing "score is now 1-1" is idempotent and self-correcting; pushing "add one goal" is not, and any missed or duplicated message corrupts the display permanently. That is a design decision, and it belongs in the lifecycle.',
+        'At received: the provider goes down entirely. The app should show the last known state with a timestamp rather than a blank or a stale-looking score presented as live. At published: the fan-out layer is behind, so the score is late; because the payload is full state, a late message is still correct, just late.',
+        'At delivered: the client is disconnected (a tunnel, or the app backgrounded). They must reconnect and catch up, and because we push full current state, catching up means fetching the current state, which is the same cached endpoint everyone else uses. That is a large simplification and it falls directly out of the full-state decision.',
         'At delivered: a deploy restarts every server, so millions reconnect at once. Without jittered backoff this is a self-inflicted denial of service that is worse than the traffic being served.',
-        'One the system owns silently: when a match ends, ten million connections should be released rather than held open for hours by clients that have stopped caring.',
+        'One branch the system handles on its own: when a match ends, ten million connections should be released rather than held open for hours by clients that have stopped caring.',
       ],
       checklist: [
         'Named the system as an actor with real decisions',
@@ -100,17 +100,17 @@ export const LIVE_SCORES: Problem = {
       id: 3,
       ask: 'Estimate concurrent connections, message rate, and total fan-out volume. Then finish "So the hard part here is ___."',
       nudges: [
-        'How many events per match, really? Count them.',
+        'How many events happen in one match? Count them.',
         'Multiply events by viewers. That is the real number.',
         'How much memory does a connection cost?',
       ],
       model: [
-        'Concurrency: a major final, 10 million simultaneous viewers. That is the headline number and it is about connections, not requests per second — which is a different capacity model from everything else in this app.',
-        'Message rate from the provider: a football match generates maybe 100 meaningful events over 90 minutes, so roughly one event every minute. That is an absurdly low input rate, and noticing it matters.',
-        'Fan-out volume: 100 events times 10 million viewers is a billion message deliveries per match. But they are not spread evenly — a goal means 10 million deliveries in one or two seconds, so the instantaneous fan-out rate is around 5 to 10 million messages per second, in bursts, separated by minutes of near silence.',
-        'That contrast is the number that changes my mind. The input rate is one message a minute; the output rate is ten million a second in a burst. There is no throughput problem on ingestion at all — the entire system exists to multiply one tiny message across ten million sockets, quickly, and then be idle.',
-        'Connections: at roughly 10 KB of memory per connection including buffers, 10 million connections is about 100 GB spread across the fleet. At, say, 100,000 connections per server that is 100 servers — a real but manageable number, and it is a memory and file-descriptor problem rather than a CPU one.',
-        'Bandwidth: 300 bytes per update times 10 million is 3 GB per goal, delivered in a couple of seconds. Noticeable, and it is why the payload staying small actually matters.',
+        'Concurrency: a major final, 10 million simultaneous viewers. That is the headline number. It counts connections, not requests per second, which is a different capacity model from most problems in this app.',
+        'Message rate from the provider: a football match generates maybe 100 meaningful events over 90 minutes, so roughly one event every minute. That input rate is tiny, and noticing it matters.',
+        'Fan-out volume: 100 events times 10 million viewers is a billion message deliveries per match. But they are not spread evenly. A goal means 10 million deliveries in one or two seconds, so the instantaneous fan-out rate is around 5 to 10 million messages per second, in bursts, separated by minutes of near silence.',
+        'That contrast changes the design. The input rate is one message a minute; the output rate is ten million a second in a burst. There is no ingestion throughput problem at all. The system exists to multiply one tiny message across ten million sockets, quickly, and then be idle.',
+        'Connections: at roughly 10 KB of memory per connection including buffers, 10 million connections is about 100 GB spread across the fleet. At, say, 100,000 connections per server that is 100 servers. That is manageable, and it is a memory and file-descriptor problem more than a CPU one.',
+        'Bandwidth: 300 bytes per update times 10 million is 3 GB per goal, delivered in a couple of seconds. That is noticeable, and it is why a small payload matters.',
         'So the hard part here is burst fan-out, not ingestion, storage or throughput in the normal sense. And the second hard part is connection management: holding ten million idle connections cheaply and surviving the moment they all reconnect.',
       ],
       checklist: [
@@ -122,7 +122,7 @@ export const LIVE_SCORES: Problem = {
         'Finished the sentence: burst fan-out and connection management',
       ],
       sayThis:
-        '"The provider sends me one message a minute. I have to turn that into ten million deliveries inside two seconds, then go quiet again. So the hard part here is burst fan-out and holding ten million mostly-idle connections — there is no ingestion problem at all, and saying that stops me designing one."',
+        '"The provider sends me one message a minute. I have to turn that into ten million deliveries inside two seconds, then go quiet again. So the hard part here is burst fan-out and holding ten million mostly-idle connections. There is no ingestion problem at all, and saying that stops me designing one."',
       trap: 'Designing a high-throughput ingestion pipeline. The input is one message a minute. Every bit of engineering belongs on the output side.',
     },
 
@@ -135,12 +135,12 @@ export const LIVE_SCORES: Problem = {
         'What happens between a message arriving and it hitting ten million sockets?',
       ],
       model: [
-        'Transport: server-sent events. Data flows one way — server to client — and SSE gives me automatic reconnection with a last-event-id, which is exactly the catch-up mechanism I need, over plain HTTP that every proxy and load balancer already understands. WebSockets would work but I would be building reconnection and heartbeats myself for a bidirectional channel I do not need. Polling would mean ten million clients asking every two seconds, which is five million requests a second of mostly-unchanged responses — though I would note that polling a heavily cached endpoint is a really reasonable fallback and is what I would ship first if I had a week. Justified by the Stage 1 assumption that the client only receives.',
-        'Ingestion: a small service receiving provider events, deduplicating by provider event id, applying corrections, and writing the current match state. Tiny, because the input rate is one message a minute — and I would say out loud that this box does not need to scale.',
-        'Fan-out: connection servers each hold a slice of the connections. When match state changes, the update is published once to a pub/sub layer, and every connection server subscribed to that match writes it to its connected sockets. The key decision is that servers subscribe per match rather than per user — so one published message becomes 100 server deliveries rather than 10 million pub/sub messages. That distinction is the whole design: the multiplication happens at the last hop, on the machine that already holds the sockets.',
+        'Transport: server-sent events. Data flows one way, server to client, and SSE gives me automatic reconnection with a last-event-id, which is the catch-up mechanism I need, over plain HTTP that every proxy and load balancer already understands. WebSockets would work but I would be building reconnection and heartbeats myself for a bidirectional channel I do not need. Polling would mean ten million clients asking every two seconds, which is five million requests a second of mostly-unchanged responses. Still, polling a heavily cached endpoint is a reasonable fallback, and it is what I would ship first if I had a week. Justified by the Stage 1 assumption that the client only receives.',
+        'Ingestion: a small service receiving provider events, deduplicating by provider event id, applying corrections, and writing the current match state. It stays tiny because the input rate is one message a minute, and I would say out loud that this box does not need to scale.',
+        'Fan-out: connection servers each hold a slice of the connections. When match state changes, the update is published once to a pub/sub layer, and every connection server subscribed to that match writes it to its connected sockets. The key decision is that servers subscribe per match rather than per user — so one published message becomes 100 server deliveries rather than 10 million pub/sub messages. So the multiplication happens at the last hop, on the machine that already holds the sockets.',
         'Connection routing: clients are routed to connection servers by match, using consistent hashing, so viewers of the same match cluster onto the same servers. That maximises the value of each pub/sub delivery and keeps subscription counts low. Cost: a very popular match concentrates load onto its servers, so hot matches need to be spread across several, which means a small amount of routing intelligence rather than a pure hash.',
-        'Current state cache: the current state of every live match sits in a cache and is also served over a plain cached HTTP endpoint. This does triple duty — it is what a newly connected client fetches to initialise, what a reconnecting client fetches to catch up, and the fallback if push fails entirely. Justified by the reconnection branch in Stage 2, and it is the highest-leverage box in the design because everyone wants identical bytes.',
-        'Batching: updates are collected into ~250 ms windows before fan-out. At one event a minute that rarely matters, but during a chaotic period — a goal, then a VAR check, then a correction — it collapses several updates into one delivery. Justified directly by the one-to-two-second slack budget: 250 ms is invisible to a human and it cuts fan-out work meaningfully.',
+        'Current state cache: the current state of every live match sits in a cache and is also served over a plain cached HTTP endpoint. This does triple duty: it is what a newly connected client fetches to initialise, what a reconnecting client fetches to catch up, and the fallback if push fails entirely. Justified by the reconnection branch in Stage 2, and it is the highest-leverage box in the design because everyone wants identical bytes.',
+        'Batching: updates are collected into ~250 ms windows before fan-out. At one event a minute that rarely matters, but during a chaotic period (a goal, then a VAR check, then a correction) it collapses several updates into one delivery. Justified directly by the one-to-two-second slack budget: 250 ms is invisible to a human and it cuts fan-out work meaningfully.',
       ],
       checklist: [
         'Chose a transport and rejected the other two with reasons',
@@ -178,13 +178,13 @@ export const LIVE_SCORES: Problem = {
         'What does a slow client do to your server?',
       ],
       model: [
-        'Hard part one: the connection storm. Traffic is not just spiky, it is scheduled — ten million people open the app in the two minutes before kick-off, so the peak is connection establishment, not steady-state delivery. Each connection costs a TLS handshake and an authentication check, and doing ten million of those in 120 seconds is roughly 80,000 per second of the most expensive operation in the system. Defences: terminate TLS at the edge with session resumption so returning clients skip the expensive handshake; keep the authentication check on connect as cheap as possible, ideally validating a token without a database call; and pre-scale, since kick-off time is known in advance, which is a luxury most systems do not have and should be used. Cost: pre-scaling means paying for idle capacity ahead of the match, which is the correct trade for a scheduled peak.',
-        'Deploys during a match are the operational nightmare, because restarting a server drops its connections and they all reconnect at once. Roll slowly, a small percentage of the fleet at a time, and have clients reconnect with exponential backoff and full jitter so the returning herd is spread across tens of seconds instead of arriving together. Better still, do not deploy during a match — which is a real and legitimate answer, and saying it shows operational judgement rather than avoidance. Cost: a deployment freeze window that constrains the team.',
-        'Slow clients are the subtle failure. A client on a bad connection cannot consume messages as fast as you write them, so per-connection buffers grow, and with enough slow clients the server runs out of memory and takes down everyone on it, including the healthy connections. The fix is a bounded buffer per connection, and when it is full, drop the client rather than the server. Because we push full current state, a dropped client reconnects and fetches current state, losing nothing — which is another benefit of that Stage 2 decision paying off. Cost: users on really bad connections get disconnected more often, and their experience becomes reconnect-and-refresh, which is acceptable and honest.',
-        'Hard part two: the hot match. Consistent hashing by match id clusters viewers usefully, but one match can be ten times the size of every other match combined. Spread a hot match across many connection servers by hashing on match id plus a bucket, so the match becomes N logical channels, each with its own set of servers. Cost: the fan-out layer publishes to N channels instead of one, which is a small multiplier and vastly better than one overloaded server.',
-        'Provider failure and corrections, revisited as an operational matter: if the provider stops, the app shows last known state with a visible timestamp — never a stale score presented as current, because a confidently wrong score is worse than an honest "last updated 3 minutes ago". If a correction arrives, full-state pushes make it self-healing. Cost: a UI requirement, and the discipline to have designed for it.',
-        'Multi-region: connection servers run in every region so viewers connect locally, and the score event is replicated to each region\'s pub/sub layer. The event is tiny, so cross-region replication is cheap and adds around 100 ms, which fits inside the budget. Cost: an extra hop for regions far from ingestion, and slightly different delivery times by region — which nobody notices at this granularity, but which I would state rather than pretend is uniform.',
-        'What I would monitor: connections per server and their distribution, delivery latency from provider receipt to socket write at p99, reconnection rate, buffer-full disconnects, and pub/sub publish latency. Reconnection rate spiking is the earliest sign something is wrong, usually before delivery latency moves.',
+        'Hard part one: the connection storm. Traffic is not just spiky, it is scheduled: ten million people open the app in the two minutes before kick-off, so the peak is connection establishment, not steady-state delivery. Each connection costs a TLS handshake and an authentication check, and doing ten million of those in 120 seconds is roughly 80,000 per second of the most expensive operation in the system. Defences: terminate TLS at the edge with session resumption so returning clients skip the expensive handshake; keep the authentication check on connect as cheap as possible, ideally validating a token without a database call; and pre-scale, since kick-off time is known in advance, a luxury most systems do not have, so use it. Cost: pre-scaling means paying for idle capacity ahead of the match, which is the correct trade for a scheduled peak.',
+        'Deploys during a match are the hardest operational case, because restarting a server drops its connections and they all reconnect at once. Roll slowly, a small percentage of the fleet at a time, and have clients reconnect with exponential backoff and full jitter so the returning herd is spread across tens of seconds instead of arriving together. Better still, do not deploy during a match. That is a legitimate answer, and saying it shows operational judgement rather than avoidance. Cost: a deployment freeze window that constrains the team.',
+        'Slow clients are the subtle failure. A client on a bad connection cannot consume messages as fast as you write them, so per-connection buffers grow, and with enough slow clients the server runs out of memory and takes down everyone on it, including the healthy connections. The fix is a bounded buffer per connection, and when it is full, drop the client rather than the server. Because we push full current state, a dropped client reconnects and fetches current state, losing nothing, so the Stage 2 decision pays off again. Cost: users on very bad connections get disconnected more often, and their experience becomes reconnect-and-refresh, which is acceptable and honest.',
+        'Hard part two: the hot match. Consistent hashing by match id clusters viewers usefully, but one match can draw more viewers than every other live match combined. Spread a hot match across many connection servers by hashing on match id plus a bucket, so the match becomes N logical channels, each with its own set of servers. Cost: the fan-out layer publishes to N channels instead of one, which is a small multiplier and vastly better than one overloaded server.',
+        'Provider failure and corrections, revisited as an operational matter: if the provider stops, the app shows last known state with a visible timestamp. It must never present a stale score as current, because a confidently wrong score is worse than an honest "last updated 3 minutes ago". If a correction arrives, full-state pushes make it self-healing. Cost: a UI requirement, and the discipline to have designed for it.',
+        'Multi-region: connection servers run in every region so viewers connect locally, and the score event is replicated to each region\'s pub/sub layer. The event is tiny, so cross-region replication is cheap and adds around 100 ms, which fits inside the budget. Cost: an extra hop for regions far from ingestion, and slightly different delivery times by region. Users are unlikely to notice at this granularity, but I would state it rather than pretend delivery is uniform.',
+        'What I would monitor: connections per server and their distribution, delivery latency from provider receipt to socket write at p99, reconnection rate, buffer-full disconnects, and pub/sub publish latency. A spike in reconnection rate is often the first sign of trouble, before delivery latency moves.',
       ],
       checklist: [
         'Addressed the scheduled connection storm and used its predictability',
@@ -222,12 +222,12 @@ export const LIVE_SCORES: Problem = {
     {
       label: "MDN \u2014 WebSockets API",
       href: "https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API",
-      note: "The transport choice this problem lives or dies on.",
+      note: "The bidirectional alternative weighed against SSE in Stage 4.",
     },
   ],
   lifecycle: {
     caption:
-      'A score event, provider to phone. The correction branch is what forces full-state pushes — and that one decision simplifies three other branches.',
+      'A score event, provider to phone. The correction branch forces full-state pushes, and that one decision simplifies three other branches.',
     states: [
       { id: 'recv', label: 'Received', by: 'provider' },
       { id: 'dedup', label: 'Deduplicated', by: 'system' },
@@ -286,7 +286,7 @@ export const LIVE_SCORES: Problem = {
   },
 
   compare: {
-    caption: 'What you put in the message. This choice quietly decides how hard three other problems are.',
+    caption: 'What you put in the message. This choice decides how hard three other problems are.',
     a: {
       title: 'Push full current state',
       points: [
@@ -306,7 +306,7 @@ export const LIVE_SCORES: Problem = {
       ],
     },
     verdict:
-      'Full current state. The payload difference is meaningless at this size, and it removes the need for ordering guarantees, a replay log, and correction handling — three subsystems deleted by one decision. When state is small, always push state.',
+      'Full current state. The payload difference is meaningless at this size, and it removes the need for ordering guarantees, a replay log, and correction handling: three subsystems deleted by one decision. When state is this small, push state.',
   },
 
   followUps: [

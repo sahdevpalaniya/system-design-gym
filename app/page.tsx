@@ -21,8 +21,8 @@ export default function Home() {
         </h1>
         <p className="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
           Most system design material is a catalogue of components. You finish it knowing more words
-          and still freeze when someone says &ldquo;design a ride-hailing app&rdquo;. What is missing
-          is never the components — it is the order you make decisions in, and the habit of saying
+          and still freeze when someone says &ldquo;design a ride-hailing app&rdquo;. What is usually
+          missing is not the components. It is the order you make decisions in, and the habit of saying
           what each one costs. That is what this site drills.
         </p>
 
@@ -68,7 +68,7 @@ export default function Home() {
           <h2 className="mb-1 text-[1.0625rem] font-semibold">How to use it</h2>
           <p className="max-w-2xl text-[0.9375rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Every topic and every problem asks you to write your own answer before it shows you ours.
-            That gap — between what you wrote and what you read — is the only thing here that teaches.
+            That gap, between what you wrote and what you read, is where the learning happens.
             If you are stuck, take a hint: each one is a question to ask yourself, never the answer,
             and you can take every hint and still have to write something yourself. The{' '}
             <Link href="/learn" className="font-medium" style={{ color: 'var(--accent)' }}>
@@ -78,7 +78,7 @@ export default function Home() {
             <Link href="/concepts" className="font-medium" style={{ color: 'var(--accent)' }}>
               {CONCEPTS.length} topics
             </Link>{' '}
-            are ordered as a dependency chain — caching before CDNs, replication before partitioning —
+            are ordered as a dependency chain (caching before CDNs, replication before partitioning),
             so reading top to bottom never asks you to assume something you have not met.
           </p>
         </div>

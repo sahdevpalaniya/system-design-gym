@@ -16,13 +16,13 @@ export default function SolutionsPage() {
     <Page wide>
       <PageHeader
         eyebrow="Worked solutions"
-        title="What a good answer actually looks like"
-        lede="Every problem, answered start to finish in the order you would say it out loud — requirements, lifecycle, numbers, design, tradeoffs, and the follow-ups that come after. Written for someone who has never seen one of these before."
+        title="What a good answer looks like"
+        lede="Every problem, answered start to finish in the order you would say it out loud: requirements, lifecycle, numbers, design, tradeoffs, and the follow-ups that come after. Written for someone who has never seen one of these before."
       />
 
       <Callout variant="trap">
-        <strong>These work best second.</strong> Reading a good answer builds recognition — you will
-        nod along and feel like you have learned it. Producing one on a blank page is a different
+        <strong>These work best second.</strong> Reading a good answer builds recognition: you
+        nod along and feel you have learned it. Producing one on a blank page is a different
         skill, and it is the one being tested. Try the problem first, then come here and compare.
       </Callout>
 

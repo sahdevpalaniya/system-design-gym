@@ -70,7 +70,7 @@ export const GO: Language = {
     {
       id: 'generics',
       name: 'Generics and stdlib',
-      blurb: 'Write one function that works for many types, and learn which built-in packages you will really use.',
+      blurb: 'Write one function that works for many types, and learn which built-in packages you will use most.',
       lessons: ['generics', 'standard-library'],
     },
     {
@@ -89,14 +89,14 @@ export const GO: Language = {
     {
       id: 'database',
       name: 'Databases',
-      blurb: 'Postgres through database/sql. No ORM, so you can see exactly which queries run.',
+      blurb: 'Postgres through database/sql. No ORM, so you write and see every query that runs.',
       lessons: ['postgres-and-sql', 'joins-transactions-n-plus-one'],
     },
     {
       id: 'project-shortener',
       name: 'Project 1 — URL shortener',
       blurb:
-        'Built with a **layered** structure — a folder per kind of code. Validation, storage, a redirect, then Postgres and a container.',
+        'Built with a **layered** structure: a folder per kind of code. Validation, storage, a redirect, then Postgres and a container.',
       lessons: [
         'shortener-overview',
         'shortener-step-1-setup',
@@ -111,7 +111,7 @@ export const GO: Language = {
       id: 'project-expenses',
       name: 'Project 2 — Expense tracker',
       blurb:
-        'Built **by feature** — one folder per concept. Accounts, passwords and login, taught inside the project that needs them.',
+        'Built **by feature**: one folder per concept. Accounts, passwords and login, taught inside the project that needs them.',
       lessons: [
         'expenses-overview',
         'expenses-step-1-setup',
@@ -143,7 +143,7 @@ export const GO: Language = {
     {
       id: 'tooling',
       name: 'Modules and packages',
-      blurb: 'How Go finds your code, the packages everyone actually uses, and the four commands to run before every push.',
+      blurb: 'How Go finds your code, the third-party packages you will meet most, and the four commands to run before every push.',
       lessons: ['modules-and-tooling', 'popular-packages', 'packages-in-code'],
     },
     {

@@ -11,7 +11,7 @@ export const BASICS: LangLesson[] = [
       {
         body: [
           'Go is a compiled language. You write a `.go` file, the compiler turns it into a single machine-code binary, and you run that. There is no interpreter to install on the server and no virtual machine. That one fact explains most of what people like about Go: you build one file and copy it anywhere.',
-          'First, install it. Pick your system below — every option installs the same thing: the compiler, the standard library and the `go` command.',
+          'First, install it. Pick your system below. Every option installs the same thing: the compiler, the standard library and the `go` command.',
         ],
         code: { label: 'terminal', src: 'go version\n# go version go1.22.2 linux/amd64' },
       },
@@ -65,14 +65,14 @@ go env GOPATH
       {
         callout: {
           tone: 'note',
-          text: 'Nothing else to install. No package manager to set up, no virtual environment, no build tool. The `go` command does all of it, which is one of the nicest things about starting Go.',
+          text: 'Nothing else to install. No package manager to set up, no virtual environment, no build tool. The `go` command does all of it.',
         },
       },
       {
         heading: 'You can also run Go without installing anything',
         body: [
           'Every code block on this site with a **▶ Run** button executes on the official Go Playground, so you can work through the language topics in a browser before you install anything. Press Run, change the code, press Run again.',
-          'You will need a real installation from the practice projects onwards, because those use files, folders and a database — none of which the playground has.',
+          'You will need a real installation from the practice projects onwards, because those use files, folders and a database. The playground has none of them.',
         ],
       },
       {
@@ -137,7 +137,7 @@ func main() {
       },
       {
         body: [
-          'Because of this you never get a "cannot read property of undefined" style crash from an unset variable. It also means you can design a type so that its zero value is already useful — a trick that pays off later, when you design your own types.',
+          'Because of this you never get a "cannot read property of undefined" style crash from an unset variable. It also means you can design a type so that its zero value is already useful. `sync.Mutex` and `bytes.Buffer` both work with no setup, and your own types can too.',
         ],
       },
       {
@@ -150,7 +150,7 @@ func main() {
       {
         callout: {
           tone: 'note',
-          text: 'Go has exactly one formatting style, and `go fmt` applies it. Nobody on a Go team argues about tabs, braces, or line length. Run it before every commit and forget the whole topic exists.',
+          text: 'Go has one formatting style, and `go fmt` applies it. Tabs, brace placement and spacing are decided for you, so a Go team has nothing to argue about there. Most editors run it on save; if yours does not, run it before every commit.',
         },
       },
       {
@@ -183,8 +183,8 @@ func main() {
       '`go run`, `go build`, `go fmt`, `go vet`. That is the whole daily toolchain.',
     ],
     remember:
-      'Go compiles to one file with no runtime, and every variable starts at a defined zero value. Those two facts shape most of the language.',
-    task: 'Print your name, age, and whether you are a student — using all three declaration styles. Then declare a variable of each basic type without assigning it and print them, to see the zero values yourself.',
+      'Go compiles to one self-contained binary with nothing to install beside it, and every variable starts at a defined zero value. Those two facts shape most of the language.',
+    task: 'Print your name, age, and whether you are a student, using all three declaration styles. Then declare a variable of each basic type without assigning it and print them, to see the zero values yourself.',
     refs: [
       { label: 'Tutorial: Get started with Go', href: 'https://go.dev/doc/tutorial/getting-started' },
       { label: 'A Tour of Go — Basics', href: 'https://go.dev/tour/basics/1' },
@@ -200,8 +200,8 @@ func main() {
       {
         heading: 'Go never converts a type for you',
         body: [
-          'In most languages, an `int` next to a `float` quietly becomes a float. Go refuses. Every conversion is written out by you.',
-          'This feels fussy until the first time it saves you. Silent numeric conversion is where money code loses cents and where an `int32` overflows without a word. Go decided the cost of typing `float64(a)` is lower than the cost of finding that bug.',
+          'In most languages, an `int` next to a `float` is converted to a float for you. Go refuses. You write every conversion yourself.',
+          'This feels fussy until the first time it saves you. Implicit numeric conversion is where money code loses cents, and where an `int64` is squeezed into an `int32` with no warning. Go decided the cost of typing `float64(a)` is lower than the cost of finding that bug.',
         ],
         code: {
           label: 'conversion.go',
@@ -257,23 +257,23 @@ func main() {
     ],
     keyPoints: [
       'Every conversion between types is written out by you. Go never widens silently.',
-      '`float64(a)`, `int64(a)`, `[]byte(s)`, `[]rune(s)` — all explicit.',
+      '`float64(a)`, `int64(a)`, `[]byte(s)`, `[]rune(s)`: all explicit.',
       '`len` on a string counts bytes, not characters.',
       'The cost of typing the conversion is lower than the cost of finding the bug it prevents.',
     ],
     remember:
-      'Silent numeric conversion is where money code loses cents. Go makes you write it down.',
+      'Implicit numeric conversion is where money code loses cents. Go makes you write it down.',
     task: 'Convert an int to a float64 and back, and a string to both `[]byte` and `[]rune`. Print the length of each.',
     exercises: [
       {
         task: 'Try `var b float64 = someInt` and read the compiler error.',
         answer:
-          '`cannot use someInt (variable of type int) as float64 value`. Go never widens for you — write `float64(someInt)`.',
+          '`cannot use someInt (variable of type int) as float64 value in variable declaration`. Go never widens for you. Write `float64(someInt)`.',
       },
       {
         task: 'Convert a float64 with a fraction to an int and see what happens to the decimals.',
         answer:
-          'The decimals are thrown away, not rounded: `int(3.9)` is 3. Add 0.5 first, or use `math.Round`.',
+          'The decimals are thrown away, not rounded: with `f := 3.9`, `int(f)` is 3, and -3.9 becomes -3 (it truncates toward zero). Use `int(math.Round(f))` to round. Note that `int(3.9)` written with a constant does not compile at all, because the constant would be truncated.',
       },
       {
         task: 'Take `len()` of a string with an emoji, then of `[]rune` of the same string.',
@@ -296,7 +296,7 @@ func main() {
       {
         heading: 'if — with a scoped variable',
         body: [
-          'Go lets you declare a variable inside the `if`, scoped to the `if` and its `else`. You will use this constantly for error handling, so get used to the shape now.',
+          'Go lets you declare a variable inside the `if`, scoped to the `if` and its `else`. Error handling uses this shape all the time: `if err := save(u); err != nil { ... }`.',
         ],
         code: {
           label: 'flow.go',
@@ -313,7 +313,7 @@ func main() {
       {
         callout: {
           tone: 'note',
-          text: 'There is no ternary operator in Go, and there never will be. Write the `if`. It is longer and it is readable at 3am.',
+          text: 'There is no ternary operator in Go, and the Go FAQ explains why it was left out on purpose. Write the `if`. It is longer, and it stays readable when the condition grows.',
         },
       },
       {
@@ -341,7 +341,7 @@ for k, v := range myMap { }       // key and value, in RANDOM order`,
       {
         heading: 'switch — cleaner than it is elsewhere',
         body: [
-          'Two things differ from C and Java. Cases do not fall through, so you never write `break`. And a `switch` with no expression is just a tidy if/else chain — you will see this everywhere in real Go.',
+          'Two things differ from C and Java. Cases do not fall through, so you never write `break`. And a `switch` with no expression is a tidy if/else chain, which is how most Go code writes three or more branches.',
         ],
         code: {
           label: 'switch.go',
@@ -363,7 +363,7 @@ case age < 20:
 default:
 \tfmt.Println("adult")
 }`,
-          note: 'If you really want fall-through, the keyword is `fallthrough`. You will almost never need it.',
+          note: 'If you do want fall-through, the keyword is `fallthrough`. You will rarely need it.',
         },
       },
       {
@@ -405,8 +405,8 @@ func main() {
       'A `switch` with no expression is the idiomatic if/else chain.',
     ],
     remember:
-      'There is no ternary operator and there never will be. Write the `if`.',
-    task: 'Write FizzBuzz twice — once with if/else, once with an expressionless switch — and keep the one you would rather read.',
+      'There is no ternary operator. Write the `if`.',
+    task: 'Write FizzBuzz twice, once with if/else and once with an expressionless switch, and keep the one you would rather read.',
     exercises: [
       {
         task: 'Write the same loop four ways: three-clause, condition-only, infinite with break, and range.',
@@ -440,14 +440,14 @@ func main() {
         heading: 'What a function is, and what an error is',
         body: [
           'A **function** is a named piece of code you can run from somewhere else, optionally giving it values (**parameters**) and optionally getting values back (**return values**). Breaking a program into functions is how you stop repeating yourself and how you give names to the steps of what you are doing.',
-          'Go functions can return more than one value, and that one feature shapes the whole language. It is how errors travel.',
+          'Go functions can return more than one value, and errors travel that way.',
           'An **error** is anything that stopped a function doing its job: a file that is not there, a network that did not answer, input that made no sense. Many languages use **exceptions**, which jump out of your function to a handler somewhere else. Go does not. An error is an ordinary value that gets returned alongside the result, and you check it right there.',
         ],
       },
       {
         heading: 'Functions can return more than one value',
         body: [
-          'This is not a niche feature in Go. It is the mechanism the whole language is built around, because it is how errors travel.',
+          'The usual shape is a result plus an `error` as the last return value. Almost every function in the standard library that can fail looks like this.',
         ],
         code: {
           label: 'funcs.go',
@@ -496,14 +496,14 @@ fmt.Println(res)`,
       },
       {
         body: [
-          'People coming from Java or Python find this verbose, and they are right — it is more lines than a `try/catch`. Here is what you get for those lines. **You can see every place a function can fail by reading it.** No hidden control flow jumps out of the middle of a function into a handler three files away. When you read Go, what you see is what runs.',
-          'It also forces a decision at every failure. You cannot accidentally ignore an error, because the compiler makes you at least assign it. The lazy escape is `_`, and that stands out in review.',
+          'People coming from Java or Python find this verbose, and they are right: it is more lines than a `try/catch`. What you get for those lines is this. **You can see every place a function can fail by reading it.** No hidden control flow jumps out of the middle of a function into a handler three files away.',
+          'It also pushes you to decide at every failure. Once you write `res, err :=`, the compiler rejects an `err` you never use, and the escape hatch `_` stands out in review. It is not a guarantee: calling `divide(10, 0)` as a bare statement drops both results and still compiles. Linters such as `errcheck` catch that case.',
         ],
       },
       {
         callout: {
           tone: 'warn',
-          text: 'Never write `if err != nil { return err }` and nothing else, six layers deep. Add context: `return fmt.Errorf("loading user %d: %w", id, err)`. **Interfaces and error values** covers what `%w` does. Without context, a production error reads "not found" and you have no idea what was not found.',
+          text: 'Do not pass a bare `return err` up six layers. Add context: `return fmt.Errorf("loading user %d: %w", id, err)`. **Interfaces and error values** covers what `%w` does. Without context, a production error reads "not found" and you have no idea what was not found.',
         },
       },
       {
@@ -629,7 +629,7 @@ func main() {
       {
         task: 'Write a function returning two values, then ignore one with `_` and decide if you would flag that in review.',
         answer:
-          'It compiles silently. Ignoring an error with `_` is the one a reviewer will flag, because nothing marks it as deliberate.',
+          'It compiles with no warning. Ignoring an error with `_` is the case a reviewer should flag, unless a comment says why it is safe.',
       },
       {
         task: 'Write a closure counter, call it three times, then make a second one and confirm they are independent.',
@@ -652,12 +652,12 @@ func main() {
     slug: 'defer',
     title: 'defer',
     navTitle: 'defer',
-    oneLine: 'Cleanup you cannot forget — and the two traps that catch everyone once.',
+    oneLine: 'Cleanup you cannot forget, and the two traps that catch most people once.',
     blocks: [
       {
         heading: 'What defer does',
         body: [
-          '`defer` schedules a function call to run when the surrounding **function** returns — whichever path it returns by, including a panic. You write the cleanup next to the thing that needs cleaning up, and it runs even if a later line returns early.',
+          '`defer` schedules a function call to run when the surrounding **function** returns, by whichever path, including a panic. You write the cleanup next to the thing that needs cleaning up, and it runs even if a later line returns early.',
           'It is how Go does the job that `finally` does elsewhere, without the extra block.',
         ],
         code: {
@@ -672,13 +672,13 @@ func main() {
 \t// ... twenty lines with five different returns ...
 \treturn nil
 }`,
-          note: 'Deferred calls run in reverse order, last one first — like a stack.',
+          note: 'Deferred calls run in reverse order, last one first, like a stack.',
         },
       },
       {
         heading: 'Trap 1 — arguments are evaluated immediately',
         body: [
-          'Only the **call** is deferred. The arguments are worked out the moment you write the `defer` line, which is almost never what people expect the first time.',
+          'Only the **call** is deferred. The arguments are evaluated when the `defer` line runs, which surprises most people the first time.',
         ],
         code: {
           label: 'trap1.go',
@@ -702,7 +702,7 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
         },
       },
       {
-        heading: 'Where defer really earns its place',
+        heading: 'Where defer earns its place',
         body: [
           'A deferred closure can change a **named** return value. That is how a transaction helper knows whether to commit or roll back, and how you turn a panic into an ordinary error.',
         ],
@@ -723,7 +723,7 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
       {
         callout: {
           tone: 'warn',
-          text: 'Always check the error from a deferred `Close` when you have been **writing**. The flush happens inside `Close`, so ignoring it can silently lose the end of a file.',
+          text: 'Check the error from `Close` when you have been **writing**. For buffered writers such as `gzip.Writer`, `Close` is where the last data is flushed. For an `os.File`, a failed earlier write can be reported only at `Close` (on NFS, for example). A plain `defer f.Close()` throws that error away, and the end of the file with it.',
         },
       },
     ],
@@ -731,7 +731,7 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
       '`defer` runs when the **function** returns, not when the block ends. LIFO order.',
       'Arguments are evaluated immediately; only the call happens later.',
       '`defer` inside a loop does not run until the whole function ends.',
-      'A deferred closure can modify a **named** return value — that is how rollback helpers work.',
+      'A deferred closure can modify a **named** return value. Rollback helpers rely on this.',
     ],
     remember:
       'defer puts cleanup next to the thing that needs cleaning up, and runs it on every return path.',
@@ -750,7 +750,7 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
       {
         task: 'Use a deferred closure to turn a panic into a returned error.',
         answer:
-          'The named return value is what makes it work — the closure assigns to `err` after `recover()` catches the panic.',
+          'The named return value makes it work: the closure assigns to `err` after `recover()` catches the panic.',
       },
     ],
     refs: [
@@ -791,7 +791,7 @@ sub := s[1:3]                     // elements 1 and 2`,
       {
         callout: {
           tone: 'warn',
-          text: '`append` may allocate a new array and copy, so it returns a slice. You must write `s = append(s, x)`. Calling `append(s, x)` and ignoring the result is a bug the compiler will catch, and forgetting the assignment on a different variable is one it will not.',
+          text: '`append` may allocate a new array and copy, so it returns a slice. You must write `s = append(s, x)`. A bare `append(s, x)` with the result unused does not compile. `t := append(s, x)` followed by more work on `s` does compile, and is the version that bites.',
         },
       },
       {
@@ -826,7 +826,7 @@ func main() {
 	cp[0] = 1             // data is untouched
 }
 `,
-          note: 'This is the single most common surprise for people new to Go. If two pieces of code hold slices of the same array, they share it.',
+          note: 'This surprises most people new to Go. If two pieces of code hold slices of the same array, they share it.',
         },
       },
       {
@@ -867,13 +867,13 @@ func main() {
 }
 `,
           canRun: true,
-          note: 'The shared backing array, and why map order is random.',
+          note: 'The shared backing array, and sorting map keys to get a stable order.',
         },
       },
     ],
     keyPoints: [
       'An array’s length is part of its type. You will rarely use one directly.',
-      'A slice is a pointer, a length and a capacity. `append` returns a new slice — always reassign.',
+      'A slice is a pointer, a length and a capacity. `append` returns a new slice, so always reassign.',
       'Sub-slices share the backing array, so a write through one is visible through the other.',
       '`copy` when you need independence. `s[a:b:b]` caps the capacity so the next append reallocates.',
     ],
@@ -884,17 +884,17 @@ func main() {
       {
         task: 'Append to a slice inside a function without returning it, and watch the caller see nothing.',
         answer:
-          'The caller sees nothing. `append` may reallocate, and the function got a copy of the slice header — which is why `append` returns a value.',
+          'The caller sees nothing. The function got a copy of the slice header, so the new length never reaches the caller, and `append` may have moved the data to a new array too. That is why `append` returns a value.',
       },
       {
         task: 'Call `append` on a `nil` slice and confirm it works.',
         answer:
-          '`append` works and allocates. Writing to a nil map panics with `assignment to entry in nil map` — a nil slice is usable, a nil map is not.',
+          '`append` works and allocates. Writing to a nil map panics with `assignment to entry in nil map`. A nil slice is ready to append to; a nil map is not ready to write to.',
       },
       {
         task: 'Preallocate with `make([]T, 0, n)` and print `len` and `cap` as you append.',
         answer:
-          '`len` climbs one at a time while `cap` stays at n — no reallocation. Without the capacity, cap roughly doubles as it grows.',
+          '`len` climbs one at a time while `cap` stays at n, so nothing is reallocated. Without the capacity, `cap` doubles while the slice is small, then grows by a smaller factor (about 1.25x) once it passes a few hundred elements.',
       },
     ],
     refs: [
@@ -907,12 +907,12 @@ func main() {
     slug: 'maps',
     title: 'Maps',
     navTitle: 'Maps',
-    oneLine: 'A hash table with two behaviours that surprise everyone once.',
+    oneLine: 'A hash table with two behaviours that surprise most people once.',
     blocks: [
       {
         heading: 'Maps',
         body: [
-          'A map is a hash table. Keys must be comparable — strings, numbers, and structs are fine; slices and maps are not.',
+          'A map is a hash table. Keys must be comparable with `==`. Strings, numbers, pointers, and structs whose fields are all comparable work. Slices, maps and funcs do not.',
         ],
         code: {
           label: 'maps.go',
@@ -941,7 +941,7 @@ for k, v := range m {       // ORDER IS RANDOM, on purpose
       {
         heading: 'The modern stdlib helpers',
         body: [
-          'Since Go 1.21 the `slices` and `maps` packages are in the standard library. Reach for these before writing a loop.',
+          'Go 1.21 added the `slices` and `maps` packages to the standard library, and Go 1.23 added iterators, which is why `maps.Keys` returns one. Reach for these before writing a loop.',
         ],
         code: {
           label: 'stdlib.go',
@@ -958,11 +958,11 @@ maps.Keys(m)                 // an iterator; use slices.Collect to get a slice`,
       'A missing key returns the zero value, not an error. Use `v, ok := m[k]`.',
       'Iteration order is randomised on purpose. Sort the keys when order matters.',
       'Writing to a `nil` map panics; reading from one is fine.',
-      'Maps are not safe for concurrent use — the runtime crashes on purpose if you try.',
+      'Maps are not safe for concurrent use. When the runtime detects a concurrent write, it crashes the program on purpose.',
     ],
     remember:
       'Absent and zero are different things. The two-value form is how you tell them apart.',
-    task: 'Count word frequency with a `map[string]int`, then print the top three — which forces you to move the pairs into a slice.',
+    task: 'Count word frequency with a `map[string]int`, then print the top three. A map cannot be sorted, so you will have to move the pairs into a slice.',
     exercises: [
       {
         task: 'Read a missing key and print the result. Then use the two-value form.',
@@ -977,7 +977,7 @@ maps.Keys(m)                 // an iterator; use slices.Collect to get a slice`,
       {
         task: 'Range over the same map five times and watch the order change.',
         answer:
-          'A different order each run. Go randomises it on purpose so you cannot come to depend on it.',
+          'The order changes between loops, even within one run. Go randomises it on purpose so you cannot come to depend on it.',
       },
     ],
     refs: [
@@ -996,7 +996,7 @@ maps.Keys(m)                 // an iterator; use slices.Collect to get a slice`,
         heading: 'What a struct is',
         body: [
           'A **struct** is a type you define yourself by grouping other values together under one name. A user has an id, a name and an email; rather than passing three separate variables around, you define a `User` type that holds all three, and pass one thing.',
-          'Structs are how you model whatever your program is actually about. Go has no classes, so this is the main tool: a struct for the data, and **methods** — functions attached to that type — for the things it can do.',
+          'Structs are how you model whatever your program is about. Go has no classes, so this is the main tool: a struct for the data, and **methods** (functions attached to that type) for the things it can do.',
         ],
       },
       {
@@ -1027,13 +1027,13 @@ func main() {
 	fmt.Println(u.Name)
 }
 `,
-          note: 'You can write `User{1, "sahdev", "s@x.com"}`, but do not. Adding a field later silently breaks every positional literal.',
+          note: 'You can write `User{1, "sahdev", "s@x.com"}`, but do not. Adding a field later breaks every positional literal, and swapping two fields of the same type (say `Name` and `Email`) silently swaps their values.',
         },
       },
       {
         heading: 'Assignment copies. Always.',
         body: [
-          'Go has no pass-by-reference. Assigning a struct copies it, and passing one to a function copies it too. When you pass a pointer, you are passing the pointer *by value* — the copy just happens to point at the same memory.',
+          'Go has no pass-by-reference. Assigning a struct copies it, and passing one to a function copies it too. When you pass a pointer, you are passing the pointer *by value*. The copy points at the same memory.',
         ],
         code: {
           label: 'copy.go',
@@ -1133,7 +1133,7 @@ func main() {
     keyPoints: [
       'A struct groups fields into one type. Always use field names in a literal.',
       'Assignment and function calls copy a struct. Go has no pass-by-reference.',
-      'Struct tags are metadata read at runtime — they control JSON field names.',
+      'Struct tags are metadata read at runtime through reflection. `encoding/json` uses them for field names.',
       '`json:"-"` is how you make it impossible to leak a password hash.',
     ],
     remember:
@@ -1148,12 +1148,12 @@ func main() {
       {
         task: 'Add `omitempty` to a field and marshal with it both set and empty.',
         answer:
-          'Set, it appears. Empty, the field is gone entirely — not `null`, absent.',
+          'Set, it appears. Empty, the key is left out entirely. It is absent, not `null`.',
       },
       {
         task: 'Make a field lowercase and watch it vanish from the JSON.',
         answer:
-          'It is missing from the JSON with no error. Only exported fields are marshalled — the most common \'the API is broken\' cause.',
+          'It is missing from the JSON with no error. Only exported fields are marshalled, so check the first letter whenever a field is missing from a response.',
       },
     ],
     refs: [
@@ -1166,12 +1166,12 @@ func main() {
     slug: 'methods-and-embedding',
     title: 'Methods, receivers, and embedding',
     navTitle: 'Methods and embedding',
-    oneLine: 'The one rule about receivers that every beginner trips on.',
+    oneLine: 'The rule about receivers that most beginners trip on.',
     blocks: [
       {
         heading: 'Methods are functions with a receiver',
         body: [
-          'A method is just a function with an extra parameter written before the name. That parameter is the receiver, and it comes in two flavours that behave very differently.',
+          'A method is a function with an extra parameter written before the name. That parameter is the receiver, and it comes in two flavours that behave very differently.',
         ],
         code: {
           label: 'methods.go',
@@ -1196,7 +1196,7 @@ fmt.Println(u.Name)       // "new"`,
           headers: ['Use a pointer receiver when', 'Use a value receiver when'],
           rows: [
             ['The method changes the struct', 'The type is small and you never mutate it'],
-            ['The struct is large (copying costs)', 'You want the type usable as a map key'],
+            ['The struct is large (copying costs)', 'Each caller should get its own independent copy'],
             ['The struct contains a `sync.Mutex`', 'The type is naturally a value, like `time.Time`'],
             ['**Any other method already needs one**', ''],
           ],
@@ -1205,19 +1205,19 @@ fmt.Println(u.Name)       // "new"`,
       {
         callout: {
           tone: 'warn',
-          text: 'Be consistent. Mixing value and pointer receivers on one type is a review comment every time, and it causes the confusing "does not implement the interface" error you will meet tomorrow. If one method needs a pointer, make them all pointers.',
+          text: 'Be consistent. Mixing value and pointer receivers on one type draws review comments, and it leads to the confusing "does not implement" error in the **Interfaces** topic: a `T` value only has the value-receiver methods, so it fails any interface that needs a pointer-receiver one. If one method needs a pointer, make them all pointers.',
         },
       },
       {
         callout: {
           tone: 'note',
-          text: 'This is **not** inheritance. An `Admin` is not a `Base` — you cannot pass one where the other is expected, and `Describe` cannot see `Admin.Level`. There are no virtual methods in Go. When you want one type to stand in for another, that is an interface, which is tomorrow.',
+          text: 'This is **not** inheritance. An `Admin` is not a `Base`: you cannot pass one where the other is expected, and `Describe` cannot see `Admin.Level`. There are no virtual methods in Go. When you want one type to stand in for another, you need an interface, which is the next topic.',
         },
       },
     ],
     keyPoints: [
       'A value receiver gets a copy; a pointer receiver can mutate the original.',
-      'Pointer receiver when you mutate, the struct is large, or it holds a mutex — then use it for all methods.',
+      'Pointer receiver when you mutate, the struct is large, or it holds a mutex. Then use it for all methods.',
       'Embedding promotes fields and methods, but it is composition, not inheritance.',
       'An `Admin` is not a `Base`. There are no virtual methods in Go.',
     ],
@@ -1233,12 +1233,12 @@ fmt.Println(u.Name)       // "new"`,
       {
         task: 'Try passing the outer type where the embedded one is expected, and read the error.',
         answer:
-          '`cannot use u (variable of type User) as Base value`. An `Admin` is not a `Base`.',
+          '`cannot use a (variable of type Admin) as Base value`. An `Admin` is not a `Base`. Pass `a.Base` if that is what the function needs.',
       },
       {
         task: 'Mix value and pointer receivers on one type and see what `go vet` says.',
         answer:
-          '`go vet` may stay quiet, but interface satisfaction breaks: only `*T` has both method sets, so `var s Shape = User{}` fails.',
+          '`go vet` may stay quiet, but interface satisfaction breaks. Only `*T` has both kinds of method in its method set, so `var s Shape = User{}` fails when `Shape` needs a pointer-receiver method.',
       },
     ],
     refs: [
@@ -1251,13 +1251,13 @@ fmt.Println(u.Name)       // "new"`,
     slug: 'interfaces',
     title: 'Interfaces',
     navTitle: 'Interfaces',
-    oneLine: 'The one abstraction Go gives you — and it works by accident, on purpose.',
+    oneLine: 'Go’s main abstraction, satisfied without ever being declared.',
     blocks: [
       {
         heading: 'There is no "implements" keyword',
         body: [
           'An interface lists method names. **Any type with those methods satisfies it automatically.** You never declare the relationship. The type does not need to know the interface exists, and the interface can be written years later by someone else.',
-          'That sounds like a small detail. It is the reason `io.Reader` works with files, network connections, buffers, gzip streams, and HTTP bodies — none of which were written with each other in mind.',
+          'That sounds like a small detail. It is the reason `io.Reader` works with files, network connections, buffers, gzip streams, and HTTP bodies, none of which were written with each other in mind.',
         ],
         code: {
           label: 'interface.go',
@@ -1307,17 +1307,17 @@ func main() {
       {
         heading: 'Small interfaces are the good ones',
         body: [
-          '"The bigger the interface, the weaker the abstraction." The best interfaces in the standard library have one method. `io.Reader` has `Read`. `error` has `Error`. `http.Handler` has `ServeHTTP`. A one-method interface is easy to satisfy, so everything plugs into it.',
+          '"The bigger the interface, the weaker the abstraction," as the Go Proverbs put it. The most widely used interfaces in the standard library have one method. `io.Reader` has `Read`. `error` has `Error`. `http.Handler` has `ServeHTTP`. A one-method interface is easy to satisfy, so everything plugs into it.',
         ],
         bullets: [
           '**Accept interfaces, return structs.** Take the narrowest thing you need as a parameter; return the concrete type so callers keep every method.',
-          '**Do not create an interface until you have a second implementation or a test that needs a fake.** A one-implementation interface is pure indirection — it makes you jump through a file to find real code and buys nothing.',
+          '**Do not create an interface until you have a second implementation or a test that needs a fake.** A one-implementation interface is indirection with no payoff: every reader has to jump through it to find the real code.',
         ],
       },
       {
         heading: 'The nil interface trap',
         body: [
-          'This is the most famous bug in Go, and you should meet it now rather than in production. An interface value holds two things: a type, and a value. It is `nil` only when **both** are empty.',
+          'This is one of the best-known Go bugs, and the Go FAQ has an entry for it. Meet it now rather than in production. An interface value holds two things: a type, and a value. It is `nil` only when **both** are empty.',
         ],
         code: {
           label: 'niltrap.go',
@@ -1351,7 +1351,7 @@ func main() {
 	}
 }
 `,
-          note: 'The fix is simple: never return a concrete error variable. Return the literal `nil`.',
+          note: 'The fix: do not return a variable of a concrete error type (here `*MyError`) as an `error`. On success, return the literal `nil`.',
         },
       },
       {
@@ -1412,14 +1412,14 @@ func main() {
 }
 `,
           canRun: true,
-          note: 'Implicit satisfaction, and the nil-interface trap that catches everyone.',
+          note: 'Implicit satisfaction, the nil-interface trap, and `errors.Is` / `errors.As` on a wrapped error.',
         },
       },
     ],
     keyPoints: [
       'Interfaces are satisfied implicitly. Any type with the methods qualifies.',
       'The smaller the interface, the more useful. One method is the ideal.',
-      'Accept interfaces, return structs — and define the interface where it is used.',
+      'Accept interfaces, return structs, and define the interface where it is used.',
       'An interface holding a nil pointer is not nil. Return the literal `nil`.',
     ],
     remember:
@@ -1429,17 +1429,17 @@ func main() {
       {
         task: 'Add `var _ Shape = (*Circle)(nil)` then delete a method and read the compile error.',
         answer:
-          'The compile fails immediately at that line, naming the missing method — a free assertion that costs nothing at runtime.',
+          'The build fails at that line and names the missing method. It is a compile-time check that costs nothing at runtime.',
       },
       {
         task: 'Return a nil `*MyError` as an `error` and check `err != nil`.',
         answer:
-          '`err != nil` is true. The interface has a type but no value, so it is not nil. Return the literal `nil` instead.',
+          '`err != nil` is true. The interface holds a type (`*MyError`) and a nil pointer, so it is not nil. Return the literal `nil` instead.',
       },
       {
         task: 'Write a function taking `io.Writer` and call it with a file, a buffer and `os.Stdout`.',
         answer:
-          'All three work unchanged. One method is why a file, a buffer and stdout are interchangeable.',
+          'All three work unchanged. Each has a `Write` method, and that one method is all `io.Writer` asks for.',
       },
     ],
     refs: [
@@ -1452,7 +1452,7 @@ func main() {
     slug: 'error-values',
     title: 'Error values in depth',
     navTitle: 'Error values',
-    oneLine: 'Sentinels, custom types, wrapping — and handling each error exactly once.',
+    oneLine: 'Sentinels, custom types, wrapping, and handling each error once.',
     blocks: [
       {
         heading: 'error is just an interface',
@@ -1491,7 +1491,7 @@ return errors.Join(errs...)`,
           '`%w` keeps the original error in a chain, so `errors.Is` and `errors.As` can still see it. This is the default choice.',
           '`%v` flattens it to text and breaks the chain. Use it on purpose when you want to *hide* an internal error from the caller.',
           '**Add context, do not restate.** Six layers each saying "failed to" gives you a useless sentence. Say what you were doing, with what: `fmt.Errorf("get user %d: %w", id, err)`.',
-          '**Handle an error once.** Either log it or return it — never both, or one failure fills your logs five times.',
+          '**Handle an error once.** Either log it or return it, not both. Otherwise one failure passing up five layers is logged five times.',
         ],
       },
     ],
@@ -1499,7 +1499,7 @@ return errors.Join(errs...)`,
       '`error` is just an interface with one method. Nothing about it is magic.',
       '`errors.Is` for "which error is this", `errors.As` for "give me its data".',
       '`%w` keeps the chain so `Is` and `As` can see through it. `%v` breaks it, which is sometimes what you want.',
-      'Handle an error once — log it or return it, never both.',
+      'Handle an error once: log it or return it, not both.',
     ],
     remember:
       'Add context, do not restate. Say what you were doing, with what.',
@@ -1508,12 +1508,12 @@ return errors.Join(errs...)`,
       {
         task: 'Wrap an error three layers deep and print the whole chain.',
         answer:
-          'You get one sentence with each layer\'s context. If every layer says \'failed to\', it is useless — say what you were doing, with what.',
+          'You get one line with each layer\'s context, joined by colons. If every layer says \'failed to\', it tells you nothing. Say what you were doing, with what.',
       },
       {
         task: 'Swap one `%w` for `%v` and watch `errors.Is` stop finding it.',
         answer:
-          '`errors.Is` stops finding it. `%v` flattens the error to text and breaks the chain — sometimes what you want, to hide internals.',
+          '`errors.Is` stops finding it. `%v` flattens the error to text and breaks the chain. That is sometimes what you want, to hide internals.',
       },
       {
         task: 'Use `errors.Join` to report three validation failures at once.',
@@ -1537,8 +1537,8 @@ return errors.Join(errs...)`,
         heading: 'Three things you need before writing anything real',
         body: [
           'A **package** is a folder of Go files compiled together. It is how you split a growing program into pieces, and it is the only privacy Go has: capitalised names are visible outside the package, lowercase names are not.',
-          '**JSON** is the text format almost every web API sends and receives. Go can turn a struct into JSON and back again, using the field tags you met with structs — so JSON is really about describing your types accurately.',
-          'A **test** is code that runs your code and fails loudly when the answer is wrong. Testing is part of the Go toolchain, not a library you pick: a file ending `_test.go`, a function starting `Test`, and `go test`. There is nothing to install and nothing to configure.',
+          '**JSON** is the text format most web APIs send and receive. Go turns a struct into JSON and back using the field tags you met with structs, so most JSON work in Go is describing your types accurately.',
+          'A **test** is code that runs your code and fails loudly when the answer is wrong. Testing is part of the Go toolchain, not a library you pick: a file ending `_test.go`, a function starting `Test`, and `go test`.',
         ],
       },
       {
@@ -1582,7 +1582,7 @@ import (
 func main() {
 \tfmt.Println(calc.Add(2, 3))
 }`,
-          note: 'The package name is part of every call, so `calc.Add` reads well and `calc.CalcAdd` does not. Never stutter.',
+          note: 'The package name is part of every call, so `calc.Add` reads well and `calc.CalcAdd` stutters. Do not repeat the package name in what it exports.',
         },
       },
     ],
@@ -1604,7 +1604,7 @@ func main() {
       {
         task: 'Use a blank import (`_ "net/http/pprof"`) and work out what it is for.',
         answer:
-          'It runs the package\'s `init()` and nothing else — here, registering pprof\'s HTTP handlers on the default mux.',
+          'It initialises the package (its package-level variables and `init()`) and gives you no name to call it by. Here, that registers pprof\'s HTTP handlers on the default mux.',
       },
       {
         task: 'Alias an import and use the alias.',
@@ -1622,7 +1622,7 @@ func main() {
     slug: 'json',
     title: 'JSON',
     navTitle: 'JSON',
-    oneLine: 'Turning structs into JSON and back, and the field that silently disappears.',
+    oneLine: 'Turning structs into JSON and back, and the field that disappears with no error.',
     blocks: [
       {
         heading: 'JSON, both directions',
@@ -1640,7 +1640,7 @@ b, err := json.Marshal(u)          // struct -> bytes
 
 var u2 User
 err = json.Unmarshal(b, &u2)       // bytes -> struct. Note the & — it needs a pointer.`,
-          note: 'Unmarshal must be given a pointer, or it has nothing to write into. Forgetting the `&` is a day-one mistake everybody makes once.',
+          note: 'Unmarshal must be given a pointer, or it has nothing to write into. Without the `&` it returns an error at runtime, not a compile error.',
         },
       },
       {
@@ -1704,12 +1704,12 @@ func main() {
       {
         task: 'Decode JSON with an unknown field, then add `DisallowUnknownFields` and try again.',
         answer:
-          'By default it is silently ignored. With `DisallowUnknownFields` you get an error — which turns a client typo into a 400 instead of silence.',
+          'By default the unknown field is ignored with no error. `DisallowUnknownFields` is a method on `json.Decoder`, and with it you get an error, so a client typo becomes a 400 instead of being dropped.',
       },
       {
         task: 'Marshal a `time.Time` and see what format Go chooses.',
         answer:
-          'RFC 3339, like `2026-09-08T16:04:05Z`. That is the format Go picks and it is the one you want in an API.',
+          'RFC 3339, like `2026-09-08T16:04:05Z`, with fractional seconds added when the time has them. It is a sensible default for an API.',
       },
     ],
     refs: [
@@ -1727,7 +1727,7 @@ func main() {
       {
         heading: 'Testing is part of the toolchain',
         body: [
-          'A test file ends in `_test.go` and sits in the same folder as the code it tests. Each test is a function starting with `Test` that takes a `*testing.T`. That is the whole setup — no framework to choose, no config file, no annotations.',
+          'A test file ends in `_test.go` and sits in the same folder as the code it tests. Each test is a function starting with `Test` that takes a `*testing.T`. That is the whole setup: no framework to choose, no config file, no annotations.',
           'You run them with `go test`. It compiles the package plus its tests and reports what failed.',
         ],
       },
@@ -1760,7 +1760,7 @@ func TestAdd(t *testing.T) {
 \t\t})
 \t}
 }`,
-          note: 'The failure message should always include what you got and what you wanted. "failed" tells you nothing at 3am.',
+          note: 'Put the inputs, what you got and what you wanted in every failure message. A bare "failed" makes you rerun the test with print statements to find out why.',
         },
       },
       {
@@ -1777,8 +1777,8 @@ go test -race ./...                # find data races — run this in CI`,
       {
         heading: 'Error versus Fatal',
         bullets: [
-          '`t.Error` records the failure and **keeps going** — use it when the rest of the checks still make sense.',
-          '`t.Fatal` records it and **stops that subtest** — use it when continuing would panic, like after a failed setup.',
+          '`t.Error` records the failure and **keeps going**. Use it when the rest of the checks still make sense.',
+          '`t.Fatal` records it and **stops that subtest**. Use it when continuing would panic, like after a failed setup.',
           '`t.Helper()` inside a helper function makes failures point at the caller, not at the helper.',
           '`t.Cleanup(fn)` runs teardown even when the test fails, and works from inside helpers where `defer` would not.',
         ],
@@ -1786,14 +1786,14 @@ go test -race ./...                # find data races — run this in CI`,
       {
         callout: {
           tone: 'note',
-          text: 'Coverage tells you what is **definitely untested**. It does not tell you what is well tested. Cover your business logic and your error paths, and do not chase 100% — that only produces tests that assert nothing.',
+          text: 'Coverage tells you what is **definitely untested**. It does not tell you what is well tested. Cover your business logic and your error paths, and do not chase 100%. The last few percent tend to be tests written for the number, which assert little.',
         },
       },
     ],
     keyPoints: [
       'A `_test.go` file next to the code, a `TestXxx(t *testing.T)` function, and `go test`.',
       'Table-driven tests are the Go standard: cases as data, one loop, `t.Run` for subtests.',
-      '`go test -run "TestX/case_name"` runs exactly one case.',
+      '`go test -run "TestX/case_name"` runs one case. The pattern is a regular expression.',
       '`t.Error` continues; `t.Fatal` stops that subtest.',
     ],
     remember:
@@ -1808,7 +1808,7 @@ go test -race ./...                # find data races — run this in CI`,
       {
         task: 'Run `go test -v -cover ./...` and read the coverage number.',
         answer:
-          'A percentage per package. It tells you what is definitely untested — not what is well tested.',
+          'A percentage per package. It tells you what is definitely untested, not what is well tested.',
       },
       {
         task: 'Move your test into `package foo_test` and see what breaks.',

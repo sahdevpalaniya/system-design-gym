@@ -22,15 +22,15 @@ export const CLICK_ANALYTICS: Problem = {
 
   slack: {
     budget: 'Ingestion: must not drop. Aggregates: minutes to hours. Historical: rebuild whenever.',
-    headline: 'Minutes, sometimes hours, of slack on every output — and this is the one group where the mistake is failing to use it.',
+    headline: 'Minutes, sometimes hours, of slack on every output. In this group the usual mistake is failing to use it.',
     body: [
-      'Nobody makes a decision on a click count within seconds of the click. A marketing dashboard refreshed every five minutes is fine; a daily report tomorrow morning is fine. That is an enormous amount of slack, and the whole design should be built to spend it: batch aggressively, write in large chunks, and process on cheap capacity.',
-      'The temptation is to build this like a request path — low latency, per-event processing, immediate consistency. That is how pipelines get built ten times more expensive than they need to be. Every second of latency you accept buys you a substantial reduction in cost and complexity, and here you have hundreds of them.',
-      'The one thing with no slack is ingestion itself. The browser fires an event and moves on; if the endpoint is down or slow, that event is gone forever and no retry will recover it. So the accepting edge must be extremely available and extremely cheap, and it must do nothing but accept — every bit of processing pushed behind it.',
+      'Almost no decision depends on a click count within seconds of the click. A marketing dashboard refreshed every five minutes is fine; a daily report tomorrow morning is fine. That is a lot of slack, and the design should spend it: batch aggressively, write in large chunks, and process on cheap capacity.',
+      'The temptation is to build this like a request path: low latency, per-event processing, immediate consistency. That is how pipelines end up many times more expensive than they need to be. Each extra second of accepted latency lets you batch more and pay less, and here you have hundreds of them.',
+      'The one thing with no slack is ingestion itself. The browser fires an event and moves on; if the endpoint is down or slow, that event is gone and no retry will recover it. So the accepting edge must be highly available and cheap, and it must do nothing but accept. All processing goes behind it.',
       'There is usually one narrow real-time carve-out: a "live visitors" counter that must be current within seconds. Treat it as a small separate approximate path, never as a reason to make the main pipeline real-time.',
     ],
     consequence:
-      'Hours of slack means batch everything, and it means a wrong aggregate can be fixed by reprocessing rather than by a scramble — which is why the raw events must be kept. No slack on ingestion means the accepting edge does nothing but write to a durable log.',
+      'Hours of slack means batch everything, and it means a wrong aggregate can be fixed by reprocessing rather than by a scramble. That is why the raw events must be kept. No slack on ingestion means the accepting edge does nothing but write to a durable log.',
   },
 
   stages: [
@@ -38,15 +38,15 @@ export const CLICK_ANALYTICS: Problem = {
       id: 1,
       ask: 'State your assumptions, ask one or two questions that change a box, and propose the scope.',
       nudges: [
-        'Exact counts or approximate? Ask — it changes the storage design.',
-        'What queries will people actually run? That decides the whole shape.',
+        'Exact counts or approximate? Ask, because it changes the storage design.',
+        'What queries will people actually run? That decides the shape.',
         'What happens to an event if ingestion is down?',
       ],
       model: [
-        'Assumptions: a large site, billions of events a day, global. Events are small — a page id, a user or session id, a timestamp, a referrer, a device, maybe 200 bytes. Queries come from dashboards and analysts, so query volume is low but query complexity is high. Two years of retention.',
-        'First question, and it decides the storage design: must counts be exact, or is a small error acceptable? Because exact distinct-user counts require keeping every identifier, while approximate counts fit in kilobytes using a sketch. For revenue and conversions people want exact; for unique visitors, approximate is almost always fine. I will assume exact for money-related counters and approximate for distinct counts, and I would say so explicitly rather than picking one for everything.',
-        'Second question: are the queries known in advance, or ad hoc? Because known queries mean I can precompute aggregates and serve them instantly, while ad hoc analysis means keeping the raw events and running real queries over them. I will assume both — precomputed rollups for dashboards, raw events retained for analysts — because that is what every real system converges on.',
-        'Scope: accept events reliably, aggregate them, and serve both dashboard and ad hoc queries. Out of scope: the tracking client itself, identity resolution across devices, and privacy compliance mechanics — though I will note that retention and deletion requests are a real constraint on any design that keeps raw events for two years.',
+        'Assumptions: a large site, billions of events a day, global. Events are small: a page id, a user or session id, a timestamp, a referrer, a device, maybe 200 bytes. Queries come from dashboards and analysts, so query volume is low but query complexity is high. Two years of retention.',
+        'First question, which decides the storage design: must counts be exact, or is a small error acceptable? Exact distinct-user counts require keeping every identifier, while approximate counts fit in kilobytes using a sketch. For revenue and conversions people want exact; for unique visitors, approximate is usually fine. I will assume exact for money-related counters and approximate for distinct counts, and I would say so explicitly rather than picking one for everything.',
+        'Second question: are the queries known in advance, or ad hoc? Known queries mean I can precompute aggregates and serve them instantly, while ad hoc analysis means keeping the raw events and running real queries over them. I will assume both: precomputed rollups for dashboards, and raw events retained for analysts. Mature pipelines usually end up with both.',
+        'Scope: accept events reliably, aggregate them, and serve both dashboard and ad hoc queries. Out of scope: the tracking client itself, identity resolution across devices, and privacy compliance mechanics. I will note, though, that retention and deletion requests are a real constraint on any design that keeps raw events for two years.',
       ],
       checklist: [
         'Asked exact versus approximate counts and split the answer by metric type',
@@ -63,8 +63,8 @@ export const CLICK_ANALYTICS: Problem = {
         },
       ],
       sayThis:
-        '"One question — exact or approximate? Because unique visitors as an exact count means storing every identifier, and as an approximation it is twelve kilobytes with about two percent error. I would go exact on anything touching money and approximate on distinct counts, and I would rather state that split than apply one answer to everything."',
-      trap: 'Not asking about exactness. It is the question that decides your storage design here, and defaulting to exact for everything makes the system an order of magnitude more expensive for numbers nobody needs precisely.',
+        '"One question: exact or approximate? Unique visitors as an exact count means storing every identifier; as an approximation it is twelve kilobytes with under one percent error. I would go exact on anything touching money and approximate on distinct counts, and I would rather state that split than apply one answer to everything."',
+      trap: 'Not asking about exactness. It is the question that decides your storage design here, and defaulting to exact for everything makes the system far more expensive for numbers that do not need to be precise.',
     },
 
     {
@@ -76,14 +76,14 @@ export const CLICK_ANALYTICS: Problem = {
         'What about events that arrive hours late?',
       ],
       model: [
-        'Actors: the browser or app emitting events, the analyst querying, and the system — which decides what is a duplicate, which time bucket a late event belongs to, when an aggregate is final, and what to do with events that arrive after that.',
+        'Actors: the browser or app emitting events, the analyst querying, and the system, which decides what is a duplicate, which time bucket a late event belongs to, when an aggregate is final, and what to do with events that arrive after that.',
         'The chain: emitted by the client → accepted at the edge → written to a durable log → aggregated into rollups → queried → eventually expired.',
-        'Failure branches. At emitted: the user closes the tab before the request completes, so the event is lost — mitigated by using a mechanism designed to survive page unload and by batching events client-side with a flush on unload. Some loss is unavoidable and should be acknowledged rather than pretended away. At emitted: the client retries after a timeout, producing duplicates — so each event carries a client-generated id, and deduplication happens downstream.',
-        'At accepted: the ingestion endpoint is down. This is the branch with no recovery, which is why that endpoint must do almost nothing — accept, append to a log, return. No validation against a database, no enrichment, no synchronous processing. Anything that can fail is pushed behind the log.',
-        'At aggregated: an event arrives three hours late, from a mobile client that was offline, after its hour has already been aggregated and reported. This is the defining problem of the group. The answer is that aggregates are not final — they are recomputed for a window of time, and dashboards must tolerate yesterday\'s number changing slightly. Alternatively, late events go into a correction bucket. Either way it is a design decision, not an edge case, and pretending events arrive in order is the most common failure here.',
-        'At aggregated: the job has a bug and produces wrong numbers for a week. This is why raw events are retained — you fix the job and reprocess. A pipeline that only keeps aggregates has no way back, and that is the strongest argument for keeping raw data that exists.',
-        'At aggregated: the job runs twice and double-counts, so aggregation must be idempotent — write the result for a time bucket as a replacement, not as an increment. That single choice makes reruns safe and is worth stating.',
-        'At queried: someone asks for two years of data at full granularity and the query takes an hour — needs tiered granularity, with older data stored more coarsely.',
+        'Failure branches. At emitted: the user closes the tab before the request completes, so the event is lost. Mitigate it with a send mechanism designed to survive page unload (such as `navigator.sendBeacon`) and by batching events client-side with a flush on unload. Some loss is unavoidable and should be acknowledged rather than pretended away. At emitted: the client retries after a timeout, producing duplicates. So each event carries a client-generated id, and deduplication happens downstream.',
+        'At accepted: the ingestion endpoint is down. This is the branch with no recovery, which is why that endpoint must do almost nothing: accept, append to a log, return. No validation against a database, no enrichment, no synchronous processing. Anything that can fail is pushed behind the log.',
+        'At aggregated: an event arrives three hours late, from a mobile client that was offline, after its hour has already been aggregated and reported. This is the defining problem of the group. The answer is that aggregates are not final. They are recomputed for a window of time, and dashboards must tolerate yesterday\'s number changing slightly. Alternatively, late events go into a correction bucket. Either way it is a design decision, not an edge case, and assuming events arrive in order is a common failure here.',
+        'At aggregated: the job has a bug and produces wrong numbers for a week. This is why raw events are retained: you fix the job and reprocess. A pipeline that only keeps aggregates has no way back, which is the strongest argument for keeping raw data.',
+        'At aggregated: the job runs twice and double-counts, so aggregation must be idempotent: write the result for a time bucket as a replacement, not as an increment. That choice makes reruns safe and is worth stating.',
+        'At queried: someone asks for two years of data at full granularity and the query takes an hour. That needs tiered granularity, with older data stored more coarsely.',
       ],
       checklist: [
         'Traced the event from browser to expiry',
@@ -102,30 +102,30 @@ export const CLICK_ANALYTICS: Problem = {
       id: 3,
       ask: 'Estimate ingestion rate, storage, and the aggregation reduction. Then finish "So the hard part here is ___."',
       nudges: [
-        'Events per second — and what does that mean in bytes?',
+        'Events per second, and what does that mean in bytes?',
         'Two years of raw events is how much?',
         'How much smaller is the aggregated data? That ratio is the design.',
       ],
       model: [
-        'Ingestion: 10 billion events a day is roughly 115,000 per second average, and traffic is peaky, so call it 350,000 per second at peak. At 200 bytes an event that is 70 MB per second at peak — 2 TB of raw events a day.',
-        'Raw storage: 2 TB a day for two years is about 1.5 PB. Compressed in a columnar format, realistically 150 to 300 TB, since this data compresses extremely well — repeated page ids, referrers and user agents. That is a real cost but an entirely ordinary one for object storage, and it is the price of being able to reprocess.',
-        'Now the reduction, which is the number that changes my mind. Aggregating to hourly counts per page: if the site has a million distinct pages, that is 24 million rows a day instead of 10 billion. About 400 times smaller, and small enough that dashboard queries are instant. Roll up further to daily and it shrinks again.',
-        'That ratio is the entire design. The raw data is expensive to store and impossible to query interactively; the aggregate is cheap and instant. So the system is fundamentally a funnel: keep everything, serve almost nothing from it directly.',
-        'Query volume: perhaps 100 dashboard queries per second against rollups, and a handful of ad hoc analyst queries against raw data. The two have completely different profiles and should not share a system — one wants millisecond lookups on small tables, the other wants to scan terabytes.',
+        'Ingestion: 10 billion events a day is roughly 115,000 per second average, and traffic is peaky, so call it 350,000 per second at peak. At 200 bytes an event that is 70 MB per second at peak, and about 2 TB of raw events a day.',
+        'Raw storage: 2 TB a day for two years is about 1.5 PB. Compressed in a columnar format, realistically 150 to 300 TB, since this data compresses very well (repeated page ids, referrers and user agents). That is a real cost but an ordinary one for object storage, and it is the price of being able to reprocess.',
+        'Now the reduction, which is the number that changes the design. Aggregating to hourly counts per page: if the site has a million distinct pages, that is 24 million rows a day instead of 10 billion. About 400 times smaller, and small enough that dashboard queries are instant. Roll up further to daily and it shrinks again.',
+        'That ratio sets the design. The raw data is expensive to store and too big to query interactively; the aggregate is cheap and instant. So the system is a funnel: keep everything, serve almost nothing from it directly.',
+        'Query volume: perhaps 100 dashboard queries per second against rollups, and a handful of ad hoc analyst queries against raw data. The two have different profiles and should not share a system. One wants millisecond lookups on small tables; the other wants to scan terabytes.',
         'Compute: aggregating 10 billion events a day is a substantial batch job but a well-understood one, and it can run on interruptible capacity because of the slack.',
-        'So the hard part here is ingestion reliability and the sheer volume reduction — accepting 350,000 events a second without losing them, and turning them into something a dashboard can query in milliseconds. Not query latency and not the aggregation logic.',
+        'So the hard part here is ingestion reliability and the volume reduction: accepting 350,000 events a second without losing them, and turning them into something a dashboard can query in milliseconds. Not query latency and not the aggregation logic.',
       ],
       checklist: [
         'Calculated events per second including peak',
         'Calculated raw storage over the retention period, with compression',
-        'Calculated the aggregation reduction ratio — the key number',
+        'Calculated the aggregation reduction ratio, the key number',
         'Separated dashboard query volume from analyst query volume',
         'Noted compute can run on interruptible capacity',
         'Finished the sentence naming ingestion reliability and volume reduction',
       ],
       sayThis:
         '"Ten billion events a day, two terabytes raw, and hourly rollups per page are about four hundred times smaller. That ratio is the design: keep everything so I can reprocess when a job is wrong, but serve every dashboard from the rollup. So the hard part is accepting 350,000 events a second without losing them, and the reduction that follows."',
-      trap: 'Estimating events per second and stopping. The number that shapes the design is the ratio between raw and aggregated volume, because it is what tells you the system is a funnel with two completely different storage tiers.',
+      trap: 'Estimating events per second and stopping. The number that shapes the design is the ratio between raw and aggregated volume, because it tells you the system is a funnel with two very different storage tiers.',
     },
 
     {
@@ -137,13 +137,13 @@ export const CLICK_ANALYTICS: Problem = {
         'How is the aggregation partitioned?',
       ],
       model: [
-        'Ingestion edge: a tiny stateless service behind a CDN or load balancer that validates the shape of the event, appends it to a durable log, and returns. Nothing else — no database lookup, no enrichment, no synchronous processing. Justified directly by the Stage 2 branch: this is the one component whose failure loses data permanently, so it must have almost no dependencies and almost no reasons to fail. It should also be geographically distributed so clients hit a nearby endpoint, since a slow ingestion endpoint means dropped events from clients that navigate away.',
-        'The log: a partitioned, durable, replayable stream — Kafka or an equivalent — partitioned by page id or site id so that events for the same key are ordered and so consumers can parallelise. Justified by 350,000 events a second and by the need to replay when a job is wrong. Retention of a few days on the stream, with everything also archived.',
-        'Archive: raw events written from the stream into object storage in a columnar format, partitioned by date and hour. Justified by the reprocessing requirement and by the compression numbers — this is the cheapest possible place to keep 1.5 PB, and it is the safety net that makes every other part of the pipeline correctable.',
-        'Aggregation: a stream processor computes rolling aggregates into time buckets, writing each bucket as a replacement rather than an increment so a rerun is idempotent. Justified by the Stage 2 double-run branch. Because the slack is hours, this can also be a batch job over the archive — and in practice a combination is common: a fast streaming path for near-real-time dashboards, and a batch recomputation over the archive that produces the authoritative numbers and corrects the streaming ones.',
-        'Serving store: aggregates go into a columnar analytical database, keyed by dimension and time bucket. Small — millions of rows a day rather than billions — so dashboard queries are millisecond lookups. Justified by the 400x reduction: this is what makes the dashboard instant.',
-        'Ad hoc queries run over the archive with a query engine that reads object storage directly. Separate from the dashboard store on purpose, justified by the two profiles being completely different — one wants small fast lookups, the other wants to scan terabytes occasionally.',
-        'Tiered granularity: recent data kept hourly, older data rolled to daily, oldest to weekly. Justified by how people actually query — nobody asks for hourly data from eighteen months ago, and keeping it costs storage and slows queries.',
+        'Ingestion edge: a tiny stateless service behind a CDN or load balancer that validates the shape of the event, appends it to a durable log, and returns. Nothing else: no database lookup, no enrichment, no synchronous processing. Justified by the Stage 2 branch. This is the one component whose failure loses data permanently, so it must have almost no dependencies and almost no reasons to fail. It should also be geographically distributed so clients hit a nearby endpoint, since a slow ingestion endpoint means dropped events from clients that navigate away.',
+        'The log: a partitioned, durable, replayable stream (Kafka or an equivalent), partitioned by page id or site id so that events for the same key are ordered and so consumers can parallelise. Justified by 350,000 events a second and by the need to replay when a job is wrong. Retention of a few days on the stream, with everything also archived.',
+        'Archive: raw events written from the stream into object storage in a columnar format, partitioned by date and hour. Justified by the reprocessing requirement and by the compression numbers. This is the cheapest place to keep 1.5 PB, and it is the safety net that makes every other part of the pipeline correctable.',
+        'Aggregation: a stream processor computes rolling aggregates into time buckets, writing each bucket as a replacement rather than an increment so a rerun is idempotent. Justified by the Stage 2 double-run branch. Because the slack is hours, this can also be a batch job over the archive. In practice a combination is common: a fast streaming path for near-real-time dashboards, and a batch recomputation over the archive that produces the authoritative numbers and corrects the streaming ones.',
+        'Serving store: aggregates go into a columnar analytical database, keyed by dimension and time bucket. It is small (millions of rows a day rather than billions), so dashboard queries are millisecond lookups. Justified by the 400x reduction.',
+        'Ad hoc queries run over the archive with a query engine that reads object storage directly. It is separate from the dashboard store on purpose, because the two query profiles differ: one wants small fast lookups, the other scans terabytes occasionally.',
+        'Tiered granularity: recent data kept hourly, older data rolled to daily, oldest to weekly. Justified by how people query: hourly data from eighteen months ago is rarely needed, and keeping it costs storage and slows queries.',
         'Late events: the streaming aggregation keeps a window open for a period, and the batch recomputation over the archive picks up anything later than that. So the batch path is not redundant, it is the correctness backstop for the streaming path.',
       ],
       checklist: [
@@ -165,14 +165,14 @@ export const CLICK_ANALYTICS: Problem = {
         },
         {
           decision: 'Streaming plus batch',
-          cost: 'Two implementations of the same aggregation logic, which can disagree — a genuine maintenance burden. Buys freshness now and correctness later.',
+          cost: 'Two implementations of the same aggregation logic, which can disagree. That is a real maintenance burden. Buys freshness now and correctness later.',
         },
         {
           decision: 'Tiered granularity',
           cost: 'Old data cannot be re-examined at fine granularity from the rollups, though the archive still has it. Keeps the serving store small and fast.',
         },
       ],
-      trap: 'Putting anything on the ingestion path that can fail — a database write, an enrichment lookup, a validation against another service. That endpoint has one job: accept and append. Everything else belongs behind the log where it can be retried.',
+      trap: 'Putting anything on the ingestion path that can fail: a database write, an enrichment lookup, a validation against another service. That endpoint has one job: accept and append. Everything else belongs behind the log where it can be retried.',
     },
 
     {
@@ -184,14 +184,14 @@ export const CLICK_ANALYTICS: Problem = {
         'The aggregation job had a bug for a week. Now what?',
       ],
       model: [
-        'Hard part one: skew. One page — a homepage, or a viral article — can be a large fraction of all events. Partitioning by page id puts all of it on one partition, which becomes a hot spot that limits the whole pipeline. The fix is to partition by page id plus a random suffix, spreading one page across N partitions, then sum the N partial aggregates at the end. Cost: reads must merge N partials instead of one, and N is a tuning parameter — a two-stage aggregation, which is more machinery than a single pass. This is the same pattern as a sharded counter, applied to a pipeline.',
-        'Detecting skew automatically matters more than handling it, because the hot page changes daily. A count-min sketch over the stream identifies heavy hitters cheaply, and those keys get the suffix treatment automatically. Cost: a small amount of extra processing on every event to maintain the sketch, which is worth it because the alternative is a manual list that is always out of date.',
-        'Hard part two: distinct counts, which are the really hard aggregation. Counts are easily additive — hourly counts sum to a daily count. Distinct users are not: you cannot add yesterday\'s uniques to today\'s, because the same person appears in both. Exact distinct counting over a year means keeping every identifier, which is the raw dataset all over again. HyperLogLog solves it: about 12 KB per sketch with roughly 2% error, and crucially the sketches merge — so an hourly sketch can be combined into a daily one, and daily into yearly, with no loss beyond the inherent error. Cost: about 2% error and no ability to drill into who those users were. For a "unique visitors" dashboard number that is exactly the right trade, and I would still offer exact counts for small, specific segments computed from the raw data on request.',
-        'The wrong-job scenario, which is the real test of whether the design is sound: a bug produced wrong numbers for a week. Because raw events are retained and aggregation is idempotent — writing replacements per time bucket — the fix is to correct the job and reprocess that week, and the rollups are overwritten with correct values. That is only possible because of two decisions made earlier: keep the raw data, and make aggregation replace rather than increment. If either were different, the numbers would be permanently wrong. I would also version the aggregation logic so it is possible to say which version produced a given rollup. Cost: reprocessing consumes significant compute, and dashboards change retroactively, which needs to be communicated rather than surprising someone.',
-        'Backpressure: if consumers fall behind, the log grows. Because the log has finite retention, a consumer down long enough loses data permanently — so the alert must be on consumer lag against retention, not just on lag. Cost: a monitoring requirement that is easy to overlook and expensive to discover.',
-        'Privacy, raised unprompted because two years of raw event data makes it unavoidable: deletion requests must be satisfiable, which is really hard when data is spread across immutable columnar files. Practical answers are storing identifiers in a form that can be broken — a keyed hash where destroying the key destroys the linkage — or periodically rewriting partitions. Cost: real engineering effort and a compaction process, and it is a requirement rather than a nice-to-have.',
-        'Consistency per feature: the real-time dashboard is approximate and a few seconds behind. The hourly rollup is eventually consistent and may be corrected by the batch path. The daily authoritative numbers are exact for counts and approximate for distincts. Financial conversion counts are exact and reconciled against the transactional system, because a marketing number disagreeing with the revenue number is a conversation nobody wants.',
-        'What I would monitor: ingestion success rate — the number that maps directly to lost data — consumer lag against retention, aggregation job duration and success, the count of late events arriving after their window closed, and a reconciliation check between rollups and a recomputation from raw for a sample of buckets.',
+        'Hard part one: skew. One page (a homepage, or a viral article) can be a large fraction of all events. Partitioning by page id puts all of it on one partition, which becomes a hot spot that limits the whole pipeline. The fix is to partition by page id plus a random suffix, spreading one page across N partitions, then sum the N partial aggregates at the end. Cost: reads must merge N partials instead of one, and N is a tuning parameter. It is a two-stage aggregation, which is more machinery than a single pass. This is the same pattern as a sharded counter, applied to a pipeline.',
+        'Detecting skew automatically matters more than handling it, because the hot page changes daily. A count-min sketch over the stream identifies heavy hitters cheaply, and those keys get the suffix treatment automatically. Cost: a small amount of extra processing on every event to maintain the sketch, which is worth it because the alternative is a manual list that goes out of date.',
+        'Hard part two: distinct counts, the genuinely hard aggregation. Counts are additive — hourly counts sum to a daily count. Distinct users are not: you cannot add yesterday\'s uniques to today\'s, because the same person appears in both. Exact distinct counting over a year means keeping every identifier, which is the raw dataset all over again. HyperLogLog solves it: about 12 KB per sketch with under 1% standard error, and the sketches merge. An hourly sketch can be combined into a daily one, and daily into yearly, with no loss beyond the inherent error. Cost: under 1% error and no way to drill into who those users were. For a "unique visitors" dashboard number that is the right trade, and I would still offer exact counts for small, specific segments computed from the raw data on request.',
+        'The wrong-job scenario tests whether the design is sound: a bug produced wrong numbers for a week. Because raw events are retained and aggregation is idempotent (it writes replacements per time bucket), the fix is to correct the job and reprocess that week, and the rollups are overwritten with correct values. That is only possible because of two decisions made earlier: keep the raw data, and make aggregation replace rather than increment. If either were different, the numbers would be permanently wrong. I would also version the aggregation logic so it is possible to say which version produced a given rollup. Cost: reprocessing consumes significant compute, and dashboards change retroactively, which needs to be communicated rather than surprising someone.',
+        'Backpressure: if consumers fall behind, the log grows. Because the log has finite retention, a consumer down long enough loses data permanently. So the alert must be on consumer lag against retention, not just on lag. Cost: a monitoring requirement that is easy to overlook and expensive to discover.',
+        'Privacy, raised unprompted because two years of raw event data makes it unavoidable: deletion requests must be satisfiable, which is hard when data is spread across immutable columnar files. Practical answers are storing identifiers in a form that can be broken (a keyed hash, where destroying the key destroys the linkage) or periodically rewriting partitions. Cost: real engineering effort and a compaction process, and it is a requirement rather than a nice-to-have.',
+        'Consistency per feature: the real-time dashboard is approximate and a few seconds behind. The hourly rollup is eventually consistent and may be corrected by the batch path. The daily authoritative numbers are exact for counts and approximate for distincts. Financial conversion counts are exact and reconciled against the transactional system, because a marketing number that disagrees with the revenue number quickly becomes a credibility problem.',
+        'What I would monitor: ingestion success rate (the number that maps directly to lost data), consumer lag against retention, aggregation job duration and success, the count of late events arriving after their window closed, and a reconciliation check between rollups and a recomputation from raw for a sample of buckets.',
       ],
       checklist: [
         'Handled partition skew with key suffixing and two-stage aggregation',
@@ -212,7 +212,7 @@ export const CLICK_ANALYTICS: Problem = {
         },
         {
           decision: 'HyperLogLog for distinct counts',
-          cost: '~2% error and no drill-down to individuals. Makes a year of unique visitors answerable from kilobytes and mergeable across any window.',
+          cost: 'Under 1% error and no drill-down to individuals. Makes a year of unique visitors answerable from kilobytes and mergeable across any window.',
         },
         {
           decision: 'Reprocessing to correct bad aggregates',
@@ -220,8 +220,8 @@ export const CLICK_ANALYTICS: Problem = {
         },
       ],
       sayThis:
-        '"Aggregation writes a replacement per time bucket rather than incrementing, and I keep the raw events. Cost: hundreds of terabytes of storage and a real privacy surface. What it buys is that when a job turns out to have been wrong for a week — which happens — I fix the code and reprocess, and the numbers become correct. Without those two decisions they would be wrong forever."',
-      trap: 'Treating distinct counts like ordinary counts. Counts add up; uniques do not. If your design sums hourly unique visitors into a daily figure, that number is wrong and it will be wrong in a way nobody notices for months.',
+        '"Aggregation writes a replacement per time bucket rather than incrementing, and I keep the raw events. Cost: hundreds of terabytes of storage and a real privacy surface. What it buys is that when a job turns out to have been wrong for a week, which happens, I fix the code and reprocess, and the numbers become correct. Without those two decisions they would be wrong forever."',
+      trap: 'Treating distinct counts like ordinary counts. Counts add up; uniques do not. If your design sums hourly unique visitors into a daily figure, that number is wrong, and nothing will flag it.',
     },
   ],
 
@@ -229,12 +229,12 @@ export const CLICK_ANALYTICS: Problem = {
     {
       label: "Apache Kafka \u2014 Design",
       href: "https://kafka.apache.org/documentation/#design",
-      note: "The ingestion log every analytics pipeline is built on.",
+      note: "A common choice for the durable, replayable ingestion log.",
     },
   ],
   lifecycle: {
     caption:
-      'An event, browser to dashboard. The late-arrival branch is the one that defines this group, and the "job was wrong" branch is what raw retention exists for.',
+      'An event, browser to dashboard. The late-arrival branch defines this group, and the "job was wrong" branch is what raw retention exists for.',
     states: [
       { id: 'em', label: 'Emitted', by: 'browser' },
       { id: 'acc', label: 'Accepted', by: 'edge' },
@@ -287,21 +287,21 @@ export const CLICK_ANALYTICS: Problem = {
       { label: 'Raw data per day', value: 2000, display: '~2 TB / day', tone: 'muted' },
       { label: 'Hourly rollup rows per day', value: 5, display: '~24M rows — ~400x smaller', tone: 'muted' },
     ],
-    note: 'Raw data is impossible to query interactively and essential to keep. Rollups are instant and 400x smaller. So the hard part is ingestion reliability and that reduction — everything else follows from the funnel shape.',
+    note: 'Raw data is impossible to query interactively and essential to keep. Rollups are instant and 400x smaller. So the hard part is ingestion reliability and that reduction. Everything else follows from the funnel shape.',
   },
 
   flow: {
     scenario: 'queue-drain',
-    caption: 'Producers are faster than consumers, and the log absorbs it. With finite retention, the alert has to be on lag against retention — past that point, data is gone.',
+    caption: 'Producers are faster than consumers, and the log absorbs it. With finite retention, the alert has to be on lag against retention. Past that point, data is gone.',
   },
 
   compare: {
-    caption: 'Streaming or batch. Real pipelines end up with both, and it is worth being able to say why.',
+    caption: 'Streaming or batch. Many pipelines end up with both, and it is worth being able to say why.',
     a: {
       title: 'Stream processing',
       points: [
         'Aggregates are seconds fresh, which is what a live dashboard needs.',
-        'Late events are hard — windows must close eventually, and something arrives after.',
+        'Late events are hard: windows must close eventually, and something arrives after.',
         'A bug produces wrong numbers continuously until you notice.',
         'Runs continuously, so it costs continuously.',
       ],
@@ -310,13 +310,13 @@ export const CLICK_ANALYTICS: Problem = {
       title: 'Batch over the archive',
       points: [
         'Sees all the data including late arrivals, so it is the correct answer.',
-        'Easily rerunnable — fix the code, reprocess, numbers become right.',
+        'Easily rerunnable: fix the code, reprocess, numbers become right.',
         'Hours behind, which is useless for anything live.',
         'Runs on interruptible capacity because nothing is waiting on it.',
       ],
     },
     verdict:
-      'Both, with clear roles: streaming for freshness, batch as the authoritative correction that overwrites it. The cost is maintaining the same aggregation logic twice, which is a genuine burden — but the slack budget in this group makes batch correctness available, and refusing to use it is how pipelines end up permanently and quietly wrong.',
+      'Both, with clear roles: streaming for freshness, batch as the authoritative correction that overwrites it. The cost is maintaining the same aggregation logic twice, which is a real burden. But the slack budget in this group makes batch correctness available, and refusing to use it is how pipelines end up permanently wrong without anyone noticing.',
   },
 
   followUps: [

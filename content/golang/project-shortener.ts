@@ -22,7 +22,7 @@ export const PROJECT_SHORTENER: LangLesson[] = [
       {
         heading: 'The architecture: layered (package by layer)',
         body: [
-          'Each of the three projects in this track uses a **different** architecture on purpose, so you end up having built all three rather than read about them. This one is **layered**, also called package-by-layer or the n-tier layout. It is the most common shape for a small Go service and the one you will meet most often in tutorials and in older codebases.',
+          'Each of the three projects in this track uses a **different** architecture on purpose, so you end up having built all three rather than read about them. This one is **layered**, also called package-by-layer or the n-tier layout. You will meet it often in tutorials and in older codebases.',
           'The idea is simple: a folder for each **kind** of code. Types in one place, storage in another, rules in another, HTTP in another. The folder answers the question *what kind of code is this?*',
         ],
         table: {
@@ -40,7 +40,7 @@ export const PROJECT_SHORTENER: LangLesson[] = [
         heading: 'The one rule',
         body: [
           'Dependencies point **downwards only**: transport → service → store → model. Nothing lower ever imports something higher. `store` must never import `transport`, and `model` must import none of them.',
-          'That rule is the whole value of the layout. It is what lets you test the service without an HTTP server, and swap the store from a map to Postgres in step 5 by writing one file.',
+          'Most of the layout’s value comes from that rule. It lets you test the service without an HTTP server, and swap the store from a map to Postgres in step 5 without touching the service or the handlers.',
         ],
         code: {
           label: 'the direction, as imports',
@@ -69,13 +69,13 @@ model            ->  nothing
       {
         callout: {
           tone: 'note',
-          text: 'Use this when the service does **one thing**. A URL shortener has exactly one concept, so a folder per layer is clear and there is nothing to spread out. Project 2 has three concepts and uses a different layout for exactly that reason.',
+          text: 'Use this when the service does **one thing**. A URL shortener has one concept, so a folder per layer is clear and there is nothing to spread out. Project 2 has three concepts, which is why it uses a different layout.',
         },
       },
       {
         heading: 'Decide the endpoints first',
         body: [
-          'Before writing code, write down what the API accepts and what it returns. Doing this first is not paperwork — it is what stops you rewriting handlers twice.',
+          'Before writing code, write down what the API accepts and what it returns. Doing this first saves you from rewriting handlers when you discover the shape was wrong.',
         ],
         table: {
           headers: ['Method and path', 'What it does', 'Returns'],
@@ -92,7 +92,7 @@ model            ->  nothing
       {
         callout: {
           tone: 'note',
-          text: 'Notice `GET /{code}` sits at the root, not under `/links`. Short URLs should be short — `sho.rt/aB3xK` beats `sho.rt/links/aB3xK`. That decision is worth making now, because it changes how you register routes.',
+          text: '`GET /{code}` sits at the root, not under `/links`, because short URLs should be short: `sho.rt/aB3xK` beats `sho.rt/links/aB3xK`. Make that decision now, because it changes how you register routes.',
         },
       },
       {
@@ -114,27 +114,26 @@ model            ->  nothing
       {
         heading: 'The plan, step by step',
         body: [
-          'You will build this in seven steps. Each step is one or two files, and after every step the program still runs. That matters: if you write all seven files and then run it for the first time, you will be debugging seven things at once.',
+          'You will build this in six steps. Each step adds a few files, and after every step the program still runs. That matters: if you write every file and only then run it for the first time, you will be debugging everything at once.',
         ],
         bullets: [
           '**Step 1** — set up the module and the layered folders, with a health check that works.',
           '**Step 2** — the store, in memory, so you can build the API before touching a database.',
           '**Step 3** — creating a link: validating the URL and generating a code.',
-          '**Step 4** — the redirect, which is the actual product.',
+          '**Step 4** — the redirect, which is the actual product, plus click counting.',
           '**Step 5** — move the store to Postgres. Nothing else changes.',
-          '**Step 6** — list, fetch and delete links, plus click counting.',
-          '**Step 7** — timeouts, shutdown, tests and a Dockerfile.',
+          '**Step 6** — list and delete links, then graceful shutdown, a test and a Dockerfile.',
         ],
       },
       {
         heading: 'What this project does not have',
         body: [
-          'No user accounts, no login, no permissions. Anyone can create a link and anyone can read the list. That is on purpose — this project is about getting one service right end to end. Accounts are project two, and they are much easier to understand once you have already built a working service without them.',
+          'No user accounts, no login, no permissions. Anyone can create a link and anyone can read the list. That is on purpose: this project is about getting one service right end to end. Accounts arrive in project two, and they are easier to understand once you have built a working service without them.',
         ],
       },
     ],
     keyPoints: [
-      'Write the endpoint table and the data table before any Go. It is the cheapest planning you will ever do.',
+      'Write the endpoint table and the data table before any Go. It takes minutes and saves rewrites.',
       'The redirect lives at the root, `GET /{code}`, so the short URLs stay short.',
       'Build it in steps where the program runs after each one, not in one go.',
       'No accounts in this project. One thing at a time.',
@@ -146,12 +145,12 @@ model            ->  nothing
       {
         task: 'Look at a real shortener and see which of these endpoints it has.',
         answer:
-          'Most expose create and redirect publicly and hide the rest behind an account. The redirect is always at the root.',
+          'Most expose create and redirect publicly and hide the rest behind an account. The redirect is usually at the root, to keep the link short.',
       },
       {
         task: 'Work out how many links a 5-character code can hold if you use letters and digits.',
         answer:
-          'With 62 characters, 62^5 ≈ 916 million. Plenty — but collisions start mattering long before you run out, which is why you retry.',
+          'With 62 characters, 62^5 ≈ 916 million. That sounds like plenty, but random codes start colliding long before the space is full (the birthday problem), which is why the code retries.',
       },
       {
         task: 'Decide what should happen if somebody shortens a URL that is already shortened.',
@@ -195,8 +194,8 @@ curl -si -X POST localhost:8080/healthz | head -1   # 405, for free`,
       {
         heading: 'What this step gives you',
         body: [
-          'By the end of this step you will have a running HTTP server that answers one request. No links, no database — just proof that the module, the folders and the server all work.',
-          'This is the right way to start anything. A server you can curl is a foundation. Seven files written blind are a debugging session.',
+          'By the end of this step you will have a running HTTP server that answers one route. No links and no database yet, only proof that the module, the folders and the server work.',
+          'Start every project this way. A server you can curl is a foundation; seven files written blind are a debugging session.',
         ],
       },
       {
@@ -259,7 +258,7 @@ func Error(w http.ResponseWriter, status int, msg string) {
       {
         heading: 'File 2 — cmd/api/main.go',
         body: [
-          'Now the program itself. It registers one route and starts a server. Note the `run() error` shape: `main` does nothing but call it and exit, so every `defer` you add later still runs.',
+          '`main.go` registers one route and starts a server. `main` does nothing but call `run()` and exit on error. `os.Exit` skips deferred calls, so keeping it out of `run` means every `defer` you add there later still runs.',
         ],
         code: {
           label: 'cmd/api/main.go — create this file',
@@ -317,18 +316,18 @@ curl -s localhost:8080/healthz
       {
         callout: {
           tone: 'note',
-          text: 'The timeouts on `http.Server` are here from the first line rather than added later. A server with no timeouts lets one slow client hold a connection open forever, and it is the single most common thing missing from Go tutorials.',
+          text: 'The timeouts on `http.Server` are here from the first line rather than added later. The zero value means no timeout, so a client that sends its headers one byte at a time can hold a connection open for as long as it likes.',
         },
       },
     ],
     keyPoints: [
       'Get one route answering before you build anything else.',
-      '`main` calls `run() error` and exits — one `os.Exit`, so defers keep working.',
+      '`main` calls `run() error` and exits. There is one `os.Exit`, outside `run`, so defers keep working.',
       'Decide your JSON error shape once, in a helper, not in each handler.',
       'Set server timeouts from the start, not as a later fix.',
     ],
     remember:
-      'A server you can curl is a foundation you can build on. Files written before anything runs are just debt.',
+      'A server you can curl is a foundation you can build on. Files written before anything runs are debt.',
     task: 'Create both files, run the server, and get a response from `/healthz`. Then try `POST /healthz` and see that you get 405 without writing any code for it.',
     exercises: [
       {
@@ -339,12 +338,12 @@ curl -s localhost:8080/healthz
       {
         task: 'Remove the `Content-Type` header from `JSON` and see how curl and your browser react.',
         answer:
-          'curl still shows the text, but a browser renders it as plain text and `jq` may still parse it. Clients that check the header will refuse it.',
+          'Go sniffs the body and sends `text/plain; charset=utf-8` instead. curl and `jq` do not care, and a browser shows it as plain text. Clients that check the header will refuse it.',
       },
       {
         task: 'Change the port to come from the `PORT` environment variable, with 8080 as the fallback.',
         answer:
-          '`os.Getenv("PORT")` returns an empty string when unset, so you need the fallback — that is why the `env` helper exists.',
+          '`os.Getenv("PORT")` returns an empty string when unset, so you need the fallback. A small `env(key, fallback)` helper keeps that to one line per setting.',
       },
     ],
     refs: [{ label: 'net/http', href: 'https://pkg.go.dev/net/http' }],
@@ -376,14 +375,14 @@ go test ./internal/store/ -run TestMemory -v`,
         heading: 'Why memory first',
         body: [
           'You could add Postgres now. Doing it later is better: an in-memory store takes ten minutes, has no setup, and lets you get the whole API working before you introduce anything that can fail for reasons unrelated to your code.',
-          'It also forces a useful shape. If the rest of your program only talks to the store through a few methods, swapping those methods for SQL later touches one file — which is exactly what Step 5 does.',
+          'It also forces a useful shape. If the rest of your program only talks to the store through a few methods, swapping them for SQL later touches only the store package. Step 5 does that.',
         ],
       },
       {
-        heading: 'One new folder',
+        heading: 'Two new folders',
         tree: {
           caption:
-            'Three new packages, one per layer. `model` holds the type, `store` keeps it, `service` decides the rules.',
+            'Two new packages, one per layer. `model` holds the type and `store` keeps it. `service`, which decides the rules, gets its first file in step 3.',
           nodes: [
             { depth: 0, name: 'internal', kind: 'dir' },
             { depth: 1, name: 'transport', kind: 'dir', note: 'from step 1' },
@@ -433,7 +432,7 @@ var (
       {
         heading: 'File 2 — internal/store/memory.go',
         body: [
-          'The store keeps links in a map. The mutex is not optional: an HTTP server handles each request in its own goroutine, so two requests can write to that map at the same moment, and Go will crash the process if they do.',
+          'The store keeps links in a map. The mutex is not optional: an HTTP server handles each request in its own goroutine, so two requests can write to that map at the same moment. Go usually detects that and crashes the process.',
         ],
         code: {
           label: 'internal/store/memory.go — create this file',
@@ -484,20 +483,20 @@ func (s *Memory) ByCode(code string) (*model.Link, error) {
         heading: 'Why RWMutex here',
         body: [
           'A **mutex** lets one goroutine at a time into a section of code. An **RWMutex** is a mutex that also allows many readers at once, as long as nobody is writing.',
-          'That fits a URL shortener exactly: every redirect is a read, and creating a link is comparatively rare. Reads outnumbering writes heavily is the one case where `RWMutex` clearly beats a plain `Mutex`.',
+          'That fits a URL shortener: every redirect is a read, and creating a link is comparatively rare. When reads heavily outnumber writes, `RWMutex` lets them run in parallel instead of queueing. For a map lookup this short the gain is small, so measure before you rely on it.',
         ],
       },
       {
         callout: {
           tone: 'warn',
-          text: 'Maps are not safe for use from several goroutines at once. Without the lock, Go detects the clash and crashes on purpose the whole process with "concurrent map writes". It does that instead of quietly corrupting your data, which is the right trade — but it will take your service down.',
+          text: 'Maps are not safe for use from several goroutines at once when any of them writes. Without the lock, the runtime usually detects the clash and deliberately crashes the whole process with "fatal error: concurrent map writes". Crashing beats corrupting your data, but it still takes your service down, and `recover` cannot catch it.',
         },
       },
     ],
     keyPoints: [
       'Build against memory first. A database is a step you take once the API already works.',
-      'Keep the type, its errors and its storage in one package named after the thing.',
-      'Every request is its own goroutine, so shared maps need a lock. Always.',
+      'Keep the type and its errors in `model`, and the code that stores it in `store`.',
+      'Every request runs in its own goroutine, so a shared map needs a lock.',
       '`RWMutex` when reads heavily outnumber writes, which is the case here.',
     ],
     remember:
@@ -512,7 +511,7 @@ func (s *Memory) ByCode(code string) (*model.Link, error) {
       {
         task: 'Remove the mutex, then run `go test -race` with two goroutines writing at once. Read the report.',
         answer:
-          'The race detector prints both stack traces and the exact line. Without it the corruption is invisible until production.',
+          'The race detector prints both goroutines’ stack traces and the lines involved. Without it, the race may only show up as a rare crash under production load.',
       },
       {
         task: 'Change `ByCode` to return `(Link, bool)` instead of an error, then decide which version you prefer and why.',
@@ -553,7 +552,7 @@ curl -s -X POST localhost:8080/links -d 'not json'`,
       {
         heading: 'What this step has to get right',
         body: [
-          'This is the first endpoint that takes input from a stranger, so it is the first place things can go wrong. Three separate jobs: check the URL is really a URL, make a short code that is not already taken, and store the result.',
+          'This is the first endpoint that takes input from a stranger. It has three separate jobs: check the URL is a usable web address, make a short code that is not already taken, and store the result.',
         ],
       },
       {
@@ -588,7 +587,7 @@ func NewCode(n int) (string, error) {
 	return string(b), nil
 }
 `,
-          note: 'crypto/rand matters even here. math/rand is predictable, so somebody could work out the next codes you will hand out and read links before their owners share them.',
+          note: 'crypto/rand matters even here. math/rand is not designed to be unpredictable, so somebody could work out the codes you will hand out next and open links before their owners share them.',
         },
       },
       {
@@ -650,7 +649,7 @@ func (s *Service) Shorten(raw string) (*model.Link, error) {
       {
         heading: 'File 3 — the validation',
         body: [
-          'Validation deserves its own function because it is where you decide what you will accept from the internet. Parsing is not enough — `url.Parse` happily accepts a lot of things that are not usable web addresses.',
+          'Validation deserves its own function because it is where you decide what you will accept from the internet. Parsing is not enough: `url.Parse` accepts plenty of strings that are not usable web addresses, including `hello` and `javascript:alert(1)`.',
         ],
         code: {
           label: 'internal/service/shortener.go — add this below',
@@ -678,7 +677,7 @@ func (s *Service) Shorten(raw string) (*model.Link, error) {
 
 \treturn u.String(), nil
 }`,
-          note: 'Restricting the scheme to http and https is a security check, not tidiness. Without it somebody can store javascript: or file: URLs and your redirect becomes an attack.',
+          note: 'Restricting the scheme to http and https is a security check, not tidiness. Without it somebody can store a javascript: or file: URL, and your short link hands it to whoever clicks.',
         },
       },
       {
@@ -755,7 +754,7 @@ curl -s -X POST localhost:8080/links -d '{"url":"hello"}'
 
 curl -s -X POST localhost:8080/links -d 'not json'
 # {"error":"invalid json"}`,
-          note: 'Test the failures, not just the happy path. Most bugs live in the branches you never ran.',
+          note: 'Test the failures, not only the happy path. Bugs hide in the branches you never ran.',
         },
       },
     ],
@@ -772,7 +771,7 @@ curl -s -X POST localhost:8080/links -d 'not json'
       {
         task: 'Let the client ask for a custom code, and return 409 when it is already taken.',
         answer:
-          'You need the unique constraint to decide, not a SELECT — otherwise two requests can both claim the same custom code.',
+          'You need the unique constraint to decide, not a SELECT. Otherwise two requests can both claim the same custom code.',
       },
       {
         task: 'Write a table-driven test for `validateURL` with eight cases, half of them invalid.',
@@ -782,12 +781,12 @@ curl -s -X POST localhost:8080/links -d 'not json'
       {
         task: 'Work out how many 6-character codes exist with this alphabet, then decide whether 6 is enough.',
         answer:
-          '62^6 ≈ 56 billion. Six is comfortable; four would collide constantly at any real volume.',
+          'This alphabet has 57 characters (62 minus the five look-alikes), so 57^6 ≈ 34 billion. Six is comfortable. Four gives about 10.6 million, and random codes would start clashing after a few thousand links.',
       },
       {
         task: 'Change the retry loop to give up after one attempt and work out how you would notice the problem in production.',
         answer:
-          'It works almost always, then fails randomly under load. You would see it as a rare 500 with no pattern — the worst kind of bug.',
+          'It works almost every time, then fails at random, more often as the table fills. You would see a rare 500 with no pattern, which is one of the hardest kinds of bug to trace.',
       },
     ],
     refs: [
@@ -827,7 +826,7 @@ go run -race ./cmd/api`,
         heading: 'What a redirect is',
         body: [
           'A **redirect** is an HTTP response that says "what you asked for is somewhere else, go here instead". The browser then requests the new address on its own. You send a status code in the 300s and a `Location` header holding the destination.',
-          'This is the endpoint that matters. Creating links happens rarely; redirects happen constantly, and they are what the user actually experiences.',
+          'Creating a link happens once. A redirect happens every time someone clicks, and it is what users experience, so this is the endpoint to keep fast.',
         ],
       },
       {
@@ -844,7 +843,7 @@ go run -race ./cmd/api`,
       {
         callout: {
           tone: 'warn',
-          text: 'A 301 is cached aggressively, sometimes for months. If you send 301 and the user later deletes or edits that link, browsers that saw the first response may keep going to the old destination. Send **302** unless you are certain the link can never change — and if you want click counts at all, you have to send 302, because a cached 301 never reaches your server to be counted.',
+          text: 'Browsers cache a 301 aggressively, often with no expiry unless you send cache headers. If you send 301 and the user later deletes or edits that link, browsers that saw the first response may keep going to the old destination. Send **302** unless you are certain the link can never change. If you want click counts, you need 302 anyway: a cached 301 never reaches your server to be counted.',
         },
       },
       {
@@ -869,7 +868,7 @@ go run -race ./cmd/api`,
       {
         heading: 'Register it carefully',
         body: [
-          'The redirect lives at the root, which means its pattern is very broad. Go 1.22 picks the **most specific** matching pattern, so your other routes still win — but it is worth understanding rather than trusting.',
+          'The redirect lives at the root, which means its pattern is very broad. Since Go 1.22, `ServeMux` picks the **most specific** matching pattern, so your other routes still win. Understand why rather than trusting it.',
         ],
         code: {
           label: 'internal/transport/web/handler.go — update Routes',
@@ -885,8 +884,8 @@ go run -race ./cmd/api`,
       {
         heading: 'Counting clicks without slowing the redirect',
         body: [
-          'You want to know how often a link is used. The obvious way — write to the store, then redirect — makes every visitor wait for a write they do not care about.',
-          'Instead, send the redirect immediately and count in the background. The user gets the fastest possible response, and a lost count during a crash costs you nothing.',
+          'You want to know how often a link is used. The obvious way is to write to the store and then redirect, which makes every visitor wait for a write they do not care about.',
+          'Instead, send the redirect immediately and count in the background. The visitor gets the response sooner. The cost is that a crash can lose a few counts, which is acceptable for a click counter.',
         ],
         code: {
           label: 'internal/service/shortener.go — add this',
@@ -907,17 +906,17 @@ go run -race ./cmd/api`,
 
 \treturn l, nil
 }`,
-          note: 'The comment about ctx is the real lesson here. A request context is cancelled when the handler returns, so passing it into background work cancels that work immediately.',
+          note: 'The comment about ctx is the lesson here. The server cancels a request’s context when the handler returns, so background work that uses it is cancelled almost at once. If `Incr` later takes a context, give it `context.WithoutCancel(ctx)` (Go 1.21+) or a fresh one with its own timeout.',
         },
       },
       {
         callout: {
           tone: 'note',
-          text: 'One unbounded goroutine per redirect is fine at small scale and is not fine at large scale — a traffic spike starts a goroutine per visitor. The grown-up version sends counts to a buffered channel that a single worker drains, so the number of goroutines stays fixed. Build the simple one now; you will meet the pattern again in the concurrency topics.',
+          text: 'One goroutine per redirect is fine at small scale. Under a traffic spike it starts a goroutine per visitor, each holding a database connection or waiting for one. The sturdier version sends codes to a buffered channel that a single worker drains, so the goroutine count stays fixed. Build the simple one now; the pattern comes back in the concurrency topics.',
         },
       },
       {
-        heading: 'Test it in a real browser',
+        heading: 'Test it',
         code: {
           label: 'terminal',
           src: `CODE=$(curl -s -X POST localhost:8080/links -d '{"url":"https://go.dev"}' | jq -r .code)
@@ -933,13 +932,13 @@ curl -si localhost:8080/nope | head -1                                # 404`,
     ],
     keyPoints: [
       'A redirect is a 3xx status plus a `Location` header. `http.Redirect` writes both.',
-      'Use 302, not 301 — a cached 301 never reaches your server again, so you cannot count or change it.',
+      'Use 302, not 301. A cached 301 never reaches your server again, so you cannot count it or change it.',
       'Go 1.22 matches the most specific pattern, so `GET /links` beats `GET /{code}`.',
       'Do the click count in the background, and do not give that goroutine the request context.',
     ],
     remember:
       'The redirect is the hot path. Everything the visitor does not need should happen after the response, not before it.',
-    task: 'Add the redirect and click counting. Open a short link in a real browser, then check the count went up. Then try it with a 301 and see it cached — you will need a private window to test it again.',
+    task: 'Add the redirect and click counting. Open a short link in a real browser, then check the count went up. Then try it with a 301 and see it cached. You will need a private window to test it again.',
     exercises: [
       {
         task: 'Return a proper HTML 404 page for a missing code instead of plain text.',
@@ -949,17 +948,17 @@ curl -si localhost:8080/nope | head -1                                # 404`,
       {
         task: 'Replace the goroutine-per-redirect with one buffered channel and a single worker draining it.',
         answer:
-          'The goroutine count stays flat under load instead of growing with traffic. That is the difference between the simple and the grown-up version.',
+          'The goroutine count stays flat under load instead of growing with traffic. The new decision: when the channel is full, do you block the redirect or drop the count?',
       },
       {
         task: 'Log the referrer and user agent alongside each click, then decide whether you should be storing that.',
         answer:
-          'It works, and it is personal data. Decide on purpose whether you need it and for how long — that decision is the exercise.',
+          'It works, and it is personal data. Decide on purpose whether you need it and how long you keep it. That decision is the exercise.',
       },
       {
         task: 'Measure how much slower the redirect gets if you count synchronously instead.',
         answer:
-          'Typically an extra database round trip per visit, so a few milliseconds each. Small until it is your busiest endpoint.',
+          'One extra database round trip per visit: well under a millisecond against a local database, a few milliseconds across a network. Small, until it is your busiest endpoint.',
       },
     ],
     refs: [
@@ -972,7 +971,7 @@ curl -si localhost:8080/nope | head -1                                # 404`,
     slug: 'shortener-step-5-postgres',
     title: 'Step 5 — Swap memory for Postgres',
     navTitle: 'Step 5 — Postgres',
-    oneLine: 'The same API, now with data that survives a restart. One new file.',
+    oneLine: 'The same API, now with data that survives a restart. The service and handlers do not change.',
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1006,8 +1005,8 @@ curl -s -X POST localhost:8080/links -d '{"url":"https://go.dev"}' | jq -r .code
       {
         heading: 'Why this step is small',
         body: [
-          'Everything above the store talks to it through the `Store` interface: `Save`, `ByCode`, `Incr`. So switching to a database means writing one new type with those three methods and changing one line in `main.go`.',
-          'That is the payoff for building against an interface in step 2. If the handler had written SQL directly, this step would touch every file.',
+          'Everything above the store talks to it through the `Store` interface: `Save`, `ByCode`, `Incr`. So switching to a database means writing one new type with those three methods and changing how `main.go` builds the store.',
+          'That is the payoff for building against an interface in step 2. If the handler had written SQL directly, this step would touch every handler.',
         ],
       },
       {
@@ -1019,7 +1018,7 @@ curl -s -X POST localhost:8080/links -d '{"url":"https://go.dev"}' | jq -r .code
   -p 5432:5432 postgres:16
 
 go get github.com/jackc/pgx/v5/stdlib`,
-          note: 'database/sql is the standard library interface. pgx is the driver that actually speaks to Postgres. One dependency, not a framework.',
+          note: 'database/sql is the standard library interface; pgx is the driver that speaks the Postgres protocol. One dependency, not a framework.',
         },
       },
       {
@@ -1035,7 +1034,7 @@ go get github.com/jackc/pgx/v5/stdlib`,
 );
 
 CREATE INDEX ON links (created_at DESC);   -- for the list endpoint`,
-          note: 'The UNIQUE constraint on code is the real protection against two links getting the same code. Checking in Go first would still leave a gap between the check and the insert.',
+          note: 'The UNIQUE constraint on code is what actually stops two links getting the same code. Checking in Go first would still leave a gap between the check and the insert.',
         },
       },
       {
@@ -1063,7 +1062,7 @@ func Open(dsn string) (*sql.DB, error) {
 
 \treturn db, db.Ping()                  // Ping is what actually connects
 }`,
-          note: 'sql.DB is a pool, not a connection. Create one for the whole program and share it — it is safe to use from many goroutines.',
+          note: 'sql.DB is a pool, not a connection. Create one for the whole program and share it; it is safe to use from many goroutines.',
         },
       },
       {
@@ -1115,7 +1114,7 @@ func (s *Postgres) Incr(code string) error {
         },
       },
       {
-        heading: 'Change one line',
+        heading: 'Change how main builds the store',
         code: {
           label: 'cmd/api/main.go',
           src: `// before
@@ -1135,19 +1134,19 @@ st := store.NewPostgres(db)      // everything below is unchanged`,
       {
         callout: {
           tone: 'warn',
-          text: 'Never build SQL with `fmt.Sprintf` or `+`. Use `$1`, `$2` placeholders, always. That is your entire defence against SQL injection, and there is no case where it is acceptable to skip it — not even for values you think you generated yourself.',
+          text: 'Never put values into SQL with `fmt.Sprintf` or `+`. Pass every value as a `$1`, `$2` placeholder, even values you think you generated yourself. Placeholders are your main defence against SQL injection. Table and column names cannot be placeholders, so if one has to vary, pick it from a fixed list in your code.',
         },
       },
     ],
     keyPoints: [
-      'Building against an interface means changing storage touches one file and one line.',
+      'Building against an interface means changing storage touches the store package and `main.go`, nothing else.',
       '`sql.DB` is a pool. Create one, share it, and always set `SetMaxOpenConns`.',
       'Translate `sql.ErrNoRows` into your own `ErrNotFound` at the storage boundary.',
       'Let the database do `clicks = clicks + 1`, and let the UNIQUE constraint catch clashes.',
     ],
     remember:
       'Placeholders always. A query built by joining strings is a security bug waiting for the right input.',
-    task: 'Run the migration, write the three files, change the one line in main, and confirm every endpoint behaves exactly as it did with the memory store. Then restart the server and check your links are still there.',
+    task: 'Run the migration, write the three files, change how main builds the store, and confirm every endpoint behaves exactly as it did with the memory store. Then restart the server and check your links are still there.',
     exercises: [
       {
         task: 'Stop Postgres and hit the API. You should get a clean 500 and a useful log line, not a panic.',
@@ -1157,7 +1156,7 @@ st := store.NewPostgres(db)      // everything below is unchanged`,
       {
         task: 'Run `EXPLAIN ANALYZE` on the redirect lookup and confirm it uses the unique index on `code`.',
         answer:
-          '`Index Scan using links_code_key`. If you see `Seq Scan`, the unique index is missing.',
+          '`Index Scan using links_code_key` once the table has more than a handful of rows. On a nearly empty table Postgres may choose `Seq Scan` because reading one page is cheaper, so insert a few thousand rows and run `ANALYZE` before you decide the index is missing.',
       },
       {
         task: 'Insert a duplicate code by hand in psql and watch the constraint reject it.',
@@ -1167,7 +1166,7 @@ st := store.NewPostgres(db)      // everything below is unchanged`,
       {
         task: 'Try rewriting one query with `fmt.Sprintf` and then shorten a URL containing a quote. Then put it back.',
         answer:
-          'A URL containing a quote breaks the query or changes its meaning. That is SQL injection in one line — then put the placeholder back.',
+          'A URL containing a quote breaks the query or changes its meaning. That is SQL injection in one line. Put the placeholder back.',
       },
     ],
     refs: [
@@ -1207,13 +1206,13 @@ go run golang.org/x/vuln/cmd/govulncheck@latest ./...`,
       {
         heading: 'What is left',
         body: [
-          'Three endpoints and the production edges. None of it is new material — it is applying what the earlier steps set up, which is what finishing a project usually looks like.',
+          'Three endpoints and the production edges. None of it is new material. It applies what the earlier steps set up, which is what finishing a project usually looks like.',
         ],
       },
       {
         heading: 'Listing, with pagination from the start',
         body: [
-          '**Pagination** means returning a page of results rather than all of them. Add it now, not later: an endpoint with no limit works with fifty rows and takes the server down at fifty thousand.',
+          '**Pagination** means returning a page of results rather than all of them. Add it now, not later. With no limit, an endpoint that returns fifty rows today returns fifty thousand next year, all built into one response in memory. Adding a limit at that point breaks clients that expect everything.',
         ],
         code: {
           label: 'internal/store/postgres.go — add this method',
@@ -1287,7 +1286,7 @@ func intParam(r *http.Request, key string, def, min, max int) int {
       {
         heading: 'Graceful shutdown',
         body: [
-          '**Graceful shutdown** means: when told to stop, refuse new connections but let the requests already running finish. Every deployment restarts your service, so this runs far more often than you would expect.',
+          '**Graceful shutdown** means: when told to stop, refuse new connections but let the requests already running finish. Every deployment stops the old process, so this code runs on every release.',
         ],
         code: {
           label: 'cmd/api/main.go — replace srv.ListenAndServe()',
@@ -1362,7 +1361,7 @@ COPY --from=build /api /api
 USER nonroot:nonroot
 EXPOSE 8080
 ENTRYPOINT ["/api"]`,
-          note: 'About 15MB, with no shell and no package manager. CGO_ENABLED=0 is what makes that possible.',
+          note: 'Around 15MB, with no shell and no package manager. CGO_ENABLED=0 produces a static binary, which is what lets it run on an image with no C library.',
         },
       },
       {
@@ -1400,7 +1399,7 @@ ENTRYPOINT ["/api"]`,
       {
         callout: {
           tone: 'ok',
-          text: 'You have built a working service: validated input, generated ids, a database, a hot path that stays fast, graceful shutdown, a test and a container. Project two adds the one thing missing here — knowing who the user is.',
+          text: 'You have built a working service: validated input, generated ids, a database, a hot path that stays fast, graceful shutdown, a test and a container. Project two adds what is missing here: knowing who the user is.',
         },
       },
     ],
@@ -1408,7 +1407,7 @@ ENTRYPOINT ["/api"]`,
       'Paginate every list endpoint from the first version, and clamp the limit rather than rejecting it.',
       'Check `RowsAffected` so deleting nothing returns 404 instead of pretending it worked.',
       '`srv.Shutdown(ctx)` drains in-flight requests. Buffer the signal channel or you lose the signal.',
-      '`CGO_ENABLED=0` plus a distroless base gives a ~15MB image with nothing to attack.',
+      '`CGO_ENABLED=0` plus a distroless base gives a ~15MB image with no shell or package manager for an attacker to use.',
     ],
     remember:
       'Finishing a project is pagination, shutdown, a test and a container. None of it is hard, and skipping it is what separates a demo from a service.',
@@ -1432,7 +1431,7 @@ ENTRYPOINT ["/api"]`,
       {
         task: 'Load-test the redirect with `hey` and see how many requests a second one instance handles.',
         answer:
-          'A single Go instance handles thousands a second here — the database lookup is the limit, not Go.',
+          'Expect thousands a second from one instance. Profile it and the database lookup, not Go, is usually the limit.',
       },
     ],
     refs: [

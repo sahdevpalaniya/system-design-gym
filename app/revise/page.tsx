@@ -211,8 +211,8 @@ export default function RevisePage() {
         <section className="mb-8 border-t pt-8">
           <h2 className="mb-1 text-[1rem] font-semibold">Problems worth running again</h2>
           <p className="mb-4 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-            You worked through these a while ago. A design you did once in March is a design you have
-            forgotten by May — and the second attempt is where it sticks.
+            You worked through these a while ago. A design you did once in March is mostly
+            forgotten by May, and the second attempt is where it sticks.
           </p>
           <div className="flex flex-wrap gap-2">
             {staleProblems.map((slug) => {

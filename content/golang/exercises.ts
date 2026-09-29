@@ -10,7 +10,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Make a second file in the same folder, put a function in it, and call that function from `main`. Notice you did not need an import.',
       answer:
-        'It compiles and runs. Files in the same folder are the same package, so there is nothing to import — that is what a package is.',
+        'It compiles and runs. Files in the same folder are the same package, so there is nothing to import. That is what a package is.',
     },
     {
       task: 'Delete the `fmt` import while still calling `fmt.Println`, and read the error. Then add an unused variable and read that one too.',
@@ -20,14 +20,14 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Build with `go build -o app .` and run `./app`. Copy the binary to another folder and run it there — nothing else needed.',
       answer:
-        'The binary runs anywhere with the same OS and architecture. No Go installation needed on the target machine — that is the single-static-binary payoff.',
+        'The binary runs anywhere with the same OS and architecture. No Go installation is needed on the target machine. That is the payoff of a single static binary.',
     },
   ],
   operators: [
     {
       task: 'Write a permissions integer with three `iota` bit flags. Set two, test one, clear one, and print with `%b` after each step.',
       answer:
-        '`0001` after one flag, `0011` after two, `0001` again after clearing. Each flag owns one bit.',
+        'With flags 1, 2 and 4: `1` after the first, `11` after the second, then `1` or `10` after clearing one, depending on which. Each flag owns one bit. `%b` does not pad, so use `%03b` to see all three.',
     },
     {
       task: 'Prove short-circuiting to yourself: `f() && g()` where both print. Then swap `f` to return false and see that `g` never runs.',
@@ -37,14 +37,14 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Compare two structs with `==`. Add a slice field and watch it stop compiling.',
       answer:
-        'It works while every field is comparable. Add a slice and it stops compiling — use `slices.Equal` or `reflect.DeepEqual` in tests.',
+        'It works while every field is comparable. Add a slice and it stops compiling. Use `slices.Equal` or `reflect.DeepEqual` in tests.',
     },
   ],
   'functions-and-errors': [
     {
       task: 'Write `divide(a, b float64) (float64, error)` and call it both ways: once handling the error, once ignoring it with `_`. Notice which one you would flag in review.',
       answer:
-        'Ignoring the error compiles fine and silently returns 0. That is exactly what a reviewer would flag.',
+        'Ignoring the error compiles fine, and the caller carries on with 0 as if it were a real result. That is what a reviewer would flag.',
     },
     {
       task: 'Write a closure counter, call it three times, then create a second one and confirm they count independently.',
@@ -66,7 +66,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Reverse a string with `[]byte`, then with `[]rune`, and test both on `"héllo"`.',
       answer:
-        'The byte version corrupts the accent into two broken characters. The rune version is correct — that is the whole lesson.',
+        'The byte version corrupts the accent into two broken characters. The rune version is correct.',
     },
     {
       task: 'Concatenate 100,000 strings with `+=`, time it, then do it with `strings.Builder` and compare.',
@@ -76,7 +76,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Parse `"Bearer abc123"` with `strings.CutPrefix`. Then do the same with `Index` arithmetic and decide which you trust more.',
       answer:
-        '`CutPrefix` returns the rest plus a bool. The `Index` version needs arithmetic and gets edge cases wrong when the prefix is missing.',
+        '`CutPrefix` returns the rest plus a bool. The `Index` version needs arithmetic and is easy to get wrong when the prefix is missing.',
     },
   ],
   'pointers-and-memory': [
@@ -93,7 +93,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Return `&x` from a function where `x` is a local. Confirm it works, then read why with `go build -gcflags=-m`.',
       answer:
-        'It works. `-gcflags=-m` says `moved to heap: x` — the compiler proved it outlives the frame, so there is no dangling pointer.',
+        'It works. `-gcflags=-m` says `moved to heap: x`. Escape analysis saw that it outlives the frame and put it on the heap, so there is no dangling pointer.',
     },
   ],
   'http-server': [
@@ -115,7 +115,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Swap `http.ListenAndServe` for a configured `http.Server` with all four timeouts.',
       answer:
-        'Behaviour is the same until a client goes slow — then the timeouts cut it off instead of holding the connection open forever.',
+        'Behaviour is the same until a client goes slow. Then the timeouts cut it off instead of holding the connection open forever.',
     },
   ],
   'middleware-and-shutdown': [
@@ -144,7 +144,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Open a pool without calling `SetMaxOpenConns`, fire 500 concurrent requests, and watch the connection count in `pg_stat_activity`.',
       answer:
-        'Connection count climbs past what Postgres allows and you start getting `too many clients already`. The pool limit is your backpressure.',
+        'The connection count climbs until Postgres hits `max_connections`, and you start getting `too many clients already`. The pool limit is your backpressure.',
     },
     {
       task: 'Forget `defer rows.Close()` in a loop and watch the pool run out of connections.',
@@ -166,17 +166,17 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Build the N+1 version with 200 rows and time it. Then do it with one JOIN and time that.',
       answer:
-        'Roughly 201 round trips versus 1. Expect tens of milliseconds against one, and it grows with the row count.',
+        'Roughly 201 round trips versus 1. On a local database that is typically tens of milliseconds against one or two, and the gap grows with row count and network latency.',
     },
     {
       task: 'Run `EXPLAIN ANALYZE` on your list query before and after adding the index.',
       answer:
-        '`Seq Scan` plus a sort before; `Index Scan` after. The execution time usually drops by an order of magnitude.',
+        'On a table with enough rows: `Seq Scan` plus a sort before, `Index Scan` after. On a tiny table the planner may keep the sequential scan, because it is genuinely cheaper there.',
     },
     {
       task: 'Write a two-statement transaction where the second fails, and confirm the first was rolled back.',
       answer:
-        'Neither change is there. Until `Commit` runs, nothing you did inside the transaction is real.',
+        'Neither change is there. Until `Commit` runs, nothing you did inside the transaction is visible to anyone else.',
     },
     {
       task: 'Open a transaction and sleep for 30 seconds inside it while running other requests. Watch the pool.',
@@ -188,7 +188,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Open two Go projects on GitHub and work out which of the three layouts each one uses.',
       answer:
-        'Most small tools are flat; most services group by domain or by layer. Layer-based ones are usually the older codebases.',
+        'Most small tools are flat; most services group by domain or by layer.',
     },
     {
       task: 'Take a small program you have written and lay it out all three ways. Notice how much work the layer version creates for one small change.',
@@ -203,14 +203,14 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Find a `utils` package in a project you have worked on and write down what is actually in it. That list is the packages it should have been.',
       answer:
-        'The list is almost always three or four unrelated groups — which are the packages it should have been.',
+        'The list usually splits into a few unrelated groups. Those are the packages it should have been.',
     },
   ],
   'folder-structure-crud': [
     {
       task: 'Try importing `net/http` inside your repository package. Nothing stops you — which is why the rule has to be a habit.',
       answer:
-        'It compiles. Nothing enforces the layer rule — which is exactly why it has to be a habit and why reviewers look for it.',
+        'It compiles. Nothing enforces the layer rule, which is why it has to be a habit and why reviewers look for it.',
     },
     {
       task: 'Move a package under `internal/` and try to import it from a second module. Read the compiler error.',
@@ -225,7 +225,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Add a second domain package alongside `user/` and wire it in `run()` — no new frameworks, just more lines.',
       answer:
-        'One new folder, four files, and three lines in `run()`. Nothing else changes — that is the test of a good layout.',
+        'One new folder, four files, and three lines in `run()`. Nothing else changes. That is the test of a good layout.',
     },
   ],
   'errors-and-logging': [
@@ -259,7 +259,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Call your API from a browser page on a different origin, with and without the origin allowlisted.',
       answer:
-        'Without the allowlist the browser blocks it and logs a CORS error; with it the call goes through. Note curl is unaffected — CORS is a browser rule.',
+        'Without the allowlist the browser blocks it and logs a CORS error; with it the call goes through. Note that curl is unaffected: CORS is enforced by browsers.',
     },
     {
       task: 'Confirm `X-Content-Type-Options: nosniff` is present on an attachment download.',
@@ -269,24 +269,24 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Make an outbound call with `http.DefaultClient` against a server that never responds, and watch it hang forever.',
       answer:
-        'It hangs forever — `DefaultClient` has no timeout. That one line is why you always build your own client.',
+        'It hangs forever: `DefaultClient` has no timeout. That is why you build your own `http.Client` with `Timeout` set.',
     },
   ],
   'docker-and-deployment': [
     {
       task: 'Build the image and check its size with `docker images`. Then build without `CGO_ENABLED=0` and see what breaks.',
       answer:
-        'About 15MB with `CGO_ENABLED=0`. Without it the build fails on a distroless base, because the binary now needs libc.',
+        'About 15MB with `CGO_ENABLED=0`. Without it the build still succeeds, but if the binary uses `net` or `os/user` it links against libc and fails to start on `distroless/static` or `scratch` with a confusing `no such file or directory`.',
     },
     {
       task: 'Try `docker exec -it <container> sh` on the distroless image. There is no shell — that is the point.',
       answer:
-        '`exec failed: no such file or directory`. There is no shell — which is the point, and also why you debug with logs.',
+        'An error ending in `executable file not found in $PATH`. There is no shell, which is the point, and also why you debug with logs.',
     },
     {
-      task: 'Set `GOMEMLIMIT` far too low and watch the GC work harder in the logs.',
+      task: 'Set `GOMEMLIMIT` far too low and watch the GC work harder with `GODEBUG=gctrace=1`.',
       answer:
-        'The GC runs far more often and CPU rises. Too high and the container gets OOM-killed instead — it is a real trade-off.',
+        'The GC runs far more often and CPU rises. Set it too high and the container gets OOM-killed instead, so it is a real trade-off.',
     },
     {
       task: 'Cross-compile for `GOOS=darwin GOARCH=arm64` and confirm the binary is produced with no extra toolchain.',
@@ -298,12 +298,12 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Clone your own repo into a fresh folder and follow your README exactly. Every improvised step is a README bug.',
       answer:
-        'Every step you have to improvise is a missing line in the README. Most people find two or three.',
+        'Each improvised step is a missing line in the README. Fix them in the order you hit them.',
     },
     {
       task: 'Add `/v1` to the paths and find every place you hardcoded a URL.',
       answer:
-        'Usually the tests, the requests file and the README. That is exactly why versioning early is cheaper than versioning later.',
+        'Usually the tests, the requests file and the README. That is why versioning early is cheaper than versioning later.',
     },
     {
       task: 'Write `requests.http` and run the whole flow — register, login, create, upload — from your editor.',
@@ -330,24 +330,24 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Delete one thing: a helper used once, a commented-out block, or an interface with one implementation.',
       answer:
-        'Every codebase this age has one. Deleting is the highest-value edit you will make in this step.',
+        'Most codebases have one. A deletion is often the highest-value edit in this step.',
     },
   ],
   'profiling-and-shipping': [
     {
       task: 'Load-test with `hey -n 2000 -c 50` and capture a 30-second CPU profile while it runs.',
       answer:
-        'The flame graph is dominated by the database call, not by your Go code. That is the normal result and the point of measuring.',
+        'Expect a fairly flat graph: JSON encoding, syscalls, the driver. A CPU profile only counts time on the CPU, so time spent waiting for the database does not appear in it. Low CPU with slow requests means the wait is elsewhere, usually the database.',
     },
     {
-      task: 'Find your slowest endpoint in the flame graph and fix one real thing.',
+      task: 'Find your slowest endpoint from request latency (not the CPU profile) and fix one real thing.',
       answer:
-        'Almost always an N+1 or a missing index. Fix the query before you touch any Go.',
+        'Most often an N+1 or a missing index. Fix the query before you touch any Go.',
     },
     {
       task: 'Benchmark that fix with `-count=10` and `benchstat`. If the difference is not significant, revert it.',
       answer:
-        'If benchstat says the difference is not significant, it is not a speed-up — revert it and keep the simpler code.',
+        'If benchstat says the difference is not significant, it is not a speed-up: revert it and keep the simpler code.',
     },
     {
       task: 'Watch the goroutine count during the load test and confirm it returns to baseline afterwards.',
@@ -369,7 +369,7 @@ export const EXERCISES: Record<string, (string | LangExercise)[]> = {
     {
       task: 'Set up a `go.work` linking two local modules and edit one from the other with no `replace` directive.',
       answer:
-        'Imports resolve to your local copy with no `replace` line in `go.mod`. Add `go.work` to `.gitignore` — it is local state.',
+        'Imports resolve to your local copy with no `replace` line in `go.mod`. Add `go.work` to `.gitignore`: it is local state.',
     },
     {
       task: 'Add the four CI commands to a Makefile target called `check` and run it before your next push.',

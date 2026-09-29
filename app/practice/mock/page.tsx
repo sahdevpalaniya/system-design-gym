@@ -77,7 +77,7 @@ function MockInner() {
               <a href="/archetypes" className="underline">
                 interviewers page
               </a>{' '}
-              to change which follow-ups fire and how the rubric is weighted.
+              to change which follow-ups fire and which part of the rubric the interviewer leans on.
             </p>
           )}
 

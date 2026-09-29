@@ -12,8 +12,8 @@ export const PRODUCTION: LangLesson[] = [
         heading: 'Two jobs that are easy to confuse',
         body: [
           'When something goes wrong, two different audiences need two different things. The **client** needs a status code and a short, safe message. **You** need the full detail, so you can find out what happened.',
-          'Mixing these up causes real problems. Returning the internal error to the client leaks your table names, your file paths, and sometimes your data. Returning nothing to yourself means you cannot debug it at all.',
-          '**Structured logging** is the second half. A log line written as a sentence cannot be searched. A log line written as key-and-value pairs can be filtered, counted and alerted on. Go has `log/slog` in the standard library for exactly this.',
+          'Mixing them up hurts both ways. Returning the internal error to the client leaks your table names, your file paths, and sometimes your data. Logging nothing means you cannot debug it at all.',
+          '**Structured logging** is the second half. A log line written as a sentence is hard to filter. A log line written as key-and-value pairs can be filtered by `status=500`, counted and alerted on.',
         ],
       },
       {
@@ -62,7 +62,7 @@ export const PRODUCTION: LangLesson[] = [
       {
         heading: 'Structured logging with log/slog',
         body: [
-          'A log line as a sentence cannot be searched. A log line as key–value pairs can be filtered, grouped, and alerted on. `log/slog` has been in the standard library since 1.21, so there is no reason to add a logging dependency.',
+          '`log/slog` has been in the standard library since Go 1.21. For most services it removes the need for a logging dependency.',
         ],
         code: {
           label: 'internal/logging/logging.go',
@@ -111,9 +111,9 @@ slog.Info("request completed",
       {
         heading: 'Logging rules',
         bullets: [
-          '**Never log** passwords, tokens, whole `Authorization` headers, card numbers, or full request bodies. This is the easiest way to turn a log store into a breach.',
-          '**Handle an error once.** Log it or return it, never both — or one failure appears five times at five layers.',
-          '**Log at the boundary**, where you decide the HTTP status. That is the place with the full context.',
+          '**Never log** passwords, tokens, whole `Authorization` headers, card numbers, or full request bodies. Anyone who can read the logs can then read those too.',
+          '**Handle an error once.** Log it or return it, not both, or one failure appears five times at five layers.',
+          '**Log at the boundary**, where you decide the HTTP status. That is where you have the request id and the wrapped error chain.',
           '**Levels mean something.** `Error` means a human should look. If everything is `Error`, nothing is.',
           '**A cancelled request is not a 500.** `context.Canceled` means the client left. Do not page anyone for it.',
         ],
@@ -163,15 +163,15 @@ mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
       {
         heading: 'Three defences, and what each one stops',
         body: [
-          '**Rate limiting** caps how often one client can call you. Without it, somebody can try ten thousand passwords a minute against your login page. It is the cheapest security you will add all month.',
-          '**CORS** — Cross-Origin Resource Sharing — is how your API tells a browser which websites are allowed to call it from a page. It is worth being clear that CORS is enforced *by the browser*, not by your server, so it protects your users from other sites. It is not a lock on your API.',
-          '**Security headers** are short instructions to the browser: do not guess this file\'s type, do not let this page be framed, always use HTTPS. Three lines of code that close real classes of attack.',
+          '**Rate limiting** caps how often one client can call you. Without it, a script can try thousands of passwords a minute against your login.',
+          '**CORS** (Cross-Origin Resource Sharing) is how your API tells a browser which other websites may call it from their pages and read the response. The browser enforces it, not your server. curl, a script or another server ignores it completely, so it is not a lock on your API.',
+          '**Security headers** are short instructions to the browser: do not guess this file\'s type, do not let this page be framed, always use HTTPS. A few lines of code that close whole classes of attack.',
         ],
       },
       {
         heading: 'Rate limiting',
         body: [
-          'Without a limit, an attacker can try ten thousand passwords a minute against your login. `golang.org/x/time/rate` gives you a token-bucket limiter: a steady refill rate, plus a burst allowance for normal bursty traffic.',
+          '`golang.org/x/time/rate` gives you a token-bucket limiter. Each client has a bucket that refills at a steady rate, and the bucket size is the burst: how many requests can arrive at once before the limit applies.',
         ],
         code: {
           label: 'internal/middleware/ratelimit.go',
@@ -228,13 +228,13 @@ mux.Handle("POST /auth/register", authLimit(http.HandlerFunc(h.register)))`,
       {
         callout: {
           tone: 'warn',
-          text: 'Behind a proxy or load balancer, `r.RemoteAddr` is the **proxy’s** IP, so everyone shares one bucket. Use the real client IP from a header your proxy sets — and only trust that header if your own proxy sets it, or anyone can spoof their way past the limit.',
+          text: 'Behind a proxy or load balancer, `r.RemoteAddr` is the **proxy’s** IP, so everyone shares one bucket. Use the real client IP from a header your proxy sets, such as `X-Forwarded-For`. Only trust that header when your own proxy sets it, or anyone can send a fake one and get a fresh bucket.',
         },
       },
       {
         heading: 'CORS',
         body: [
-          'A browser refuses to let a page on one origin call your API on another, unless your API says it is allowed. CORS is that permission, and it is enforced *by the browser* — it is not a server-side security control.',
+          'A browser refuses to let a page on one origin call your API on another, unless your API says it is allowed. CORS is that permission.',
         ],
         code: {
           label: 'internal/middleware/cors.go',
@@ -283,7 +283,7 @@ mux.Handle("POST /auth/register", authLimit(http.HandlerFunc(h.register)))`,
 \t\tnext.ServeHTTP(w, r)
 \t})
 }`,
-          note: 'nosniff is the one that matters most for an API that serves uploads — it stops a browser guessing that your file is HTML and running it.',
+          note: 'For an API that serves uploads, nosniff matters most. It stops a browser deciding that an uploaded file is HTML and running its scripts.',
         },
       },
       {
@@ -311,11 +311,11 @@ defer io.Copy(io.Discard, resp.Body)   // drain it, or the connection is not reu
     keyPoints: [
       'Token-bucket rate limiting per IP, and a much tighter limit on the auth routes.',
       'CORS is an explicit allowlist, never `*` on an authenticated API. Set `Vary: Origin`.',
-      '`nosniff`, `DENY`, and HSTS are three lines that close real attack classes.',
+      '`nosniff`, `DENY`, and HSTS each close a whole class of attack in one line.',
       'Never use `http.DefaultClient`. Set a timeout, reuse one client, drain every body.',
     ],
     remember:
-      'Rate limiting is what turns "an attacker gets unlimited guesses" into "an attacker gets twelve a minute". It is the cheapest security you will add all month.',
+      'Rate limiting turns "an attacker gets unlimited guesses" into "an attacker gets twelve a minute". For a few dozen lines, few defences buy more.',
     task: 'Add the rate limiter, CORS, and security headers. Then hammer your login with a curl loop and confirm you start getting 429s with a Retry-After.',
     refs: [
       { label: 'Go Security Best Practices', href: 'https://go.dev/doc/security/best-practices' },
@@ -327,14 +327,14 @@ defer io.Copy(io.Discard, resp.Body)   // drain it, or the connection is not reu
     slug: 'docker-and-deployment',
     title: 'Docker, Makefile, and running in a container',
     navTitle: 'Docker and deployment',
-    oneLine: 'A 15MB image with no operating system in it — and the two settings that stop Go misbehaving in Kubernetes.',
+    oneLine: 'A 15MB image with no operating system in it, and the two runtime settings a container needs.',
     blocks: [
       {
         heading: 'What containers give a Go program',
         body: [
           'A **container** is your program packaged with everything it needs to run, so it behaves the same on your machine, a colleague\'s, and a server. An **image** is the packaged thing; a container is a running copy of it.',
-          'Go is unusually well suited to this. Because `go build` produces a single file with no runtime to install, the image can contain almost nothing but your binary — no operating system, no shell, no package manager. That makes it small and gives an attacker very little to work with.',
-          'The catch is that Go\'s runtime reads the *machine* for its settings, not the container\'s limits. Two environment variables fix that, and they are the most common cause of Go services misbehaving in production.',
+          'Go is unusually well suited to this. Because `go build` produces a single file with no runtime to install, the image can contain almost nothing but your binary: no operating system, no shell, no package manager. That makes it small and gives an attacker very little to work with.',
+          'The catch is that Go\'s runtime does not know the container\'s memory limit, and before Go 1.25 it did not know the CPU limit either. Two environment variables fix that.',
         ],
       },
       {
@@ -355,20 +355,20 @@ COPY --from=build /api /api
 USER nonroot:nonroot
 EXPOSE 8080
 ENTRYPOINT ["/api"]`,
-          note: 'The final image has no shell, no package manager, and no libc — just your binary. About 15MB, and almost nothing to attack.',
+          note: 'The final image has no shell, no package manager, and no libc: just your binary, CA certificates and time zone data. About 15MB, and almost nothing to attack.',
         },
       },
       {
         heading: 'Why each flag is there',
         bullets: [
-          '**`CGO_ENABLED=0`** — a fully static binary with no libc dependency. This is what lets you use a distroless base at all, and what makes cross-compiling work.',
-          '**`-ldflags="-s -w"`** — strips the symbol table and DWARF debug info. A few MB smaller, and you keep stack traces.',
-          '**Copy `go.mod` first** — Docker caches that layer, so changing a `.go` file does not re-download every dependency.',
-          '**`USER nonroot`** — if something does go wrong, it does not go wrong as root.',
+          '**`CGO_ENABLED=0`**: a fully static binary with no libc dependency. This is what lets you use the `static` distroless base, and it keeps cross-compiling free of a C toolchain.',
+          '**`-ldflags="-s -w"`**: strips the symbol table and DWARF debug info. A few MB smaller. Panic stack traces still show function names; you lose debugger support.',
+          '**Copy `go.mod` first**: Docker caches that layer, so changing a `.go` file does not re-download every dependency.',
+          '**`USER nonroot`**: if something does go wrong, it does not go wrong as root.',
         ],
       },
       {
-        heading: 'The two container settings everybody gets wrong',
+        heading: 'The two runtime settings a container needs',
         code: {
           label: 'env',
           src: `GOMEMLIMIT=450MiB      # ~90% of the container's memory limit
@@ -377,8 +377,8 @@ GOMAXPROCS=2           # match the CPU limit, not the host's core count`,
       },
       {
         body: [
-          '**`GOMEMLIMIT`** is a soft ceiling on the heap. Without it, Go’s garbage collector happily grows the heap until the OOM killer takes your process. This is the single most common Go-in-Kubernetes production problem.',
-          '**`GOMAXPROCS`** defaults to the *machine’s* CPU count, not your container’s limit. On a 64-core node with a 2-core quota, Go runs 64 schedulers fighting over 2 cores of CPU time, and your responses get very slow. Set it explicitly, or use `go.uber.org/automaxprocs`.',
+          '**`GOMEMLIMIT`** is a soft limit on the memory the Go runtime uses. Without it, the garbage collector sizes the heap from `GOGC` alone: by default it lets the heap grow to about twice the live data before collecting. A service with 300MB of live data can then reach 600MB, and a 512MB container gets OOM-killed. With the limit set, the collector works harder as memory approaches it.',
+          '**`GOMAXPROCS`** used to default to the *machine’s* CPU count, not your container’s limit. On a 64-core node with a 2-core quota, Go runs Go code on up to 64 threads at once, uses up the quota early in each period, and the kernel throttles the container until the next one. Latency spikes. Since Go 1.25, on Linux, the runtime reads the cgroup CPU limit itself, but only when your `go.mod` says `go 1.25` or later. On older versions, set it explicitly or use `go.uber.org/automaxprocs`.',
         ],
       },
       {
@@ -419,12 +419,12 @@ volumes:
 
 run:     ; go run ./cmd/api
 test:    ; go test -race -cover ./...
-lint:    ; go vet ./... && gofmt -l .
+lint:    ; go vet ./... && test -z "$$(gofmt -l .)"
 build:   ; CGO_ENABLED=0 go build -ldflags="-s -w" -o bin/api ./cmd/api
 up:      ; docker compose up -d
 down:    ; docker compose down
 migrate: ; migrate -path migrations -database "$(DATABASE_URL)" up
-check:   ; gofmt -l . && go vet ./... && go test -race ./... && govulncheck ./...`,
+check:   ; test -z "$$(gofmt -l .)" && go vet ./... && go test -race ./... && govulncheck ./...`,
         },
       },
       {
@@ -444,7 +444,7 @@ go tool dist list      # everything Go can target`,
     keyPoints: [
       'Multi-stage build + distroless gives a ~15MB image with no shell and no package manager.',
       '`CGO_ENABLED=0` is what makes both the static binary and cross-compiling work.',
-      'Set `GOMEMLIMIT` and `GOMAXPROCS` in every container. They fix most Go-in-k8s complaints.',
+      'Set `GOMEMLIMIT` in every container, and `GOMAXPROCS` too before Go 1.25. They prevent OOM kills and CPU throttling.',
       'A Makefile with `check` gives you one command to run before every push.',
     ],
     remember:
@@ -463,16 +463,16 @@ go tool dist list      # everything Go can target`,
     oneLine: 'The difference between "it works on my machine" and something another person can run.',
     blocks: [
       {
-        heading: 'What polish actually means',
+        heading: 'What polish means',
         body: [
           'The API works. **Polish** is the difference between something that works on your machine and something another person can clone, run and use without asking you a single question.',
-          'It is the least exciting hour of the project and the one most visible to anybody else — an interviewer, a teammate, or you in six months. Everything in this topic is small, and none of it is optional if somebody else will touch the code.',
+          'It is the least exciting hour of the project and the one most visible to anybody else: an interviewer, a teammate, or you in six months. Everything in this topic is small, and all of it matters once somebody else will touch the code.',
         ],
       },
       {
         heading: 'Version your API from the start',
         body: [
-          'Put `/v1` in the path now. It costs nothing today and is nearly impossible to retrofit once clients exist.',
+          'Put `/v1` in the path now. It costs nothing today. Once clients exist, adding it means moving every URL they call.',
         ],
         code: {
           label: 'routes.go',
@@ -558,13 +558,13 @@ Authorization: Bearer {{login.response.body.access_token}}
 Content-Type: application/json
 
 {"title":"First note","body":"hello"}`,
-          note: 'VS Code REST Client and JetBrains both run this file directly. It lives in the repo, so it never goes stale like a Postman export.',
+          note: 'VS Code REST Client and JetBrains both run this file directly. It lives in the repo, so it changes in the same commits as the API it calls, unlike a Postman export on someone\'s laptop.',
         },
       },
       {
         heading: 'Doc comments',
         body: [
-          'A doc comment starts with the name of the thing it describes. `go doc` and pkg.go.dev read them, so they are the documentation, not a decoration.',
+          'A doc comment starts with the name of the thing it describes. `go doc` and pkg.go.dev display them, so they are the documentation people will read.',
         ],
         code: {
           label: 'doc.go',
@@ -583,7 +583,7 @@ type Service struct{ repo Repository }`,
         heading: 'Final touches worth the hour',
         bullets: [
           '`.env.example` committed with every key and no values. `.env` in `.gitignore`.',
-          'A `/livez` and `/readyz` that actually reflect reality.',
+          'A `/livez` and `/readyz` that check what they claim to check.',
           '`X-Request-ID` echoed on every response, so a user can quote it in a bug report.',
           'One consistent error shape everywhere: `{"error": "..."}`, never a bare string sometimes and an object other times.',
           'Consistent JSON casing. Pick `snake_case` and use it in every tag.',
@@ -592,13 +592,13 @@ type Service struct{ repo Repository }`,
     ],
     keyPoints: [
       'Version the path now. Retrofitting `/v1` after clients exist is painful.',
-      'A seed command and a `requests.http` file save you time every single day.',
+      'A seed command and a `requests.http` file save you time every time you reset the database.',
       'The README is the run instructions plus the endpoint list. Nothing else is needed.',
       'Doc comments start with the identifier name and explain why, not what.',
     ],
     remember:
       'The project is finished when someone else can clone it and have it running in three commands.',
-    task: 'Add `/v1`, the seed command, the README, and `requests.http`. Then clone your own repo into a fresh folder and follow your own instructions exactly — every step you have to improvise is a bug in the README.',
+    task: 'Add `/v1`, the seed command, the README, and `requests.http`. Then clone your own repo into a fresh folder and follow your own instructions word for word. Every step you have to improvise is a bug in the README.',
     refs: [
       { label: 'Go Doc Comments', href: 'https://go.dev/doc/comment' },
       { label: 'Effective Go — Commentary', href: 'https://go.dev/doc/effective_go#commentary' },
@@ -609,13 +609,13 @@ type Service struct{ repo Repository }`,
     slug: 'hardening-and-review',
     title: 'Harden it, and review your own code',
     navTitle: 'Harden and review',
-    oneLine: 'Read what you wrote as if a stranger wrote it, hunting for the eight things that actually break.',
+    oneLine: 'Read what you wrote as if a stranger wrote it, hunting for eight things that commonly break.',
     blocks: [
       {
         heading: 'What hardening and self-review mean',
         body: [
-          '**Hardening** is going back over working code specifically looking for ways it could be misused — not bugs that show up in normal use, but the request nobody sends by accident.',
-          '**Self-review** is reading your own diff as if a stranger wrote it and you have to maintain it. It is uncomfortable and it is the highest-value hour in this whole track, because everything you find now is something you do not find in production.',
+          '**Hardening** is going back over working code looking for ways it could be misused. You are not hunting bugs that show up in normal use, but the request nobody sends by accident.',
+          '**Self-review** is reading your own diff as if a stranger wrote it and you have to maintain it. It is uncomfortable, and it pays well: every problem you find now is one you do not find in production.',
           'The order matters: run the automated tools first, so you spend your own attention on what they cannot see.',
         ],
       },
@@ -629,7 +629,7 @@ go test -race ./...     # must be green
 govulncheck ./...       # must be clean
 
 go install golang.org/x/vuln/cmd/govulncheck@latest`,
-          note: 'govulncheck is official and low-noise because it only reports vulnerabilities in code you actually call, not every CVE in your dependency tree.',
+          note: 'govulncheck is the Go team\'s tool. It is low-noise because it reports vulnerabilities in functions your code can reach, not every CVE in your dependency tree.',
         },
       },
       {
@@ -693,7 +693,7 @@ curl -i -F "file=@evil.jpg" -H "Authorization: Bearer $T" \\
 
 # SQL injection attempt
 curl -i "localhost:8080/v1/notes?limit=1;DROP%20TABLE%20users"`,
-          note: 'Expected: 401, 404, 401, 413, 415, and a clean 200 with a clamped limit. If any of those surprises you, you found today’s work.',
+          note: 'Expected: 401, 404, 401, 413, 415, and for the last one a 400 (or your default limit, if you fall back on bad input). Never a 500. If any of those surprises you, you found today’s work.',
         },
       },
       {
@@ -712,14 +712,14 @@ curl -i "localhost:8080/v1/notes?limit=1;DROP%20TABLE%20users"`,
       {
         callout: {
           tone: 'note',
-          text: 'Then delete something. Every codebase this age has a helper used once, a commented-out block, an interface with one implementation, or a config value that never changes. Deleting is the highest-value edit you will make today.',
+          text: 'Then delete something. Most codebases this age have a helper used once, a commented-out block, an interface with one implementation, or a config value that never changes. Each one you delete is code nobody has to read again.',
         },
       },
     ],
     keyPoints: [
-      'gofmt, vet, race, govulncheck — all four clean before you review anything by hand.',
+      'gofmt, vet, race, govulncheck: all four clean before you review anything by hand.',
       'The eight-point sweep: auth, scope, SQL, errors, goroutines, logs, limits, paths.',
-      'Attack your own API with curl. Six requests find most of what is wrong.',
+      'Attack your own API with curl. Six requests cover the most common holes.',
       'Delete something. Unused abstraction is the debt you are least likely to notice.',
     ],
     remember:
@@ -740,9 +740,9 @@ curl -i "localhost:8080/v1/notes?limit=1;DROP%20TABLE%20users"`,
       {
         heading: 'What profiling is',
         body: [
-          '**Profiling** is measuring where a running program actually spends its time and memory. It matters because people are consistently wrong about this. The line you are sure is slow usually is not, and the real cost is somewhere you never looked.',
-          'Go ships a profiler in the standard library, called **pprof**. You expose it on a port, take a sample while the program is under load, and it shows you exactly which functions the time went into.',
-          'The rule that follows from this: correct first, clear second, fast only when a measurement says so. An optimisation without a profile is usually a guess that costs you readability and buys nothing.',
+          '**Profiling** is measuring where a running program spends its time and memory. It matters because intuition about this is often wrong. The line you are sure is slow may not be, and the cost is somewhere you never looked.',
+          'Go ships a profiler in the standard library, called **pprof**. You expose it on a port, take a sample while the program is under load, and it shows which functions the time went into.',
+          'The rule that follows from this: correct first, clear second, fast only when a measurement says so. An optimisation without a profile is a guess, and it often costs readability and buys nothing.',
         ],
       },
       {
@@ -756,7 +756,7 @@ go func() {
 \tslog.Info("pprof on localhost:6060")
 \thttp.ListenAndServe("localhost:6060", nil)
 }()`,
-          note: 'Exposing /debug/pprof publicly leaks your source paths and lets anyone stall your process with a 30-second CPU profile. Bind it to localhost.',
+          note: 'Exposing /debug/pprof publicly leaks your function names and source paths, and lets anyone start CPU profiles and heap dumps that cost you CPU. Bind it to localhost.',
         },
       },
       {
@@ -773,11 +773,11 @@ go tool pprof -http=:8081 http://localhost:6060/debug/pprof/allocs
 
 # goroutine leak hunting: does this number grow and never come back down?
 curl -s 'localhost:6060/debug/pprof/goroutine?debug=1' | head -1`,
-          note: 'In the web UI: Flame Graph for where time goes, Top for the honest list, Source for line by line.',
+          note: 'In the web UI: Flame Graph for where time goes, Top for a ranked list of functions, Source for line by line.',
         },
       },
       {
-        heading: 'What actually costs you, in order',
+        heading: 'What usually costs you, roughly in order',
         table: {
           headers: ['#', 'Cause', 'Typical fix'],
           rows: [
@@ -786,14 +786,14 @@ curl -s 'localhost:6060/debug/pprof/goroutine?debug=1' | head -1`,
             ['3', 'a pool that is too small, or unlimited', '`SetMaxOpenConns`'],
             ['4', 'unbounded concurrency', 'a semaphore, or `errgroup.SetLimit`'],
             ['5', 'allocations in a hot loop', 'preallocate with `make([]T, 0, n)`'],
-            ['6', 'everything else', 'you will almost certainly never need to touch it'],
+            ['6', 'everything else', 'rarely worth touching until a profile points at it'],
           ],
         },
       },
       {
         callout: {
           tone: 'warn',
-          text: 'Do not do these on faith: `sync.Pool`, `unsafe` string conversion, replacing a mutex with atomics, hand-rolled lock-free structures. Each needs a benchmark proving it *in your workload*, or it is just damage to readability.',
+          text: 'Do not do these on faith: `sync.Pool`, `unsafe` string conversion, replacing a mutex with atomics, hand-rolled lock-free structures. Each needs a benchmark proving it *in your workload*. Without one, you pay in readability and may gain nothing.',
         },
       },
       {
@@ -819,7 +819,7 @@ go test -bench=. -benchmem -count=10 ./... > new.txt
 benchstat old.txt new.txt
 
 go install golang.org/x/perf/cmd/benchstat@latest`,
-          note: 'A single benchmark run is noise. -count=10 plus benchstat is the only honest comparison.',
+          note: 'A single benchmark run is noisy. -count=10 plus benchstat tells you whether a difference is bigger than the noise.',
         },
       },
       {
@@ -842,33 +842,33 @@ git push -u origin main`,
 go vet ./...            # silent
 go test -race ./...     # green
 govulncheck ./...       # clean`,
-          note: 'Then read the diff you are about to push as if someone else wrote it, and delete a third of it.',
+          note: 'Then read the diff you are about to push as if someone else wrote it, and cut what it does not need.',
         },
       },
       {
         heading: 'What to build next',
         bullets: [
-          '**A CLI** with `flag` and subcommands — a completely different shape of program.',
-          '**A concurrent web crawler** with bounded workers, dedup, and a context timeout. This is where concurrency finally clicks.',
+          '**A CLI** with `flag` and subcommands: a different shape of program from a server.',
+          '**A concurrent web crawler** with bounded workers, dedup, and a context timeout. It makes you use every concurrency tool from this track at once.',
           '**A rate limiter as a library**, with benchmarks and fuzz tests.',
           '**A queue worker** (Redis, NATS, or SQS) with graceful shutdown and retries.',
-          '**Add caching, metrics, and tracing** to SnapNotes — the natural sequel.',
+          '**Add caching, metrics, and tracing** to SnapNotes.',
         ],
       },
       {
         heading: 'What to read next',
         bullets: [
-          '[Effective Go](https://go.dev/doc/effective_go) — reread it in a month. It means much more once you have written real code.',
-          '[Go Code Review Comments](https://go.dev/wiki/CodeReviewComments) — the official list of what reviewers flag.',
-          '[The Go Memory Model](https://go.dev/ref/mem) — short, and it settles every concurrency argument.',
-          '[The Go Blog](https://go.dev/blog/) — start with pipelines, context, and errors-are-values.',
-          '**The standard library source.** `net/http`, `io`, `errors`, and `sync` are the best Go anyone has written, and it is already on your disk.',
+          '[Effective Go](https://go.dev/doc/effective_go): reread it in a month. It means much more once you have written real code.',
+          '[Go Code Review Comments](https://go.dev/wiki/CodeReviewComments): the Go wiki\'s list of what reviewers commonly flag.',
+          '[The Go Memory Model](https://go.dev/ref/mem): short, and it settles arguments about when one goroutine is guaranteed to see another\'s writes.',
+          '[The Go Blog](https://go.dev/blog/): start with pipelines, context, and errors-are-values.',
+          '**The standard library source.** `net/http`, `io`, `errors`, and `sync` are some of the clearest Go you can read, and it is already on your disk.',
         ],
       },
       {
         callout: {
           tone: 'ok',
-          text: 'You started this month not knowing what a goroutine was. You now have a Go API with authentication, a database, file uploads, tests, and a container that runs it. That is a real portfolio project and a real skill. The best Go code is boring — if a reviewer says "this is clever", that is not the compliment it sounds like.',
+          text: 'You started this track not knowing what a goroutine was. You now have a Go API with authentication, a database, file uploads, tests, and a container that runs it. That is a real portfolio project and a real skill. Good Go code is boring. If a reviewer says "this is clever", that is not the compliment it sounds like.',
         },
       },
     ],
@@ -879,7 +879,7 @@ govulncheck ./...       # clean`,
       'fmt, vet, race, govulncheck before every push. Forever.',
     ],
     remember:
-      'Correct, then clear, then fast — and only fast when a measurement told you to. Almost every optimisation written without a profile is a pessimisation with worse readability.',
+      'Correct, then clear, then fast, and only fast when a measurement told you to. An optimisation written without a profile often makes the code harder to read and no faster.',
     task: 'Profile the API under a `hey` or `ab` load test, find the slowest endpoint, and fix one real thing. Then run `make check`, push it, and take the rest of the day off.',
     refs: [
       { label: 'Profiling Go programs', href: 'https://go.dev/blog/pprof' },

@@ -8,7 +8,7 @@ import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
   'Learn system design from nothing',
-  'Start from zero: what system design actually is, how the interview works, the vocabulary, the five stages, and where the slack hides.',
+  'Start from zero: what system design is, how the interview works, the vocabulary, the five stages, and where the slack hides.',
   '/learn',
 )
 
@@ -24,7 +24,7 @@ export default function LearnPage() {
       <section className="mb-12">
         <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">First, the ground floor</h2>
         <p className="mb-5 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
-          Five short lessons. After these, nothing on the topic pages will be a word you have never met.
+          Five short lessons. After these, the vocabulary on the topic pages should be familiar.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {LESSONS.map((l, i) => (

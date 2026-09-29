@@ -12,7 +12,7 @@ export const TOOLING: LangLesson[] = [
         heading: 'What a module is, and what the go command does',
         body: [
           'A **module** is one project: a folder with a `go.mod` file at the top, containing one or more packages. `go.mod` records the module\'s name, the Go version it needs, and every outside package it depends on.',
-          'A **dependency** is a package written by someone else that your code imports. Go fetches these from their source repository — there is no central registry to publish to, and the import path *is* the URL.',
+          'A **dependency** is a package written by someone else that your code imports. The import path starts with where the code lives, such as `github.com/jackc/pgx`. By default the go command downloads it through the Go module mirror (`proxy.golang.org`), which fetches from that repository. There is no registry you have to publish to.',
           'The **go command** is the single tool that does everything: builds, tests, formats, fetches dependencies, and reads documentation. This topic covers the parts of it you will use weekly, and the four checks worth running before every push.',
         ],
       },
@@ -39,14 +39,14 @@ require (
       {
         bullets: [
           '**`go.mod`** declares the module path, the minimum Go version, and your dependencies.',
-          '**`go.sum`** holds cryptographic checksums of every module version you use. It is what makes a build reproducible and tamper-evident. **Commit it.**',
-          '**The `go` line matters.** It gates language behaviour — a module declaring `go 1.21` keeps the old per-loop variable semantics even on a newer toolchain.',
+          '**`go.sum`** holds cryptographic checksums of every module version you use. If a download ever differs from what was recorded, the build fails. **Commit it.**',
+          '**The `go` line matters.** It gates language behaviour: a module declaring `go 1.21` keeps the old per-loop variable semantics even on a newer toolchain.',
         ],
       },
       {
         heading: 'Minimal Version Selection',
         body: [
-          'Most package managers resolve to the *newest* version that satisfies everyone. Go picks the **oldest** version that satisfies everyone. That sounds backwards until you notice the consequence: your build does not change because someone else published a release. Upgrades only happen when you ask for one.',
+          'Many package managers resolve to the *newest* version that satisfies everyone. Go picks the **oldest** version that satisfies everyone: the highest of the minimums that your modules ask for. That sounds backwards until you notice the consequence: your build does not change because someone else published a release. Upgrades only happen when you ask for one.',
           'This is why Go needs no lockfile. `go.mod` plus MVS is already deterministic.',
         ],
       },
@@ -113,26 +113,26 @@ go build -gcflags='-m' ./... 2>&1 | head         # what escaped to the heap`,
       },
       {
         bullets: [
-          '**`gofmt`** — not a preference. Unformatted code fails the build.',
-          '**`go vet`** — ships with Go, no false positives worth silencing. Mandatory.',
-          '**`govulncheck`** — official, and low-noise because it only reports vulnerabilities in code paths you actually call.',
-          '**`staticcheck`** — the best-value third-party linter. Add it once `vet` is clean.',
-          '**`golangci-lint`** — a runner for many linters. Enable a small set, not sixty, or you will spend your life writing `//nolint`.',
+          '**`gofmt`**: not a preference. With the CI line above, unformatted code fails the build.',
+          '**`go vet`**: ships with Go, and its checks are chosen to have very few false positives. Run it always.',
+          '**`govulncheck`**: from the Go team, and low-noise because it reports vulnerabilities only in functions your code can reach.',
+          '**`staticcheck`**: a widely used third-party linter that finds real bugs vet misses. Add it once `vet` is clean.',
+          '**`golangci-lint`**: a runner for many linters. Enable a small set, not sixty, or you will spend your time writing `//nolint`.',
         ],
       },
       {
         callout: {
           tone: 'note',
-          text: 'Go’s standard library carries a compatibility promise: code written for Go 1 still compiles today. Upgrading the toolchain is normally a version bump and nothing else — which is why "what Go version should I use" has one answer: the latest.',
+          text: 'Go carries the Go 1 compatibility promise: code written for Go 1 is meant to keep compiling and working on later releases. Upgrading the toolchain is normally a version bump and nothing else. That is why the usual answer to "what Go version should I use" is the latest release. Only the two newest releases get security fixes.',
         },
       },
       {
         heading: 'Publishing a package',
         bullets: [
           'The module path **is** the repository URL: `github.com/you/thing`.',
-          'Tag a release with a semver tag: `git tag v1.0.0 && git push --tags`. That is the whole publishing process — there is no registry to upload to.',
+          'Tag a release with a semver tag: `git tag v1.0.0 && git push --tags`. That is the whole publishing process. There is no registry to upload to.',
           'Breaking change? The major version goes in the path: `github.com/you/thing/v2`. That way v1 and v2 can coexist in one build.',
-          'Before v1.0.0 you are allowed to break things. After it, you are not.',
+          'Before v1.0.0 you are allowed to break things. After it, a breaking change needs a new major version.',
         ],
       },
     ],
@@ -156,13 +156,13 @@ go build -gcflags='-m' ./... 2>&1 | head         # what escaped to the heap`,
     slug: 'popular-packages',
     title: 'The packages everyone actually uses',
     navTitle: 'Popular packages',
-    oneLine: 'The well-known third-party libraries, what each is for, and when the standard library is still the better answer.',
+    oneLine: 'The well-known third-party libraries, what each is for, and when the standard library is still the better choice.',
     blocks: [
       {
         heading: 'Why this topic exists',
         body: [
-          'Go has an unusually strong standard library, so the honest advice for most problems is **use the stdlib**. That is why this whole track ships three real projects on four dependencies.',
-          'But you will read other people\'s code, join teams with existing choices, and hit problems the stdlib genuinely does not solve. This is the map: what the well-known packages are, what each one is for, and — for every single one — the stdlib alternative you should try first.',
+          'Go has an unusually strong standard library, so for most problems the advice is **use the stdlib**. That is why this whole track ships three real projects on four dependencies.',
+          'But you will read other people\'s code, join teams with existing choices, and hit problems the stdlib does not solve. This is the map: what the well-known packages are, what each one is for, and, where one exists, the stdlib alternative to try first.',
         ],
       },
       {
@@ -170,8 +170,8 @@ go build -gcflags='-m' ./... 2>&1 | head         # what escaped to the heap`,
         bullets: [
           '**Is it still alive?** Look at the last commit and the open issue count on GitHub, not the star count. Stars measure a blog post from 2019.',
           '**What does it drag in?** Run `go mod graph` after adding it. A logging library that pulls in forty modules is a supply-chain decision, not a convenience.',
-          '**Could you write it in an afternoon?** If yes, and it is not security-critical, write it. Every dependency is code you must update forever.',
-          '**Does it wrap something you should understand?** An ORM you adopt before you know SQL will cost you more than it saves.',
+          '**Could you write it in an afternoon?** If yes, and it is not security-critical, write it. Every dependency is code you must keep updating.',
+          '**Does it wrap something you should understand?** An ORM you adopt before you know SQL tends to cost more than it saves.',
           '**Check `pkg.go.dev`** for the docs and the import count, and run **`govulncheck`** after adding anything.',
         ],
         code: {
@@ -190,9 +190,9 @@ go doc example.com/thing       # read the API before you build on it`,
           rows: [
             ['`net/http`', '**The standard library.** Since Go 1.22 it routes on method and path parameters.', '— this *is* the answer for most services'],
             ['`chi`', 'A thin router on top of `net/http`. Middleware chaining, route groups, sub-routers.', '`http.ServeMux` plus your own middleware'],
-            ['`gin`', 'The most popular full framework. Its own context type, binding, validation.', '`net/http` — gin\'s context is not `context.Context`'],
+            ['`gin`', 'The most popular full framework. Its own context type, binding, validation.', '`net/http`: gin handlers take `*gin.Context`, not the standard handler signature'],
             ['`echo`', 'Similar to gin, slightly cleaner API.', '`net/http`'],
-            ['`fiber`', 'Express-style API built on `fasthttp`, not `net/http`.', '`net/http` — fiber cannot use standard middleware'],
+            ['`fiber`', 'Express-style API built on `fasthttp`, not `net/http`.', '`net/http`: fiber cannot use standard middleware directly'],
             ['`gorilla/mux`', 'The classic router. Was unmaintained for a while, now revived.', '`http.ServeMux` does this in 1.22+'],
           ],
         },
@@ -200,7 +200,7 @@ go doc example.com/thing       # read the API before you build on it`,
       {
         callout: {
           tone: 'note',
-          text: 'The honest position: on a new service in 2024 or later, start with `net/http`. Reach for `chi` when you want route groups and middleware helpers without leaving the standard interfaces. Reach for `gin` or `echo` when the team already uses them.',
+          text: 'On a new service today, start with `net/http`. Reach for `chi` when you want route groups and middleware helpers without leaving the standard interfaces. Reach for `gin` or `echo` when the team already uses them.',
         },
       },
       {
@@ -208,12 +208,12 @@ go doc example.com/thing       # read the API before you build on it`,
         table: {
           headers: ['Package', 'What it is', 'When it is the right call'],
           rows: [
-            ['`database/sql`', '**Standard library.** The common interface every driver implements.', 'always — everything below sits on top of it'],
-            ['`pgx`', 'The Postgres driver. Used directly, or through `database/sql`.', 'any Postgres project — this is the default'],
+            ['`database/sql`', '**Standard library.** The common interface SQL drivers implement.', 'the default; `sqlx`, GORM and most drivers plug into it'],
+            ['`pgx`', 'The Postgres driver. Used directly, or through `database/sql`.', 'any Postgres project; this is the default'],
             ['`go-sql-driver/mysql`', 'The MySQL driver.', 'MySQL projects'],
             ['`sqlx`', 'A thin layer over `database/sql` that scans rows into structs.', 'when hand-writing `Scan` calls gets tedious'],
-            ['`sqlc`', 'Generates type-safe Go **from your SQL**. You keep writing SQL.', 'the best of both — strongly worth a look'],
-            ['`ent`', 'A schema-as-code graph ORM from Facebook. Powerful, opinionated.', 'complex relational graphs'],
+            ['`sqlc`', 'Generates type-safe Go **from your SQL**. You keep writing SQL.', 'you want typed Go and still want to write the SQL'],
+            ['`ent`', 'A schema-as-code entity framework, first built at Facebook. Powerful, opinionated.', 'complex relational graphs'],
             ['`GORM`', 'A full ORM. Auto-migration, hooks, associations.', 'CRUD-heavy apps where SQL control matters less'],
             ['`golang-migrate` / `goose`', 'Schema migration runners.', 'every project with a database'],
             ['`go-redis`', 'The Redis client.', 'caching, rate limiting, queues'],
@@ -226,8 +226,8 @@ go doc example.com/thing       # read the API before you build on it`,
           headers: ['Package', 'What it is', 'Try first'],
           rows: [
             ['`os.Getenv` + `flag`', '**Standard library.** Environment variables and command-line flags.', '— enough for most services'],
-            ['`godotenv`', 'Loads a `.env` file in development.', 'used in this track — 1 file, no dependencies of its own'],
-            ['`viper`', 'Config from files, env, flags and remote stores, merged together.', 'when you genuinely need layered config; it is large'],
+            ['`godotenv`', 'Loads a `.env` file in development.', 'used in this track; small, with no dependencies of its own'],
+            ['`viper`', 'Config from files, env, flags and remote stores, merged together.', 'when you need layered config; it pulls in many dependencies'],
             ['`kelseyhightower/envconfig`', 'Fills a struct from environment variables using tags.', 'a light middle ground'],
             ['`cobra`', 'The CLI framework behind `kubectl`, `hugo` and `gh`. Subcommands, help, completion.', 'multi-command CLIs'],
             ['`urfave/cli`', 'A lighter CLI framework.', 'simpler CLIs'],
@@ -239,8 +239,8 @@ go doc example.com/thing       # read the API before you build on it`,
         table: {
           headers: ['Package', 'What it is', 'Verdict'],
           rows: [
-            ['`log/slog`', '**Standard library since Go 1.21.** Structured, levelled, with handlers.', '**start here** — this is what the track uses'],
-            ['`zap`', 'Uber\'s logger. Extremely fast, more ceremony.', 'when profiling shows logging is your bottleneck'],
+            ['`log/slog`', '**Standard library since Go 1.21.** Structured, levelled, with handlers.', '**start here**; this is what the track uses'],
+            ['`zap`', 'Uber\'s logger. Very fast, more ceremony.', 'when profiling shows logging is your bottleneck'],
             ['`zerolog`', 'Zero-allocation JSON logger, chained API.', 'similar case to zap'],
             ['`logrus`', 'The original structured logger. **In maintenance mode.**', 'you will meet it in old code; do not start with it'],
           ],
@@ -251,20 +251,20 @@ go doc example.com/thing       # read the API before you build on it`,
         table: {
           headers: ['Package', 'What it is', 'Note'],
           rows: [
-            ['`testing`', '**Standard library.** Tests, subtests, benchmarks, fuzzing.', 'no framework needed — see the Testing topic'],
-            ['`testify`', 'Assertions (`assert`, `require`) plus mocks and suites.', 'by far the most common; `require.NoError` is the draw'],
+            ['`testing`', '**Standard library.** Tests, subtests, benchmarks, fuzzing.', 'no framework needed; see the Testing topic'],
+            ['`testify`', 'Assertions (`assert`, `require`) plus mocks and suites.', 'the most common add-on; `require.NoError` is the draw'],
             ['`google/go-cmp`', 'Deep comparison built for tests, with readable diffs.', 'better than `reflect.DeepEqual` for structs'],
-            ['`testcontainers-go`', 'Starts real Postgres, Redis or Kafka in Docker for a test.', 'the right way to test a repository layer'],
+            ['`testcontainers-go`', 'Starts real Postgres, Redis or Kafka in Docker for a test.', 'testing a repository layer against a real database'],
             ['`ory/dockertest`', 'Lighter alternative to testcontainers.', 'same job, fewer features'],
             ['`uber-go/mock`', 'Generated mocks from interfaces (successor to `golang/mock`).', 'hand-written fakes are usually smaller'],
-            ['`goleak`', 'Fails a test if goroutines are still running at the end.', 'catches leaks you would never notice'],
+            ['`goleak`', 'Fails a test if goroutines are still running at the end.', 'catches leaks that no other test would notice'],
           ],
         },
       },
       {
         callout: {
           tone: 'warn',
-          text: 'The one to think twice about is `testify`\'s mock and suite packages. Assertions are fine and save real typing. Generated mocks and test suites tend to hide what a test is doing — and because Go interfaces are small and implicit, a hand-written fake is usually shorter than the mock setup.',
+          text: 'The one to think twice about is `testify`\'s mock and suite packages. Assertions are fine and save real typing. Generated mocks and test suites tend to hide what a test is doing. Go interfaces are small and implicit, so a hand-written fake is usually shorter than the mock setup.',
         },
       },
       {
@@ -273,7 +273,7 @@ go doc example.com/thing       # read the API before you build on it`,
           headers: ['Package', 'What it is', 'Why it matters'],
           rows: [
             ['`sync`, `context`', '**Standard library.** Mutex, WaitGroup, Once, cancellation.', 'covers most of what you need'],
-            ['`golang.org/x/sync/errgroup`', 'Run goroutines, collect the first error, cancel the rest. `SetLimit` bounds concurrency.', '**the one worth adding** — see the Concurrency topics'],
+            ['`golang.org/x/sync/errgroup`', 'Run goroutines, collect the first error, cancel the rest. `SetLimit` bounds concurrency.', '**the one worth adding**; see the Concurrency topics'],
             ['`golang.org/x/sync/singleflight`', 'Collapses duplicate concurrent calls into one.', 'cache stampede protection in ~5 lines'],
             ['`golang.org/x/sync/semaphore`', 'A weighted semaphore.', 'when a plain channel-as-semaphore is not enough'],
             ['`golang.org/x/time/rate`', 'Token-bucket rate limiter.', 'used in this track for rate limiting'],
@@ -287,7 +287,7 @@ go doc example.com/thing       # read the API before you build on it`,
           headers: ['Package', 'What it is for'],
           rows: [
             ['`google/uuid`', 'UUID generation. The near-universal choice.'],
-            ['`shopspring/decimal`', 'Exact decimal arithmetic — for money, when integer cents is not enough.'],
+            ['`shopspring/decimal`', 'Exact decimal arithmetic for money, when integer cents is not enough.'],
             ['`go-playground/validator`', 'Struct validation driven by tags. Common with gin.'],
             ['`golang-jwt/jwt`', 'JSON Web Tokens. Used in this track.'],
             ['`golang.org/x/crypto/bcrypt`', 'Password hashing. Used in this track.'],
@@ -298,7 +298,7 @@ go doc example.com/thing       # read the API before you build on it`,
             ['`segmentio/kafka-go`, `IBM/sarama`', 'Kafka clients.'],
             ['`nats-io/nats.go`', 'NATS messaging.'],
             ['`hibiken/asynq`', 'Background job queue backed by Redis.'],
-            ['`uber-go/automaxprocs`', 'Sets `GOMAXPROCS` from the container CPU limit. One import, real fix.'],
+            ['`uber-go/automaxprocs`', 'Sets `GOMAXPROCS` from the container CPU limit. Not needed from Go 1.25, which does this itself on Linux.'],
             ['`samber/lo`', 'Lodash-style generic helpers. Check `slices` and `maps` first.'],
             ['`spf13/afero`', 'A filesystem interface, so you can fake the disk in tests.'],
             ['`swaggo/swag`, `oapi-codegen`', 'OpenAPI docs from comments, or Go from an OpenAPI spec.'],
@@ -311,7 +311,7 @@ go doc example.com/thing       # read the API before you build on it`,
           label: 'terminal',
           src: `# linting and safety
 go install honnef.co/go/tools/cmd/staticcheck@latest       # the best-value linter
-go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+go install github.com/golangci/golangci-lint/v2/cmd/golangci-lint@latest
 go install golang.org/x/vuln/cmd/govulncheck@latest        # official, low noise
 
 # development
@@ -323,13 +323,13 @@ go install github.com/rakyll/hey@latest                    # simple load testing
 # database
 go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`,
-          note: 'These are binaries, not imports. They never appear in your go.mod.',
+          note: 'These are binaries, not imports. Installed this way, they do not appear in your go.mod. (Since Go 1.24, `go get -tool` can pin a tool in go.mod instead.)',
         },
       },
       {
         heading: 'What a typical production service actually imports',
         body: [
-          'To make it concrete — this is a realistic dependency list for a Go API at a company, and it is short. That shortness is the point.',
+          'A realistic dependency list for a company\'s Go API is short, like this one.',
         ],
         code: {
           label: 'go.mod — a normal, boring, production service',
@@ -338,7 +338,7 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`,
 	github.com/jackc/pgx/v5 v5.6.0             // Postgres
 	github.com/golang-jwt/jwt/v5 v5.2.1        // tokens
 	github.com/google/uuid v1.6.0              // ids
-	github.com/prometheus/client_golang v1.20  // metrics
+	github.com/prometheus/client_golang v1.20.0 // metrics
 	golang.org/x/crypto v0.27.0                // bcrypt
 	golang.org/x/sync v0.8.0                   // errgroup
 )
@@ -350,7 +350,7 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`,
       {
         callout: {
           tone: 'ok',
-          text: 'If your `go.mod` has 200 lines, that is worth a look. Go culture leans hard towards fewer dependencies, and a reviewer will ask why each one is there. "Because the standard library already does it" is the most common reason to remove one.',
+          text: 'If your `go.mod` has 200 lines, that is worth a look. Go culture leans hard towards fewer dependencies, and a reviewer may ask why each one is there. "Because the standard library already does it" is a common reason to remove one.',
         },
       },
     ],
@@ -361,28 +361,28 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`,
       'Judge a package by its last commit and what it drags in — not by its star count.',
     ],
     remember:
-      'Every dependency is code you have to update, audit and explain forever. The stdlib is the one you never have to justify.',
+      'Every dependency is code you have to update, audit and explain for as long as you keep it. The stdlib rarely needs justifying.',
     task: 'Open the `go.mod` of a Go project you did not write and look up every dependency on pkg.go.dev. For each one, decide whether the standard library could have done it.',
     exercises: [
       {
         task: 'Add `gin` to a scratch project, run `go mod graph | wc -l`, then do the same for `chi`. Compare.',
         answer:
-          'chi pulls in almost nothing; gin brings a validator, a JSON library and more. Neither is wrong — but you should know which you are choosing.',
+          'chi pulls in almost nothing; gin brings a validator, a JSON library and more. Neither is wrong, but you should know which you are choosing.',
       },
       {
         task: 'Rewrite one `reflect.DeepEqual` test assertion with `google/go-cmp` and compare the failure output.',
         answer:
-          'go-cmp prints a readable diff showing exactly which field differs. DeepEqual prints two whole structs and leaves you to spot it.',
+          'go-cmp prints a readable diff showing which field differs. DeepEqual only returns false, so your message prints two whole structs and leaves you to spot it.',
       },
       {
         task: 'Replace a hand-rolled worker pool with `errgroup.SetLimit` and count the lines removed.',
         answer:
-          'Usually 25 lines become about 8, and you get first-error cancellation for free. This is the clearest case in Go for adding a dependency.',
+          'A typical hand-rolled pool shrinks to a few lines, and you get first-error cancellation for free (with `errgroup.WithContext`). It is one of the clearest cases for adding a dependency.',
       },
       {
         task: 'Run `govulncheck ./...` on any project you have and read what it reports.',
         answer:
-          'It only reports vulnerabilities in code paths you actually call, so the list is short and every item is worth reading — unlike most scanners.',
+          'It reports vulnerabilities only in functions your code can reach, so the list is short and each item is worth reading. Scanners that list every CVE in the dependency tree bury the ones that matter.',
       },
     ],
     refs: [
@@ -402,7 +402,7 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`,
         heading: 'Why compare them side by side',
         body: [
           'Reading a package\'s name tells you nothing. Reading twenty lines of it tells you almost everything — its style, what it takes over, and how hard it would be to leave.',
-          'Every block below does **the same job**, written with each of the popular options. You are not learning all of these. You are learning to open an unfamiliar Go repo and immediately know what you are looking at.',
+          'Every block below does **the same job**, written with each of the popular options. You are not learning all of these. You are learning to open an unfamiliar Go repo and quickly tell what you are looking at.',
         ],
       },
       {
@@ -418,7 +418,7 @@ mux.HandleFunc("GET /users/{id}", func(w http.ResponseWriter, r *http.Request) {
 })
 
 http.ListenAndServe(":8080", mux)`,
-          note: 'No dependency. Since 1.22 this handles method + path params, which was the main reason people reached for a router.',
+          note: 'No dependency. Since 1.22 this handles method + path params, which was the main reason people added a router.',
         },
       },
       {
@@ -449,7 +449,7 @@ r.GET("/users/:id", func(c *gin.Context) {   // its OWN context type
 })
 
 r.Run(":8080")`,
-          note: '`*gin.Context` is not `context.Context`. It carries both the request and the response, which is convenient and is also what ties your handlers to gin.',
+          note: '`*gin.Context` carries both the request and the response, which is convenient and is also what ties your handlers to gin. It does satisfy the `context.Context` interface, but by default it does not carry the request\'s cancellation, so pass `c.Request.Context()` to database calls.',
         },
       },
       {
@@ -462,7 +462,7 @@ e.GET("/users/:id", func(c echo.Context) error {   // handlers RETURN an error
 })
 
 e.Start(":8080")`,
-          note: 'Returning an error is genuinely nicer than gin\'s style — echo\'s central error handler turns it into a response.',
+          note: 'Handlers return an error, and echo\'s central error handler turns it into a response. That saves each handler writing its own error JSON.',
         },
       },
       {
@@ -475,13 +475,13 @@ app.Get("/users/:id", func(c *fiber.Ctx) error {
 })
 
 app.Listen(":8080")`,
-          note: 'Fiber sits on `fasthttp`, so standard `net/http` middleware, `httptest` and most of the ecosystem do not work with it. Know that before choosing it.',
+          note: 'Fiber sits on `fasthttp`, so standard `net/http` middleware and `httptest` do not work with it without an adaptor. Know that before choosing it.',
         },
       },
       {
         callout: {
           tone: 'note',
-          text: 'Notice the pattern: `net/http` and `chi` share one handler type, so code moves between them freely. `gin`, `echo` and `fiber` each invent their own, so every handler you write is tied to that framework. That is the real cost, and it is rarely the one people compare.',
+          text: '`net/http` and `chi` share one handler type, so code moves between them freely. `gin`, `echo` and `fiber` each invent their own, so every handler you write is tied to that framework. That lock-in is the main cost, and feature comparisons rarely mention it.',
         },
       },
       {
@@ -496,7 +496,7 @@ err := db.QueryRowContext(ctx,
 if errors.Is(err, sql.ErrNoRows) {
 	return nil, ErrNotFound
 }`,
-          note: 'You write the SQL and you write the Scan. Verbose, and you can see exactly what runs.',
+          note: 'You write the SQL and you write the Scan. Verbose, and you can see what runs.',
         },
       },
       {
@@ -538,7 +538,7 @@ db.Model(&u).Update("name", "new")
 // associations, hooks and auto-migration come with it:
 db.AutoMigrate(&User{}, &Order{})
 db.Preload("Orders").Find(&users)                 // loads the related rows`,
-          note: 'Least typing, least visibility. You cannot see the query, and eventually GORM generates one you have to fight. Fine for CRUD-heavy apps; know what you are trading.',
+          note: 'Least typing, least visibility. The query is not in your code, and sooner or later GORM generates one you have to fight. Fine for CRUD-heavy apps; know what you are trading.',
         },
       },
       {
@@ -563,7 +563,7 @@ assert.Equal(t, 5, got)             // assert:  records it and carries on
 assert.Len(t, users, 3)
 assert.Contains(t, body, "not found")
 assert.ErrorIs(t, err, ErrNotFound)`,
-          note: '`require.NoError` is the reason most teams adopt testify — it replaces four lines with one, and the failure messages are good.',
+          note: '`require.NoError` is a common reason teams adopt testify. It replaces three lines with one, and the failure messages are good.',
         },
       },
       {
@@ -611,7 +611,7 @@ logger.Info("request completed",
         heading: 'How to read an unfamiliar Go repo',
         bullets: [
           '**Open `go.mod` first.** The dependency list tells you the framework, the database approach and the logging style before you read any code.',
-          '**Find `func main`** — it is under `cmd/` in most projects, and it shows you how everything is wired in one screen.',
+          '**Find `func main`.** It is under `cmd/` in many projects, and it shows how everything is wired, often on one screen.',
           '**A `*gin.Context` or `echo.Context` in a handler** means every handler is tied to that framework.',
           '**`db.First(&x)` or `AutoMigrate`** means GORM. **`.Scan(&`** means `database/sql`. **A `query.sql` file** means sqlc.',
           '**`assert.` or `require.`** means testify. **`zap.String(`** means zap.',
@@ -620,7 +620,7 @@ logger.Info("request completed",
       {
         callout: {
           tone: 'ok',
-          text: 'You now know what most Go codebases are made of. The track itself deliberately used almost none of these, so that you learned the layer underneath first — which is exactly what makes each of these easy to pick up when a job needs one.',
+          text: 'You now know what most Go codebases are made of. The track deliberately used almost none of these, so you learned the layer underneath first. That is what makes each of them easy to pick up when a job needs one.',
         },
       },
     ],
@@ -637,7 +637,7 @@ logger.Info("request completed",
       {
         task: 'Find a Go project on GitHub, open its `go.mod`, and predict its framework, database approach and logger before reading any code.',
         answer:
-          'You will usually be right. That is the point — the dependency list is the fastest summary of a codebase there is.',
+          'You will usually be right. The dependency list is a fast summary of a codebase.',
       },
       {
         task: 'Take a `net/http` handler and port it to gin. Then port it back.',

@@ -14,21 +14,21 @@ export const INTERVIEW: LangLesson[] = [
     blocks: [
       {
         body: [
-          'These get asked because they separate people who read a tutorial from people who shipped something. In each case the short answer is the first line — say it, then add the second line only if they want more. Rambling makes you sound unsure.',
+          'These get asked because they separate people who read a tutorial from people who shipped something. In each case the short answer is the first line. Say it, then add the second line only if they want more. Rambling makes you sound unsure.',
         ],
       },
       {
         heading: '"Why would you choose Go?"',
         bullets: [
           '**Say:** one static binary with no runtime to install, concurrency built into the language, fast compiles, and a standard library big enough that most services need almost no dependencies.',
-          '**Then the honest cost:** more verbose error handling than exceptions, a small standard set of abstractions, and no built-in dependency injection or ORM — you write more by hand.',
+          '**Then the cost:** more verbose error handling than exceptions, a small standard set of abstractions, and no built-in dependency injection or ORM, so you write more by hand.',
           '**Do not say:** "it is fast". So is everything else they are comparing it to, and it invites a benchmark argument you cannot win.',
         ],
       },
       {
         heading: '"What is a zero value, and why does it matter?"',
         bullets: [
-          'Every type has a defined default — `0`, `""`, `false`, `nil` for pointers/slices/maps/channels/funcs/interfaces. There is no undefined.',
+          'Every type has a defined default: `0`, `""`, `false`, `nil` for pointers/slices/maps/channels/funcs/interfaces. There is no undefined.',
           'What you get from this: `var b bytes.Buffer`, `var mu sync.Mutex` and `var wg sync.WaitGroup` are all usable immediately, with no constructor. Designing your own types so the zero value works removes a whole class of "did you call New?" bugs.',
           'The trap they are usually fishing for: a `nil` map reads fine but **panics on write**, so a map field in a struct needs `make`.',
         ],
@@ -43,29 +43,29 @@ var a [3]int
 
 // Slice: a three-field header — pointer, len, cap — over an array.
 s := []int{1, 2, 3}`,
-          note: 'Then add the part they are really asking about: two slices can share a backing array, so a write through one is visible through the other.',
+          note: 'Then add what they are actually testing: two slices can share a backing array, so a write through one is visible through the other.',
         },
       },
       {
         heading: '"Why does append return a value?"',
         bullets: [
-          'Because it may need to allocate a bigger array and copy. When it does, the old header is stale — so `append` returns the new one and you must write `s = append(s, x)`.',
-          '**The follow-up:** "what happens if two slices share a backing array and both append?" One silently overwrites the other’s element. One slice, one appender.',
+          'Because it may need to allocate a bigger array and copy. When it does, the old header is stale, so `append` returns the new one and you must write `s = append(s, x)`.',
+          '**The follow-up:** "what happens if two slices share a backing array and both append?" If there is spare capacity, both write into the same slot and one overwrites the other’s element with no error. One slice, one appender.',
         ],
       },
       {
         heading: '"How does Go handle errors, and do you like it?"',
         bullets: [
-          'An error is an ordinary value returned alongside the result. No exceptions, no hidden jumps — every failure point is visible in the code you are reading.',
-          'Say what you actually do: wrap with `%w` and context (`fmt.Errorf("get user %d: %w", id, err)`), use `errors.Is` for sentinels, `errors.As` for typed errors, and handle each error **once** — log it or return it, never both.',
-          'Be honest about the cost: it is more lines than try/catch, and a bare `return err` six layers deep gives you a useless message. That honesty scores better than defending it as perfect.',
+          'An error is an ordinary value returned alongside the result. No exceptions and no hidden jumps: every failure point is visible in the code you are reading.',
+          'Say what you actually do: wrap with `%w` and context (`fmt.Errorf("get user %d: %w", id, err)`), use `errors.Is` for sentinels, `errors.As` for typed errors, and handle each error **once**: log it or return it, never both.',
+          'Admit the cost: it is more lines than try/catch, and a bare `return err` six layers deep gives you a useless message. Naming that scores better than defending it as perfect.',
         ],
       },
       {
         heading: '"What is the difference between a value and a pointer receiver?"',
         bullets: [
           'A value receiver gets a copy, so mutation is lost. A pointer receiver can mutate.',
-          'The rule: pointer if you mutate, if the struct is large, or if it contains a `sync.Mutex` — and then make them all pointers for consistency.',
+          'The rule: pointer if you mutate, if the struct is large, or if it contains a `sync.Mutex`. If any method needs a pointer, make them all pointers for consistency.',
           '**The part that catches people:** interface satisfaction uses the strict method set. The method set of `T` has only value-receiver methods; `*T` has both. That is why `var s Shape = User{}` fails with "method has pointer receiver" and `&User{}` works.',
         ],
       },
@@ -74,7 +74,7 @@ s := []int{1, 2, 3}`,
         bullets: [
           'Implicit satisfaction: any type with the methods qualifies, with no declaration. That is why your type can satisfy an interface written later by someone who never heard of it.',
           '"The bigger the interface, the weaker the abstraction." `io.Reader` has one method, which is why files, sockets, buffers and HTTP bodies all compose.',
-          '**Accept interfaces, return structs**, and define the interface in the package that *consumes* it, not the one that implements it. That keeps the interface exactly the size of the need.',
+          '**Accept interfaces, return structs**, and define the interface in the package that *consumes* it, not the one that implements it. That keeps the interface as small as the caller’s need.',
           'Say this out loud: **do not create an interface until there is a second implementation or a test that needs a fake.** It signals you have maintained a Go codebase rather than ported Java patterns into one.',
         ],
       },
@@ -98,22 +98,22 @@ if err := doWork(); err != nil {
         bullets: [
           'Schedules a call for when the **function** returns, LIFO, on every return path.',
           'Two things they probe: **arguments are evaluated immediately**, so `defer fmt.Println(time.Since(start))` prints ~0; and `defer` inside a loop does not run until the whole function ends.',
-          'The bonus point: a deferred closure can modify a **named** return value — which is how you turn a panic into an error, and how a transaction helper knows whether to roll back.',
+          'The bonus point: a deferred closure can modify a **named** return value. That is how you turn a panic into an error, and how a transaction helper knows whether to roll back.',
         ],
       },
       {
         heading: '"When would you panic?"',
         bullets: [
           'Only when the program’s assumptions are broken: a nil dependency at startup, an impossible switch branch, `regexp.MustCompile` on a literal.',
-          'Never for anything a user can cause — a bad request, a missing row, a network failure. Those are errors.',
-          '**The one they like:** a panic in a goroutine you started is not caught by a parent recover. It kills the whole process, so every long-lived goroutine needs its own.',
+          'Never for anything a user can cause: a bad request, a missing row, a network failure. Those are errors.',
+          '**The one they like:** a panic in a goroutine you started is not caught by a parent recover. It kills the whole process, so every long-lived goroutine needs its own `recover`.',
         ],
       },
     ],
     keyPoints: [
       'Lead with one sentence, then stop. Add the cost or the trap only if they want more.',
       'Zero values, `append` returning, shared backing arrays, and method sets are the four most-asked mechanics.',
-      'The nil-interface trap comes up constantly. Know both why it happens and the one-line fix.',
+      'The nil-interface trap comes up often. Know both why it happens and the one-line fix.',
       'Saying "do not add an interface until there is a second implementation" marks you as someone who has maintained Go.',
     ],
     remember:
@@ -123,7 +123,7 @@ if err := doWork(); err != nil {
       {
         task: 'Write the nil-interface trap from memory, run it, then fix it. You should be able to do this without looking.',
         answer:
-          'If you cannot, reread it. It is the single most-asked Go trick question.',
+          'If you cannot, reread it. It is one of the most-asked Go trick questions.',
       },
       {
         task: 'Explain value versus pointer receivers to someone non-technical in two sentences.',
@@ -146,11 +146,11 @@ if err := doWork(); err != nil {
     slug: 'interview-concurrency',
     title: 'Interview: concurrency',
     navTitle: 'Interview — concurrency',
-    oneLine: 'The half of the interview that actually decides it — and the code they will put in front of you.',
+    oneLine: 'The half of the interview that usually decides it, and the code they will put in front of you.',
     blocks: [
       {
         body: [
-          'Concurrency is where Go interviews get real. Everyone can define a goroutine. Far fewer can spot a leak, explain why a race is undefined behaviour, or say what happens when nobody receives.',
+          'Concurrency is where Go interviews get hard. Most candidates can define a goroutine. Far fewer can spot a leak, explain why a race is undefined behaviour, or say what happens when nobody receives.',
         ],
       },
       {
@@ -166,7 +166,7 @@ if err := doWork(); err != nil {
         table: {
           headers: ['Operation', 'nil', 'open & empty', 'open & full', 'closed'],
           rows: [
-            ['send', 'blocks forever', 'proceeds', 'blocks', '**panic**'],
+            ['send', 'blocks forever', 'proceeds if buffered; unbuffered waits for a receiver', 'blocks', '**panic**'],
             ['receive', 'blocks forever', 'blocks', 'proceeds', 'zero value, `ok=false`'],
             ['close', 'panic', '—', '—', '**panic**'],
           ],
@@ -175,7 +175,7 @@ if err := doWork(); err != nil {
       {
         bullets: [
           'The sender closes, never the receiver, and only one goroutine may close.',
-          'You do not have to close a channel — the GC collects unreferenced ones. Close only when receivers need to *know* it ended.',
+          'You do not have to close a channel. The GC collects unreferenced ones. Close only when receivers need to *know* it ended.',
           '**Why a nil channel blocking is useful:** setting a channel variable to `nil` inside a `select` disables that case. That is the standard way to drop a branch out of a loop.',
         ],
       },
@@ -188,7 +188,7 @@ if err := doWork(); err != nil {
 \tgo func() { ch <- expensive() }()
 \treturn
 }`,
-          note: 'The goroutine blocks on the send forever, so it is never collected — and neither is anything it references. Two fixes: make the channel buffered with size 1, or select on ctx.Done() alongside the send.',
+          note: 'The goroutine blocks on the send forever, so it is never collected, and neither is anything it references. Two fixes: make the channel buffered with size 1, or select on ctx.Done() alongside the send.',
         },
       },
       {
@@ -202,10 +202,10 @@ if err := doWork(); err != nil {
       {
         heading: '"What is a data race, and how do you find one?"',
         bullets: [
-          'Two goroutines touch the same memory, at least one writes, and there is no synchronisation between them. The behaviour is **undefined** — not "occasionally wrong". The compiler and CPU both reorder freely.',
+          'Two goroutines touch the same memory, at least one writes, and there is no synchronisation between them. The behaviour is **undefined**, which is worse than "occasionally wrong": the compiler and CPU both reorder freely.',
           'Happens-before edges come from: a channel send/receive pair, close→receive, `Unlock`→`Lock`, `WaitGroup.Wait` after `Done`, `Once.Do`, the `go` statement, and atomics.',
           '`go test -race ./...` in CI. It only reports races that actually occur, so the concurrent paths need test coverage. Add that they can find leaks with `pprof`’s goroutine profile.',
-          '**The special case:** concurrent map read/write is detected by the runtime and hard-crashes with "concurrent map writes" rather than corrupting silently.',
+          '**The special case:** the runtime usually detects concurrent map access and crashes with `fatal error: concurrent map writes` (or `concurrent map read and map write`). The check is best-effort, so it does not replace `-race`.',
         ],
       },
       {
@@ -257,7 +257,7 @@ if err := doWork(); err != nil {
       {
         callout: {
           tone: 'note',
-          text: 'Often the better answer is "I would use `errgroup` with `SetLimit`" — bounded concurrency and first-error cancellation, in five lines. Knowing when *not* to hand-roll the pool is itself the senior signal. But be able to write the pool if they ask.',
+          text: 'Often the better answer is "I would use `errgroup` with `SetLimit`": bounded concurrency and first-error cancellation in a few lines. Knowing when *not* to hand-roll the pool is a senior signal. But be able to write the pool if they ask.',
         },
       },
       {
@@ -266,14 +266,14 @@ if err := doWork(); err != nil {
           '`context.Context`: first parameter, named `ctx`, never stored in a struct, and `defer cancel()` every time.',
           'Cancelling does not stop anything by itself. It closes `ctx.Done()`, and your code must select on it. Anything that blocks should.',
           'In a handler, derive from `r.Context()` so a disconnecting client stops your database query too. Deriving from `context.Background()` inside a handler is a real bug.',
-          '`context.Value` is for request-scoped identity crossing API boundaries — not for dependencies or config.',
+          '`context.Value` is for request-scoped identity crossing API boundaries, not for dependencies or config.',
         ],
       },
       {
         heading: 'The loop variable question',
         bullets: [
           'Before Go 1.22, `for _, v := range xs { go func(){ use(v) }() }` captured one shared variable, so every goroutine usually saw the last element. The fix was `v := v`.',
-          'Go 1.22 made loop variables per-iteration, so it is now correct as written — **but only if the module’s `go.mod` declares 1.22 or later.** Saying that caveat is what shows you actually know it, rather than having read one headline.',
+          'Go 1.22 made loop variables per-iteration, so it is now correct as written — **but only if the module’s `go.mod` declares 1.22 or later.** Mentioning that caveat shows you know the change, not just the headline.',
         ],
       },
     ],
@@ -284,7 +284,7 @@ if err := doWork(); err != nil {
       'The worker pool is marked on: `Add` before `go`, sender closes, `ctx.Done()` in every select, bounded concurrency.',
     ],
     remember:
-      'Anyone can start a goroutine. The interview is about stopping one — how it exits, who waits for it, and what happens when it panics.',
+      'Anyone can start a goroutine. The interview is about stopping one: how it exits, who waits for it, and what happens when it panics.',
     task: 'Write the worker pool from a blank file, with no reference, in under ten minutes. Then run it with `-race` and with `goleak` to prove nothing is left running.',
     exercises: [
       {
@@ -333,14 +333,14 @@ if err := doWork(); err != nil {
         bullets: [
           'Use the project from this track. Structure the answer: **what it does → how it is laid out → one decision you made and its cost → one thing you would change.**',
           'The layout line: one package per domain, `handler → service → repository`, dependencies pointing inward, wired by hand in `run() error`, everything under `internal/`.',
-          'The decision line: "no ORM — `database/sql` so I could see every query, at the cost of hand-writing scans. If it grew I would move to `sqlc`, not GORM." Naming the cost and the upgrade path is the whole answer.',
+          'The decision line: "no ORM — `database/sql` so I could see every query, at the cost of hand-writing scans. If it grew I would move to `sqlc`, not GORM." Naming the cost and the upgrade path is what they are listening for.',
         ],
       },
       {
         heading: '"Why no framework?"',
         bullets: [
           'Since Go 1.22, `net/http` routes on method and path parameters. That was the main reason to add one.',
-          'A framework mostly wraps `func(http.ResponseWriter, *http.Request)` — knowing that means every framework makes sense immediately.',
+          'A framework mostly wraps `func(http.ResponseWriter, *http.Request)`. Once you know that, any framework is quick to pick up.',
           'Do not be rigid about it. "On a large team already using chi or echo, I would use theirs" is the right closing line.',
         ],
       },
@@ -364,7 +364,7 @@ if err := doWork(); err != nil {
         bullets: [
           'bcrypt for passwords. Identical error and similar timing for unknown-email and wrong-password.',
           'Short access JWT (15 min) plus a long refresh token that is **stored as a hash** and rotated on every use.',
-          'Verify the signing method explicitly when parsing, or `alg: none` is a full auth bypass.',
+          'Verify the signing method explicitly when parsing. Otherwise the token chooses its own algorithm, which is how `alg: none` and key-confusion bypasses happen.',
           'Say why the access token is short: **a JWT cannot be revoked**, so the short window is what limits the damage. That trade-off is the actual question.',
         ],
       },
@@ -379,8 +379,8 @@ if err := doWork(); err != nil {
       {
         heading: '"Your endpoint is slow. What do you do?"',
         bullets: [
-          '**First, measure.** pprof for CPU, and count database round trips — do not start guessing at Go code.',
-          'The ranked list of real causes: a query in a loop (N+1) → a missing index → a pool that is too small or unlimited → unbounded concurrency hammering a downstream → allocations in a hot loop → everything else.',
+          '**First, measure.** pprof for CPU, and count database round trips. Do not start by guessing at Go code.',
+          'The usual causes, most likely first: a query in a loop (N+1) → a missing index → a pool that is too small or unlimited → unbounded concurrency hammering a downstream → allocations in a hot loop → everything else.',
           '"The database is where the latency lives. One JOIN beats twenty round trips, and one index beats a month of Go micro-optimisation."',
           'Then: `-count=10` and `benchstat`, because a single benchmark run is noise.',
         ],
@@ -388,8 +388,8 @@ if err := doWork(); err != nil {
       {
         heading: '"Your service is being OOM-killed in Kubernetes"',
         bullets: [
-          'Set **`GOMEMLIMIT`** to about 90% of the container limit. Without it Go’s GC grows the heap until the OOM killer wins — the single most common Go-in-k8s problem.',
-          'Also set **`GOMAXPROCS`** to the CPU limit. It defaults to the *host’s* core count, so on a 64-core node with a 2-core quota you get 64 schedulers fighting over 2 cores, and very slow responses.',
+          'Set **`GOMEMLIMIT`** to about 90% of the container limit. Without it the GC paces itself only by `GOGC` and ignores the container limit, so the heap can grow until the OOM killer wins.',
+          'Check **`GOMAXPROCS`** against the CPU limit. Before Go 1.25 it defaulted to the *host’s* core count, so on a 64-core node with a 2-core quota you got 64 schedulers sharing 2 cores of quota, and CPU throttling showed up as latency spikes. From Go 1.25 the runtime reads the cgroup CPU limit on Linux, so say which version you run.',
           'Then look for the actual leak: goroutines that never exit (check the goroutine profile), small slices holding whole large buffers alive, and unbounded caches.',
         ],
       },
@@ -397,7 +397,7 @@ if err := doWork(); err != nil {
         heading: '"How would you scale this to 10x traffic?"',
         bullets: [
           'Measure first, then in this order: **index the queries → cache the hot reads → add read replicas → shard.** Say the order and why each is cheaper than the next.',
-          'For a Go service specifically: the connection pool is your backpressure, so you have to choose its size carefully — 500 concurrent goroutines against a pool of 25 just means 475 are queueing.',
+          'For a Go service specifically: the connection pool is your backpressure, so choose its size deliberately: 500 concurrent goroutines against a pool of 25 means 475 are queueing.',
           'Horizontal scaling implications you own: no in-process state, no local disk for uploads (move to S3), rate limiting moves to Redis or every instance allows the full limit.',
         ],
       },
@@ -405,7 +405,7 @@ if err := doWork(); err != nil {
         heading: '"How do you deploy it?"',
         bullets: [
           'Multi-stage Docker build, `CGO_ENABLED=0`, distroless or scratch base, non-root user. About 15MB, with no shell and no package manager to attack.',
-          'Migrations run separately from the app, and must be **backwards compatible with the currently-running code** — add a nullable column, deploy code that writes it, backfill, then tighten. Never rename in one step.',
+          'Migrations run separately from the app, and must be **backwards compatible with the currently-running code**: add a nullable column, deploy code that writes it, backfill, then tighten. Never rename in one step.',
           '`/livez` and `/readyz` as separate checks, because wiring a DB ping into liveness restarts every pod at once during a blip.',
         ],
       },
@@ -422,7 +422,7 @@ if err := doWork(); err != nil {
       'Structure the project answer: what → layout → one decision and its cost → one thing you would change.',
       'Owner scoping belongs in the SQL. That single line answers the whole security question.',
       'Slow endpoint: measure, then N+1, then indexes, then the pool. Go code is last.',
-      '`GOMEMLIMIT` and `GOMAXPROCS` are the two answers to "it misbehaves in a container".',
+      '`GOMEMLIMIT` and `GOMAXPROCS` are the two answers to "it misbehaves in a container" (the second is automatic from Go 1.25).',
     ],
     remember:
       'Every design answer is stronger when you name what it costs you. "I chose X, it cost me Y, and here is when I would switch" is the sentence they are listening for.',
@@ -431,12 +431,12 @@ if err := doWork(); err != nil {
       {
         task: 'Draw your service on paper — client, server, database, uploads — and mark where each failure mode lives.',
         answer:
-          'The failure modes cluster at the boundaries — the database, the third party, the disk. That is also where your timeouts belong.',
+          'The failure modes cluster at the boundaries: the database, the third party, the disk. That is also where your timeouts belong.',
       },
       {
-        task: 'Pick three decisions you made and write the honest cost of each. If a decision has no cost, you have not understood it.',
+        task: 'Pick three decisions you made and write down what each one cost. If a decision has no cost, you have not understood it.',
         answer:
-          'If a decision has no cost, you have not understood it yet. Every real choice gives something up.',
+          'Every real choice gives something up: time, flexibility, speed or simplicity. Name which one each decision spent.',
       },
       {
         task: 'Explain N+1 and its two fixes without using the word "database".',
@@ -446,7 +446,7 @@ if err := doWork(); err != nil {
       {
         task: 'Time yourself explaining graceful shutdown, from SIGTERM to process exit, in 60 seconds.',
         answer:
-          'Stop accepting connections, let the in-flight ones finish, cancel background work, then exit — with a deadline so it cannot hang.',
+          'Stop accepting connections, let the in-flight ones finish, cancel background work, then exit, with a deadline so it cannot hang.',
       },
     ],
     refs: [
@@ -459,7 +459,7 @@ if err := doWork(); err != nil {
     slug: 'interview-live-coding',
     title: 'Interview: the live coding round',
     navTitle: 'Interview — live coding',
-    oneLine: 'What they actually score while you type, and the Go-specific things that lose marks.',
+    oneLine: 'What they score while you type, and the Go-specific things that lose marks.',
     blocks: [
       {
         body: [
@@ -469,8 +469,8 @@ if err := doWork(); err != nil {
       {
         heading: 'Before you type a line',
         bullets: [
-          '**Restate the problem** in one sentence and get agreement. Half of failed rounds are a good solution to a different question.',
-          '**Ask about scale and input.** "Is this thousands or millions?" "Can the input be empty, or unsorted, or duplicated?" These change the answer and asking them is scored.',
+          '**Restate the problem** in one sentence and get agreement. A good solution to a different question still fails the round.',
+          '**Ask about scale and input.** "Is this thousands or millions?" "Can the input be empty, or unsorted, or duplicated?" These change the answer, and asking them is part of what is scored.',
           '**Say your plan out loud before coding.** Thinking silently for ninety seconds teaches them nothing about you.',
         ],
       },
@@ -491,9 +491,9 @@ if err := doWork(); err != nil {
         },
       },
       {
-        heading: 'The problems that actually come up',
+        heading: 'The problems that come up',
         bullets: [
-          '**Concurrent fetch of N URLs with a concurrency limit** — the single most common Go live question. `errgroup.SetLimit`, or a semaphore channel plus a `WaitGroup`.',
+          '**Concurrent fetch of N URLs with a concurrency limit** — one of the most common Go live questions. `errgroup.SetLimit`, or a semaphore channel plus a `WaitGroup`.',
           '**Word frequency count, top K** — a map, then move it to a slice and `slices.SortFunc`, because maps have no order.',
           '**An LRU cache** — a map plus a doubly linked list, with a mutex if they say "thread-safe" (and ask whether they want it thread-safe).',
           '**A rate limiter** — token bucket. Say `time.Ticker` plus a buffered channel, or that `x/time/rate` already does it.',
@@ -524,13 +524,13 @@ for i, u := range urls {
 if err := g.Wait(); err != nil {     // first error cancels the rest
 \treturn nil, err
 }`,
-          note: 'Writing to distinct indices of a preallocated slice is race-free and needs no mutex. Say that — it is the part most candidates get wrong by reaching for a lock or a channel.',
+          note: 'Writing to distinct indices of a preallocated slice is race-free and needs no mutex. Say that out loud. Reaching for a lock or a channel here is a common over-complication.',
         },
       },
       {
         heading: 'While you type',
         bullets: [
-          '**Handle errors as you go.** Do not say "I will add error handling later" — later never arrives and they have already written it down.',
+          '**Handle errors as you go.** Do not say "I will add error handling later". By then they have already written it down.',
           '**Name things properly** even under pressure. `users`, not `arr`. It costs nothing.',
           '**Say the complexity out loud** when you finish a function: "this is O(n) with one pass and one map".',
           '**Mention the test you would write**, even if there is no time to write it. "I would table-test empty input, one element, and duplicates."',
@@ -548,24 +548,24 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
       {
         callout: {
           tone: 'note',
-          text: 'A slightly simpler solution you can explain completely beats a clever one you cannot. That is true in the interview for the same reason it is true in the codebase — someone has to read it at 3am.',
+          text: 'A slightly simpler solution you can explain completely beats a clever one you cannot. That is true in the interview for the same reason as in the codebase: someone has to read it at 3am.',
         },
       },
     ],
     keyPoints: [
       'Restate the problem, ask about scale and input, and say the plan before typing.',
       'Errors, `ctx`, and bounded concurrency are what actually get marked in a Go round.',
-      'Have the `errgroup.SetLimit` fetch pattern memorised — it is the most common question.',
+      'Have the `errgroup.SetLimit` fetch pattern memorised. It is one of the most common questions.',
       'Narrate stuck moments. Silence scores worse than an imperfect answer.',
     ],
     remember:
       'They are not hiring the algorithm. They are hiring the person whose code the team will have to read.',
-    task: 'Do the concurrent URL fetch with a limit of 5, from a blank file, in under fifteen minutes — with error wrapping, a context, and a table-driven test. Then delete it and do it again tomorrow.',
+    task: 'Do the concurrent URL fetch with a limit of 5, from a blank file, in under fifteen minutes, with error wrapping, a context, and a table-driven test. Then delete it and do it again tomorrow.',
     exercises: [
       {
         task: 'Implement top-K word frequency, then state its complexity out loud.',
         answer:
-          'O(n) to count, O(m log m) to sort the distinct words — or O(m log k) with a heap if k is small.',
+          'O(n) to count, O(m log m) to sort the distinct words, or O(m log k) with a heap if k is small.',
       },
       {
         task: 'Write a thread-safe LRU cache and run it under `-race` with concurrent readers and writers.',
@@ -575,7 +575,7 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
       {
         task: 'Parse a 1GB file with `bufio.Scanner` and watch memory stay flat. Then try `io.ReadAll` and watch it not.',
         answer:
-          'Memory stays flat at a few kilobytes. `io.ReadAll` needs a gigabyte and may not finish.',
+          'Memory stays flat, at roughly the scanner’s buffer size. `io.ReadAll` needs more than a gigabyte, because it grows its buffer as it reads.',
       },
       {
         task: 'Set a 15-minute timer and solve one problem end to end, talking through it the whole time as if someone were watching.',
@@ -598,8 +598,8 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
       {
         heading: 'How to use this last topic',
         body: [
-          'This is the pass to make in the day or two before an interview. It is not new material — it is the short list of what is worth revising, how to handle a question you cannot answer, and what to ask them at the end.',
-          'The single most useful thing here is the summary table near the bottom: one line per area, covering the whole track. Cover the right column and see how much of it you can reconstruct.',
+          'This is the pass to make in the day or two before an interview. It is not new material. It is the short list of what is worth revising, how to handle a question you cannot answer, and what to ask them at the end.',
+          'The most useful part is the summary table near the bottom: one line per area, covering the whole track. Cover the right column and see how much of it you can reconstruct.',
         ],
       },
       {
@@ -619,14 +619,14 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
       {
         callout: {
           tone: 'note',
-          text: 'Do not learn anything new the night before. Revising what you already half-know converts far more of it into answers than a new topic does — and it stops you second-guessing yourself mid-sentence.',
+          text: 'Do not learn anything new the night before. Revising what you already half-know converts far more of it into answers than a new topic does, and it stops you second-guessing yourself mid-sentence.',
         },
       },
       {
         heading: 'How to answer anything you do not know',
         bullets: [
-          '**Say so, immediately, then reason.** "I have not used that. I would expect it to work like X because of Y — is that close?" That sounds honest and thoughtful. Bluffing sounds like neither, and they always know.',
-          'Never guess a confident wrong answer. One of those undoes three good ones.',
+          '**Say so, immediately, then reason.** "I have not used that. I would expect it to work like X because of Y — is that close?" That sounds honest and thoughtful. Bluffing sounds like neither, and interviewers usually notice.',
+          'Never guess a confident wrong answer. One of those can undo several good ones.',
           'If you half-remember, say which half: "I know it changed in 1.22, I am not certain of the exact semantics."',
         ],
       },
@@ -645,7 +645,7 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
         heading: 'Questions worth asking them',
         bullets: [
           '"How is the Go code laid out — by domain or by layer?" Their answer tells you a lot about the codebase you would inherit.',
-          '"Do you run the race detector in CI?" A “no” tells you a lot.',
+          '"Do you run the race detector in CI?" A “no” means concurrency bugs are being found in production.',
           '"What does your on-call look like, and what usually breaks?"',
           '"Where does the team disagree about Go style, and how is that settled?"',
           '"What would my first three months look like?"',
@@ -679,13 +679,13 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
       {
         callout: {
           tone: 'ok',
-          text: 'You have built a real API with authentication, a database, file uploads, tests and a container. That is more than most candidates bring. Talk about that project — concretely, with its costs — rather than reciting definitions, and you will be in the top half of the pile.',
+          text: 'You have built a real API with authentication, a database, file uploads, tests and a container. Talk about that project concretely, with its costs, rather than reciting definitions. It is the strongest material you have.',
         },
       },
     ],
     keyPoints: [
       'Revise the nine mechanics above and nothing new the night before.',
-      '"I do not know, but I would expect X because Y" beats a confident wrong answer every time.',
+      '"I do not know, but I would expect X because Y" beats a confident wrong answer.',
       'Have five questions ready — what you ask says as much as what you answer.',
       'Talk about your project concretely, with the costs of each decision.',
     ],
@@ -701,7 +701,7 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
       {
         task: 'Record yourself describing your project for three minutes, then listen back and cut a third.',
         answer:
-          'Almost everyone rambles on the setup and rushes the trade-offs. Cut the setup.',
+          'Most people ramble on the setup and rush the trade-offs. Cut the setup.',
       },
       {
         task: 'Write out the five questions you will ask them, and pick which two you will use if there is only time for two.',

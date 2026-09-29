@@ -112,8 +112,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         <div className="mb-5">
           <h2 className="text-[1.375rem] font-bold tracking-[-0.01em]">Work it through</h2>
           <p className="mt-2 text-[0.9375rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-            Five stages, gated. You write your answer for each stage before the model answer unlocks — that is
-            the entire method, and it is the only thing this app will not let you skip.
+            Five stages, gated. You write your answer for each stage before its model answer unlocks. That
+            is the core of the method.
           </p>
         </div>
         <StageEngine problem={p} stageIds={ALL_STAGES} />
@@ -123,7 +123,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
       <section className="border-t pt-10">
         <p className="mb-8 text-[0.8438rem]" style={{ color: 'var(--faint)' }}>
           Reference material for this problem. The diagrams below are here to check your own against once you
-          have drawn it — not to read first.
+          have drawn it, not to read first.
         </p>
 
         <Section title="The lifecycle">
@@ -150,7 +150,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
           </Section>
         ) : null}
 
-        <Section title="Follow-ups you should expect" sub="Interviews are lost in follow-ups, not in the first diagram.">
+        <Section title="Follow-ups you should expect" sub="Many interviews are decided in the follow-ups, not the first diagram.">
           <div className="space-y-2">
             {p.followUps.map((id) => {
               const f = getFollowUp(id)
@@ -186,8 +186,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         </Section>
 
         <Callout variant="say-this" title="Before you leave">
-          Try this problem again in a week without reading anything. The gap between what you write then and
-          what you wrote today is the only measure of progress that means anything.
+          Try this problem again in a week without reading anything. Comparing what you write then with
+          what you wrote today shows you what stuck.
         </Callout>
 
         <Link
@@ -201,8 +201,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
             </span>
             <span className="block text-[1.125rem] font-semibold">Read the full worked solution</span>
             <span className="mt-1 block text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
-              All five stages end to end, with every diagram and every cost named — written out the way you
-              would actually say it. Best read after you have had a go.
+              All five stages end to end, with the diagrams and the costs, written out the way you
+              would say it. Best read after you have had a go.
             </span>
           </span>
           <span
@@ -217,8 +217,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         <section className="mb-10">
           <h2 className="mb-2 text-[1.0625rem] font-semibold">How it is really built</h2>
           <p className="mb-4 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
-            Write your own answer first. Then read how the teams who run this at scale describe it —
-            their constraints were real, and the write-ups say what it cost them.
+            Write your own answer first. Then read how teams who run this at scale describe it.
+            Their constraints were real, and the write-ups often say what their choices cost.
           </p>
           <ul className="space-y-3">
             {p.refs.map((r) => (

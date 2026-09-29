@@ -9,20 +9,20 @@ export const PROJECT_SHOP: LangLesson[] = [
     slug: 'shop-overview',
     title: 'Project 3 — Small shop: what we are building',
     navTitle: 'Overview and plan',
-    oneLine: 'Products, images, a cart and a checkout — where roles, files and transactions arrive.',
+    oneLine: 'Products, images, a cart and a checkout. This is where roles, files and transactions arrive.',
     blocks: [
       {
         heading: 'Why a shop is the right third project',
         body: [
           'The expense tracker had accounts, but everybody was the same kind of user. A shop has two kinds: **customers**, who browse and buy, and **admins**, who add products. That difference introduces a new idea.',
-          'It also brings two things neither earlier project needed. **Files** — product images have to be uploaded, stored and served. And **money** — when somebody checks out, stock must go down and an order must be created, and it is not acceptable for one of those to happen without the other.',
+          'It also brings two things neither earlier project needed. **Files**: product images have to be uploaded, stored and served. And **money**: when somebody checks out, stock must go down and an order must be created, and one must never happen without the other.',
         ],
       },
       {
         heading: 'The architecture: ports and adapters (hexagonal)',
         body: [
-          'Project 1 grouped code by **layer**. Project 2 grouped it by **feature**. This project uses a third shape, and it is the one large Go teams reach for: **ports and adapters**, usually called **hexagonal architecture**, and closely related to what people call Clean Architecture.',
-          'The idea in one sentence: **your business rules sit in the middle and depend on nothing; everything that touches the outside world plugs into them.** HTTP, Postgres, the filesystem, a payment provider — none of those are the application. They are things the application talks to.',
+          'Project 1 grouped code by **layer**. Project 2 grouped it by **feature**. This project uses a third shape, common in larger Go codebases: **ports and adapters**, usually called **hexagonal architecture**, and closely related to what people call Clean Architecture.',
+          'The idea in one sentence: **your business rules sit in the middle and depend on nothing; everything that touches the outside world plugs into them.** HTTP, Postgres, the filesystem and a payment provider are not the application. They are things the application talks to.',
         ],
       },
       {
@@ -51,7 +51,7 @@ export const PROJECT_SHOP: LangLesson[] = [
       {
         heading: 'The rule that makes it work: dependencies point inwards',
         body: [
-          'The core declares the interfaces. The adapters implement them. So the arrow points from the outside **in** — Postgres depends on your core, not the other way around. That single inversion is the whole trick, and it is why this is also called **dependency inversion**.',
+          'The core declares the interfaces. The adapters implement them. So the arrow points from the outside **in**: the Postgres adapter depends on your core, not the other way around. This is the **dependency inversion** principle applied to the whole application.',
         ],
         code: {
           label: 'who imports whom',
@@ -70,13 +70,13 @@ export const PROJECT_SHOP: LangLesson[] = [
 // core/service imports: core/domain, core/port
 // adapter/*    imports: core/port, core/domain      <- inwards
 // cmd/api      imports: everything, and wires it together`,
-          note: 'Notice `core/service` never imports an adapter. It only ever knows the port. That is what lets you swap Postgres for anything else without touching a rule.',
+          note: '`core/service` never imports an adapter; it only knows the port. That is what lets you swap Postgres for anything else without touching a rule.',
         },
       },
       {
         heading: 'Why this project is the right place for it',
         body: [
-          'Hexagonal costs more than the other two layouts: more folders, more interfaces, more indirection. It pays for itself when you really expect the outside world to change — and a shop is exactly that case.',
+          'Hexagonal costs more than the other two layouts: more folders, more interfaces, more indirection. It pays for itself when you expect the outside world to change, and a shop is that case.',
         ],
         bullets: [
           '**Images start on local disk** and will have to move to S3 once you run more than one instance. With a `Storage` port, that is a second adapter and nothing else changes.',
@@ -127,7 +127,7 @@ export const PROJECT_SHOP: LangLesson[] = [
         heading: 'Authentication and authorisation are different',
         body: [
           'You already have **authentication**: the middleware from project two proves who somebody is. This project adds **authorisation**: deciding what that person is allowed to do.',
-          'They fail differently, and the difference matters. Failing authentication means "I do not know who you are" — that is a **401**. Failing authorisation means "I know who you are and you may not do this" — that is a **403**.',
+          'They fail differently, and the difference matters. Failing authentication means "I do not know who you are": a **401**. Failing authorisation means "I know who you are, and you may not do this": a **403**.',
           'The exception is when confirming a resource exists would itself leak something. Asking for another customer’s order should be a **404**, not a 403, because a 403 tells them the order is real.',
         ],
       },
@@ -154,7 +154,7 @@ export const PROJECT_SHOP: LangLesson[] = [
       'Authentication is who you are (401). Authorisation is what you may do (403).',
       'A shop needs two things earlier projects did not: files on disk and money that cannot be lost.',
       'Use 404 instead of 403 when a 403 would confirm something exists.',
-      'No real payments — the learning is in the transaction, not the card.',
+      'No real payments. The learning is in the transaction, not the card.',
     ],
     remember:
       'Roles are not a bigger login. They are a separate question asked after login has already been answered.',
@@ -163,7 +163,7 @@ export const PROJECT_SHOP: LangLesson[] = [
       {
         task: 'Decide what should happen if two people check out the last item at the same moment.',
         answer:
-          'One succeeds, one gets a clear out-of-stock error. Stock must never go negative — that is what step 6 builds.',
+          'One succeeds, one gets a clear out-of-stock error. Stock must never go negative; step 6 builds that.',
       },
       {
         task: 'Decide whether prices should be stored on the product or copied onto the order line, and why.',
@@ -349,7 +349,7 @@ CREATE INDEX ON orders (user_id, created_at DESC);`,
           rows: [
             [
               '`CHECK (stock >= 0)`',
-              'The database refuses to go below zero. Even a buggy checkout cannot oversell — the transaction fails instead.',
+              'The database refuses to go below zero. Even a buggy checkout cannot oversell: the UPDATE fails and the transaction rolls back.',
             ],
             [
               '`UNIQUE (user_id, product_id)` on cart_items',
@@ -369,7 +369,7 @@ CREATE INDEX ON orders (user_id, created_at DESC);`,
       {
         callout: {
           tone: 'warn',
-          text: 'Copying the price onto the order line is the most commonly missed decision in shop schemas. Without it, a price change rewrites every past order and your accounts stop adding up.',
+          text: 'Copying the price onto the order line is an easy decision to miss when you design a shop schema. Without it, a price change rewrites every past order and your accounts stop adding up.',
         },
       },
       {
@@ -390,7 +390,7 @@ docker exec -it shop-pg psql -U postgres -d shop -c '\\d products'
       {
         heading: 'Copy the shared files from project two',
         body: [
-          'The config package, the database pool, the JSON helpers, the user package and the auth middleware are the same as project two. Copy them across rather than retyping them — reusing your own earlier work is the point of having built it.',
+          'The config package, the database pool, the JSON helpers, the user package and the auth middleware are the same as project two. Copy them across rather than retyping them. Reusing your own earlier work is part of the point of having built it.',
         ],
         code: {
           label: 'terminal',
@@ -446,7 +446,7 @@ docker exec -it shop-pg psql -U postgres -d shop \\
       {
         task: 'Add the same product to a cart twice and see the UNIQUE constraint stop the second row.',
         answer:
-          'The second insert is rejected — which is exactly what `ON CONFLICT DO UPDATE` then turns into an increment.',
+          'The second insert is rejected. In step 5, `ON CONFLICT DO UPDATE` turns that rejection into an increment.',
       },
       {
         task: 'Write the `001_init.down.sql` that undoes this migration cleanly.',
@@ -475,13 +475,13 @@ docker exec -it shop-pg psql -U postgres -d shop \\
         heading: 'What a role is',
         body: [
           'A **role** is a label on a user that decides what they are allowed to do. This shop has two: `customer` and `admin`. Adding a product is admin-only; browsing is open to everyone.',
-          'The existing middleware answers "who are you" and puts the user id in the context. This step adds a second one that answers "may you do this" — and it has to run **after** the first, because it needs to know who the user is before it can look up their role.',
+          'The existing middleware answers "who are you" and puts the user id in the context. This step adds a second one that answers "may you do this". It has to run **after** the first, because it needs to know who the user is before it can check their role.',
         ],
       },
       {
         heading: 'Carry the role in the token',
         body: [
-          'You could look the role up in the database on every admin request. Putting it in the token avoids that query, at a cost worth stating plainly: if you demote an admin, their existing token keeps admin rights until it expires — up to fifteen minutes.',
+          'You could look the role up in the database on every admin request. Putting it in the token avoids that query, at a cost: if you demote an admin, their existing token keeps admin rights until it expires, up to fifteen minutes later.',
           'For this project that is an acceptable trade. For a bank it would not be, and there you would take the extra query.',
         ],
         code: {
@@ -551,7 +551,7 @@ mux.Handle("POST /v1/products",
 \tprotect(adminOnly(http.HandlerFunc(productH.Create))))
 mux.Handle("PATCH /v1/products/{id}",
 \tprotect(adminOnly(http.HandlerFunc(productH.Update))))`,
-          note: 'protect(adminOnly(handler)) reads inside-out: protect runs first, then adminOnly, then the handler. Getting that order backwards means the role check runs before anyone has been identified.',
+          note: 'In protect(adminOnly(handler)) the outermost wrapper runs first: protect, then adminOnly, then the handler. Getting that order backwards means the role check runs before anyone has been identified.',
         },
       },
       {
@@ -603,7 +603,7 @@ mux.Handle("PATCH /v1/products/{id}",
 \t}
 \treturn p, s.repo.Create(ctx, p)
 }`,
-          note: 'The upper bound is not paranoia. Without it, one typo creates a £1,000,000 product, and someone will find it.',
+          note: 'The upper bound catches typos. Without it, a few extra zeros create a product priced in the billions, and it stays in the catalogue until someone notices.',
         },
       },
       {
@@ -631,14 +631,14 @@ curl -si -X POST localhost:8080/v1/products -H "Authorization: Bearer $ADMIN" \\
 
 # browsing needs no token at all → 200
 curl -si localhost:8080/v1/products | head -1`,
-          note: 'Those four requests are the whole feature. Run all four every time you touch the middleware.',
+          note: 'Those four requests cover the feature. Run them every time you touch the middleware.',
         },
       },
     ],
     keyPoints: [
       'Authentication and authorisation are separate middlewares, and the order matters.',
       '401 means we do not know you. 403 means we do, and the answer is no.',
-      'A role in the token saves a query, at the cost of staying valid until the token expires. Say that out loud.',
+      'A role in the token saves a query, at the cost of staying valid until the token expires. Write that trade down where the next developer will see it.',
       'Validate an upper bound on price, not just a lower one.',
     ],
     remember:
@@ -648,7 +648,7 @@ curl -si localhost:8080/v1/products | head -1`,
       {
         task: 'Swap the wrapping order to `adminOnly(protect(...))` and work out what breaks.',
         answer:
-          'The role check runs before anyone is identified, so there is no role in the context and every request gets 401 — including admins.',
+          'The role check runs before anyone is identified, so there is no role in the context and every request gets 401, admins included.',
       },
       {
         task: 'Demote an admin in psql and see how long their existing token still works.',
@@ -663,7 +663,7 @@ curl -si localhost:8080/v1/products | head -1`,
       {
         task: 'Try to create a product with a price of `-500` and with `999999999999`.',
         answer:
-          'Both rejected — one by your lower bound, one by the upper. Without the upper bound a typo creates a product nobody can afford.',
+          'Both are rejected, one by the lower bound and one by the upper. Without the upper bound a typo creates a product nobody can afford.',
       },
     ],
     refs: [
@@ -680,23 +680,23 @@ curl -si localhost:8080/v1/products | head -1`,
       {
         heading: 'What multipart means',
         body: [
-          'A normal JSON request has one body. Uploading a file usually needs two things at once — the file itself and some fields describing it — so browsers use a format called **multipart/form-data**, which packs several named parts into one body.',
+          'A normal JSON request has one body. Uploading a file usually needs two things at once, the file itself and some fields describing it, so browsers use a format called **multipart/form-data**, which packs several named parts into one body.',
           'Go parses it for you with `r.ParseMultipartForm`, and `r.FormFile("file")` hands back the part you want. The parsing is the easy bit. The safety is not.',
         ],
       },
       {
-        heading: 'Every default here is wrong',
+        heading: 'None of the defaults are safe',
         bullets: [
-          '**Size:** by default Go will read as much as the client sends. A 4GB upload takes your process down before any of your checks run.',
+          '**Size:** by default Go will read as much as the client sends. A 4GB upload can fill your memory or disk before any of your checks run.',
           '**Type:** the file extension and the `Content-Type` header both come from the client, so both can lie.',
-          '**Name:** a filename of `../../etc/passwd` writes wherever it likes if you use it to build a path.',
+          '**Name:** a filename of `../../etc/passwd` writes wherever it likes if you use it to build a path. Recent Go versions strip the directory part from the name, but do not build a path from it anyway.',
           '**Cleanup:** if the file is written and the database row fails, you have a file nothing points at, forever.',
         ],
       },
       {
         heading: 'Part 1 — cap the body, then read the file',
         body: [
-          'The size cap has to come first, before anything reads the body. `ParseMultipartForm` gets the same limit so it cannot buffer more than you allow.',
+          'The size cap has to come first, before anything reads the body. `MaxBytesReader` enforces the limit. The number passed to `ParseMultipartForm` is how much it keeps in memory; anything larger spills to temporary files on disk.',
         ],
         code: {
           label: 'internal/adapter/handler/http/image.go — start the file',
@@ -774,7 +774,7 @@ curl -si localhost:8080/v1/products | head -1`,
       {
         heading: 'Part 4 — record it, and clean up if that fails',
         body: [
-          'The file is on disk. If the database row fails now, that file is orphaned — nothing will ever point at it or delete it. So remove it on the failure path.',
+          'The file is on disk. If the database row fails now, that file is orphaned: nothing points at it and nothing will delete it. So remove it on the failure path.',
         ],
         code: {
           label: 'internal/adapter/handler/http/image.go — finish the file',
@@ -802,14 +802,14 @@ var allowed = map[string]bool{
       {
         heading: 'Why io.Copy and not io.ReadAll',
         body: [
-          '`io.ReadAll` pulls the entire file into memory before writing it. Ten people uploading 5MB at the same time is 50MB of heap, and it grows exactly as badly as that suggests.',
-          '`io.Copy` streams through a small fixed buffer, so memory stays flat no matter how big the file is. This is what `io.Reader` and `io.Writer` exist for — an uploaded file and a file on disk are both just somewhere bytes come from and go to.',
+          '`io.ReadAll` pulls the entire file into memory before writing it. Ten people uploading 5MB at once is 50MB of heap, and it grows with every concurrent upload and every megabyte you allow.',
+          '`io.Copy` streams through a small fixed buffer, so its memory use does not grow with the file. This is what `io.Reader` and `io.Writer` exist for: an uploaded file and a file on disk are both somewhere bytes come from and go to.',
         ],
       },
       {
         callout: {
           tone: 'warn',
-          text: '`http.DetectContentType` reads the file’s magic bytes, so it tells you what the file really is. It is a **type** check, not a malware check. And never serve uploads from your own domain at a guessable path — a stored HTML or SVG that a browser renders is stored cross-site scripting on your own origin.',
+          text: '`http.DetectContentType` reads the file’s first bytes (its magic number), so it reports what the content looks like, whatever the name says. It is a **type** check, not a malware check. Be careful serving uploads from your main domain: a stored HTML or SVG file that a browser renders is stored cross-site scripting on your own origin. Many sites serve user uploads from a separate domain for that reason.',
         },
       },
       {
@@ -860,7 +860,7 @@ curl -si -X POST localhost:8080/v1/products/1/image \\
       {
         task: 'Remove the MIME check and upload an SVG containing a script tag. Then put the check back.',
         answer:
-          'It is stored, and served from your own domain a browser may execute it. That is stored cross-site scripting — put the check back.',
+          'It is stored, and when it is served from your own domain a browser may run the script. That is stored cross-site scripting. Put the check back.',
       },
       {
         task: 'Make the database insert fail on purpose and confirm the file is removed from disk.',
@@ -916,13 +916,13 @@ curl -si -X POST localhost:8080/v1/products/1/image \\
         heading: 'Why nosniff matters here',
         body: [
           'Some browsers will ignore the `Content-Type` you send and guess from the file contents instead. If somebody sneaks past your upload checks, that guessing is what turns a stored file into running code on your domain.',
-          '`X-Content-Type-Options: nosniff` tells the browser to believe your header and nothing else. One line, and it closes the whole category.',
+          '`X-Content-Type-Options: nosniff` tells the browser to believe your header and nothing else. One line closes that route. It does not help if the type you send is itself dangerous, such as `text/html` or `image/svg+xml`, which is why the upload allow-list matters too.',
         ],
       },
       {
         heading: 'What io.Reader and io.Writer actually are',
         body: [
-          'These two interfaces are why the Go standard library fits together so well. One method each, and that is the whole definition:',
+          'These two interfaces are much of why the Go standard library fits together. Each has one method:',
         ],
         code: {
           label: 'the standard library',
@@ -937,7 +937,7 @@ type Writer interface {
       },
       {
         body: [
-          'A file, a network connection, an HTTP request body, a buffer in memory, a gzip stream, a hash and `os.Stdout` are all one or both of these. So any function written against them works with all of them — and, more usefully, you can stack them.',
+          'A file, a network connection, an HTTP request body, a buffer in memory, a gzip stream, a hash and `os.Stdout` are all one or both of these. So any function written against them works with all of them, and you can stack them.',
         ],
         code: {
           label: 'stacking them',
@@ -957,14 +957,14 @@ json.NewEncoder(gz).Encode(data)
 
 io.LimitReader(r, 1<<20)        // a reader that stops after 1MB
 io.MultiWriter(f, os.Stdout)    // write to a file and the terminal at once`,
-          note: 'This is the payoff of small interfaces. One method is why a file, a socket and a buffer can all be used the same way.',
+          note: 'Because the interfaces are this small, almost any type can satisfy them, and wrappers such as gzip or a hash slot in between without either end knowing.',
         },
       },
       {
         heading: 'Local disk is fine, until it is not',
         body: [
-          'Storing files on local disk is the right first choice: no credentials, no network, easy to debug. It stops working the moment you run more than one instance — instance B cannot serve a file that landed on instance A — or when your container has no disk that survives a restart.',
-          'The fix is not to redesign now. Keep the storage calls behind a small type with `Save` and `Open` methods. Swapping local disk for S3 then means writing a second implementation, which is exactly when an interface earns its place.',
+          'Storing files on local disk is the right first choice: no credentials, no network, easy to debug. It stops working once you run more than one instance (instance B cannot serve a file that landed on instance A), or when your container has no disk that survives a restart.',
+          'The fix is not to redesign now. Keep the storage calls behind the `Storage` port, with `Save`, `Open` and `Remove`. Swapping local disk for S3 then means writing a second adapter, which is when an interface earns its place.',
         ],
         code: {
           label: 'internal/core/port/storage.go — the shape to aim for',
@@ -1000,22 +1000,22 @@ open http://localhost:8080/v1/images/$ID`,
     keyPoints: [
       '`http.ServeFile` handles ranges and caching. Set `nosniff` so the browser believes your Content-Type.',
       'Random, never-reused filenames mean images can be cached forever.',
-      '`io.Reader` and `io.Writer` have one method each — that is why everything composes and stacks.',
+      '`io.Reader` and `io.Writer` have one method each, which is why so much of the standard library composes.',
       'Keep storage behind three methods so S3 later is a second implementation, not a refactor.',
     ],
     remember:
-      'One-method interfaces are the reason files, sockets, buffers and HTTP bodies are interchangeable. It is the best design lesson in the standard library.',
+      'One-method interfaces are the reason files, sockets, buffers and HTTP bodies are interchangeable. It is one of the most useful design lessons in the standard library.',
     task: 'Serve images with the right headers, then load one in a real browser. Then write the `Storage` interface and move your disk code behind it.',
     exercises: [
       {
         task: 'Remove `nosniff`, upload an HTML file renamed to `.png`, and see what the browser does. Then put it back.',
         answer:
-          'Some browsers ignore your Content-Type and render it as HTML. `nosniff` closes that entirely.',
+          'Some browsers, older ones especially, ignore your Content-Type and render it as HTML. `nosniff` stops that.',
       },
       {
         task: 'Add gzip to a JSON endpoint with `gzip.NewWriter` and compare response sizes.',
         answer:
-          'Typically 70-90% smaller for JSON. Remember `defer gz.Close()`, or the last bytes are never flushed.',
+          'Often 70-90% smaller for repetitive JSON. Remember `defer gz.Close()`, or the last bytes are never flushed.',
       },
       {
         task: 'Write a second `Storage` implementation that keeps files in a map in memory, and use it in tests.',
@@ -1025,7 +1025,7 @@ open http://localhost:8080/v1/images/$ID`,
       {
         task: 'Use `io.LimitReader` to cap a download at 1MB and see where it cuts off.',
         answer:
-          'It stops at exactly 1MB and reports EOF. It is the reader-side twin of `MaxBytesReader`.',
+          'It stops at 1MB and reports a plain EOF, so the caller cannot tell a cut-off stream from a complete one. `MaxBytesReader` returns an error instead, which is why it is the one to use on request bodies.',
       },
     ],
     refs: [
@@ -1043,14 +1043,14 @@ open http://localhost:8080/v1/images/$ID`,
       {
         heading: 'What a cart is, in database terms',
         body: [
-          'A cart is not a special thing. It is rows in `cart_items` belonging to one user: a product, a quantity, and nothing else. There is no cart object, no session, no expiry — the rows are the cart.',
-          'Which means everything from project two applies unchanged. Every query is scoped with `WHERE user_id = $1`, and adding to somebody else’s cart has to be impossible rather than merely disallowed.',
+          'A cart is not a special thing. It is rows in `cart_items` belonging to one user: a product, a quantity, and nothing else. There is no cart object, no session, no expiry: the rows are the cart.',
+          'So everything from project two applies unchanged. Every query is scoped with `WHERE user_id = $1`, and adding to somebody else’s cart has to be impossible rather than merely disallowed.',
         ],
       },
       {
         heading: 'Adding an item — the naive way, and the good one',
         body: [
-          'Adding a product already in the cart should increase the quantity, not create a second row. The obvious approach is: SELECT to see if it is there, then INSERT or UPDATE. That is three round trips and a race between the check and the write.',
+          'Adding a product already in the cart should increase the quantity, not create a second row. The obvious approach is: SELECT to see if it is there, then INSERT or UPDATE. That is two round trips, and a race between the check and the write.',
           'SQL has one statement that does the whole thing, and the `UNIQUE (user_id, product_id)` constraint from step 1 is what makes it work.',
         ],
         code: {
@@ -1070,7 +1070,7 @@ open http://localhost:8080/v1/images/$ID`,
       {
         heading: 'Reading the cart with a join',
         body: [
-          'The cart rows hold only ids and quantities. To show a cart you also need names, prices and stock — which live on the product. One **join** brings them together in a single query.',
+          'The cart rows hold only ids and quantities. To show a cart you also need names, prices and stock, which live on the product. One **join** brings them together in a single query.',
         ],
         code: {
           label: 'internal/adapter/storage/postgres/cart.go',
@@ -1099,14 +1099,14 @@ open http://localhost:8080/v1/images/$ID`,
 \t}
 \treturn out, rows.Err()
 }`,
-          note: 'The alternative — fetch the cart rows, then loop and fetch each product — is the N+1 problem. One join, one round trip.',
+          note: 'Fetching the cart rows and then querying each product in a loop is the N+1 problem. One join is one round trip.',
         },
       },
       {
         heading: 'Totals belong in Go here, not in SQL',
         body: [
-          'A judgement call worth explaining. The monthly report in project two used SQL `SUM` because it added up thousands of rows. A cart has five. Adding those up in Go is clearer and the round trip saved is irrelevant.',
-          'The rule is not "always use SQL" or "always use Go" — it is *do the work where the data already is*, and a cart is small enough that it does not matter.',
+          'This is a judgement call. The monthly report in project two used SQL `SUM` because it added up thousands of rows. A cart has a handful, and the join has already brought them into Go. Adding them up there is clearer and costs nothing extra.',
+          'The rule is *do the work where the data already is*. For the report that was the database; here it is your Go code.',
         ],
         code: {
           label: 'internal/core/service/cart.go',
@@ -1147,7 +1147,7 @@ open http://localhost:8080/v1/images/$ID`,
 
 \treturn s.repo.AddItem(ctx, userID, productID, qty)
 }`,
-          note: 'This stock check is a courtesy, not a guarantee. Between here and checkout somebody else can buy the last one — which is exactly what step 6 has to handle.',
+          note: 'This stock check is a courtesy, not a guarantee. Between here and checkout somebody else can buy the last one, and step 6 has to handle that.',
         },
       },
       {
@@ -1171,7 +1171,7 @@ curl -s -H "Authorization: Bearer $CUST2" localhost:8080/v1/cart | jq`,
     keyPoints: [
       'A cart is just rows scoped to a user. Nothing about it is special.',
       '`ON CONFLICT ... DO UPDATE` does insert-or-increment in one statement, with no race.',
-      'One join beats fetching the cart then looping for each product — that loop is N+1.',
+      'One join beats fetching the cart then looping for each product. That loop is N+1.',
       'Do the arithmetic where the data is. Small set: Go. Large set: SQL.',
     ],
     remember:
@@ -1191,12 +1191,12 @@ curl -s -H "Authorization: Bearer $CUST2" localhost:8080/v1/cart | jq`,
       {
         task: 'Try adding a quantity of 0 and of 1000.',
         answer:
-          'Both rejected — 0 by the CHECK constraint and your validation, 1000 by your upper bound.',
+          'Both are rejected by your validation: 0 is below 1 and 1000 is above 99. The CHECK constraint would still catch 0 if validation missed it.',
       },
       {
         task: 'Add 20 different products, then check how many queries viewing the cart takes.',
         answer:
-          'One. The join fetches products alongside cart rows — the loop version would be 21.',
+          'One. The join fetches products alongside cart rows. The loop version would be 21.',
       },
     ],
     refs: [
@@ -1214,8 +1214,8 @@ curl -s -H "Authorization: Bearer $CUST2" localhost:8080/v1/cart | jq`,
       {
         heading: 'What a transaction is',
         body: [
-          'A **transaction** groups several database statements so they either all take effect or none of them do. You open it, run your statements, and then either **commit** — make it all real — or **roll back** — pretend none of it happened.',
-          'Checkout is the textbook case. It has to create an order, copy each cart line onto it, reduce stock for each product, and empty the cart. If the server dies after reducing stock but before creating the order, a customer has been charged nothing and the shop has lost inventory. Without a transaction that is a real outcome.',
+          'A **transaction** groups several database statements so they either all take effect or none of them do. You open it, run your statements, and then either **commit** (make it all permanent) or **roll back** (undo all of it).',
+          'Checkout is the textbook case. It has to create an order, copy each cart line onto it, reduce stock for each product, and empty the cart. If the server dies after reducing stock but before creating the order, a customer has been charged nothing and the shop has lost inventory. Without a transaction that can happen.',
         ],
       },
       {
@@ -1267,7 +1267,7 @@ func (r *Repository) Checkout(ctx context.Context, userID int64) (o *Order, err 
 
 \treturn o, tx.Commit()
 }`,
-          note: 'Every statement inside must use tx. One stray r.db call happens outside the transaction and will not be rolled back.',
+          note: 'Every statement inside must use tx. One stray r.db call runs on another connection, outside the transaction, and will not be rolled back.',
         },
       },
       {
@@ -1317,7 +1317,7 @@ func (r *Repository) Checkout(ctx context.Context, userID int64) (o *Order, err 
       {
         heading: 'Inside, part 3 — copy each line and take the stock',
         body: [
-          'This is the important part of the whole project. Look at the `WHERE` on the UPDATE — the check and the change are one statement, so nothing can slip between them.',
+          'This is the most important code in the project, and the `WHERE` on the UPDATE is why.',
         ],
         code: {
           label: 'internal/adapter/storage/postgres/order.go — continue',
@@ -1362,23 +1362,23 @@ func (r *Repository) Checkout(ctx context.Context, userID int64) (o *Order, err 
         heading: 'The line that prevents overselling',
         body: [
           'Look closely at `WHERE id = $2 AND stock >= $1`. The check and the change are the same statement, so nothing can happen between them.',
-          'Do it the other way — read the stock, check it in Go, then update — and two checkouts can both read "1 left", both decide it is fine, and both subtract. That gap is called a **race condition**, and putting the condition inside the UPDATE removes it entirely.',
+          'Do it the other way (read the stock without a row lock, check it in Go, then update) and two checkouts can both read "1 left", both decide it is fine, and both subtract. That gap is a **race condition**. Putting the condition inside the UPDATE removes it.',
           '`RowsAffected() == 0` is then how you find out somebody else got there first.',
         ],
       },
       {
         callout: {
           tone: 'note',
-          text: '`FOR UPDATE` locks the product rows until the transaction ends, so concurrent checkouts queue rather than clash. `ORDER BY ci.product_id` matters too: if two transactions lock the same rows in different orders they can deadlock. Always take locks in a consistent order.',
+          text: '`FOR UPDATE` and the conditional UPDATE overlap on purpose. The lock makes concurrent checkouts queue; the `WHERE` keeps the stock rule true even if a later change drops the lock. `ORDER BY ci.product_id` makes every checkout take its locks in the same order, so two of them cannot deadlock.',
         },
       },
       {
         heading: 'Transaction rules',
         bullets: [
           '**Keep them short.** A transaction holds a connection from the pool for its whole life.',
-          '**Never call an external service inside one.** A slow payment provider would hold a database connection and, with enough of them, use up the pool.',
+          '**Never call an external service inside one.** A slow payment provider would hold a database connection and its row locks, and with enough of them, use up the pool.',
           '**Always use `tx`, never `db`,** for every statement inside.',
-          '**Lock rows in a consistent order** everywhere in your codebase, or two transactions will eventually deadlock.',
+          '**Lock rows in a consistent order** everywhere in your codebase, or two transactions can deadlock.',
         ],
       },
       {
@@ -1401,7 +1401,7 @@ wait
 # exactly one order, and stock is 0 — never -1
 docker exec -it shop-pg psql -U postgres -d shop \\
   -c "SELECT stock FROM products WHERE id=1; SELECT count(*) FROM orders;"`,
-          note: 'This is the test that matters. Run it several times — a race that only shows up sometimes is still a race.',
+          note: 'Run it several times. A race that only shows up sometimes is still a race.',
         },
       },
     ],
@@ -1416,14 +1416,14 @@ docker exec -it shop-pg psql -U postgres -d shop \\
     task: 'Build checkout as one transaction, then run the two-customers-one-item test several times. Stock must never go negative and exactly one order must exist.',
     exercises: [
       {
-        task: 'Remove `AND stock >= $1` and run the race test again until you see stock go negative.',
+        task: 'Remove `AND stock >= $1` and run the race test again. Work out what still stops stock going negative.',
         answer:
-          'Stock goes negative and both orders succeed. You have sold something you do not have.',
+          'Stock still cannot go negative: `FOR UPDATE` makes the second checkout wait, and `CHECK (stock >= 0)` rejects its UPDATE. But that customer now gets a 500 from a constraint error instead of a clear out-of-stock message. Drop the lock and the CHECK too, and both orders succeed with stock at -1.',
       },
       {
         task: 'Force an error after the order insert and confirm the whole thing rolls back.',
         answer:
-          'The order disappears entirely. Nothing between BeginTx and Commit is real until Commit runs.',
+          'The order never appears. Nothing between BeginTx and Commit is permanent until Commit runs.',
       },
       {
         task: 'Add a `time.Sleep` inside the transaction and watch the connection pool while sending several checkouts.',
@@ -1433,7 +1433,7 @@ docker exec -it shop-pg psql -U postgres -d shop \\
       {
         task: 'Change one query to use `r.db` instead of `tx` and work out exactly what breaks.',
         answer:
-          'That statement runs outside the transaction, so a rollback does not undo it. This is a very nasty bug to find.',
+          'That statement runs on another connection, outside the transaction, so a rollback does not undo it. If it touches a row the transaction has locked, it waits for that lock and the request hangs.',
       },
     ],
     refs: [
@@ -1451,7 +1451,7 @@ docker exec -it shop-pg psql -U postgres -d shop \\
       {
         heading: 'Orders: scoped, paged, and joined',
         body: [
-          'Nothing new here, which is the point — it is the same three rules from earlier projects applied together.',
+          'Nothing new here. It is the same three rules from earlier projects, applied together.',
         ],
         code: {
           label: 'internal/adapter/storage/postgres/order.go',
@@ -1499,7 +1499,7 @@ apiLimit := middleware.RateLimit(20, 40)      // generous for normal use
 mux.Handle("POST /v1/auth/login", authLimit(http.HandlerFunc(userH.Login)))
 mux.Handle("POST /v1/auth/register", authLimit(http.HandlerFunc(userH.Register)))
 mux.Handle("POST /v1/checkout", apiLimit(protect(http.HandlerFunc(orderH.Checkout))))`,
-          note: 'Login and register get the tight limit — that is where password-guessing attacks land.',
+          note: 'Login and register get the tight limit, because that is where password guessing and mass sign-ups land.',
         },
       },
       {
@@ -1548,7 +1548,7 @@ docker compose exec db psql -U postgres -d shop`,
   GOMAXPROCS: "2"             # match the CPU limit, not the host
 volumes:
   - uploads:/data/uploads     # uploads must outlive the container`,
-          note: 'Without GOMEMLIMIT the garbage collector grows the heap until the container is killed. Without GOMAXPROCS Go reads the host machine core count, not your limit.',
+          note: 'Without GOMEMLIMIT the garbage collector does not know the container’s memory limit. By default it lets the heap grow to about twice the live data before collecting, which can cross the limit and get the process OOM-killed. Before Go 1.25, GOMAXPROCS defaulted to the host’s core count rather than the container’s CPU limit. Go 1.25 reads the limit itself, but this Dockerfile builds with 1.22.',
         },
       },
       {
@@ -1595,12 +1595,12 @@ make check`,
     ],
     keyPoints: [
       'Orders are the same three rules again: scoped, paged, joined rather than looped.',
-      'Structured logs with `slog` — JSON in production, and never log secrets.',
+      'Structured logs with `slog`: JSON in production, and never log secrets.',
       'Rate-limit login and register hardest. That is where attacks land.',
       '`GOMEMLIMIT` and `GOMAXPROCS` in every container, and a volume for uploads.',
     ],
     remember:
-      'Shipping is pagination, logging, limits, a container and one hardening pass. None of it is hard, and skipping it is what separates a demo from a service.',
+      'Shipping is pagination, logging, limits, a container and one hardening pass. Each is small; together they are the difference between a demo and a service.',
     task: 'Finish orders, add logging and rate limits, containerise it, and work the hardening checklist line by line. Then run `make check` and get it green.',
     exercises: [
       {
@@ -1611,17 +1611,17 @@ make check`,
       {
         task: 'Restart the container and confirm uploaded images are still there. Then remove the volume and see them vanish.',
         answer:
-          'With the volume they survive; without it they are gone. Container filesystems do not persist.',
+          'With the volume they survive. Without it they are lost as soon as the container is removed and recreated, because the container’s own filesystem goes with it.',
       },
       {
         task: 'Set `GOMEMLIMIT` far too low and watch the garbage collector work harder in the logs.',
         answer:
-          'The GC runs far more often and CPU rises. Too high and the container gets OOM-killed instead — it is a real trade-off.',
+          'The GC runs far more often and CPU rises. Too high and the container gets OOM-killed instead. The right value sits a little below the container limit.',
       },
       {
         task: 'Find one thing to delete: a helper used once, or an interface with one implementation.',
         answer:
-          'Every codebase this age has one. Deleting is the highest-value edit you will make today.',
+          'Most codebases this size have one. Deleting it makes the code shorter and the next change easier.',
       },
     ],
     refs: [

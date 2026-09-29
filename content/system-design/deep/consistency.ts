@@ -2,7 +2,7 @@ import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const CONSISTENCY_DEEP: DeepDive = {
   intro:
-    'The summary said "precise words for how out of date a read is allowed to be". This page makes them precise. It covers the six models in the order of what they cost, how to pick one per feature rather than per system, the exact mechanics of read-your-own-writes, why eventual consistency lets reads go backwards, what strong consistency actually costs on a good day, and the sentence that turns this from vocabulary into a design.',
+    'The summary said "precise words for how out of date a read is allowed to be". This page makes them precise. It covers the six models in the order of what they cost, how to pick one per feature rather than per system, the mechanics of read-your-own-writes, why eventual consistency lets reads go backwards, what strong consistency costs on a good day, and the sentence that turns this from vocabulary into a design.',
   minutes: 20,
   sections: [
     {
@@ -26,7 +26,7 @@ export const CONSISTENCY_DEEP: DeepDive = {
         'Read-your-own-writes covers most user-facing complaints for a fraction of the cost of strong consistency.',
         'Monotonic reads is nearly free and removes a whole class of "the page keeps flickering" bugs.',
         'Causal consistency is usually what people mean when they say a system "feels" correct.',
-        'Strong consistency is the only one that costs you on every operation whether or not anything is broken.',
+        'Strong consistency is the one that adds a network round trip to every operation, whether or not anything is broken.',
       ],
       callouts: [
         {
@@ -44,7 +44,7 @@ export const CONSISTENCY_DEEP: DeepDive = {
       points: [
         'The fix is monotonic reads: pin a user to one replica, usually by hashing their session id, so their view of history only moves forward.',
         'It costs almost nothing, and it means one slow replica affects a fixed set of users rather than randomly affecting everyone.',
-        'A refresh producing an older value is one of the most reported and least understood bugs in replicated systems.',
+        'A refresh that shows an older value looks like a bug to users, and it is hard to reproduce because it depends on which replica served each read.',
         '"Eventually consistent" without a number is a phrase, not a design. Say how long eventual is, and what the user sees in the meantime.',
       ],
       visuals: [
@@ -52,7 +52,7 @@ export const CONSISTENCY_DEEP: DeepDive = {
           type: 'diagram',
           diagram: {
             caption:
-              'Two reads, two replicas, time moving backwards. Both answers are legal under eventual consistency — pinning the user to one replica is what makes their view monotonic.',
+              'Two reads, two replicas, time moving backwards. Both answers are legal under eventual consistency. Pinning the user to one replica is what makes their view monotonic.',
             nodes: [
               { id: 'u', label: 'User', kind: 'client', col: 0, row: 1 },
               { id: 'r1', label: 'Replica A', sub: 'caught up — 42', kind: 'store', col: 1, row: 0 },
@@ -70,27 +70,27 @@ export const CONSISTENCY_DEEP: DeepDive = {
     {
       heading: 'Read-your-own-writes, mechanically',
       body: [
-        'This is the single highest-value guarantee in a user-facing product, because almost every "the app lost my change" report is this and nothing else. It is also far cheaper than making the whole system strongly consistent, because you only have to be careful about one user\'s reads rather than about everybody\'s.',
+        'This is often the highest-value guarantee in a user-facing product, because many "the app lost my change" reports are this: the write succeeded, and the next read hit a lagging replica. It is also far cheaper than making the whole system strongly consistent, because you only have to be careful about one user\'s reads rather than about everybody\'s.',
         'There are three implementations, in increasing precision and increasing effort.',
       ],
       points: [
-        '**Session pinning**: after a user writes, mark their session and send their reads to the leader for a fixed window — ten or thirty seconds. Two lines of code. The window is a guess, and leader read load rises with your most active users.',
-        '**Write position tokens**: the write returns the log position it committed at, the client carries it, and a read waits for a replica that has reached at least that position. Precise, no guessed window, no unnecessary leader load — and reads can now block, which is a new latency risk.',
+        '**Session pinning**: after a user writes, mark their session and send their reads to the leader for a fixed window, say ten or thirty seconds. Two lines of code. The window is a guess, and leader read load rises with your most active users.',
+        '**Write position tokens**: the write returns the log position it committed at, the client carries it, and a read waits for a replica that has reached at least that position. Precise, no guessed window, no unnecessary leader load. The catch is that reads can now block, which is a new latency risk.',
         '**Client-side rendering**: do not re-fetch at all. The client already has the value it just submitted, so render that. Free, and it only covers the exact thing they just wrote.',
-        'Real systems use the third where they can and the first everywhere else, moving to the second when leader load becomes measurable.',
+        'A common pattern is the third where it fits and the first everywhere else, moving to the second when leader load becomes measurable.',
       ],
       callouts: [
         {
           variant: 'say-this',
-          text: '"A user\'s reads go to the leader for ten seconds after they write, so they always see their own changes. Everyone else reads replicas with a second or two of lag. Cost: leader read load rises with exactly my most active users, and I would move to write-position tokens if that became the bottleneck."',
+          text: '"A user\'s reads go to the leader for ten seconds after they write, so they always see their own changes. Everyone else reads replicas with a second or two of lag. Cost: leader read load rises with my most active users, and I would move to write-position tokens if that became the bottleneck."',
         },
       ],
     },
     {
-      heading: 'What strong consistency actually costs',
+      heading: 'What strong consistency costs',
       body: [
         'People choose strong consistency because it feels safe, and then are surprised that the system is slow when nothing is broken. That surprise comes from learning only the first half of PACELC.',
-        'Strong consistency means a write is not confirmed until a majority agrees, and often that a read consults a majority too. That is a round trip added to every operation, permanently. Inside one datacenter it is about half a millisecond and really cheap. Across regions it is 80 milliseconds or more, and it applies on every good day, not just during failures.',
+        'Strong consistency means a write is not confirmed until a majority agrees, and often that a read consults a majority too. That is a round trip added to every operation, permanently. Inside one datacenter the network part is about half a millisecond, which is cheap. Across regions it is 80 milliseconds or more, and it applies on every good day, not just during failures.',
       ],
       visuals: [
         {
@@ -102,13 +102,13 @@ export const CONSISTENCY_DEEP: DeepDive = {
               { label: 'Majority within one datacenter', value: 2, display: '~2 ms', tone: 'muted' },
               { label: 'Majority across regions', value: 80, display: '~80 ms, on every write, forever', tone: 'bad' },
             ],
-            note: 'The last row is not a failure cost. It is what you pay on a completely healthy Tuesday, which is the half of PACELC most people never learn.',
+            note: 'The last row is not a failure cost. It is what you pay on a completely healthy Tuesday, which is the half of PACELC that is easy to forget.',
           },
         },
       ],
       points: [
         'Strong consistency also means unavailability on the minority side of a network split. That is a choice you make on purpose, and for seats or balances it is the right one.',
-        'It does not scale by adding nodes — a bigger majority is slower to convince.',
+        'It does not scale by adding nodes: a bigger majority is slower to convince.',
         'Use it on the specific operation that needs it, not on the whole system. The same product can have a strongly consistent checkout and an eventually consistent feed.',
       ],
       callouts: [
@@ -119,10 +119,10 @@ export const CONSISTENCY_DEEP: DeepDive = {
       ],
     },
     {
-      heading: 'Choosing per feature — the sentence that scores',
+      heading: 'Choosing per feature: the sentence that scores',
       body: [
-        'The move that turns this from vocabulary into design is going feature by feature, out loud, in one breath. It demonstrates that you understand these as prices rather than as qualities.',
-        'A worked version for a social commerce product: "The like count is eventually consistent — a second of lag is invisible and I am not spending a round trip on it. A user\'s own posts are read-your-own-writes, or they will think it failed and post again. Comments under a post are causally consistent, so nobody sees a reply above the thing it replies to. The stock check at checkout is strongly consistent, and I accept the extra latency there because selling the same item twice costs real money."',
+        'The move that turns this from vocabulary into design is going feature by feature, out loud, in one breath. It shows you treat these as prices rather than as qualities.',
+        'A worked version for a social commerce product: "The like count is eventually consistent. A second of lag is invisible and I am not spending a round trip on it. A user\'s own posts are read-your-own-writes, or they will think it failed and post again. Comments under a post are causally consistent, so nobody sees a reply above the thing it replies to. The stock check at checkout is strongly consistent, and I accept the extra latency there because selling the same item twice costs real money."',
       ],
       points: [
         'Anything a human cannot tell is two seconds old: eventual.',
@@ -134,7 +134,7 @@ export const CONSISTENCY_DEEP: DeepDive = {
       callouts: [
         {
           variant: 'say-this',
-          text: '"Feed and counts eventual, own posts read-your-own-writes, comment threads causally ordered, checkout strong. Four features, four different prices — and the reason each one is different is what the failure costs, not what the database supports."',
+          text: '"Feed and counts eventual, own posts read-your-own-writes, comment threads causally ordered, checkout strong. Four features, four different prices, and the reason each one is different is what the failure costs, not what the database supports."',
         },
       ],
     },
@@ -145,16 +145,16 @@ export const CONSISTENCY_DEEP: DeepDive = {
       ],
       points: [
         'Saying "eventually consistent" with no number. How long is eventual, and what does the user see meanwhile?',
-        'Applying one model to the whole system. Real products need four different answers and saying so is the signal.',
+        'Applying one model to the whole system. Most products need several different answers, and saying so is what the interviewer is listening for.',
         'Forgetting that eventual consistency permits reads to go backwards, then being unable to explain the flickering count.',
-        'Checking a value in application code and then writing — that gap is a race no consistency model closes for you.',
+        'Checking a value in application code and then writing. That gap is a race no consistency model closes for you.',
         'Confusing consistency with durability. A write can be strongly consistent and still lost if it was never fsynced.',
-        'Confusing the C in ACID with the C in CAP. They are unrelated: the first means database constraints hold, the second means all replicas agree.',
+        'Confusing the C in ACID with the C in CAP. They are unrelated: the first means database constraints hold, the second means linearizability: every read sees the latest confirmed write, as if there were one copy.',
       ],
       callouts: [
         {
           variant: 'trap',
-          text: 'The last one is a genuine trap rather than being fussy. Being able to say "those are two different words that happen to share a letter" is a small, reliable senior signal.',
+          text: 'The last one matters more than it sounds. Saying "those are two different properties that happen to share a letter" is a small sign of seniority, and mixing them up undermines everything you say next about consistency.',
         },
       ],
     },
@@ -169,27 +169,27 @@ export const CONSISTENCY_EXAMPLE: WorkedExample = {
     {
       step: 'Price the blanket proposal',
       detail:
-        'Strong consistency everywhere means a majority round trip on every read and write. The product page alone does about eight reads, so at 2 ms of added coordination each that is 16 ms added to a page nobody needed protected — and if replicas ever span regions it becomes 640 ms and the product is unusable. It also means the page goes down entirely on the minority side of a network split, including the parts that could have been served perfectly well. Safety was not free and it was not even safety.',
+        'Strong consistency everywhere means a majority round trip on every read and write. The product page alone does about eight reads, so at about 2 ms of coordination each, run one after another, that is 16 ms added to a page nobody needed protected. If replicas ever span regions it becomes 640 ms and the product is unusable. It also means the page goes down entirely on the minority side of a network split, including the parts that could have been served perfectly well. The proposal was not free, and for most of the page it protected nothing.',
     },
     {
       step: 'View count: eventual',
       detail:
-        'Nobody can tell a view count is two seconds old, and nobody makes a decision from it. Eventual consistency, sharded counters, cached total refreshed every few seconds. The cost is that the number can briefly go backwards on refresh, which I remove cheaply by pinning a user to one replica — monotonic reads for almost nothing.',
+        'Nobody can tell a view count is two seconds old, and nobody makes a decision from it. Eventual consistency, sharded counters, cached total refreshed every few seconds. The cost is that the number can briefly go backwards on refresh, which I remove cheaply by pinning a user to one replica: monotonic reads for almost nothing.',
     },
     {
       step: 'Seller inventory: two answers, not one',
       detail:
-        'This is the interesting one, because the same data needs different guarantees in different places. The "3 left" badge on the browse page can be eventually consistent and slightly wrong — the worst case is mild disappointment. The stock check inside checkout must be strongly consistent, and specifically must be a conditional update inside the transaction that reserves the item, not a read followed by a decision. Same field, two guarantees, chosen by what being wrong costs at that moment.',
+        'This is the interesting one, because the same data needs different guarantees in different places. The "3 left" badge on the browse page can be eventually consistent and slightly wrong. The worst case is mild disappointment. The stock check inside checkout must be strongly consistent, and specifically must be a conditional update inside the transaction that reserves the item, not a read followed by a decision. Same field, two guarantees, chosen by what being wrong costs at that moment.',
     },
     {
       step: 'Reviews and replies: causal',
       detail:
-        'A reply appearing above the review it answers is not slow, it is nonsense, and users report it as a bug. But full strong consistency is not needed — nobody minds if a review takes two seconds to appear, only that it appears in the right order relative to its parent. So route all writes for one review thread through one partition, and ordering is free with no coordination at all.',
+        'A reply appearing above the review it answers is not slow, it is nonsense, and users report it as a bug. But full strong consistency is not needed. A review taking two seconds to appear is fine; what matters is it appears in the right order relative to its parent. So route all writes for one review thread through one partition, and ordering comes free, with no cross-partition coordination.',
     },
     {
       step: 'The seller\'s own listing: read-your-own-writes',
       detail:
-        'A seller edits a price and reloads. If a lagging replica serves that read, they see the old price, assume it failed, and edit again — creating a support ticket and possibly a duplicate. Pin their reads to the leader for ten seconds after any write. This is the cheapest fix on the whole page and it prevents the most common complaint.',
+        'A seller edits a price and reloads. If a lagging replica serves that read, they see the old price, assume it failed, and edit again, which creates a support ticket and possibly a duplicate. Pin their reads to the leader for ten seconds after any write. This is the cheapest fix on the page, and it prevents the complaint sellers are most likely to raise.',
     },
     {
       step: 'Say the whole thing in one breath',
@@ -198,6 +198,6 @@ export const CONSISTENCY_EXAMPLE: WorkedExample = {
     },
   ],
   outcome:
-    'The design pays for strong consistency on exactly one operation — the one where being wrong means selling stock you do not have — and pays nothing for it everywhere else. The blanket proposal would have cost 16 ms on every page load and taken the whole product down during a network split, in exchange for protecting a view counter nobody was going to complain about.',
+    'The design pays for strong consistency on one operation, the one where being wrong means selling stock you do not have, and pays nothing for it everywhere else. The blanket proposal would have cost 16 ms on every page load and taken the whole product down during a network split, in exchange for protecting a view counter nobody was going to complain about.',
   problemSlug: 'ticket-booking',
 }

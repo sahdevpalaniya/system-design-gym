@@ -27,7 +27,7 @@ export default function ContactPage() {
         <Prose
           paragraphs={[
             '**Found a mistake?** Say which page and what is wrong. Technical corrections are the most useful mail this site gets, and they get fixed.',
-            '**Want your data deleted?** Say so and it will be done — the account, the stored answers, all of it. No reason required.',
+            '**Want your data deleted?** Say so and it will be done: the account, the stored answers, all of it. No reason required.',
             '**Security problem?** See [/.well-known/security.txt](/.well-known/security.txt) for the reporting address.',
           ]}
         />

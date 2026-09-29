@@ -190,7 +190,7 @@ export default function DrillsPage() {
       <PageHeader
         eyebrow="The follow-up engine"
         title="Defence drills"
-        lede="Interviews are lost in follow-ups, not in the first diagram. Ninety seconds each: the question, your defence, then **what a weak answer sounds like, what a strong one sounds like, and the trap hidden in the question**."
+        lede="Many interviews are decided in the follow-ups, not the first diagram. Ninety seconds each: the question, your defence, then **what a weak answer sounds like, what a strong one sounds like, and the trap hidden in the question**."
         meta={
           <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
             {FOLLOW_UPS.length} questions across {CATEGORIES.length} categories
