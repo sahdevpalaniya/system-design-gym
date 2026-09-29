@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const CLICK_ANALYTICS: Problem = {
   slug: 'click-analytics',
-  searchTitle: "Design a click analytics pipeline",
+  searchTitle: "Design an ad click aggregator",
   title: 'Click analytics pipeline',
   navTitle: 'Click analytics',
   group: 'pipelines',

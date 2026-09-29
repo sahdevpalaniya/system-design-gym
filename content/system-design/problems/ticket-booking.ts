@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const TICKET_BOOKING: Problem = {
   slug: 'ticket-booking',
-  searchTitle: "Design a ticket booking system",
+  searchTitle: "Design ticket booking (Ticketmaster)",
   title: 'Ticket booking',
   group: 'contested',
   difficulty: 'core',

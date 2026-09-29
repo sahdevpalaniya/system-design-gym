@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const TYPEAHEAD: Problem = {
   slug: 'typeahead',
-  searchTitle: "Design search autocomplete",
+  searchTitle: "Design search autocomplete (Google)",
   title: 'Search typeahead',
   navTitle: 'Typeahead',
   group: 'search',

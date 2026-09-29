@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const FILE_SYNC: Problem = {
   slug: 'file-sync',
-  searchTitle: "Design a file sync service",
+  searchTitle: "Design file sync like Dropbox",
   title: 'File sync across devices',
   navTitle: 'File sync',
   group: 'sync',

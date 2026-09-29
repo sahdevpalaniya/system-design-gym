@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const SOCIAL_TIMELINE: Problem = {
   slug: 'social-timeline',
-  searchTitle: "Design a news feed",
+  searchTitle: "Design a news feed (Twitter)",
   title: 'Follower timeline',
   group: 'write-heavy',
   difficulty: 'core',

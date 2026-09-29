@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const PAYMENT_LEDGER: Problem = {
   slug: 'payment-ledger',
-  searchTitle: "Design a payment ledger",
+  searchTitle: "Design a payment system (Stripe)",
   title: 'Payments and ledger',
   navTitle: 'Payment ledger',
   group: 'money',

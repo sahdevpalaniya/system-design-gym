@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const NEARBY_PLACES: Problem = {
   slug: 'nearby-places',
-  searchTitle: "Design a nearby-places search",
+  searchTitle: "Design nearby places search (Yelp)",
   title: 'Nearby places',
   group: 'location',
   difficulty: 'core',
