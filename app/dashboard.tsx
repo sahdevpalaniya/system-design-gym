@@ -116,9 +116,10 @@ export function Dashboard() {
                 </span>
                 <Badge>{view.action.minutes} min</Badge>
               </div>
-              <h1 className="text-[1.625rem] leading-tight font-bold tracking-[-0.015em] sm:text-[1.875rem]">
+              {/* h2: the page's one <h1> is the introduction above */}
+              <h2 className="text-[1.625rem] leading-tight font-bold tracking-[-0.015em] sm:text-[1.875rem]">
                 {view.action.title}
-              </h1>
+              </h2>
               <p className="mt-3 mb-6 max-w-md text-[0.9688rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {view.action.body}
               </p>
