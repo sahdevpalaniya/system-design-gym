@@ -79,13 +79,14 @@ function sh(cmd: string, args: string[]): string | null {
 /** Compiles, vets and runs on the official Go Playground, which tracks the
  *  latest Go release, the same backend the Run button uses. The local
  *  toolchain may be older than the APIs the course teaches. */
-async function playground(
+async function playgroundOnce(
   src: string,
+  vet = true,
 ): Promise<{ out: string; err: string | null }> {
   const body = new URLSearchParams({
     version: "2",
     body: src,
-    withVet: "true",
+    withVet: vet ? "true" : "false",
   });
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
@@ -129,6 +130,13 @@ async function playground(
     }
   }
   return { out: "", err: "unreachable" };
+}
+
+/** Like the app: retry once when the Playground hits its build time limit. */
+async function playground(src: string, vet = true): Promise<{ out: string; err: string | null }> {
+  const first = await playgroundOnce(src, vet)
+  if (first.err && /timeout running go build/.test(first.err)) return playgroundOnce(src, vet)
+  return first
 }
 
 function checkSyntax(src: string): string | null {
@@ -267,7 +275,8 @@ async function main() {
           break;
         }
         const nonce = newNonce();
-        const { out, err } = await playground(mergeForTest(code, ch.test, nonce));
+        // same as the app: challenge runs skip the separate vet pass
+        const { out, err } = await playground(mergeForTest(code, ch.test, nonce), false);
         const v = verdict(out, which === "starter" ? "" : (err ?? ""), nonce);
         // a starter that does not compile is fine: it is meant to be filled in
         if (which === "starter" && err) continue;

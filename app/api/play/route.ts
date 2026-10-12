@@ -37,7 +37,9 @@ export async function POST(req: Request) {
   const raw = await readCapped(req, MAX_BODY)
   if (raw === null) return NextResponse.json({ error: 'code too long' }, { status: 413 })
 
-  let body: { code?: string; action?: 'run' | 'share' }
+  // vet: false for challenge runs; `go test` already runs vet's key checks,
+  // and a second full vet pass pushes cold builds past the Playground's limit
+  let body: { code?: string; action?: 'run' | 'share'; vet?: boolean }
   try {
     body = JSON.parse(raw)
   } catch {
@@ -64,7 +66,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ url: `https://go.dev/play/p/${id}` })
     }
 
-    const form = new URLSearchParams({ version: '2', body: code, withVet: 'true' })
+    const form = new URLSearchParams({ version: '2', body: code, withVet: body.vet === false ? 'false' : 'true' })
     const res = await fetch(COMPILE, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

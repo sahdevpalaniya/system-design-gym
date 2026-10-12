@@ -33,12 +33,18 @@ export function Challenge({ c }: { c: LangChallenge }) {
     setResult(null)
     const nonce = newNonce()
     try {
-      const res = await fetch('/api/play', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: mergeForTest(code, c.test, nonce) }),
-      })
-      const data = await res.json()
+      // a cold build that imports net/http runs right up against the
+      // Playground's ~10s build limit, so one automatic retry is worth it
+      const send = async () =>
+        (
+          await fetch('/api/play', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: mergeForTest(code, c.test, nonce), vet: false }),
+          })
+        ).json()
+      let data = await send()
+      if (/timeout running go build/.test(data.errors ?? '')) data = await send()
       const errors = data.error || data.errors || data.vet || ''
       const output = data.output ?? ''
       setResult({ ...verdict(output, errors, nonce), output: visibleOutput(output) })

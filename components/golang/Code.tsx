@@ -70,12 +70,17 @@ export function CodeBlock({
     setOutput(null)
     setFailed(false)
     try {
-      const res = await fetch('/api/play', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code: program }),
-      })
-      const data = await res.json()
+      // one automatic retry when the Playground's build limit is hit
+      const send = async () =>
+        (
+          await fetch('/api/play', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: program }),
+          })
+        ).json()
+      let data = await send()
+      if (/timeout running go build/.test(data.errors ?? '')) data = await send()
 
       if (data.errors) {
         setFailed(true)
