@@ -1,5 +1,6 @@
 'use client'
 
+import { OpenInPlayground, playgroundTrouble } from './OpenInPlayground'
 import { useState, type ReactNode } from 'react'
 
 /*
@@ -174,6 +175,7 @@ export function CodeBlock({
             >
               {output}
             </pre>
+            {failed && playgroundTrouble(output) ? <OpenInPlayground code={program} /> : null}
           </div>
         ) : null}
       </div>

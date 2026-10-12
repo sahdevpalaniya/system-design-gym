@@ -160,7 +160,7 @@ export default function MockPage() {
     <Suspense
       fallback={
         <Page>
-          <PageHeader eyebrow={'Timed mock'} title={'Timed mock · 45 minutes'} lede={'A full problem under interview conditions, timed, with the clock visible.'} />
+          {/* no heading here: the streamed page's own <h1> replaces this, and two would show */}
           <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>

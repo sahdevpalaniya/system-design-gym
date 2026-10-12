@@ -2,7 +2,7 @@ import type { LangLesson } from '@/lib/types'
 
 /**
  * Go for coding rounds. The problems that turn up again and again in
- * placement tests and online assessments, each solved the way a Go reviewer
+ * campus hiring tests and online assessments, each solved the way a Go reviewer
  * would want to see it — and each with the Go-specific trap that costs marks.
  */
 
@@ -61,7 +61,7 @@ func main() {
 	input := "hello world from go\\nsecond line\\n"
 
 	// Line by line. The default limit is 64 KB per line; a long line
-	// (say 10 lakh numbers on one line) silently stops the scan.
+	// (say 1,000,000 numbers on one line) silently stops the scan.
 	// Buffer raises the limit, here to 1 MB.
 	sc := bufio.NewScanner(strings.NewReader(input))
 	sc.Buffer(make([]byte, 1024*1024), 1024*1024)
@@ -853,7 +853,7 @@ export const DSA: LangLesson[] = [
       {
         heading: 'Why plain fmt.Scan is slow',
         bullets: [
-          '`fmt.Scan(&x)` reads straight from `os.Stdin`, which is not buffered. To find where one number ends it asks the operating system for **one byte at a time**. Each ask is a system call, and 10 lakh numbers means millions of them.',
+          '`fmt.Scan(&x)` reads straight from `os.Stdin`, which is not buffered. To find where one number ends it asks the operating system for **one byte at a time**. Each ask is a system call, and 1,000,000 numbers means millions of them.',
           '`fmt.Println` has the same problem in reverse: every call is a separate write to the terminal or pipe.',
           '`bufio.NewReader(os.Stdin)` asks for 4096 bytes at once and hands them out from memory. `bufio.NewWriter(os.Stdout)` collects your output and writes it in big chunks. Same `fmt` functions, just with an `F` in front: `fmt.Fscan(in, &x)`, `fmt.Fprintln(out, x)`.',
         ],
@@ -886,7 +886,7 @@ export const DSA: LangLesson[] = [
           rows: [
             ['numbers separated by spaces or newlines', '`bufio.NewReader` + `fmt.Fscan`'],
             ['whole lines of text', '`bufio.Scanner` (+ `Buffer` if a line can pass 64 KB)'],
-            ['lakhs of numbers, tight time limit', '`bufio.Scanner` with `ScanWords` + `strconv.Atoi`, the fastest of the three'],
+            ['millions of numbers, tight time limit', '`bufio.Scanner` with `ScanWords` + `strconv.Atoi`, the fastest of the three'],
             ['any output', '`bufio.NewWriter` + `defer Flush()`'],
           ],
         },
@@ -904,7 +904,7 @@ export const DSA: LangLesson[] = [
     exercises: [
       { task: 'Delete the `defer out.Flush()` line from the example and run it. What is printed?', answer: 'Nothing. The answers sit in the writer\'s memory buffer and are thrown away when the program ends.' },
       { task: 'The input is one line with `n` and then `n` names on the next line. Which reader do you pick, and why?', answer: '`bufio.NewReader` + `fmt.Fscan` works: `Fscan` into a `string` reads one word. A `bufio.Scanner` with `ScanWords` works too.' },
-      { task: 'A problem gives 10 lakh numbers on a single line and your `bufio.Scanner` loop reads none of them. What went wrong and what is the fix?', answer: 'The line is longer than the 64 KB default, so `Scan()` returned false at once. Call `sc.Buffer(make([]byte, 1<<20), 1<<24)` before scanning, or use `ScanWords`.' },
+      { task: 'A problem gives 1,000,000 numbers on a single line and your `bufio.Scanner` loop reads none of them. What went wrong and what is the fix?', answer: 'The line is longer than the 64 KB default, so `Scan()` returned false at once. Call `sc.Buffer(make([]byte, 1<<20), 1<<24)` before scanning, or use `ScanWords`.' },
       { task: 'Why does the example take `io.Reader` and `io.Writer` instead of using `os.Stdin` and `os.Stdout` directly?', answer: 'So the same function can read from a `strings.Reader` in a test and from stdin on the judge, and write to a `bytes.Buffer` or to stdout.' },
     ],
     challenge: {"prompt":"Write `Solve(r io.Reader, w io.Writer)`. The input is `T`, then `T` test cases; each case is `n` followed by `n` integers (spaces and newlines may be mixed freely). Print the sum of each case on its own line. Read through `bufio.NewReader` and write through `bufio.NewWriter` with `defer Flush()`: the hidden tests count your Read and Write calls on a big input. Example: `\"2\\n3\\n1 2 3\\n2\\n-5 5\\n\"` → `\"6\\n0\\n\"`.","starter":"package main\n\nimport (\n\t\"fmt\"\n\t\"io\"\n)\n\n// Solve reads T cases of \"n, then n ints\" from r and prints each sum to w.\nfunc Solve(r io.Reader, w io.Writer) {\n\tvar t int\n\tfmt.Fscan(r, &t)\n\tfmt.Fprintln(w, t) // your code here\n}\n","test":"package main\n\nimport (\n\t\"bytes\"\n\t\"fmt\"\n\t\"io\"\n\t\"strings\"\n\t\"testing\"\n)\n\n// slowReader hides the fast paths of strings.Reader and counts Read calls.\ntype slowReader struct {\n\tsrc   io.Reader\n\treads int\n}\n\nfunc (s *slowReader) Read(p []byte) (int, error) { s.reads++; return s.src.Read(p) }\n\ntype countWriter struct {\n\tbuf    bytes.Buffer\n\twrites int\n}\n\nfunc (c *countWriter) Write(p []byte) (int, error) { c.writes++; return c.buf.Write(p) }\n\nfunc TestSolve(t *testing.T) {\n\ttests := []struct{ in, want string }{\n\t\t{\"1\\n3\\n1 2 3\\n\", \"6\\n\"},\n\t\t{\"3\\n2\\n-5 5\\n0\\n1\\n1000000000000\\n\", \"0\\n0\\n1000000000000\\n\"},\n\t\t{\"2\\n4\\n7 7 7 7\\n3\\n-1 -2 -3\\n\", \"28\\n-6\\n\"},\n\t\t{\"2 3 1 2 3 2 10 20\", \"6\\n30\\n\"},\n\t\t{\"0\\n\", \"\"},\n\t}\n\tfor _, tc := range tests {\n\t\tvar out bytes.Buffer\n\t\tSolve(strings.NewReader(tc.in), &out)\n\t\tif got := out.String(); got != tc.want {\n\t\t\tt.Errorf(\"Solve(%q) = %q, want %q\", tc.in, got, tc.want)\n\t\t}\n\t}\n}\n\nfunc TestSolveBuffered(t *testing.T) {\n\tvar in, want strings.Builder\n\tconst cases = 2000\n\tfmt.Fprintln(&in, cases)\n\tfor i := 0; i < cases; i++ {\n\t\tfmt.Fprintln(&in, 5)\n\t\tfmt.Fprintln(&in, i, i, i, i, -i)\n\t\tfmt.Fprintln(&want, 3*i)\n\t}\n\tr := &slowReader{src: strings.NewReader(in.String())}\n\tw := &countWriter{}\n\tSolve(r, w)\n\tif got := w.buf.String(); got != want.String() {\n\t\tt.Errorf(\"Solve(%v cases) printed %v bytes, want %v\", cases, len(got), want.Len())\n\t}\n\tif r.reads > 100 {\n\t\tt.Errorf(\"Solve(%v cases) made %v Read calls, want at most %v (wrap r in bufio.NewReader)\", cases, r.reads, 100)\n\t}\n\tif w.writes > 20 {\n\t\tt.Errorf(\"Solve(%v cases) made %v Write calls, want at most %v (wrap w in bufio.NewWriter and Flush)\", cases, w.writes, 20)\n\t}\n}\n","solution":"package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"io\"\n)\n\nfunc Solve(r io.Reader, w io.Writer) {\n\tin := bufio.NewReader(r)\n\tout := bufio.NewWriter(w)\n\tdefer out.Flush()\n\n\tvar t int\n\tfmt.Fscan(in, &t)\n\tfor ; t > 0; t-- {\n\t\tvar n int\n\t\tfmt.Fscan(in, &n)\n\t\tsum := 0\n\t\tfor i := 0; i < n; i++ {\n\t\t\tvar x int\n\t\t\tfmt.Fscan(in, &x)\n\t\t\tsum += x\n\t\t}\n\t\tfmt.Fprintln(out, sum)\n\t}\n}\n"},
@@ -927,7 +927,7 @@ export const DSA: LangLesson[] = [
         ],
       },
       {"heading": "Tools you'll use here", "bullets": ["`slices.Sort(s)` sorts a slice of numbers or strings in place, smallest first.", "`slices.SortFunc(s, func(a, b T) int { return cmp.Compare(a.x, b.x) })` sorts by your own rule; `cmp.Compare` returns -1, 0 or 1 for you.", "Why `slices.Sort` works on any number or string type (generics, `cmp.Ordered`) is explained later in **Generics**, and `container/heap` in **The standard library**. Where a lesson uses a heap, it is an optional extra."]},
-      {"heading": "Brute force first", "body": ["Check every pair with two nested loops: for each `i`, try every `j > i` and see if `nums[i] + nums[j] == target`.", "**O(n²) time, O(1) space.** Fine for 100 numbers, far too slow for 10 lakh."]},
+      {"heading": "Brute force first", "body": ["Check every pair with two nested loops: for each `i`, try every `j > i` and see if `nums[i] + nums[j] == target`.", "**O(n²) time, O(1) space.** Fine for 100 numbers, far too slow for 1 million."]},
       {
         heading: 'The approach',
         body: [
@@ -1031,7 +1031,7 @@ export const DSA: LangLesson[] = [
           '**`min` and `max` are built-ins** since Go 1.21. `list[:min(k, len(list))]` stops a panic when `k` is bigger than the list.',
         ],
       },
-      {"heading": "Faster for big n (optional)", "body": ["Skip this on a first read. If `k` is small (say 10) and there are lakhs of distinct words, sorting all of them is wasted work. Keep only the best `k` in a min-heap from `container/heap`: push each word, and pop the weakest when the heap grows past `k`. That is **O(n + m log k)**.", "**`any`** is just another name for `interface{}`: a box that can hold a value of any type. `container/heap` was written before generics, so `Push` and `Pop` use it.", "**`x.(T)`** is a type assertion: \"I know the box `x` holds a `T`, give me the `T`\". If it holds something else, the program panics.", "`container/heap` needs you to write `Len`, `Less`, `Swap`, `Push` and `Pop`, then call `heap.Push(h, x)`, never `h.Push(x)` directly, or the heap order is not restored."]},
+      {"heading": "Faster for big n (optional)", "body": ["Skip this on a first read. If `k` is small (say 10) and there are hundreds of thousands of distinct words, sorting all of them is wasted work. Keep only the best `k` in a min-heap from `container/heap`: push each word, and pop the weakest when the heap grows past `k`. That is **O(n + m log k)**.", "**`any`** is just another name for `interface{}`: a box that can hold a value of any type. `container/heap` was written before generics, so `Push` and `Pop` use it.", "**`x.(T)`** is a type assertion: \"I know the box `x` holds a `T`, give me the `T`\". If it holds something else, the program panics.", "`container/heap` needs you to write `Len`, `Less`, `Swap`, `Push` and `Pop`, then call `heap.Push(h, x)`, never `h.Push(x)` directly, or the heap order is not restored."]},
       { code: { label: "top_k_heap.go", src: TOP_K_HEAP, run: TOP_K_HEAP } },
     ],
     keyPoints: [
@@ -1369,7 +1369,7 @@ export const DSA: LangLesson[] = [
           'Given distinct integers, return every subset (`[1 2 3]` has 8), and separately every permutation (it has 6).',
         ],
       },
-      {"heading": "Brute force first", "body": ["For permutations: generate every length-n sequence of the numbers with repeats allowed (nⁿ of them) and keep only the ones with no repeated number.", "**O(n · nⁿ) time.** For n = 8 that is 1.6 crore sequences to make 40,320 permutations. Backtracking only builds the ones that can work."]},
+      {"heading": "Brute force first", "body": ["For permutations: generate every length-n sequence of the numbers with repeats allowed (nⁿ of them) and keep only the ones with no repeated number.", "**O(n · nⁿ) time.** For n = 8 that is 16.7 million sequences to make 40,320 permutations. Backtracking only builds the ones that can work."]},
       {
         heading: 'The approach',
         body: [

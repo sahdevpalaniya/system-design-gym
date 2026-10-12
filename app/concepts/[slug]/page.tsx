@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { Byline } from '@/components/common/Byline'
+import { CrossLinks } from '@/components/common/CrossLinks'
 import { notFound } from 'next/navigation'
 import { CONCEPTS, TIER_INFO, getConcept } from '@/content/system-design/concepts'
 import { PROBLEMS } from '@/content/system-design/problems'
@@ -27,6 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     `${short} explained for a system design interview: ${c.oneLine} What it costs you, when to use it, when not to, and the follow-up interviewers ask.`,
     `/concepts/${c.slug}`,
     true,
+    true, // own opengraph-image
   )
 }
 
@@ -315,6 +318,8 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
           ) : null}
         </section>
       ) : null}
+      <CrossLinks path={`/concepts/${c.slug}`} />
+      <Byline title={c.title} path={`/concepts/${c.slug}`} />
     </Page>
   )
 }

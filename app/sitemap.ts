@@ -53,6 +53,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       at(`/languages/${l.id}/revise`, 0.6),
       ...(l.quizzes?.length ? [at(`/languages/${l.id}/quiz`, 0.6)] : []),
       ...(l.quizzes ?? []).map((q) => at(`/languages/${l.id}/quiz/${q.id}`, 0.5)),
+      ...l.sections.map((sec) => at(`/languages/${l.id}/topics/${sec.id}`, 0.7)),
       ...l.lessons.map((t) => at(`/languages/${l.id}/${t.slug}`, 0.8)),
     ]),
   ]

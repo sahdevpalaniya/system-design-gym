@@ -11,6 +11,7 @@ import { PROJECT_SHOP } from './project-shop'
 import { DATABASE } from './database'
 import { PRODUCTION } from './production'
 import { INTERVIEW } from './interview'
+import { COMPARE } from './compare'
 import { DSA } from './dsa'
 import { EXERCISES } from './exercises'
 import { QUIZZES } from './quiz'
@@ -25,7 +26,7 @@ export const GO: Language = {
   alias: 'Golang',
   tagline: 'Start from nothing. Finish with a real API you could put online.',
   blurb:
-    'Go is small enough to learn well, and big enough to build real things with. You start with variables. You finish with a working JSON API that has user accounts, a database, file uploads and tests. It uses only four outside packages. Everything else comes with Go. **Placement path:** if you are preparing for campus placements or online assessments, do Getting started → Core language → Go for coding rounds → Interview preparation first, and come back for the rest.',
+    'Go is small enough to learn well, and big enough to build real things with. You start with variables. You finish with a working JSON API that has user accounts, a database, file uploads and tests. It uses only four outside packages. Everything else comes with Go. **Interview path:** if you are preparing for campus hiring, new-grad interviews or online assessments, do Getting started → Core language → Go for coding rounds → Interview preparation first, and come back for the rest.',
   home: 'https://go.dev/',
   sections: [
     {
@@ -66,8 +67,9 @@ export const GO: Language = {
     },
     {
       id: 'dsa',
+      searchTitle: 'DSA in Go (Golang): coding interview problems, solved',
       name: 'Go for coding rounds',
-      blurb: 'How to read judge input fast, then fifteen problems placement tests and online assessments ask most (maps, slices, linked lists, trees, recursion, DP, graphs, sliding windows), each solved idiomatically in Go with the trap that costs marks.',
+      blurb: 'How to read judge input fast, then fifteen problems campus hiring tests and online assessments ask most (maps, slices, linked lists, trees, recursion, DP, graphs, sliding windows), each solved idiomatically in Go with the trap that costs marks.',
       lessons: [
         'dsa-fast-io',
         'dsa-two-sum',
@@ -186,10 +188,24 @@ export const GO: Language = {
       ],
     },
     {
+      id: 'compare',
+      name: 'Go comparisons',
+      searchTitle: 'Go (Golang) comparisons: which one to use and why',
+      blurb: 'The "X vs Y" questions people search and interviewers ask: goroutines vs threads, mutex vs channel, arrays vs slices, buffered vs unbuffered channels, and Go vs Java vs Python for first-job interviews.',
+      lessons: [
+        'goroutines-vs-threads',
+        'mutex-vs-channel',
+        'arrays-vs-slices',
+        'buffered-vs-unbuffered-channels',
+        'go-vs-java-vs-python-for-placements',
+      ],
+    },
+    {
       id: 'interview',
       name: 'Interview preparation',
       blurb: 'Everything above, written the way interviewers ask it. Plus the live coding round and a last checklist.',
       lessons: [
+        'go-interview-questions',
         'interview-language-fundamentals',
         'interview-concurrency',
         'interview-backend-and-design',
@@ -212,6 +228,7 @@ export const GO: Language = {
     ...DATABASE,
     ...PRODUCTION,
     ...DSA,
+    ...COMPARE,
     ...INTERVIEW,
   ]),
 }

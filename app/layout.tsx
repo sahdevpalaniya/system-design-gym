@@ -3,7 +3,7 @@ import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/common/Providers'
 import { Footer, Shell } from '@/components/common/Nav'
-import { ADSENSE_CLIENT, SITE_JSONLD, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
+import { SITE_JSONLD, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -28,8 +28,6 @@ export const metadata: Metadata = {
       ? { 'msvalidate.01': process.env.NEXT_PUBLIC_BING_VERIFICATION }
       : {},
   },
-  // lets AdSense verify the site during review; auto ads place the units
-  other: ADSENSE_CLIENT ? { 'google-adsense-account': ADSENSE_CLIENT } : {},
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   description:
     'Learn the method for system design interviews: requirements, numbers, design, tradeoffs. Write your answer first, then compare. 44 topics, 16 worked problems.',
@@ -56,13 +54,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_JSONLD) }} />
-        {ADSENSE_CLIENT && (
-          <script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT}`}
-            crossOrigin="anonymous"
-          />
-        )}
       </head>
       <body className="flex min-h-screen flex-col">
         <Providers>

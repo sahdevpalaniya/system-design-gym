@@ -279,3 +279,8 @@ input::placeholder {
     transition-duration: 0.001ms !important;
   }
 }
+
+/* sidebar groups fold with <details>; the chevron in the summary replaces the browser marker */
+summary::-webkit-details-marker {
+  display: none;
+}

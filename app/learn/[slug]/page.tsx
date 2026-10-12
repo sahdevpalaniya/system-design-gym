@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Byline } from '@/components/common/Byline'
 import { notFound } from 'next/navigation'
 import { LESSONS, getLesson } from '@/content/system-design/foundations'
 import { PATH, getConcept } from '@/content/system-design/concepts'
@@ -113,6 +114,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
           <span className="flex-1" />
         )}
       </nav>
+      <Byline title={l.title} path={`/learn/${l.slug}`} />
     </Page>
   )
 }

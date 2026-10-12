@@ -25,7 +25,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!p) return {}
   const search = p.searchTitle ?? `Design ${(p.navTitle ?? p.title).toLowerCase()}`
   return pageMeta(
-    `${search} — full worked solution`,
+    // the generic tail goes when it would push the brand-name title past ~60 chars
+    `${search} — full worked solution`.length > 60 ? `${search}: solution` : `${search} — full worked solution`,
     `${search}: the complete answer stage by stage — requirements, lifecycle, capacity numbers, the architecture and every tradeoff named out loud.`,
     `/problems/${p.slug}/solution`,
     true,
@@ -82,7 +83,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             <span style={{ color: 'var(--faint)' }}>Worked solution</span>
           </>
         }
-        title={`${p.title} — a full worked answer`}
+        title={`${p.searchTitle ?? p.title}: a full worked answer`}
         lede="The whole thing, start to finish, in the order you would actually say it. Read it to learn the shape of a strong answer — then go and produce one yourself, because reading is not the same skill as producing."
         meta={<Badge>{p.difficulty}</Badge>}
       />

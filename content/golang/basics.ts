@@ -234,7 +234,7 @@ func main() {
         heading: 'Go never converts a type for you',
         body: [
           'In most languages, an `int` next to a `float` is converted to a float for you. Go refuses. You write every conversion yourself.',
-          'This feels fussy until the first time it saves you. Implicit numeric conversion is where money code loses paise, and where an `int64` is squeezed into an `int32` with no warning. Go decided the cost of typing `float64(a)` is lower than the cost of finding that bug.',
+          'This feels fussy until the first time it saves you. Implicit numeric conversion is where money code loses cents, and where an `int64` is squeezed into an `int32` with no warning. Go decided the cost of typing `float64(a)` is lower than the cost of finding that bug.',
         ],
         code: {
           label: 'conversion.go',
@@ -332,7 +332,7 @@ func main() {
       'The cost of typing the conversion is lower than the cost of finding the bug it prevents.',
     ],
     remember:
-      'Implicit numeric conversion is where money code loses paise. Go makes you write it down.',
+      'Implicit numeric conversion is where money code loses cents. Go makes you write it down.',
     task: 'Convert an int to a float64 and back, and a string to both `[]byte` and `[]rune`. Print the length of each.',
     exercises: [
       {
@@ -1020,14 +1020,14 @@ func main() {
     ],
     blocks: [
       {
-        heading: 'Arrays are fixed; you will rarely use them',
+        heading: 'What is the difference between an array and a slice?',
         body: [
-          'In Go an array’s length is **part of its type**. `[3]int` and `[4]int` are different types, and passing an array to a function copies the whole thing. That is almost never what you want, so arrays mostly exist to be the thing a slice points at.',
+          'An array has a fixed length that is part of its type; a slice is a resizable view over an array, and it is what you use day to day. In Go an array’s length is **part of its type**. `[3]int` and `[4]int` are different types, and passing an array to a function copies the whole thing. That is almost never what you want, so arrays mostly exist to be the thing a slice points at.',
         ],
         code: { label: 'array.go', src: 'var arr [3]int = [3]int{1, 2, 3}\n// arr can never hold four elements' },
       },
       {
-        heading: 'Slices are what you actually use',
+        heading: 'What is a slice made of?',
         body: [
           'A slice is a small three-field value: a pointer to a backing array, a length, and a capacity. Length is how many elements you can index. Capacity is how many fit before Go has to allocate a bigger array.',
         ],
@@ -1049,9 +1049,9 @@ sub := s[1:3]                     // elements 1 and 2`,
         },
       },
       {
-        heading: 'The trap: slicing shares memory',
+        heading: 'Why does changing one slice change another?',
         body: [
-          'A sub-slice does not copy. It points into the same backing array. Change one, and you have changed the other.',
+          'Because slicing shares memory. A sub-slice does not copy. It points into the same backing array. Change one, and you have changed the other.',
         ],
         code: {
           label: 'sharing.go',
@@ -1084,9 +1084,9 @@ func main() {
         },
       },
       {
-        heading: 'Capping capacity with s[a:b:b]',
+        heading: 'How do you stop append from overwriting the original? (s[a:b:b])',
         body: [
-          'A sub-slice usually keeps the spare capacity of the array behind it. So `append` on the sub-slice can write straight over elements the original still uses. A **full slice expression** `s[low:high:max]` sets the capacity to `max - low`. Write `s[a:b:b]` and capacity equals length, so the next `append` has no room and copies to a new array instead of overwriting.',
+          'Cap the capacity with a full slice expression, `s[a:b:b]`, so the next `append` has to copy. A sub-slice usually keeps the spare capacity of the array behind it. So `append` on the sub-slice can write straight over elements the original still uses. A **full slice expression** `s[low:high:max]` sets the capacity to `max - low`. Write `s[a:b:b]` and capacity equals length, so the next `append` has no room and copies to a new array instead of overwriting.',
         ],
         code: {
           label: 'fullslice.go',
@@ -1255,9 +1255,9 @@ func Reversed(s []int) []int {
     ],
     blocks: [
       {
-        heading: 'Maps',
+        heading: 'What is a map in Go?',
         body: [
-          'A map is a hash table. Keys must be comparable with `==`. Strings, numbers, pointers, and structs whose fields are all comparable work. Slices, maps and funcs do not.',
+          'A map is a hash table: it stores values by key. Keys must be comparable with `==`. Strings, numbers, pointers, and structs whose fields are all comparable work. Slices, maps and funcs do not.',
         ],
         code: {
           label: 'maps.go',
@@ -2002,9 +2002,9 @@ func (r *Rect) Scale(f float64) {
     ],
     blocks: [
       {
-        heading: 'There is no "implements" keyword',
+        heading: 'How does a type implement an interface in Go?',
         body: [
-          'An interface lists method names. **Any type with those methods satisfies it automatically.** You never declare the relationship. The type does not need to know the interface exists, and the interface can be written years later by someone else.',
+          'Automatically: there is no "implements" keyword. An interface lists method names. **Any type with those methods satisfies it automatically.** You never declare the relationship. The type does not need to know the interface exists, and the interface can be written years later by someone else.',
           'That sounds like a small detail. It is the reason `io.Reader` works with files, network connections, buffers, gzip streams, and HTTP bodies, none of which were written with each other in mind.',
         ],
         code: {
@@ -2053,9 +2053,9 @@ func main() {
         },
       },
       {
-        heading: 'Small interfaces are the good ones',
+        heading: 'Why are small interfaces better?',
         body: [
-          '"The bigger the interface, the weaker the abstraction," as the Go Proverbs put it. The most widely used interfaces in the standard library have one method. `io.Reader` has `Read`. `error` has `Error`. `http.Handler` has `ServeHTTP`. A one-method interface is easy to satisfy, so everything plugs into it.',
+          'A small interface is easy to satisfy, so many types can plug into it. "The bigger the interface, the weaker the abstraction," as the Go Proverbs put it. The most widely used interfaces in the standard library have one method. `io.Reader` has `Read`. `error` has `Error`. `http.Handler` has `ServeHTTP`. A one-method interface is easy to satisfy, so everything plugs into it.',
         ],
         bullets: [
           '**Accept interfaces, return structs.** Take the narrowest thing you need as a parameter; return the concrete type so callers keep every method.',
@@ -2063,9 +2063,9 @@ func main() {
         ],
       },
       {
-        heading: 'The nil interface trap',
+        heading: 'Why is an interface holding a nil pointer not nil?',
         body: [
-          'This is one of the best-known Go bugs, and the Go FAQ has an entry for it. Meet it now rather than in production. An interface value holds two things: a type, and a value. It is `nil` only when **both** are empty.',
+          'Because an interface is nil only when both its type and its value are empty, and a nil pointer still has a type. This is one of the best-known Go bugs, and the Go FAQ has an entry for it. Meet it now rather than in production. An interface value holds two things: a type, and a value. It is `nil` only when **both** are empty.',
         ],
         code: {
           label: 'niltrap.go',
@@ -2268,9 +2268,9 @@ func TotalArea(shapes []Shape) float64 {
     ],
     blocks: [
       {
-        heading: 'error is just an interface',
+        heading: 'What is an error in Go?',
         body: [
-          'Now that you know what an interface is, `error` stops being magic. It is this, and nothing more:',
+          'An error is any value with an `Error() string` method: `error` is just a one-method interface. Now that you know what an interface is, `error` stops being magic. It is this, and nothing more:',
         ],
         code: { label: 'builtin', src: 'type error interface {\n\tError() string\n}' },
       },
@@ -2347,7 +2347,7 @@ func main() {
         },
       },
       {
-        heading: 'Wrapping: %w versus %v',
+        heading: 'What is the difference between %w and %v?',
         bullets: [
           '`%w` keeps the original error in a chain, so `errors.Is` and `errors.As` can still see it. This is the default choice.',
           '`%v` flattens it to text and breaks the chain. Use it on purpose when you want to *hide* an internal error from the caller.',
@@ -2356,9 +2356,9 @@ func main() {
         ],
       },
       {
-        heading: 'errors.As: getting the data back out',
+        heading: 'How do you get data out of an error with errors.As?',
         body: [
-          '`errors.Is` answers "is this that exact error?". When the error is a custom type carrying data, you want the value itself. `errors.As` walks the wrap chain looking for an error of the type you ask for. If it finds one, it stores it in your variable and returns `true`.',
+          'Pass `errors.As` a pointer to a variable of your error type; it finds that type in the wrap chain and fills the variable. `errors.Is` answers "is this that exact error?". When the error is a custom type carrying data, you want the value itself. `errors.As` walks the wrap chain looking for an error of the type you ask for. If it finds one, it stores it in your variable and returns `true`.',
           'You pass a **pointer to a variable** of the error type: `var ve *ValidationError` and then `errors.As(err, &ve)`. Forget the `&` and it panics, because it has nowhere to write the result.',
         ],
         code: {

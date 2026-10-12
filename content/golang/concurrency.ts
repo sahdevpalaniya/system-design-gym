@@ -85,7 +85,7 @@ func SumChunks(nums []int, n int) []int {
     },
     blocks: [
       {
-        heading: 'What a goroutine is',
+        heading: 'What is a goroutine?',
         body: [
           'A **goroutine** is a function that runs at the same time as the rest of your program. You start one by writing `go` in front of a function call. That is the whole syntax.',
           'They are very cheap. Starting one costs far less than a millisecond and a few kilobytes of memory, so a program can run thousands of them without trouble.',
@@ -119,7 +119,7 @@ func main() {
         },
       },
       {
-        heading: 'WaitGroup — wait for N goroutines to finish',
+        heading: 'How do you wait for goroutines to finish? (WaitGroup)',
         code: {
           label: 'waitgroup.go',
           src: `var wg sync.WaitGroup
@@ -158,9 +158,9 @@ func main() {
         },
       },
       {
-        heading: 'How it works underneath (optional)',
+        heading: 'How do goroutines work underneath? (optional)',
         body: [
-          'You can skip this on a first read. A goroutine is managed by the Go runtime, not the operating system. It starts with a small stack (2KB minimum) that grows as needed. An OS thread reserves a fixed stack of a megabyte or more (8MB by default on Linux) and needs a system call to create. That is why a Go server can run a hundred thousand goroutines, where a hundred thousand OS threads would strain the machine.',
+          'A goroutine is scheduled by the Go runtime onto a few OS threads, not given a thread of its own. You can skip this on a first read. A goroutine is managed by the Go runtime, not the operating system. It starts with a small stack (2KB minimum) that grows as needed. An OS thread reserves a fixed stack of a megabyte or more (8MB by default on Linux) and needs a system call to create. That is why a Go server can run a hundred thousand goroutines, where a hundred thousand OS threads would strain the machine.',
           'Go runs many goroutines on a few OS threads. When a goroutine blocks — on a channel, a mutex, a network read, a `time.Sleep` — the runtime parks it and runs another one on that thread. No thread sits idle waiting.',
           'This is what makes Go servers simple to write. You write plain blocking code that reads like a script, and the runtime handles the waiting for you. There are no callbacks and no `async`/`await`.',
         ],
@@ -247,9 +247,9 @@ func main() {
     challenge: {"prompt":"Write `SumBoth(a, b)`: receive every value from both channels until both are closed, and return the total. The hidden tests use **unbuffered** channels fed by one goroutine that alternates between them, so ranging over `a` and then `b` deadlocks. Use `select`, and set a channel to `nil` once it is closed so `select` stops picking it. Example: b sends 1, a sends 2, a closes, b sends 3, b closes: the result is `6`.","starter":"package main\n\nfunc SumBoth(a, b <-chan int) int {\n\ttotal := 0\n\tfor v := range a { // TODO: this waits for a to close before reading b\n\t\ttotal += v\n\t}\n\tfor v := range b {\n\t\ttotal += v\n\t}\n\treturn total\n}\n","test":"package main\n\nimport (\n\t\"fmt\"\n\t\"testing\"\n\t\"time\"\n)\n\n// feed plays a script on two unbuffered channels: \"a5\" sends 5 on a, \"A\" closes a.\nfunc feed(script []string) (<-chan int, <-chan int) {\n\ta, b := make(chan int), make(chan int)\n\tgo func() {\n\t\tfor _, s := range script {\n\t\t\tvar v int\n\t\t\tswitch s[0] {\n\t\t\tcase 'A':\n\t\t\t\tclose(a)\n\t\t\tcase 'B':\n\t\t\t\tclose(b)\n\t\t\tcase 'a':\n\t\t\t\tfmt.Sscan(s[1:], &v)\n\t\t\t\ta <- v\n\t\t\tcase 'b':\n\t\t\t\tfmt.Sscan(s[1:], &v)\n\t\t\t\tb <- v\n\t\t\t}\n\t\t}\n\t}()\n\treturn a, b\n}\n\nfunc TestSumBoth(t *testing.T) {\n\tcases := []struct {\n\t\tscript []string\n\t\twant   int\n\t}{\n\t\t{[]string{\"b1\", \"a2\", \"b3\", \"a4\", \"A\", \"b5\", \"B\"}, 15},\n\t\t{[]string{\"a10\", \"b-3\", \"a7\", \"B\", \"a1\", \"A\"}, 15},\n\t\t{[]string{\"A\", \"b4\", \"b5\", \"B\"}, 9},\n\t\t{[]string{\"B\", \"A\"}, 0},\n\t\t{[]string{\"b1000000000\", \"a1000000000\", \"B\", \"A\"}, 2000000000},\n\t\t{[]string{\"b2\", \"b2\", \"a3\", \"B\", \"a3\", \"A\"}, 10},\n\t}\n\tfor _, c := range cases {\n\t\ta, b := feed(c.script)\n\t\tgot := make(chan int, 1)\n\t\tgo func() { got <- SumBoth(a, b) }()\n\t\tselect {\n\t\tcase v := <-got:\n\t\t\tif v != c.want {\n\t\t\t\tt.Errorf(\"SumBoth(%v) = %v, want %v\", c.script, v, c.want)\n\t\t\t}\n\t\tcase <-time.After(time.Second):\n\t\t\tt.Errorf(\"SumBoth(%v) = %v, want %v\", c.script, \"stuck after 1s (use select)\", c.want)\n\t\t}\n\t}\n}\n","solution":"package main\n\nfunc SumBoth(a, b <-chan int) int {\n\ttotal := 0\n\tfor a != nil || b != nil {\n\t\tselect {\n\t\tcase v, ok := <-a:\n\t\t\tif !ok {\n\t\t\t\ta = nil // closed: never pick this case again\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\ttotal += v\n\t\tcase v, ok := <-b:\n\t\t\tif !ok {\n\t\t\t\tb = nil\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\ttotal += v\n\t\t}\n\t}\n\treturn total\n}\n"},
     blocks: [
       {
-        heading: 'The problem a channel solves',
+        heading: 'What problem does a channel solve?',
         body: [
-          'Goroutines run at the same time, so they need a safe way to hand each other results. Writing to a shared variable is a data race unless you add a lock, and even then the reader does not know *when* the value is ready.',
+          'A channel lets goroutines hand each other values safely, and tells the receiver exactly when a value is ready. Goroutines run at the same time, so they need a safe way to hand each other results. Writing to a shared variable is a data race unless you add a lock, and even then the reader does not know *when* the value is ready.',
           'A channel fixes both. One goroutine sends a value, another receives it, and the receive waits until the value is there. The handoff is the synchronisation: everything the sender did before the send is visible to the receiver after the receive.',
         ],
       },
@@ -296,9 +296,9 @@ func main() {
         },
       },
       {
-        heading: 'Unbuffered versus buffered',
+        heading: 'What is the difference between unbuffered and buffered channels?',
         body: [
-          'An **unbuffered** channel is a rendezvous. The sender blocks until a receiver takes the value, so both goroutines know the handoff happened. That synchronisation is often the point, not a cost.',
+          'An unbuffered channel makes the sender wait for a receiver; a buffered channel lets the sender continue until the buffer is full. An **unbuffered** channel is a rendezvous. The sender blocks until a receiver takes the value, so both goroutines know the handoff happened. That synchronisation is often the point, not a cost.',
           'A **buffered** channel is a queue. The sender carries on until the buffer is full. Use one when you have a specific reason: a known number of results, or a signal that must never block the sender. A buffer size picked by feel hides backpressure: when the consumer falls behind, the buffer absorbs it, and you only find out later, under load.',
         ],
       },
@@ -619,7 +619,7 @@ func main() {
     challenge: {"prompt":"Write `SleepCtx(ctx, d)`: wait for `d`, or stop early if `ctx` is done. Return `nil` if the time passed, or `ctx.Err()` if the context ended first. The hidden tests time you: a cancelled context must make a 2-second sleep return almost at once. Example: with a context that times out after 5ms, `SleepCtx(ctx, 2*time.Second)` returns `context.DeadlineExceeded` after about 5ms.","starter":"package main\n\nimport (\n\t\"context\"\n\t\"time\"\n)\n\nfunc SleepCtx(ctx context.Context, d time.Duration) error {\n\ttime.Sleep(d) // TODO: select on time.After(d) and ctx.Done()\n\treturn ctx.Err()\n}\n","test":"package main\n\nimport (\n\t\"context\"\n\t\"testing\"\n\t\"time\"\n)\n\nfunc TestSleepCtx(t *testing.T) {\n\tcancelled, cancel := context.WithCancel(context.Background())\n\tcancel()\n\tshort, cancel2 := context.WithTimeout(context.Background(), 5*time.Millisecond)\n\tdefer cancel2()\n\tlater, cancel3 := context.WithCancel(context.Background())\n\ttime.AfterFunc(10*time.Millisecond, cancel3)\n\tcases := []struct {\n\t\tname     string\n\t\tctx      context.Context\n\t\td        time.Duration\n\t\twant     error\n\t\tmin, max time.Duration\n\t}{\n\t\t{\"cancelled midway\", later, 2 * time.Second, context.Canceled, 0, 100 * time.Millisecond},\n\t\t{\"background\", context.Background(), 20 * time.Millisecond, nil, 20 * time.Millisecond, time.Second},\n\t\t{\"cancelled\", cancelled, 2 * time.Second, context.Canceled, 0, 50 * time.Millisecond},\n\t\t{\"timeout\", short, 2 * time.Second, context.DeadlineExceeded, 0, 100 * time.Millisecond},\n\t}\n\tfor _, c := range cases {\n\t\tstart := time.Now()\n\t\tgot := SleepCtx(c.ctx, c.d)\n\t\ttook := time.Since(start)\n\t\tif got != c.want {\n\t\t\tt.Errorf(\"SleepCtx(%v, %v) = %v, want %v\", c.name, c.d, got, c.want)\n\t\t}\n\t\tif took < c.min || took > c.max {\n\t\t\tt.Errorf(\"SleepCtx(%v, %v) took %v, want between %v and %v\", c.name, c.d, took, c.min, c.max)\n\t\t}\n\t}\n}\n","solution":"package main\n\nimport (\n\t\"context\"\n\t\"time\"\n)\n\nfunc SleepCtx(ctx context.Context, d time.Duration) error {\n\tt := time.NewTimer(d)\n\tdefer t.Stop()\n\tselect {\n\tcase <-t.C:\n\t\treturn nil\n\tcase <-ctx.Done():\n\t\treturn ctx.Err()\n\t}\n}\n"},
     blocks: [
       {
-        heading: 'Context: cancellation, deadlines, and request values',
+        heading: 'What is context used for in Go?',
         body: [
           '`context.Context` is how a Go program says "stop, nobody needs this any more". In a typical service it is the first parameter of every function that does I/O: database queries, HTTP calls, RPCs.',
         ],
@@ -653,9 +653,9 @@ func work(ctx context.Context) error {
         },
       },
       {
-        heading: 'context.WithoutCancel — keep the values, drop the cancellation',
+        heading: 'What does context.WithoutCancel do?',
         body: [
-          'Sometimes work must outlive the request that started it, such as writing an audit log after the response is sent. If you pass `r.Context()`, the log write is cancelled the moment the client disconnects. `context.WithoutCancel(ctx)` (Go 1.21) gives you a child that keeps every value (request ID, user ID) but is never cancelled and has no deadline.',
+          'It gives you a context that keeps the parent’s values but is never cancelled. Sometimes work must outlive the request that started it, such as writing an audit log after the response is sent. If you pass `r.Context()`, the log write is cancelled the moment the client disconnects. `context.WithoutCancel(ctx)` (Go 1.21) gives you a child that keeps every value (request ID, user ID) but is never cancelled and has no deadline.',
         ],
         code: {
           label: 'press Run — this executes on the Go Playground',
@@ -684,7 +684,7 @@ func main() {
         },
       },
       {
-        heading: 'context.AfterFunc — run something when a context ends',
+        heading: 'What does context.AfterFunc do?',
         body: [
           '`context.AfterFunc(ctx, f)` (Go 1.21) runs `f` in its own goroutine once `ctx` is done. It returns a `stop` function: calling `stop()` before then cancels the plan, and it returns `true` if it stopped `f` from running. Use it to clean up, such as closing a connection, without writing a goroutine that waits on `ctx.Done()`.',
         ],
@@ -1169,9 +1169,9 @@ func main() {
     challenge: {"prompt":"Write the generic function `Max[T cmp.Ordered](s []T) (T, bool)`: return the largest element and `true`, or the zero value and `false` for an empty slice. It must work for ints, floats, strings, and your own types built on them (like `type Celsius float64`), which is what the `~` inside `cmp.Ordered` allows. Example: `Max([3 -1 7 7])` returns `7, true`.","starter":"package main\n\nimport \"cmp\"\n\nfunc Max[T cmp.Ordered](s []T) (T, bool) {\n\tvar zero T\n\treturn zero, false // TODO: walk s and keep the biggest\n}\n","test":"package main\n\nimport \"testing\"\n\ntype Celsius float64\n\nfunc TestMax(t *testing.T) {\n\tints := []struct {\n\t\tin   []int\n\t\twant int\n\t\tok   bool\n\t}{\n\t\t{[]int{3, -1, 7, 7}, 7, true},\n\t\t{[]int{-5, -2, -9}, -2, true},\n\t\t{[]int{1 << 62, 1}, 1 << 62, true},\n\t\t{nil, 0, false},\n\t}\n\tfor _, c := range ints {\n\t\tif got, ok := Max(c.in); got != c.want || ok != c.ok {\n\t\t\tt.Errorf(\"Max(%v) = %v, %v, want %v, %v\", c.in, got, ok, c.want, c.ok)\n\t\t}\n\t}\n\twords := []string{\"pear\", \"apple\", \"zebra\", \"mango\"}\n\tif got, ok := Max(words); got != \"zebra\" || !ok {\n\t\tt.Errorf(\"Max(%v) = %v, %v, want %v, %v\", words, got, ok, \"zebra\", true)\n\t}\n\ttemps := []Celsius{-3.5, 21.25, 21}\n\tif got, ok := Max(temps); got != 21.25 || !ok {\n\t\tt.Errorf(\"Max(%v) = %v, %v, want %v, %v\", temps, got, ok, 21.25, true)\n\t}\n}\n","solution":"package main\n\nimport \"cmp\"\n\nfunc Max[T cmp.Ordered](s []T) (T, bool) {\n\tvar zero T\n\tif len(s) == 0 {\n\t\treturn zero, false\n\t}\n\tbest := s[0]\n\tfor _, v := range s[1:] {\n\t\tif v > best {\n\t\t\tbest = v\n\t\t}\n\t}\n\treturn best, true\n}\n"},
     blocks: [
       {
-        heading: 'What generics are for',
+        heading: 'What are generics for in Go?',
         body: [
-          'Suppose you write a function that finds the largest number in a slice of `int`. Then you need one for `float64`. Then one for your own `Cents` type. The logic is identical each time, but Go\'s type checking will not let you pass a `[]float64` where a `[]int` is expected, so you end up with three near-identical copies.',
+          'Generics let you write one function or type that works for many types, without copying the code. Suppose you write a function that finds the largest number in a slice of `int`. Then you need one for `float64`. Then one for your own `Cents` type. The logic is identical each time, but Go\'s type checking will not let you pass a `[]float64` where a `[]int` is expected, so you end up with three near-identical copies.',
           '**Generics** let you write it once, with the type left as a blank to be filled in at the call site. The blank is called a **type parameter**, and a **constraint** says which types are allowed to fill it.',
           'The next topic is the standard library: the packages that ship with Go. Much of what you might write generically is already there.',
         ],
@@ -1254,7 +1254,7 @@ func main() {
         },
       },
       {
-        heading: 'Generics are for types; interfaces are for behaviour',
+        heading: 'When should you use generics instead of interfaces?',
         bullets: [
           '**Use generics for** containers (a typed cache, set, or queue) and functions over any slice or map. The `slices` and `maps` packages in the stdlib are built this way.',
           '**Use an interface when** the thing you care about is what a type *does*. `Shape` is an interface, not a generic.',

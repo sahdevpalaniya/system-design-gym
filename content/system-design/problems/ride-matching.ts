@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const RIDE_MATCHING: Problem = {
   slug: 'ride-matching',
-  searchTitle: "Design a ride-hailing app (Uber)",
+  searchTitle: "Design a ride-hailing app like Uber / Ola",
   title: 'Ride matching',
   group: 'matching',
   difficulty: 'hard',

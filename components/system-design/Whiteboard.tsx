@@ -1141,7 +1141,16 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
     </div>
   )
 
-  if (!full) return card
+  if (!full)
+    return (
+      <>
+        {/* drawing works with touch, but a phone screen is cramped for a diagram */}
+        <p className="mb-2 text-[0.8125rem] sm:hidden" style={{ color: 'var(--muted)' }}>
+          On a phone, drawing is cramped. Use full screen, or describe the boxes and arrows in the text answer instead.
+        </p>
+        {card}
+      </>
+    )
   return (
     <div className="fixed inset-0 z-50" style={{ background: 'var(--surface)' }}
       role="dialog" aria-modal="true" aria-label="Whiteboard, full screen">

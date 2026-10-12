@@ -320,7 +320,7 @@ func main() {
           '**`int` for counting anything.** It is the default, it is 64-bit on the servers and laptops you will deploy to, and using `int32` "to save memory" on a loop counter saves nothing.',
           '**`int64` for database ids** and anything crossing a wire format where the size must be fixed.',
           '**`float64` for decimals.** `float32` only when you have a specific reason, like graphics.',
-          '**Never a float for money.** `0.1 + 0.2 != 0.3` in binary floating point. Use integer paise, or a decimal library.',
+          '**Never a float for money.** `0.1 + 0.2 != 0.3` in binary floating point. Use integer cents (the smallest currency unit), or a decimal library.',
           '**`byte` for raw data, `rune` for characters.** They are the same thing as `uint8` and `int32`, but the alias tells the reader your intent.',
         ],
       },
@@ -419,12 +419,12 @@ func main() {
       {
         task: 'Add 0.1 and 0.2 as float64 and print the result. That is why money is not a float.',
         answer:
-          '0.30000000000000004. Binary floating point cannot represent 0.1 exactly, which is why money is stored as whole paise.',
+          '0.30000000000000004. Binary floating point cannot represent 0.1 exactly, which is why money is stored as whole cents.',
       },
       {
-        task: 'Store the price of three items as whole paise in an `int64`, add them, and print the total as rupees and paise with `/ 100` and `% 100`.',
+        task: 'Store the price of three items as whole cents in an `int64`, add them, and print the total as dollars and cents with `/ 100` and `% 100`.',
         answer:
-          'For 199 + 250 + 75 you get 524, printed as ₹5 and 24 paise. Integer paise never lose a paisa, which is why money code uses them instead of floats.',
+          'For 199 + 250 + 75 you get 524, printed as $5.24. Integer cents never lose a cent, which is why money code uses them instead of floats.',
       },
     ],
     refs: [

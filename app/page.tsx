@@ -4,6 +4,8 @@ import { PROBLEMS } from '@/content/system-design/problems'
 import { LESSONS } from '@/content/system-design/foundations'
 import { STAGES } from '@/content/system-design/method'
 import { Page } from '@/components/common/ui'
+import { TRACKS } from '@/content/tracks'
+import { Newsletter } from '@/components/common/Newsletter'
 import { Dashboard } from './dashboard'
 
 /**
@@ -26,21 +28,57 @@ export default function Home() {
           what each one costs. That is what this site drills.
         </p>
 
-        <div className="mt-7 flex flex-wrap gap-3">
-          <Link
-            href="/learn/what-is-system-design"
-            className="rounded-lg px-5 py-2.5 text-[0.9375rem] font-semibold"
-            style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
-          >
-            Start from the beginning →
-          </Link>
-          <Link
-            href="/problems"
-            className="card px-5 py-2.5 text-[0.9375rem] font-semibold"
-            style={{ color: 'var(--accent)' }}
-          >
-            Jump to the {PROBLEMS.length} problems
-          </Link>
+        {/* pick a goal: a newcomer is one click from doing something, rather
+            than facing the whole sidebar. Language tracks come from the
+            registry, so a new track gets its own start card here. */}
+        <h2 className="mt-8 mb-3 text-[1.0625rem] font-semibold">Where do you want to start?</h2>
+        <div className="grid max-w-4xl gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {[
+            {
+              href: '/problems/url-shortener',
+              title: 'Try one problem now',
+              text: '10 minutes, no sign-in. Answer first, then compare with a worked answer.',
+              primary: true,
+            },
+            {
+              href: '/practice/daily',
+              title: 'Interview soon?',
+              text: 'A 15-minute daily rep: one problem, requirements and numbers only.',
+            },
+            {
+              href: '/learn/what-is-system-design',
+              title: 'New to system design',
+              text: `Start at lesson 1. ${LESSONS.length} short lessons, then ${CONCEPTS.length} topics in order.`,
+            },
+            ...TRACKS.slice(1).map((t) => ({
+              href: t.href,
+              title: `Learn ${t.name}${t.alias && t.alias !== t.name ? ` (${t.alias})` : ''}`,
+              text: 'From your first program, with examples you can run and challenges checked by tests.',
+            })),
+            {
+              href: '/problems',
+              title: `All ${PROBLEMS.length} problems`,
+              text: 'URL shortener, chat, news feed, ride-hailing, ticket booking and more.',
+            },
+          ].map((g) => (
+            <Link
+              key={g.href}
+              href={g.href}
+              className="card block p-4 transition hover:opacity-90"
+              style={g.primary ? { borderColor: 'var(--accent)', borderWidth: 2 } : undefined}
+            >
+              <div className="text-[0.9688rem] font-semibold" style={{ color: g.primary ? 'var(--accent)' : undefined }}>
+                {g.title} →
+              </div>
+              <div className="mt-1 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                {g.text}
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        <div className="max-w-2xl">
+          <Newsletter />
         </div>
 
         <div className="mt-10">

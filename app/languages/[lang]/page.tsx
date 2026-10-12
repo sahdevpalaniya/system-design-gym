@@ -17,6 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     `${l.alias ?? l.name} tutorial for beginners. ${l.tagline} ${l.blurb}`,
     `/languages/${l.id}`,
     true,
+    true, // own opengraph-image
   )
 }
 
@@ -94,7 +95,11 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
                 <span className="tabular text-[0.75rem] font-bold" style={{ color: 'var(--accent)' }}>
                   {String(si + 1).padStart(2, '0')}
                 </span>
-                <h2 className="text-[1.1875rem] font-bold tracking-[-0.01em]">{s.name}</h2>
+                <h2 className="text-[1.1875rem] font-bold tracking-[-0.01em]">
+                  <Link href={`/languages/${l.id}/topics/${s.id}`} className="hover:opacity-70">
+                    {s.name}
+                  </Link>
+                </h2>
                 <span className="tabular shrink-0 text-[0.75rem]" style={{ color: 'var(--faint)' }}>
                   {humanMinutes(sectionMinutes(s, l.lessons))}
                 </span>

@@ -1,11 +1,9 @@
 import type { Metadata } from 'next'
+import { trackList } from '@/content/tracks'
+import { AUTHOR } from '@/lib/author'
 
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.devskills.in'
-
-/** AdSense publisher id (ca-pub-XXXXXXXXXXXXXXXX). Unset, no ad code, ads.txt
- *  or advertising section in the privacy policy is emitted at all. */
-export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
 
 /** Appended to every page title by the root layout's template. Pages pass a
  *  plain string title (see pageMeta) so the template reaches them. */
@@ -32,6 +30,9 @@ export function pageMeta(
   description: string,
   path: string,
   absolute = false,
+  /** the route has its own opengraph-image file; leave the image to it, since
+   *  an explicit `images` here would win over the file */
+  ownImage = false,
 ): Metadata {
   const d = clamp(description)
   return {
@@ -52,7 +53,7 @@ export function pageMeta(
       type: 'article',
       siteName: SITE_NAME,
       locale: 'en_GB',
-      images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
+      ...(ownImage ? {} : { images: [{ url: '/opengraph-image', width: 1200, height: 630 }] }),
     },
   }
 }
@@ -94,7 +95,7 @@ export function articleJsonLd(a: {
     articleSection: a.section,
     inLanguage: 'en',
     isAccessibleForFree: true,
-    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    author: { '@type': 'Person', name: AUTHOR.name, jobTitle: AUTHOR.role, url: `${SITE_URL}/about`, sameAs: AUTHOR.links.map((l) => l.href) },
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${a.path}` },
   }
@@ -107,16 +108,20 @@ export const SITE_JSONLD = [
     '@context': 'https://schema.org',
     '@type': 'Organization',
     name: SITE_NAME,
+    // a different company uses "DevSkills" (devskills.co); the domain disambiguates
+    alternateName: 'devskills.in',
     url: SITE_URL,
     logo: `${SITE_URL}/icon.svg`,
+    founder: { '@type': 'Person', name: AUTHOR.name, sameAs: AUTHOR.links.map((l) => l.href) },
   },
   {
     '@context': 'https://schema.org',
     '@type': 'WebSite',
     name: SITE_NAME,
+    alternateName: 'devskills.in',
     url: SITE_URL,
     inLanguage: 'en',
-    description: 'System design interview preparation and a Go (Golang) course, with runnable examples.',
+    description: `Learn to build software step by step, in plain English, with runnable examples: ${trackList()}.`,
   },
 ]
 
@@ -137,6 +142,17 @@ export function courseJsonLd(c: { name: string; description: string; path: strin
     offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD', category: 'Free', availability: 'https://schema.org/InStock' },
     // from the same reading + practice estimate the track page shows
     hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: `PT${Math.max(1, Math.round(c.minutes / 60))}H` },
+  }
+}
+
+/** An ordered list of pages, for hub pages that list lessons or problems. */
+export function itemListJsonLd(name: string, items: { name: string; path: string }[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name,
+    numberOfItems: items.length,
+    itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, url: `${SITE_URL}${it.path}` })),
   }
 }
 

@@ -54,6 +54,34 @@ export const LESSONS: Lesson[] = [
   },
 
   {
+    slug: 'system-design-for-freshers',
+    title: 'System design for freshers and new grads: is it asked, and what to learn first',
+    navTitle: 'For new grads',
+    oneLine: 'An honest answer on whether new grads get system design rounds, and a 30-day plan if you do.',
+    body: [
+      '**Is system design asked for new grads?** Sometimes, and usually lightly. At most product companies, from the US and Europe to India, new-grad and 0–2 year roles are mostly judged on DSA, projects and CS basics. Some add a short design question: "how would you build a URL shortener?" Full system design rounds are much more common from mid-level (SDE-2, about 3+ years) upward.',
+      '**What a new-grad round looks like.** Expect 20–30 minutes, often inside a project or "low-level plus a bit of high-level" round. The interviewer wants to see that you ask what the system must do, guess rough numbers, draw a few sensible boxes (app servers, a database, a cache) and say what breaks first. Nobody expects you to know how a big company really runs it.',
+      '**What to learn first.** Not a list of tools. Learn the order of decisions (the [five stages](/learn/the-five-stages)) and about ten core ideas. Everything else is these ideas at a bigger size.',
+      '**Week 1: the basics.** Read [What is system design?](/learn/what-is-system-design), [How the interview works](/learn/how-the-interview-works) and [The five stages](/learn/the-five-stages). Then the concepts: [latency numbers](/concepts/latency-numbers), [back-of-envelope maths](/concepts/back-of-envelope), [load balancing](/concepts/load-balancing), [caching](/concepts/caching), [SQL vs NoSQL](/concepts/sql-vs-nosql) and [indexes](/concepts/indexes).',
+      '**Week 2: data and scale.** [Replication](/concepts/replication), [partitioning](/concepts/partitioning), [consistent hashing](/concepts/consistent-hashing), [CDN](/concepts/cdn), [API design](/concepts/api-design) and [rate limiting](/concepts/rate-limiting). Solve your first two problems end to end: [URL shortener](/problems/url-shortener) and [rate limiter](/problems/rate-limiter).',
+      '**Week 3: async and correctness.** [Message queues](/concepts/message-queues), [idempotency](/concepts/idempotency), [transactions and locking](/concepts/transactions-and-locking), [fan-out](/concepts/fan-out) and [CAP and PACELC](/concepts/cap-pacelc). Solve [news feed](/problems/social-timeline), [chat app](/problems/chat-messaging) and [notification system](/problems/notification-system).',
+      '**Week 4: practise like the real thing.** Solve [ticket booking](/problems/ticket-booking), [typeahead](/problems/typeahead), [nearby places](/problems/nearby-places), [web crawler](/problems/web-crawler) and [key-value store](/problems/key-value-store). Do the [daily question](/practice/daily) every day, and at least two timed [mock interviews](/practice/mock), out loud, as if someone is listening.',
+      '**The 10 problems new grads get most.** (1) [URL shortener](/problems/url-shortener), (2) [rate limiter](/problems/rate-limiter), (3) [news feed](/problems/social-timeline), (4) [chat app like WhatsApp](/problems/chat-messaging), (5) [notification system](/problems/notification-system), (6) [ticket booking like Ticketmaster or BookMyShow](/problems/ticket-booking), (7) [search autocomplete](/problems/typeahead), (8) [nearby places](/problems/nearby-places), (9) [web crawler](/problems/web-crawler), (10) [key-value store](/problems/key-value-store). This list is from what the problems teach, not a survey: they are small enough for 30 minutes and cover the core ideas.',
+      '**How to practise.** Write your own answer before reading ours, every time. The [daily question](/practice/daily) builds the habit in ten minutes a day. The [mock interview](/practice/mock) adds a clock, which is where most beginners find they spend too long on boxes and too little on requirements and numbers.',
+      '**Do not drop DSA for this.** For entry-level roles, DSA and your projects still decide most offers. Treat system design as the round that turns a "maybe" into a "yes", and spend about a fifth of your prep time on it.',
+    ],
+    keyPoints: [
+      'New grads get light design questions at some product companies; full rounds are mostly mid-level and up.',
+      'Learn the five-stage order and about ten core concepts before any big problem.',
+      'Ten small problems cover almost everything a new-grad round asks.',
+      'Practise out loud, with a clock, writing your answer before reading ours.',
+      'Keep DSA and projects as your main prep; design is the tie-breaker.',
+    ],
+    remember:
+      'For new grads, system design is a short round about asking good questions and drawing a few sensible boxes. Learn the order, ten ideas and ten problems.',
+  },
+
+  {
     slug: 'how-the-interview-works',
     title: 'How a system design interview works',
     navTitle: 'How the interview works',

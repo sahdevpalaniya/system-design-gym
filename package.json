@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "check:go": "tsx scripts/check-go.ts"
+    "check:go": "tsx scripts/check-go.ts",
+    "indexnow": "tsx scripts/indexnow.ts"
   },
   "dependencies": {
     "next": "^16.3.4",

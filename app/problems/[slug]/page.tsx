@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import { Byline } from '@/components/common/Byline'
+import { CrossLinks } from '@/components/common/CrossLinks'
 import { notFound } from 'next/navigation'
 import { PROBLEMS, getProblem } from '@/content/system-design/problems'
 import { getGroup } from '@/content/system-design/method'
@@ -22,10 +24,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // written out per problem rather than derived from the display title
   const search = p.searchTitle ?? `Design ${(p.navTitle ?? p.title).toLowerCase()}`
   return pageMeta(
-    `${search} — system design interview`,
+    // the generic tail goes when it would push the brand-name title past ~60 chars
+    `${search} — system design interview`.length > 60 ? `${search}` : `${search} — system design interview`,
     `${search} in a system design interview: requirements, the lifecycle, the numbers, the architecture and the tradeoffs, worked in five stages. ${p.prompt}`,
     `/problems/${p.slug}`,
     true,
+    true, // own opengraph-image
   )
 }
 
@@ -69,7 +73,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
             {group.name}
           </Link>
         }
-        title={p.title}
+        // the H1 carries the phrase people search for, matching the <title>
+        title={p.searchTitle ?? p.title}
         lede={p.prompt}
         meta={
           <>
@@ -243,6 +248,8 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         </section>
       ) : null}
 
+      <CrossLinks path={`/problems/${p.slug}`} />
+      <Byline title={p.searchTitle ?? p.title} path={`/problems/${p.slug}`} />
     </Page>
   )
 }

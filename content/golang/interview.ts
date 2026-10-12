@@ -258,6 +258,138 @@ func main() {
  */
 export const INTERVIEW: LangLesson[] = [
   {
+    slug: 'go-interview-questions',
+    title: 'Golang interview questions and answers (2026)',
+    navTitle: 'Interview questions',
+    oneLine: '60 Go interview questions for freshers, new grads and 1–3 year developers, each with a short answer and the lesson that explains it.',
+    objectives: [
+      'Answer the most common Go interview questions in one to three sentences each.',
+      'Predict the output of the tricky snippets interviewers like to show.',
+      'Find the lesson to revise for any question you got wrong.',
+    ],
+    blocks: [
+      {
+        body: [
+          'These are the questions that come up most in Go interviews for freshers, new grads and developers with 1–3 years of experience. Each answer is short on purpose: say it in an interview, then stop. The link after each answer goes to the lesson with the full explanation and runnable code.',
+          'Groups: basics, slices and maps, interfaces and errors, concurrency, web and databases, and tricky output. For the deeper "how would you answer this" versions, see [Interview: language fundamentals](/languages/go/interview-language-fundamentals) and [Interview: concurrency](/languages/go/interview-concurrency).',
+        ],
+      },
+      {
+        heading: 'Go basics interview questions',
+        bullets: [
+          '**1. What is a zero value?** Every type has a default when declared without a value: `0`, `""`, `false`, or `nil`. There is no "undefined" in Go. → [Basic data types](/languages/go/basic-data-types)',
+          '**2. What is the difference between `var` and `:=`?** `:=` declares and assigns in one step and works only inside functions. `var` works anywhere and can declare without a value. → [Syntax and comments](/languages/go/syntax-and-comments)',
+          '**3. How do you make a name public in Go?** Start it with a capital letter. `User` is exported from the package; `user` is not. → [Packages](/languages/go/packages)',
+          '**4. What is `iota`?** A counter inside a `const` block that starts at 0 and goes up by one on each line. It is used for enums. → [Constants and iota](/languages/go/constants-and-iota)',
+          '**5. What does `defer` do?** It runs a call when the surrounding function returns, even on panic. Arguments are evaluated when the `defer` line runs, not later. → [Defer](/languages/go/defer)',
+          '**6. In what order do multiple defers run?** Last in, first out, like a stack. → [Defer](/languages/go/defer)',
+          '**7. Is Go pass-by-value or pass-by-reference?** Always pass-by-value. Slices, maps and pointers just contain pointers, so the copy still reaches the same data. → [Pointers and memory](/languages/go/pointers-and-memory)',
+          '**8. Does Go have classes and inheritance?** No. It has structs with methods, and embedding for reuse. Interfaces give polymorphism. → [Methods and embedding](/languages/go/methods-and-embedding)',
+          '**9. Value receiver or pointer receiver?** Use a pointer receiver when the method changes the struct or the struct is large; keep all methods of a type consistent. → [Methods and embedding](/languages/go/methods-and-embedding)',
+          '**10. What is a rune?** An `int32` holding one Unicode code point. `len(s)` counts bytes; ranging over a string gives runes. → [Strings and formatting](/languages/go/strings-and-formatting)',
+          '**11. Does Go have exceptions?** No. Errors are returned as values. `panic` is for bugs that should crash, and `recover` inside a deferred function can stop one. → [Functions and errors](/languages/go/functions-and-errors)',
+          '**12. Does Go have a while loop?** No, `for` does it all: `for cond {}` is a while loop and `for {}` loops forever. → [Control flow](/languages/go/control-flow)',
+        ],
+      },
+      {
+        heading: 'Go slices and maps interview questions',
+        bullets: [
+          '**13. What is the difference between an array and a slice?** An array has a fixed length that is part of its type and is copied on assignment. A slice is a growable view over an array. → [Arrays vs slices](/languages/go/arrays-vs-slices)',
+          '**14. What is inside a slice?** A pointer to a backing array, a length and a capacity. → [Arrays and slices](/languages/go/arrays-and-slices)',
+          '**15. Why must you write `s = append(s, x)`?** When capacity runs out, `append` allocates a new array and returns a new header. The old one still points at the old array. → [Arrays and slices](/languages/go/arrays-and-slices)',
+          '**16. What is the difference between a nil slice and an empty slice?** Both have length 0 and work with `append` and `range`. A nil slice `== nil` and encodes to JSON `null`; `[]int{}` encodes to `[]`. → [JSON](/languages/go/json)',
+          '**17. What does `s[a:b:c]` do?** It slices from a to b and caps capacity at c−a, so a later `append` copies instead of overwriting the original. → [Arrays and slices](/languages/go/arrays-and-slices)',
+          '**18. Is map iteration order fixed?** No. Go randomises it on purpose. Sort the keys if you need an order. → [Maps](/languages/go/maps)',
+          '**19. What happens when you write to a nil map?** It panics. Reading from a nil map is fine and returns the zero value. Create maps with `make` or a literal. → [Maps](/languages/go/maps)',
+          '**20. How do you check if a key exists?** `v, ok := m[k]`. `ok` is false when the key is missing. → [Maps](/languages/go/maps)',
+          '**21. Are maps safe for concurrent use?** No. Concurrent write and read can crash with "concurrent map writes". Guard it with a `sync.Mutex` or use `sync.Map` for special cases. → [Mutexes and races](/languages/go/mutex-and-races)',
+          '**22. Can a slice be a map key?** No, slices are not comparable. Arrays and structs of comparable fields can be keys. → [Maps](/languages/go/maps)',
+        ],
+      },
+      {
+        heading: 'Go interfaces and errors interview questions',
+        bullets: [
+          '**23. How does a type implement an interface?** Automatically, by having all its methods. There is no `implements` keyword. → [Interfaces](/languages/go/interfaces)',
+          '**24. What is `any`?** An alias for `interface{}`, the empty interface. Every type satisfies it. → [Interfaces](/languages/go/interfaces)',
+          '**25. Type assertion versus type switch?** `v, ok := x.(T)` checks for one type. A type switch `switch v := x.(type)` checks several in one go. → [Type switches](/languages/go/type-switches)',
+          '**26. Why can an interface holding a nil pointer be non-nil?** An interface is nil only if both its type and value are nil. A nil `*MyErr` inside an `error` still has a type. → [Interfaces](/languages/go/interfaces)',
+          '**27. Why are small interfaces preferred?** They are easy to satisfy, so more types fit. `io.Reader` has one method and works with files, networks and buffers. → [Interfaces](/languages/go/interfaces)',
+          '**28. What does "accept interfaces, return structs" mean?** Take the smallest interface you need as a parameter, and return a concrete type so callers get all of it. → [Interfaces](/languages/go/interfaces)',
+          '**29. What is `errors.Is` versus `errors.As`?** `errors.Is` checks for a specific error value anywhere in the chain. `errors.As` finds an error of a given type and gives you its fields. → [Error values](/languages/go/error-values)',
+          '**30. `%w` versus `%v` in `fmt.Errorf`?** `%w` wraps, so `errors.Is`/`As` still see the original. `%v` turns it into text and breaks the chain. → [Error values](/languages/go/error-values)',
+          '**31. What is a sentinel error?** A package-level error value like `io.EOF` or `sql.ErrNoRows` that callers compare against with `errors.Is`. → [Error values](/languages/go/error-values)',
+          '**32. Generics or interfaces?** Generics for the same logic over many types (containers, `slices` helpers). Interfaces for different behaviour behind one method set. → [Generics](/languages/go/generics)',
+        ],
+      },
+      {
+        heading: 'Go concurrency interview questions',
+        bullets: [
+          '**33. What is a goroutine?** A function running concurrently, started with `go f()`. It is managed by the Go runtime and starts with a small stack. → [Goroutines](/languages/go/goroutines)',
+          '**34. Goroutines versus threads?** Goroutines are cheap and scheduled by the Go runtime onto a few OS threads, and they are preemptive since Go 1.14. → [Goroutines vs threads](/languages/go/goroutines-vs-threads)',
+          '**35. What happens to goroutines when `main` returns?** The program exits and they are killed without finishing. Wait for them with a `sync.WaitGroup`. → [Goroutines](/languages/go/goroutines)',
+          '**36. Buffered versus unbuffered channel?** Unbuffered: a send waits for a receiver. Buffered: sends go through until the buffer is full. → [Buffered vs unbuffered channels](/languages/go/buffered-vs-unbuffered-channels)',
+          '**37. What happens when you send on a closed channel?** It panics. Receiving from a closed channel returns the zero value with `ok == false`. → [Channels and select](/languages/go/channels-and-select)',
+          '**38. Who should close a channel?** The sender, and only when receivers need to know no more values are coming. Never close from the receiving side. → [Channels and select](/languages/go/channels-and-select)',
+          '**39. What does a nil channel do?** Send and receive block forever. In `select`, that is useful to switch a case off. → [Channels and select](/languages/go/channels-and-select)',
+          '**40. What does `select` do?** It waits on several channel operations and runs whichever is ready first. With `default` it never blocks. → [Channels and select](/languages/go/channels-and-select)',
+          '**41. Mutex or channel?** Mutex for shared state, channel for passing data or work. The Go wiki says use whichever is simpler. → [Mutex vs channel](/languages/go/mutex-vs-channel)',
+          '**42. What is a data race and how do you find one?** Two goroutines touch the same memory at once and at least one writes. Run `go test -race` to find it. → [Mutexes and races](/languages/go/mutex-and-races)',
+          '**43. What is a goroutine leak?** A goroutine blocked forever, often on a channel nobody reads, that never exits. Fix it with a cancel signal such as `ctx.Done()`. → [Concurrency patterns](/languages/go/concurrency-patterns)',
+          '**44. What is `context.Context` for?** Carrying cancellation, deadlines and request-scoped values down the call chain. Pass it as the first parameter. → [Context](/languages/go/context)',
+          '**45. What does "all goroutines are asleep - deadlock!" mean?** Every goroutine is blocked, usually on a channel send or receive with no partner. → [Buffered vs unbuffered channels](/languages/go/buffered-vs-unbuffered-channels)',
+        ],
+      },
+      {
+        heading: 'Go web and database interview questions',
+        bullets: [
+          '**46. How do you build an HTTP server without a framework?** Use `net/http`: register handlers on an `http.ServeMux` and call `ListenAndServe`. Since Go 1.22 patterns can include the method and path wildcards, like `GET /users/{id}`. → [HTTP server](/languages/go/http-server)',
+          '**47. What is middleware in Go?** A function that takes an `http.Handler` and returns a new one that runs code before or after it, like logging or auth. → [Middleware and shutdown](/languages/go/middleware-and-shutdown)',
+          '**48. How do you shut down a server gracefully?** Catch the signal, then call `srv.Shutdown(ctx)` so in-flight requests finish before the process exits. → [Middleware and shutdown](/languages/go/middleware-and-shutdown)',
+          '**49. Is `*sql.DB` a single connection?** No, it is a connection pool, safe for concurrent use. Open it once and share it. → [Postgres and SQL](/languages/go/postgres-and-sql)',
+          '**50. How do you prevent SQL injection in Go?** Use placeholders (`$1` in Postgres) and pass values as arguments. Never build SQL by joining strings. → [Postgres and SQL](/languages/go/postgres-and-sql)',
+          '**51. What is the N+1 query problem?** Running one query for a list and then one more per item. Fix it with a join or one `IN` query. → [Joins, transactions, N+1](/languages/go/joins-transactions-n-plus-one)',
+          '**52. How do struct tags work with JSON?** `json:"name,omitempty"` sets the JSON key and skips empty values. Only exported fields are encoded. → [JSON](/languages/go/json)',
+          '**53. How do you write tests in Go?** In a `_test.go` file with `func TestX(t *testing.T)`, run with `go test`. Table-driven tests are the common style. → [Testing](/languages/go/testing)',
+        ],
+      },
+      {
+        heading: 'Tricky Go output questions',
+        bullets: [
+          '**54. `for i := 0; i < 3; i++ { defer fmt.Print(i) }` prints?** `210`. Defers run last-in-first-out, and each `i` is evaluated when the defer line runs. → [Defer](/languages/go/defer)',
+          '**55. `a := []int{1, 2, 3}; b := a[:2]; b = append(b, 9); fmt.Println(a)` prints?** `[1 2 9]`. `b` had spare capacity, so `append` wrote into `a`’s array. → [Arrays and slices](/languages/go/arrays-and-slices)',
+          '**56. `var p *MyErr; var err error = p; fmt.Println(err == nil)` prints?** `false`. The interface has a type (`*MyErr`) even though the value is nil. → [Interfaces](/languages/go/interfaces)',
+          '**57. `func f() (n int) { defer func() { n++ }(); return 1 }` returns?** `2`. `return 1` sets `n`, then the deferred function increments the named result. → [Defer](/languages/go/defer)',
+          '**58. `fmt.Println(len("héllo"))` prints?** `6`. `é` takes 2 bytes in UTF-8, and `len` counts bytes. → [Strings and formatting](/languages/go/strings-and-formatting)',
+          '**59. `var x []int; y := []int{}; fmt.Println(x == nil, y == nil)` prints?** `true false`. Only the declared-but-unset slice is nil. → [Arrays and slices](/languages/go/arrays-and-slices)',
+          '**60. In Go 1.22+, `for i := range 3 { go func() { fmt.Print(i) }() }` prints?** `0`, `1` and `2` in some order (if you wait for them). Since 1.22 each iteration has its own `i`. → [Goroutines](/languages/go/goroutines)',
+        ],
+      },
+    ],
+    keyPoints: [
+      'Give the short answer first, then stop unless they ask for more.',
+      'Most Go interviews cover slices, maps, interfaces, errors and concurrency.',
+      'Tricky output questions test defer order, slice sharing and the nil interface.',
+      'For any question you miss, open the linked lesson and run its code.',
+    ],
+    remember: 'Know the one-line answer for each question, and the lesson behind it for the follow-up.',
+    exercises: [
+      {
+        task: 'Cover the answers and go through all 60 questions out loud. Mark every one you could not answer in one breath.',
+        answer: 'Revise each marked question’s linked lesson, then try again in two days.',
+      },
+      {
+        task: 'Type out questions 54 to 60 as real programs and run them. Did any output surprise you?',
+        answer: 'They should print exactly what the answers say. If one surprised you, that is the lesson to read again.',
+      },
+    ],
+    refs: [
+      { label: 'Go FAQ', href: 'https://go.dev/doc/faq' },
+      { label: 'Effective Go', href: 'https://go.dev/doc/effective_go' },
+      { label: 'Go spec', href: 'https://go.dev/ref/spec' },
+    ],
+  },
+
+  {
     slug: 'interview-language-fundamentals',
     title: 'Interview: language fundamentals',
     navTitle: 'Interview — language',

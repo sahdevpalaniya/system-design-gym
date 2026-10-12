@@ -188,7 +188,7 @@ refresh_tokens  ← one per active session, so logout can end it`,
       {
         task: 'Decide whether an expense amount should be stored as a float. Then look up why the answer is no.',
         answer:
-          'No. `0.1 + 0.2 != 0.3` in binary floating point, so totals drift. Store whole paise (₹1 = 100 paise) in an integer.',
+          'No. `0.1 + 0.2 != 0.3` in binary floating point, so totals drift. Store whole cents (the smallest currency unit, $1 = 100 cents) in an integer.',
       },
     ],
     refs: [
@@ -204,7 +204,7 @@ refresh_tokens  ← one per active session, so logout can end it`,
     objectives: [
       'Write a config loader that fails at startup when a required variable is missing.',
       'Write a schema that uses constraints to enforce rules in the database.',
-      'Explain why money is stored as integer paise, not float.',
+      'Explain why money is stored as integer cents, not float.',
     ],
     blocks: [
       {
@@ -348,7 +348,7 @@ CREATE INDEX ON expenses (user_id, spent_on DESC);`,
           rows: [
             [
               '`amount_cents BIGINT`, not a decimal or float',
-              'Money in a float is wrong: `0.1 + 0.2` is not `0.3` in binary. Store whole paise as an integer and divide by 100 only when displaying rupees.',
+              'Money in a float is wrong: `0.1 + 0.2` is not `0.3` in binary. Store whole cents as an integer and divide by 100 only when displaying dollars (or rupees, or euros).',
             ],
             [
               '`REFERENCES users(id) ON DELETE CASCADE`',
@@ -364,7 +364,7 @@ CREATE INDEX ON expenses (user_id, spent_on DESC);`,
       {
         callout: {
           tone: 'warn',
-          text: 'Never store money in a `float64`. Each rounding error is tiny, and nobody notices until totals stop matching. Use integer paise, or a proper decimal type.',
+          text: 'Never store money in a `float64`. Each rounding error is tiny, and nobody notices until totals stop matching. Use integer cents, or a proper decimal type.',
         },
       },
       {
@@ -381,7 +381,7 @@ go get github.com/joho/godotenv           # .env in development`,
     ],
     keyPoints: [
       'Read config once at startup, check it, and refuse to start when something is missing.',
-      'Store money as whole paise in an integer. Never a float.',
+      'Store money as whole cents (the smallest currency unit) in an integer. Never a float.',
       'Let the database enforce what it can: foreign keys, cascades, unique and check constraints.',
       'Index the query you will actually run: here, `(user_id, spent_on DESC)`.',
     ],

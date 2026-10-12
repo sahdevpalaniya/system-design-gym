@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const VIDEO_PLATFORM: Problem = {
   slug: 'video-platform',
-  searchTitle: "Design a video platform (YouTube)",
+  searchTitle: "Design a video platform like YouTube / Netflix",
   title: 'Video upload and playback',
   navTitle: 'Video platform',
   group: 'big-files',

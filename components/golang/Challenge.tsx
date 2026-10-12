@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import type { LangChallenge } from '@/lib/types'
 import { forbidden, mergeForTest, newNonce, verdict, visibleOutput, type TestVerdict } from '@/lib/challenge'
 import { Rich } from '@/components/common/ui'
+import { OpenInPlayground, playgroundTrouble } from './OpenInPlayground'
 
 /**
  * An auto-graded exercise: edit the starter, run the hidden tests on the Go
@@ -146,6 +147,9 @@ export function Challenge({ c }: { c: LangChallenge }) {
             >
               {result.message || result.output}
             </pre>
+          ) : null}
+          {!result.passed && result.message && playgroundTrouble(result.message) ? (
+            <OpenInPlayground code={mergeForTest(code, c.test, newNonce())} />
           ) : null}
         </div>
       ) : null}

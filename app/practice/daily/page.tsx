@@ -122,7 +122,7 @@ export default function DailyPage() {
     <Suspense
       fallback={
         <Page>
-          <PageHeader eyebrow={'Daily rep'} title={'Daily rep · 15 minutes'} lede={'One stage of one problem, every day. Short enough that you actually do it.'} />
+          {/* no heading here: the streamed page's own <h1> replaces this, and two would show */}
           <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>

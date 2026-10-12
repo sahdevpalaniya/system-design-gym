@@ -3,6 +3,7 @@ import { PROBLEMS } from '@/content/system-design/problems'
 import { LESSONS } from '@/content/system-design/foundations'
 import { SITE_URL } from '@/lib/seo'
 import { LANGUAGES, getLanguage } from '@/content/languages'
+import { trackList } from '@/content/tracks'
 
 export const dynamic = 'force-static'
 
@@ -15,7 +16,11 @@ export const dynamic = 'force-static'
 export function GET() {
   const url = (p: string) => `${SITE_URL}${p}`
   const lines: string[] = [
-    '# Dev Skills — system design interview preparation',
+    '# Dev Skills — learn to build software, step by step',
+    '',
+    `> Learning tracks: ${trackList()}. More are added over time.`,
+    '',
+    '## System Design track',
     '',
     '> Teaches the method for answering system design interviews (requirements,',
     '> lifecycle, numbers, design, tradeoffs) rather than a catalogue of components.',

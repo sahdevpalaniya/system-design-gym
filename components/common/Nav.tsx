@@ -10,7 +10,8 @@ import { GROUPS } from '@/content/system-design/method'
 import { PROBLEMS } from '@/content/system-design/problems'
 import { ARCHETYPES } from '@/content/system-design/archetypes'
 import { COMPANIES } from '@/content/system-design/companies'
-import { LANGUAGES, getLanguage, orderedLessons } from '@/content/languages'
+import { LANGUAGES, getLanguage } from '@/content/languages'
+import { TRACKS, type Track } from '@/content/tracks'
 import { hasDeepDive } from '@/content/system-design/deep'
 import { conceptState, dueConcepts, problemState, readCount, streakCount, useProgress } from '@/lib/store'
 import { AccountButton } from './Account'
@@ -24,18 +25,6 @@ const SidebarCtx = createContext<{ open: boolean; setOpen: (v: boolean) => void 
 })
 
 /* ---------- tracks: the top tabs, w3schools style ---------- */
-
-type Track = { id: string; name: string; href: string }
-
-const TRACKS: Track[] = [
-  { id: 'sd', name: 'System Design', href: '/' },
-  // a language tab starts the course: it opens the first lesson, not the index
-  ...LANGUAGES.map((l) => ({
-    id: l.id,
-    name: l.name,
-    href: orderedLessons(l)[0] ? `/languages/${l.id}/${orderedLessons(l)[0].slug}` : `/languages/${l.id}`,
-  })),
-]
 
 /** The tab a path belongs to. Everything outside /languages is System Design. */
 function trackFor(pathname: string): Track {
@@ -268,31 +257,52 @@ function Group({
   children,
   done,
   total,
+  paths,
 }: {
   title: string
   children: ReactNode
   /** when given, shows a "3 / 7 done" counter next to the group name */
   done?: number
   total?: number
+  /** the pages inside; when given, the group folds shut unless the current
+   *  page is one of them, so a newcomer sees a short list, not a wall */
+  paths?: string[]
 }) {
-  return (
-    <div className="mb-5">
-      <div
-        className="mb-1 flex items-baseline gap-2 px-3 text-[0.6875rem] font-bold tracking-[0.08em] uppercase"
-        style={{ color: 'var(--faint)' }}
-      >
-        <span className="min-w-0 flex-1 truncate">{title}</span>
-        {total ? (
-          <span
-            className="tabular shrink-0 tracking-normal"
-            style={{ color: done === total ? 'var(--ok)' : 'var(--faint)' }}
-          >
-            {done}/{total}
-          </span>
-        ) : null}
+  const pathname = usePathname()
+  const header = (
+    <>
+      <span className="min-w-0 flex-1 truncate">{title}</span>
+      {total ? (
+        <span className="tabular shrink-0 tracking-normal" style={{ color: done === total ? 'var(--ok)' : 'var(--faint)' }}>
+          {done}/{total}
+        </span>
+      ) : null}
+    </>
+  )
+  const headerClass = 'mb-1 flex items-baseline gap-2 px-3 text-[0.6875rem] font-bold tracking-[0.08em] uppercase'
+
+  if (!paths) {
+    return (
+      <div className="mb-5">
+        <div className={headerClass} style={{ color: 'var(--faint)' }}>
+          {header}
+        </div>
+        {children}
       </div>
-      {children}
-    </div>
+    )
+  }
+  const here = paths.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+  return (
+    // keyed on whether we are inside, so navigating into a group opens it
+    <details key={String(here)} open={here} className="group mb-3">
+      <summary className={`${headerClass} cursor-pointer list-none py-1 hover:opacity-80`} style={{ color: 'var(--faint)' }}>
+        <span aria-hidden className="inline-block w-2 transition group-open:rotate-90">
+          ›
+        </span>
+        {header}
+      </summary>
+      <div className="mb-2">{children}</div>
+    </details>
   )
 }
 
@@ -329,6 +339,7 @@ function LanguageMenu({ lang }: { lang: Language }) {
           title={sec.name}
           done={ready ? readCount(state, sec.lessons.map((sl) => `lang:${lang.id}:${sl}`)) : 0}
           total={sec.lessons.length}
+          paths={[`/languages/${lang.id}/topics/${sec.id}`, ...sec.lessons.map((sl) => `/languages/${lang.id}/${sl}`)]}
         >
           {sec.lessons.map((slug) => {
             const t = lang.lessons.find((x) => x.slug === slug)
@@ -453,6 +464,7 @@ function Sidebar() {
             title={stage.name}
             done={ready ? readCount(state, (stage.concepts ?? []).map((s) => `concept:${s}`)) : 0}
             total={(stage.concepts ?? []).length}
+            paths={(stage.concepts ?? []).map((s) => `/concepts/${s}`)}
           >
             {(stage.concepts ?? []).map((slug) => {
               const c = getConcept(slug)
@@ -505,6 +517,7 @@ function Sidebar() {
               title={g.name}
               done={ready ? ps.filter((p) => problemState(state, p.slug) !== 'untouched').length : 0}
               total={ps.length}
+              paths={ps.map((p) => `/problems/${p.slug}`)}
             >
               {ps.map((p) => (
                 <Item

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { Byline } from '@/components/common/Byline'
 import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage, orderedLessons, sectionOf } from '@/content/languages'
 import type { LangBlock } from '@/lib/types'
@@ -6,6 +7,7 @@ import { CodeBlock } from '@/components/golang/Code'
 import { FolderTree } from '@/components/golang/FolderTree'
 import { Exercises } from '@/components/golang/Exercises'
 import { Challenge } from '@/components/golang/Challenge'
+import { CrossLinks } from '@/components/common/CrossLinks'
 import { Contents } from '@/components/golang/Contents'
 import { headingSlug } from '@/lib/slug'
 import { humanMinutes, practiceMinutes, readMinutes } from '@/lib/estimate'
@@ -37,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     `${t.oneLine} A ${l.alias ?? l.name} tutorial with runnable code, key points and practice exercises.`,
     `/languages/${l.id}/${t.slug}`,
     true,
+    true, // own opengraph-image
   )
 }
 
@@ -195,6 +198,8 @@ export default async function LangLessonPage({
         <Block key={bi} b={b} />
       ))}
 
+      <CrossLinks path={path} />
+
       <Card className="my-8">
         <div className="mb-3 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
           The short version
@@ -331,6 +336,7 @@ export default async function LangLessonPage({
           <span className="flex-1" />
         )}
       </nav>
+      <Byline title={t.title} path={path} />
     </Page>
   )
 }

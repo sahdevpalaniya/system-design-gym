@@ -568,6 +568,9 @@ export interface LangChallenge {
 export interface LangSection {
   id: string
   name: string
+  /** the phrase people search for, used as the section hub's title and H1
+   *  (e.g. "DSA in Go"); falls back to "<name> in <language>" */
+  searchTitle?: string
   blurb: string
   /** lesson slugs, in the order they build on each other */
   lessons: string[]

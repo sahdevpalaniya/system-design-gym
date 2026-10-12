@@ -4,6 +4,7 @@ import { PROBLEMS } from '@/content/system-design/problems'
 import { Page, PageHeader, Prose, Section } from '@/components/common/ui'
 import { CONTACT_EMAIL } from '@/lib/legal'
 import { pageMeta } from '@/lib/seo'
+import { AUTHOR } from '@/lib/author'
 
 export const metadata = pageMeta(
   'About Dev Skills: who builds it and why',
@@ -43,10 +44,25 @@ export default function AboutPage() {
       <Section n="3" title="Who writes it">
         <Prose
           paragraphs={[
-            'One engineer, writing the material they wanted when they were preparing. There is no team and no company behind it.',
-            'Every topic links out to its sources, such as the RFC, the paper or the database documentation, rather than asking you to take its word for anything. Where this site and a specification disagree, the specification is right.',
+            `**${AUTHOR.name}**, ${AUTHOR.role.toLowerCase()}. ${AUTHOR.bio}`,
+            'Every topic links out to its sources, such as the RFC, the paper or the language documentation, rather than asking you to take its word for anything. Where this site and a specification disagree, the specification is right.',
+            'Every Go example on the site is compiled and run automatically before each release, and every coding challenge is checked to make sure its tests catch a wrong answer.',
           ]}
         />
+        <p className="mt-3 flex flex-wrap gap-4 text-[0.9375rem]">
+          {AUTHOR.links.map((l) => (
+            <a key={l.href} href={l.href} target="_blank" rel="noreferrer me" className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+              {l.label}
+            </a>
+          ))}
+        </p>
+        <p className="mt-3 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
+          Found a mistake? Every page has a &ldquo;Report a mistake&rdquo; link, or write to{' '}
+          <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+            {CONTACT_EMAIL}
+          </a>
+          .
+        </p>
       </Section>
 
       <Section n="4" title="Get in touch">

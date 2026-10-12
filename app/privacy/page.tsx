@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Page, PageHeader, Prose, Section } from '@/components/common/ui'
 import { CONTACT_EMAIL, POLICY_UPDATED } from '@/lib/legal'
-import { ADSENSE_CLIENT, pageMeta } from '@/lib/seo'
+import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
   'Privacy policy · Dev Skills',
@@ -64,11 +64,6 @@ export default function PrivacyPage() {
             'Your theme choice and progress live in localStorage, which is not a cookie and is not transmitted anywhere.',
             '**Google Analytics** sets its own cookies (`_ga`, `_ga_*`) to count visits and see which pages are read. It records pages viewed, rough location, device and browser — never your answers or progress. You can block it with any tracker blocker and the site works the same. See [how Google uses information from sites that use its services](https://policies.google.com/technologies/partner-sites).',
             'Signed in, there is one session cookie so the site knows it is still you between page loads. It is strictly necessary for sign-in to work and does nothing else.',
-            ...(ADSENSE_CLIENT
-              ? [
-                  '**Google AdSense** shows ads on this site. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this site and other sites. Google’s use of advertising cookies enables it and its partners to serve ads to you based on those visits. You can opt out of personalised advertising in [Google Ads Settings](https://adssettings.google.com), or opt out of many third-party vendors’ cookies at [aboutads.info](https://www.aboutads.info/choices). In the UK, EU and Switzerland you are asked for consent before any advertising cookie is set.',
-                ]
-              : []),
           ]}
         />
       </Section>
@@ -86,9 +81,7 @@ export default function PrivacyPage() {
         <Prose
           paragraphs={[
             '**Vercel** hosts the site and processes standard server request logs, including IP addresses, as any web host does. **Google** provides sign-in, if you choose to use it, and Google Analytics for anonymous usage statistics. **Neon or an equivalent PostgreSQL host** stores the database.',
-            ADSENSE_CLIENT
-              ? '**Google AdSense** serves the ads, and with them sets the advertising cookies described above. Your answers and progress are never shared with it.'
-              : 'If advertising is ever added to this site, this section will name the provider and say what it collects **before** any ad is served, and a cookie banner will ask for your consent first where the law requires it.',
+            'If advertising is ever added to this site, this section will name the provider and say what it collects **before** any ad is served, and a cookie banner will ask for your consent first where the law requires it.',
           ]}
         />
       </Section>
