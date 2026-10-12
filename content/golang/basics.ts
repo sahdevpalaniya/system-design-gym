@@ -7,13 +7,18 @@ export const BASICS: LangLesson[] = [
     title: 'Setup, your first program, and the toolchain',
     navTitle: 'Setup and first program',
     oneLine: 'Install Go, run one file, and meet the four commands you will use every day.',
+    objectives: [
+      'Write and run a `package main` program with `go run .`.',
+      'Explain what the zero value of an `int`, a `string` and a `bool` is.',
+      'Predict what `go build`, `go fmt` and `go vet` each do before you run them.',
+    ],
     blocks: [
       {
         body: [
           'Go is a compiled language. You write a `.go` file, the compiler turns it into a single machine-code binary, and you run that. There is no interpreter to install on the server and no virtual machine. That one fact explains most of what people like about Go: you build one file and copy it anywhere.',
           'First, install it. Pick your system below. Every option installs the same thing: the compiler, the standard library and the `go` command.',
         ],
-        code: { label: 'terminal', src: 'go version\n# go version go1.22.2 linux/amd64' },
+        code: { label: 'terminal', src: 'go version\n# go version go1.25.1 linux/amd64' },
       },
       {
         heading: 'Install Go',
@@ -42,9 +47,9 @@ winget install GoLang.Go
         code: {
           label: 'Linux',
           src: `# the official way — distribution packages are often far behind
-curl -LO https://go.dev/dl/go1.22.2.linux-amd64.tar.gz
+curl -LO https://go.dev/dl/go1.25.1.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf go1.22.2.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.25.1.linux-amd64.tar.gz
 
 # then add Go to your PATH, and reload your shell
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
@@ -56,7 +61,7 @@ source ~/.profile`,
         code: {
           label: 'check it worked',
           src: `go version
-# go version go1.22.2 linux/amd64
+# go version go1.25.1 linux/amd64
 
 go env GOPATH
 # /home/you/go   — where downloaded packages live. You rarely need to touch it.`,
@@ -130,14 +135,12 @@ func main() {
             ['`int`, `float64`', '`0`'],
             ['`string`', '`""` (empty, not nil)'],
             ['`bool`', '`false`'],
-            ['pointer, slice, map, channel, func, interface', '`nil`'],
-            ['struct', 'a struct with every field at its own zero value'],
           ],
         },
       },
       {
         body: [
-          'Because of this you never get a "cannot read property of undefined" style crash from an unset variable. It also means you can design a type so that its zero value is already useful. `sync.Mutex` and `bytes.Buffer` both work with no setup, and your own types can too.',
+          'Because of this you never get a "cannot read property of undefined" style crash from an unset variable. The other types you will meet later also have zero values, and each lesson says what they are.',
         ],
       },
       {
@@ -175,6 +178,31 @@ func main() {
           note: 'Press Run. Then change a value, or add a line, and run it again.',
         },
       },
+      {
+        heading: 'Build this: your first win',
+        body: [
+          'A tiny program that does a real job: split a bill. Put it in `main.go` in your `d01` folder and run `go run .`. Then change the numbers and run it again.',
+        ],
+        code: {
+          label: 'main.go — split a bill',
+          src: `package main
+
+import "fmt"
+
+func main() {
+	total := 84.50
+	people := 4
+
+	share := total / float64(people)
+	fmt.Println("Total:", total)
+	fmt.Println("People:", people)
+	fmt.Println("Each pays:", share)
+}
+`,
+          canRun: true,
+          note: '`float64(people)` turns the whole number into a decimal so the two can be divided. **Type conversion** explains why Go makes you write that.',
+        },
+      },
     ],
     keyPoints: [
       'A module is a folder with a `go.mod`. A runnable program is `package main` with `func main()`.',
@@ -196,12 +224,17 @@ func main() {
     title: 'Type conversion',
     navTitle: 'Type conversion',
     oneLine: 'Why Go refuses to turn an int into a float for you.',
+    objectives: [
+      'Write explicit conversions between `int`, `float64` and a named type.',
+      'Explain why `string(rune(65))` gives "A" while `strconv.Itoa(65)` gives "65".',
+      'Predict the output of `len` on a string with non-English characters.',
+    ],
     blocks: [
       {
         heading: 'Go never converts a type for you',
         body: [
           'In most languages, an `int` next to a `float` is converted to a float for you. Go refuses. You write every conversion yourself.',
-          'This feels fussy until the first time it saves you. Implicit numeric conversion is where money code loses cents, and where an `int64` is squeezed into an `int32` with no warning. Go decided the cost of typing `float64(a)` is lower than the cost of finding that bug.',
+          'This feels fussy until the first time it saves you. Implicit numeric conversion is where money code loses paise, and where an `int64` is squeezed into an `int32` with no warning. Go decided the cost of typing `float64(a)` is lower than the cost of finding that bug.',
         ],
         code: {
           label: 'conversion.go',
@@ -210,12 +243,49 @@ var b float64 = float64(a)   // required. "var b float64 = a" does not compile.
 var c int64 = int64(a)
 
 // Strings convert to and from byte and rune slices
-s := "hello"
+s := "héllo"
 bs := []byte(s)   // the raw bytes
 rs := []rune(s)   // the unicode characters
 
-fmt.Println(len(s), len(rs))`,
-          note: '`len` on a string counts BYTES, not characters. For "héllo" that is 6 and 5. **Slices, maps, and strings** covers why.',
+fmt.Println(len(s), len(bs), len(rs))   // 6 6 5`,
+          note: '`len` on a string counts BYTES, not characters, so "héllo" is 6 bytes but 5 runes. **Strings, bytes, and runes** covers why.',
+        },
+      },
+      {
+        heading: 'Numbers and text: strconv, not a cast',
+        body: [
+          'A cast like `float64(a)` changes one number type into another. Turning the number 42 into the text "42", or back, is a different job. That is what the `strconv` package is for, and the text side can fail, so it returns an error.',
+        ],
+        code: {
+          label: 'strconv.go',
+          src: `package main
+
+import (
+	"fmt"
+	"strconv"
+)
+
+func main() {
+	s := strconv.Itoa(42)                  // "42"
+	n, err := strconv.Atoi("42")           // 42, nil
+	fmt.Println(s, n, err)
+
+	f, err := strconv.ParseFloat("3.14", 64)
+	fmt.Println(f, err)
+
+	b, err := strconv.ParseBool("true")
+	fmt.Println(b, err)
+
+	fmt.Println(strconv.FormatInt(255, 16)) // "ff"
+}
+`,
+          canRun: true,
+        },
+      },
+      {
+        callout: {
+          tone: 'warn',
+          text: '`string(65)` gives you `"A"`, not `"65"`. It converts a code point to a character. To turn a number into its text form you need `strconv.Itoa`. `go vet` flags `string(n)` on an int for this reason, which is why code here writes `string(rune(65))` when it really wants the character.',
         },
       },
       {
@@ -251,7 +321,7 @@ func main() {
 }
 `,
           canRun: true,
-          note: 'Every conversion here is written out. Delete one and see what the compiler says.',
+          note: 'Every conversion here is written out. This is the one place in the course that covers `strconv`, so keep it handy. Delete one and see what the compiler says.',
         },
       },
     ],
@@ -262,7 +332,7 @@ func main() {
       'The cost of typing the conversion is lower than the cost of finding the bug it prevents.',
     ],
     remember:
-      'Implicit numeric conversion is where money code loses cents. Go makes you write it down.',
+      'Implicit numeric conversion is where money code loses paise. Go makes you write it down.',
     task: 'Convert an int to a float64 and back, and a string to both `[]byte` and `[]rune`. Print the length of each.',
     exercises: [
       {
@@ -292,6 +362,11 @@ func main() {
     title: 'if, for, and switch',
     navTitle: 'if, for, and switch',
     oneLine: 'One loop keyword, no ternary, and cases that do not fall through.',
+    objectives: [
+      'Write the same loop as a three-part `for`, a condition-only `for` and a `range` loop.',
+      'Explain why a variable declared in `if n := ...; cond` cannot be used after the block.',
+      'Predict which `switch` case runs, knowing that cases do not fall through.',
+    ],
     blocks: [
       {
         heading: 'if — with a scoped variable',
@@ -300,7 +375,8 @@ func main() {
         ],
         code: {
           label: 'flow.go',
-          src: `if n := len(s); n > 3 {
+          src: `s := "golang"
+if n := len(s); n > 3 {
 \tfmt.Println("long:", n)
 } else if n == 3 {
 \tfmt.Println("exactly three")
@@ -325,6 +401,7 @@ func main() {
           label: 'loops.go',
           src: `for i := 0; i < 5; i++ { }        // the classic three-part loop
 
+i := 0
 for i < 5 { i++ }                 // no init or post: this is a while loop
 
 for { break }                     // no condition at all: infinite
@@ -333,9 +410,14 @@ for i, ch := range "héllo" {      // range over a string gives byte index + run
 \tfmt.Println(i, string(ch))
 }
 
-for i, v := range mySlice { }     // index and value
-for _, v := range mySlice { }     // "_" throws the index away
-for k, v := range myMap { }       // key and value, in RANDOM order`,
+nums := []int{10, 20, 30}         // a slice: a list of values (Arrays and slices covers them)
+for i, v := range nums {          // index and value
+\tfmt.Println(i, v)
+}
+for _, v := range nums {          // "_" throws the index away
+\tfmt.Println(v)
+}`,
+          note: '`range` also works on maps, which you will meet in **Maps**. Their order is random, on purpose.',
         },
       },
       {
@@ -355,6 +437,7 @@ default:
 }
 
 // switch with no expression — the idiomatic if/else chain
+age := 30
 switch {
 case age < 13:
 \tfmt.Println("child")
@@ -424,6 +507,57 @@ func main() {
           'It moves to the next case without testing its condition. In C every case falls through unless you break; in Go it is the opposite.',
       },
     ],
+    challenge: {
+      prompt:
+        'Write `Grade(score int) string`. 90 to 100 is "A", 75 to 89 is "B", 50 to 74 is "C", 0 to 49 is "F", and anything below 0 or above 100 is "invalid". Example: `Grade(82)` → "B", `Grade(101)` → "invalid". Use a `switch` with no expression. The `func` line is written for you; the next lesson, **Functions and errors**, explains it.',
+      starter: `package main
+
+// Grade turns a score from 0 to 100 into a letter.
+func Grade(score int) string {
+\treturn ""
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestGrade(t *testing.T) {
+\ttests := []struct {
+\t\tscore int
+\t\twant  string
+\t}{
+\t\t{95, "A"}, {100, "A"}, {90, "A"},
+\t\t{89, "B"}, {75, "B"},
+\t\t{74, "C"}, {50, "C"},
+\t\t{49, "F"}, {0, "F"},
+\t\t{-1, "invalid"}, {101, "invalid"},
+\t}
+\tfor _, tt := range tests {
+\t\tif got := Grade(tt.score); got != tt.want {
+\t\t\tt.Errorf("Grade(%v) = %q, want %q", tt.score, got, tt.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+// Grade turns a score from 0 to 100 into a letter.
+func Grade(score int) string {
+\tswitch {
+\tcase score < 0 || score > 100:
+\t\treturn "invalid"
+\tcase score >= 90:
+\t\treturn "A"
+\tcase score >= 75:
+\t\treturn "B"
+\tcase score >= 50:
+\t\treturn "C"
+\tdefault:
+\t\treturn "F"
+\t}
+}
+`,
+    },
     refs: [
       { label: 'A Tour of Go — Flow control', href: 'https://go.dev/tour/flowcontrol/1' },
       { label: 'Effective Go', href: 'https://go.dev/doc/effective_go' },
@@ -435,6 +569,11 @@ func main() {
     title: 'Functions, multiple returns, and errors',
     navTitle: 'Functions and errors',
     oneLine: 'There are no exceptions. An error is a value you return, and that changes everything.',
+    objectives: [
+      'Write a function that returns a result and an `error`, and check the error at the call site.',
+      'Explain why Go returns errors as values instead of throwing exceptions.',
+      'Write a variadic function and a closure that keeps its own state.',
+    ],
     blocks: [
       {
         heading: 'What a function is, and what an error is',
@@ -476,7 +615,13 @@ func divide(a, b float64) (float64, error) {
 }
 
 func main() {
-	_ = 0
+	fmt.Println(add(2, 3)) // 5
+
+	res, err := divide(10, 4)
+	fmt.Println(res, err) // 2.5 <nil>
+
+	res, err = divide(1, 0)
+	fmt.Println(res, err) // 0 divide by zero
 }
 `,
         },
@@ -503,14 +648,15 @@ fmt.Println(res)`,
       {
         callout: {
           tone: 'warn',
-          text: 'Do not pass a bare `return err` up six layers. Add context: `return fmt.Errorf("loading user %d: %w", id, err)`. **Interfaces and error values** covers what `%w` does. Without context, a production error reads "not found" and you have no idea what was not found.',
+          text: 'Do not pass a bare `return err` up six layers. Add context: `return fmt.Errorf("loading user %d: %w", id, err)`. **Error values in depth** covers what `%w` does. Without context, a production error reads "not found" and you have no idea what was not found.',
         },
       },
       {
         heading: 'Variadic functions',
         code: {
           label: 'variadic.go',
-          src: `func sum(nums ...int) int {       // nums is a []int inside the function
+          src: `// inside the function, nums is a []int
+func sum(nums ...int) int {
 \ttotal := 0
 \tfor _, n := range nums {
 \t\ttotal += n
@@ -518,11 +664,15 @@ fmt.Println(res)`,
 \treturn total
 }
 
-sum(1, 2, 3)
+// calling it, inside main or any other function:
+fmt.Println(sum(1, 2, 3))         // 6
 
 xs := []int{1, 2, 3}
-sum(xs...)                        // "..." spreads a slice into the arguments`,
+fmt.Println(sum(xs...))           // 6 — "..." spreads a slice into the arguments`,
+          note: 'Excerpt: the last three lines go inside a function body. `[]int{1, 2, 3}` is a slice, a growable list (preview — explained in Arrays and slices).',
           run: `package main
+
+import "fmt"
 
 func sum(nums ...int) int {       // nums is a []int inside the function
 	total := 0
@@ -533,11 +683,11 @@ func sum(nums ...int) int {       // nums is a []int inside the function
 }
 
 func main() {
+	fmt.Println(sum(1, 2, 3))         // 6
+	fmt.Println(sum())                // 0 — no arguments is fine
 
-	sum(1, 2, 3)
-
-	xs := []int{1, 2, 3}
-	sum(xs...)                        // "..." spreads a slice into the arguments
+	xs := []int{4, 5, 6}
+	fmt.Println(sum(xs...))           // 15 — "..." spreads a slice into the arguments
 }
 `,
         },
@@ -603,16 +753,13 @@ func main() {
 
 	if _, err := divide(10, 0); err != nil {
 		fmt.Println("error:", err) // the branch you must not forget
+		return
 	}
-
-	defer fmt.Println("deferred 1 — runs last")
-	defer fmt.Println("deferred 2")
-	defer fmt.Println("deferred 3 — runs first")
-	fmt.Println("main body finished")
+	fmt.Println("never printed: we returned early")
 }
 `,
           canRun: true,
-          note: 'Multiple returns, the error check, and defer running in reverse.',
+          note: 'Multiple returns, the error check, and returning early when something fails.',
         },
       },
     ],
@@ -642,6 +789,60 @@ func main() {
           '`sum(1,2,3)` and `sum(xs...)` both work. Without the `...` you get a type error, because it expects ints, not a slice.',
       },
     ],
+    challenge: {
+      prompt:
+        'Write `Average(nums ...int) (float64, error)`. It returns the average of the numbers. With no numbers at all it returns 0 and an error, because there is nothing to average. Example: `Average(1, 2)` → 1.5, nil. `Average()` → 0, an error.',
+      starter: `package main
+
+// Average returns the mean of nums, or an error when there are none.
+func Average(nums ...int) (float64, error) {
+\treturn 0, nil
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestAverage(t *testing.T) {
+\ttests := []struct {
+\t\tnums    []int
+\t\twant    float64
+\t\twantErr bool
+\t}{
+\t\t{[]int{1, 2, 3}, 2, false},
+\t\t{[]int{1, 2}, 1.5, false},
+\t\t{[]int{7}, 7, false},
+\t\t{[]int{-4, 4}, 0, false},
+\t\t{nil, 0, true},
+\t}
+\tfor _, tt := range tests {
+\t\tgot, err := Average(tt.nums...)
+\t\tif (err != nil) != tt.wantErr {
+\t\t\tt.Errorf("Average(%v) error = %v, want error: %v", tt.nums, err, tt.wantErr)
+\t\t}
+\t\tif got != tt.want {
+\t\t\tt.Errorf("Average(%v) = %v, want %v", tt.nums, got, tt.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+import "errors"
+
+// Average returns the mean of nums, or an error when there are none.
+func Average(nums ...int) (float64, error) {
+\tif len(nums) == 0 {
+\t\treturn 0, errors.New("average of no numbers")
+\t}
+\ttotal := 0
+\tfor _, n := range nums {
+\t\ttotal += n
+\t}
+\treturn float64(total) / float64(len(nums)), nil
+}
+`,
+    },
     refs: [
       { label: 'A Tour of Go — More types', href: 'https://go.dev/tour/moretypes/1' },
       { label: 'Effective Go — Errors', href: 'https://go.dev/doc/effective_go#errors' },
@@ -653,6 +854,11 @@ func main() {
     title: 'defer',
     navTitle: 'defer',
     oneLine: 'Cleanup you cannot forget, and the two traps that catch most people once.',
+    objectives: [
+      'Predict the order in which several deferred calls run.',
+      'Explain why `defer fmt.Println(x)` prints the value `x` had on the defer line.',
+      'Fix a loop that defers `Close` so each file is closed on time.',
+    ],
     blocks: [
       {
         heading: 'What defer does',
@@ -661,7 +867,7 @@ func main() {
           'It is how Go does the job that `finally` does elsewhere, without the extra block.',
         ],
         code: {
-          label: 'defer.go',
+          label: 'real-world excerpt — opening a file (os.Open is covered in The standard library)',
           src: `func readFile(name string) error {
 \tf, err := os.Open(name)
 \tif err != nil {
@@ -676,12 +882,36 @@ func main() {
         },
       },
       {
+        heading: 'See it run',
+        body: ['Three defers, then a normal line. Watch the order: the body finishes first, then the defers run last-in, first-out (LIFO), like taking plates off a stack.'],
+        code: {
+          label: 'press Run — this executes on the Go Playground',
+          src: `package main
+
+import "fmt"
+
+func main() {
+	defer fmt.Println("deferred 1 — runs last")
+	defer fmt.Println("deferred 2")
+	defer fmt.Println("deferred 3 — runs first")
+
+	x := 1
+	defer fmt.Println("deferred x =", x) // x is read NOW, so this prints 1
+	x = 99
+	fmt.Println("main body finished, x =", x)
+}
+`,
+          canRun: true,
+          note: 'Output: the body line with x = 99, then "deferred x = 1", then 3, 2, 1.',
+        },
+      },
+      {
         heading: 'Trap 1 — arguments are evaluated immediately',
         body: [
           'Only the **call** is deferred. The arguments are evaluated when the `defer` line runs, which surprises most people the first time.',
         ],
         code: {
-          label: 'trap1.go',
+          label: 'trap1.go (excerpt — time.Now and time.Since read the clock)',
           src: `start := time.Now()
 
 defer fmt.Println(time.Since(start))          // prints ~0s — evaluated NOW
@@ -691,7 +921,7 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
       {
         heading: 'Trap 2 — defer runs at function end, not block end',
         code: {
-          label: 'trap2.go',
+          label: 'trap2.go (real-world excerpt)',
           src: `for _, name := range files {
 \tf, _ := os.Open(name)
 \tdefer f.Close()          // nothing closes until the WHOLE function returns
@@ -705,6 +935,7 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
         heading: 'Where defer earns its place',
         body: [
           'A deferred closure can change a **named** return value. That is how a transaction helper knows whether to commit or roll back, and how you turn a panic into an ordinary error.',
+          'In plain words: a **panic** is Go crashing the current function because something went badly wrong (dividing by zero, reading past the end of a list). `recover()` is a built-in you call **inside a deferred function**: if a panic is happening it stops the crash and hands you the panic value; otherwise it returns `nil`. You will rarely need it, but this is the one pattern to recognise.',
         ],
         code: {
           label: 'named-return.go',
@@ -718,6 +949,24 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
 \tmightPanic()
 \treturn nil
 }`,
+          run: `package main
+
+import "fmt"
+
+func safeDivide(a, b int) (result int, err error) { // err is NAMED
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("recovered: %v", r) // the caller sees this
+		}
+	}()
+	return a / b, nil // panics when b is 0
+}
+
+func main() {
+	fmt.Println(safeDivide(10, 2)) // 5 <nil>
+	fmt.Println(safeDivide(1, 0))  // 0 recovered: runtime error: integer divide by zero
+}
+`,
         },
       },
       {
@@ -735,7 +984,7 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
     ],
     remember:
       'defer puts cleanup next to the thing that needs cleaning up, and runs it on every return path.',
-    task: 'Write a function with three defers and predict their order before running it. Then defer `fmt.Println(time.Since(start))` and work out why it prints zero.',
+    task: 'Write a function with three defers and predict their order before running it. Then set `n := 1`, `defer fmt.Println(n)`, change `n` to 2, and work out why it prints 1. Fix it with a deferred closure so it prints 2.',
     exercises: [
       {
         task: 'Open ten files in a loop with `defer f.Close()` and work out when they actually close.',
@@ -764,6 +1013,11 @@ defer func() { fmt.Println(time.Since(start)) }()   // correct: evaluated later`
     title: 'Arrays and slices',
     navTitle: 'Arrays and slices',
     oneLine: 'The data structure you use all day, and the shared-memory trap inside it.',
+    objectives: [
+      'Explain the difference between a slice\'s length and its capacity.',
+      'Predict the output when you write through a sub-slice.',
+      'Fix a shared-memory bug with `copy` or a full slice expression `s[a:b:b]`.',
+    ],
     blocks: [
       {
         heading: 'Arrays are fixed; you will rarely use them',
@@ -830,15 +1084,51 @@ func main() {
         },
       },
       {
+        heading: 'Capping capacity with s[a:b:b]',
+        body: [
+          'A sub-slice usually keeps the spare capacity of the array behind it. So `append` on the sub-slice can write straight over elements the original still uses. A **full slice expression** `s[low:high:max]` sets the capacity to `max - low`. Write `s[a:b:b]` and capacity equals length, so the next `append` has no room and copies to a new array instead of overwriting.',
+        ],
+        code: {
+          label: 'fullslice.go',
+          src: `data := []int{1, 2, 3, 4, 5}
+
+a := data[0:2]          // len 2, cap 5 — spare room is data's elements
+a = append(a, 99)
+fmt.Println(data)       // [1 2 99 4 5] — append overwrote data[2]!
+
+data = []int{1, 2, 3, 4, 5}
+b := data[0:2:2]        // len 2, cap 2 — no spare room
+b = append(b, 99)       // must copy to a new array
+fmt.Println(data)       // [1 2 3 4 5] — untouched
+fmt.Println(b)          // [1 2 99]`,
+          run: `package main
+
+import "fmt"
+
+func main() {
+	data := []int{1, 2, 3, 4, 5}
+
+	a := data[0:2]          // len 2, cap 5 — spare room is data's elements
+	a = append(a, 99)
+	fmt.Println(data)       // [1 2 99 4 5] — append overwrote data[2]!
+
+	data = []int{1, 2, 3, 4, 5}
+	b := data[0:2:2]        // len 2, cap 2 — no spare room
+	b = append(b, 99)       // must copy to a new array
+	fmt.Println(data)       // [1 2 3 4 5] — untouched
+	fmt.Println(b)          // [1 2 99]
+}
+`,
+          note: 'Use `s[a:b:b]` when you hand a piece of your slice to other code and do not want its appends to touch your data.',
+        },
+      },
+      {
         heading: 'Try it yourself',
         code: {
           label: 'press Run — this executes on the Go Playground',
           src: `package main
 
-import (
-	"fmt"
-	"sort"
-)
+import "fmt"
 
 func main() {
 	data := []int{1, 2, 3, 4, 5}
@@ -851,23 +1141,13 @@ func main() {
 	cp[0] = 1
 	fmt.Println("after copy, data is untouched:", data)
 
-	m := map[string]int{"pears": 3, "apples": 5, "figs": 1}
-	fmt.Println("missing key returns:", m["kiwi"])
-	v, ok := m["kiwi"]
-	fmt.Println("two-value form:", v, ok)
-
-	keys := make([]string, 0, len(m))
-	for k := range m {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys) // maps have no order, so sort to print predictably
-	for _, k := range keys {
-		fmt.Println(" ", k, m[k])
-	}
+	safe := data[0:2:2]
+	safe = append(safe, 7)
+	fmt.Println("capped append left data alone:", data, safe)
 }
 `,
           canRun: true,
-          note: 'The shared backing array, and sorting map keys to get a stable order.',
+          note: 'The shared backing array, `copy` for independence, and `s[a:b:b]` for a safe append.',
         },
       },
     ],
@@ -894,9 +1174,69 @@ func main() {
       {
         task: 'Preallocate with `make([]T, 0, n)` and print `len` and `cap` as you append.',
         answer:
-          '`len` climbs one at a time while `cap` stays at n, so nothing is reallocated. Without the capacity, `cap` doubles while the slice is small, then grows by a smaller factor (about 1.25x) once it passes a few hundred elements.',
+          '`len` climbs one at a time while `cap` stays at n, so nothing is reallocated. Without the capacity, `cap` doubles while the slice is small; after 256 elements the growth factor tapers from 2x toward 1.25x, and the result is then rounded up to a memory size class, so the exact numbers can look odd.',
       },
     ],
+    challenge: {
+      prompt:
+        'Write `Reversed(s []int) []int`. It returns a NEW slice with the elements in reverse order and must not change `s`. Example: `Reversed([]int{1, 2, 3})` → `[3 2 1]`, and the input is still `[1 2 3]`.',
+      starter: `package main
+
+// Reversed returns a reversed copy of s. s itself is not changed.
+func Reversed(s []int) []int {
+\treturn nil
+}
+`,
+      test: `package main
+
+import "testing"
+
+func sameInts(a, b []int) bool {
+\tif len(a) != len(b) {
+\t\treturn false
+\t}
+\tfor i := range a {
+\t\tif a[i] != b[i] {
+\t\t\treturn false
+\t\t}
+\t}
+\treturn true
+}
+
+func TestReversed(t *testing.T) {
+\ttests := []struct {
+\t\tin, want []int
+\t}{
+\t\t{[]int{1, 2, 3}, []int{3, 2, 1}},
+\t\t{[]int{5, 6}, []int{6, 5}},
+\t\t{[]int{9}, []int{9}},
+\t\t{[]int{}, []int{}},
+\t}
+\tfor _, tt := range tests {
+\t\tbefore := make([]int, len(tt.in))
+\t\tcopy(before, tt.in)
+\t\tgot := Reversed(tt.in)
+\t\tif !sameInts(got, tt.want) {
+\t\t\tt.Errorf("Reversed(%v) = %v, want %v", before, got, tt.want)
+\t\t}
+\t\tif !sameInts(tt.in, before) {
+\t\t\tt.Errorf("Reversed(%v) changed its input to %v", before, tt.in)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+// Reversed returns a reversed copy of s. s itself is not changed.
+func Reversed(s []int) []int {
+\tout := make([]int, 0, len(s))
+\tfor i := len(s) - 1; i >= 0; i-- {
+\t\tout = append(out, s[i])
+\t}
+\treturn out
+}
+`,
+    },
     refs: [
       { label: 'Go Slices: usage and internals', href: 'https://go.dev/blog/slices-intro' },
       { label: 'A Tour of Go — Slices', href: 'https://go.dev/tour/moretypes/7' },
@@ -908,6 +1248,11 @@ func main() {
     title: 'Maps',
     navTitle: 'Maps',
     oneLine: 'A hash table with two behaviours that surprise most people once.',
+    objectives: [
+      'Write code that tells a missing key from a zero value with `v, ok := m[k]`.',
+      'Explain why ranging over a map may give a different order each time.',
+      'Fix the panic caused by writing to a nil map.',
+    ],
     blocks: [
       {
         heading: 'Maps',
@@ -928,6 +1273,42 @@ fmt.Println(len(m))
 for k, v := range m {       // ORDER IS RANDOM, on purpose
 \tfmt.Println(k, v)
 }`,
+          run: `package main
+
+import (
+	"fmt"
+	"sort"
+)
+
+func main() {
+	stock := map[string]int{"pears": 3, "apples": 5} // create with values
+	stock["figs"] = 1                                // set
+	stock["pears"] = 4                               // overwrite
+
+	fmt.Println("apples:", stock["apples"])          // get
+	fmt.Println("kiwi:", stock["kiwi"])              // 0 — missing key gives zero value
+
+	v, ok := stock["kiwi"]                           // comma-ok form
+	fmt.Println("kiwi present?", v, ok)              // 0 false
+
+	delete(stock, "figs")
+	fmt.Println("items:", len(stock))                // 2
+
+	for k, v := range stock {                        // order is random: run it twice
+		fmt.Println(" ", k, v)
+	}
+
+	keys := make([]string, 0, len(stock))            // for a fixed order, sort the keys
+	for k := range stock {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		fmt.Println("sorted:", k, stock[k])
+	}
+}
+`,
+          note: 'Run it a few times: the plain `range` loop can change order, the sorted one never does.',
         },
       },
       {
@@ -939,18 +1320,26 @@ for k, v := range m {       // ORDER IS RANDOM, on purpose
         ],
       },
       {
+        body: [
+          'Since Go 1.24, maps are built as **Swiss tables**, a newer hash-table design that makes lookups and inserts faster. Nothing you write changes: the syntax, the rules above and the random order all stay the same. Your old code just runs a bit quicker.',
+        ],
+      },
+      {
         heading: 'The modern stdlib helpers',
         body: [
-          'Go 1.21 added the `slices` and `maps` packages to the standard library, and Go 1.23 added iterators, which is why `maps.Keys` returns one. Reach for these before writing a loop.',
+          'Go 1.21 added the `slices` and `maps` packages to the standard library. Reach for these before writing a loop.',
+          'Preview: `maps.Keys` does not hand you a slice. It returns an **iterator**, something that gives you the keys one at a time. You will learn how they work in **Iterators**; for now, treat `slices.Sorted(maps.Keys(m))` as "the keys, sorted".',
         ],
         code: {
           label: 'stdlib.go',
-          src: `slices.Contains(s, 3)
-slices.Sort(s)
-slices.SortFunc(users, func(a, b User) int { return cmp.Compare(a.Name, b.Name) })
-slices.Index(s, 3)
-slices.Reverse(s)
-maps.Keys(m)                 // an iterator; use slices.Collect to get a slice`,
+          src: `s := []int{3, 1, 2}
+slices.Contains(s, 3)               // true
+slices.Sort(s)                      // s is now [1 2 3]
+slices.Index(s, 3)                  // 2
+slices.Reverse(s)                   // s is now [3 2 1]
+
+m := map[string]int{"b": 2, "a": 1}
+keys := slices.Sorted(maps.Keys(m)) // [a b] — preview, explained in Iterators`,
         },
       },
     ],
@@ -977,20 +1366,81 @@ maps.Keys(m)                 // an iterator; use slices.Collect to get a slice`,
       {
         task: 'Range over the same map five times and watch the order change.',
         answer:
-          'The order changes between loops, even within one run. Go randomises it on purpose so you cannot come to depend on it.',
+          'The order may change between loops, even within one run. Go randomises it on purpose so you cannot come to depend on it.',
       },
     ],
+    challenge: {
+      prompt:
+        'Write `WordCount(words []string) map[string]int` that counts how many times each word appears. Example: `WordCount([]string{"go", "is", "go"})` → `map[go:2 is:1]`. An empty list gives an empty map.',
+      starter: `package main
+
+// WordCount counts how often each word appears in words.
+func WordCount(words []string) map[string]int {
+\treturn nil
+}
+`,
+      test: `package main
+
+import "testing"
+
+func sameCounts(a, b map[string]int) bool {
+\tif len(a) != len(b) {
+\t\treturn false
+\t}
+\tfor k, v := range a {
+\t\tif w, ok := b[k]; !ok || w != v {
+\t\t\treturn false
+\t\t}
+\t}
+\treturn true
+}
+
+func TestWordCount(t *testing.T) {
+\ttests := []struct {
+\t\twords []string
+\t\twant  map[string]int
+\t}{
+\t\t{[]string{"go", "is", "go"}, map[string]int{"go": 2, "is": 1}},
+\t\t{[]string{"a", "a", "a"}, map[string]int{"a": 3}},
+\t\t{[]string{"x", "y"}, map[string]int{"x": 1, "y": 1}},
+\t\t{[]string{}, map[string]int{}},
+\t}
+\tfor _, tt := range tests {
+\t\tif got := WordCount(tt.words); !sameCounts(got, tt.want) {
+\t\t\tt.Errorf("WordCount(%v) = %v, want %v", tt.words, got, tt.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+// WordCount counts how often each word appears in words.
+func WordCount(words []string) map[string]int {
+\tcounts := make(map[string]int)
+\tfor _, w := range words {
+\t\tcounts[w]++ // a missing key starts at the zero value, 0
+\t}
+\treturn counts
+}
+`,
+    },
     refs: [
-      { label: 'Go Slices: usage and internals', href: 'https://go.dev/blog/slices-intro' },
-      { label: 'A Tour of Go — Slices', href: 'https://go.dev/tour/moretypes/7' },
+      { label: 'Go blog: Go maps in action', href: 'https://go.dev/blog/maps' },
+      { label: 'Go spec — Map types', href: 'https://go.dev/ref/spec#Map_types' },
+      { label: 'maps package', href: 'https://pkg.go.dev/maps' },
     ],
   },
 
   {
     slug: 'structs',
-    title: 'Structs and struct tags',
-    navTitle: 'Structs and tags',
-    oneLine: 'How you make your own types, and how they turn into JSON.',
+    title: 'Structs',
+    navTitle: 'Structs',
+    oneLine: 'How you make your own types by grouping values under one name.',
+    objectives: [
+      'Write a struct type and create values of it with named fields.',
+      'Predict the output after copying a struct and changing the copy.',
+      'Write a function that changes a struct through a pointer.',
+    ],
     blocks: [
       {
         heading: 'What a struct is',
@@ -1031,6 +1481,19 @@ func main() {
         },
       },
       {
+        heading: 'Printing a struct',
+        code: {
+          label: 'print.go',
+          src: `u := User{ID: 1, Name: "sahdev", Email: "s@x.com"}
+
+fmt.Printf("%v\\n", u)   // {1 sahdev s@x.com}          — just the values
+fmt.Printf("%+v\\n", u)  // {ID:1 Name:sahdev Email:s@x.com} — with field names
+fmt.Printf("%#v\\n", u)  // main.User{ID:1, Name:"sahdev", Email:"s@x.com"}
+fmt.Printf("%T\\n", u)   // main.User`,
+          note: '`%+v` is the one you will use most when debugging: it shows which value belongs to which field.',
+        },
+      },
+      {
         heading: 'Assignment copies. Always.',
         body: [
           'Go has no pass-by-reference. Assigning a struct copies it, and passing one to a function copies it too. When you pass a pointer, you are passing the pointer *by value*. The copy points at the same memory.',
@@ -1048,9 +1511,56 @@ fmt.Println(a.Name)       // "changed"`,
         },
       },
       {
-        heading: 'Embedding is composition, not inheritance',
+        heading: 'Functions that take a struct',
         body: [
-          'You can put one struct inside another with no field name. Its fields and methods are then promoted, so they look like they belong to the outer type.',
+          'To work with a struct, write an ordinary function that takes it. Take a pointer (`*User`, from **Pointers**) when the function must change the original, because a plain `User` parameter is a copy.',
+        ],
+        code: {
+          label: 'funcs.go',
+          src: `func display(u User) string { return u.Name + " <" + u.Email + ">" }
+
+func rename(u *User, n string) { u.Name = n } // pointer: changes the original
+
+u := User{Name: "old", Email: "o@x.com"}
+rename(&u, "new")
+fmt.Println(display(u))   // new <o@x.com>`,
+          note: 'In **Methods and embedding** you will attach these functions to the type itself, so you can write `u.Rename("new")`.',
+        },
+      },
+      {
+        heading: 'Pointers to structs',
+        body: [
+          'This builds on **Pointers**. `&User{...}` makes a struct and gives you its address in one step; it is the usual way to get a `*User`. Go also dereferences struct fields for you: with `p := &u`, you write `p.Name`, and Go reads it as `(*p).Name`.',
+        ],
+        code: {
+          label: 'ptr-struct.go',
+          src: `p := &User{Name: "sahdev"}   // a new User, and its address
+
+fmt.Println(p.Name)          // Go rewrites this as (*p).Name
+p.Name = "changed"           // and this too`,
+        },
+      },
+      {
+        heading: 'A nil-able pointer field',
+        body: [
+          'A pointer field can be `nil`, so it tells "not sent" apart from "sent as empty". A PATCH endpoint needs that: `{"title": ""}` should clear the title, while `{}` should leave it alone. **JSON** shows how the tags work.',
+        ],
+        code: {
+          label: 'optional.go',
+          src: `type UpdateRequest struct {
+\tTitle *string \`json:"title"\`   // nil = not provided at all
+\tBody  *string \`json:"body"\`
+}
+
+if req.Title != nil {
+\tnote.Title = *req.Title           // they DID send it, even if it is ""
+}`,
+        },
+      },
+      {
+        heading: 'Embedding: a struct inside a struct',
+        body: [
+          'You can put one struct inside another with no field name. Its fields are then promoted, so they look like they belong to the outer type.',
         ],
         code: {
           label: 'embed.go',
@@ -1058,38 +1568,14 @@ fmt.Println(a.Name)       // "changed"`,
 \tID int
 }
 
-func (b Base) Describe() string { return fmt.Sprint("id=", b.ID) }
-
 type Admin struct {
 \tBase           // embedded — no field name
 \tLevel int
 }
 
 a := Admin{Base: Base{ID: 1}, Level: 5}
-fmt.Println(a.ID)          // promoted field
-fmt.Println(a.Describe())  // promoted method`,
-          run: `package main
-
-import "fmt"
-
-type Base struct {
-	ID int
-}
-func (b Base) Describe() string { return fmt.Sprint("id=", b.ID) }
-type Admin struct {
-	Base           // embedded — no field name
-	Level int
-}
-
-func main() {
-
-
-
-	a := Admin{Base: Base{ID: 1}, Level: 5}
-	fmt.Println(a.ID)          // promoted field
-	fmt.Println(a.Describe())  // promoted method
-}
-`,
+fmt.Println(a.ID)          // promoted field — same as a.Base.ID`,
+          note: 'This is composition, not inheritance. **Methods and embedding** shows that methods get promoted too.',
         },
       },
       {
@@ -1102,43 +1588,42 @@ import "fmt"
 
 type Base struct{ ID int }
 
-func (b Base) Describe() string { return fmt.Sprint("id=", b.ID) }
-
 type User struct {
-	Base        // embedded: ID and Describe are promoted
+	Base        // embedded: ID is promoted
 	Name string
 }
 
-func (u User) Display() string  { return u.Name }
-func (u *User) Rename(n string) { u.Name = n } // pointer: can mutate
+func display(u User) string      { return u.Name }
+func rename(u *User, n string)   { u.Name = n } // pointer: can mutate
 
 func main() {
 	u := User{Base: Base{ID: 1}, Name: "first"}
+	fmt.Printf("%+v\\n", u)
+	fmt.Println(display(u), u.ID)
 
-	fmt.Println(u.Display(), u.ID, u.Describe())
-
-	u.Rename("second") // Go takes the address for you
-	fmt.Println("after Rename:", u.Name)
+	rename(&u, "second")
+	fmt.Println("after rename:", u.Name)
 
 	copyOfU := u
-	copyOfU.Rename("third")
+	rename(&copyOfU, "third")
 	fmt.Println("original is still:", u.Name) // assignment copied it
 }
 `,
           canRun: true,
-          note: 'Value and pointer receivers side by side, plus embedding.',
+          note: 'A copy and a pointer side by side, plus embedding.',
         },
       },
     ],
     keyPoints: [
       'A struct groups fields into one type. Always use field names in a literal.',
       'Assignment and function calls copy a struct. Go has no pass-by-reference.',
-      'Struct tags are metadata read at runtime through reflection. `encoding/json` uses them for field names.',
-      '`json:"-"` is how you make it impossible to leak a password hash.',
+      'Taking a pointer (`*User`) lets a function change the original instead of a copy. `&User{...}` makes one, and `p.Name` dereferences for you.',
+      'A nil-able pointer field (`*string`) separates "not sent" from "sent as empty".',
+      'Embedding puts one struct inside another; its fields are promoted. Composition, not inheritance.',
     ],
     remember:
       'Everything in Go is a value and every assignment is a copy.',
-    task: 'Build a `User` struct with tags, marshal it to JSON, and confirm a `json:"-"` field never appears.',
+    task: 'Build a `Book` struct (Title, Author, Pages), write `func describe(b Book) string` and `func addPages(b *Book, n int)`, and print the book with `%+v` before and after.',
     exercises: [
       {
         task: 'Copy a struct, change the copy, and print the original.',
@@ -1146,16 +1631,91 @@ func main() {
           'The original is unchanged. Assignment copies the whole struct.',
       },
       {
-        task: 'Add `omitempty` to a field and marshal with it both set and empty.',
+        task: 'Write `rename(u User, n string)` without a pointer, call it, and print the name. Then switch to `*User`.',
         answer:
-          'Set, it appears. Empty, the key is left out entirely. It is absent, not `null`.',
+          'Without the pointer the name does not change, because the function got a copy. With `*User` and `rename(&u, ...)`, it does.',
       },
       {
-        task: 'Make a field lowercase and watch it vanish from the JSON.',
+        task: 'Embed a `Base{ID int}` in two different structs and print `x.ID` on both.',
         answer:
-          'It is missing from the JSON with no error. Only exported fields are marshalled, so check the first letter whenever a field is missing from a response.',
+          'Both print their ID directly. The field is promoted from the embedded `Base`, the same as writing `x.Base.ID`.',
       },
     ],
+    challenge: {
+      prompt:
+        'A `Book` has a `Title` and `Pages`. Write `Describe(b Book) string`, which returns the title and page count like `"Go 101 (250 pages)"`, and `AddPages(b *Book, n int)`, which adds `n` to the ORIGINAL book\'s pages. Example: a book with 250 pages after `AddPages(&b, 10)` has 260.',
+      starter: `package main
+
+type Book struct {
+\tTitle string
+\tPages int
+}
+
+// Describe returns "Title (N pages)".
+func Describe(b Book) string {
+\treturn ""
+}
+
+// AddPages adds n pages to the book b points at.
+func AddPages(b *Book, n int) {
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestDescribe(t *testing.T) {
+\ttests := []struct {
+\t\tb    Book
+\t\twant string
+\t}{
+\t\t{Book{Title: "Go 101", Pages: 250}, "Go 101 (250 pages)"},
+\t\t{Book{Title: "Tiny", Pages: 1}, "Tiny (1 pages)"},
+\t}
+\tfor _, tt := range tests {
+\t\tif got := Describe(tt.b); got != tt.want {
+\t\t\tt.Errorf("Describe(%+v) = %q, want %q", tt.b, got, tt.want)
+\t\t}
+\t}
+}
+
+func TestAddPages(t *testing.T) {
+\ttests := []struct {
+\t\tstart, add, want int
+\t}{
+\t\t{250, 10, 260},
+\t\t{0, 5, 5},
+\t\t{7, 0, 7},
+\t}
+\tfor _, tt := range tests {
+\t\tb := Book{Title: "x", Pages: tt.start}
+\t\tAddPages(&b, tt.add)
+\t\tif b.Pages != tt.want {
+\t\t\tt.Errorf("AddPages(%v pages, %v) = %v pages, want %v", tt.start, tt.add, b.Pages, tt.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+import "fmt"
+
+type Book struct {
+\tTitle string
+\tPages int
+}
+
+// Describe returns "Title (N pages)".
+func Describe(b Book) string {
+\treturn fmt.Sprintf("%s (%d pages)", b.Title, b.Pages)
+}
+
+// AddPages adds n pages to the book b points at.
+func AddPages(b *Book, n int) {
+\tb.Pages += n
+}
+`,
+    },
     refs: [
       { label: 'A Tour of Go — Methods', href: 'https://go.dev/tour/methods/1' },
       { label: 'FAQ: pointer or value receiver?', href: 'https://go.dev/doc/faq#methods_on_values_or_pointers' },
@@ -1167,6 +1727,11 @@ func main() {
     title: 'Methods, receivers, and embedding',
     navTitle: 'Methods and embedding',
     oneLine: 'The rule about receivers that most beginners trip on.',
+    objectives: [
+      'Write a value-receiver method and a pointer-receiver method, and explain when to use each.',
+      'Write an enum with a named type, `iota` and a `String()` method.',
+      'Explain why embedding is composition and not inheritance.',
+    ],
     blocks: [
       {
         heading: 'Methods are functions with a receiver',
@@ -1191,6 +1756,63 @@ fmt.Println(u.Name)       // "new"`,
         },
       },
       {
+        heading: 'Enums: a named type, iota, and a String method',
+        body: [
+          'In **Constants and iota** you numbered choices with `iota`. Give those constants their own named type and a `String()` method, and `fmt` prints them as words. `fmt` looks for a method called `String() string` and uses it automatically; **Interfaces** explains why that works.',
+        ],
+        code: {
+          label: 'enum.go',
+          src: `type Status int            // a new type whose underlying value is an int
+
+const (
+\tPending Status = iota      // 0
+\tActive                     // 1
+\tDeleted                    // 2
+)
+
+func (s Status) String() string {
+\tswitch s {
+\tcase Pending:
+\t\treturn "pending"
+\tcase Active:
+\t\treturn "active"
+\t}
+\treturn "deleted"
+}
+
+fmt.Println(Active)          // active — String() at work
+fmt.Printf("%d\\n", Active)  // 1 — the number underneath`,
+          run: `package main
+
+import "fmt"
+
+type Status int
+
+const (
+	Pending Status = iota
+	Active
+	Deleted
+)
+
+func (s Status) String() string {
+	switch s {
+	case Pending:
+		return "pending"
+	case Active:
+		return "active"
+	}
+	return "deleted"
+}
+
+func main() {
+	fmt.Println(Pending, Active, Deleted) // pending active deleted
+	fmt.Printf("%d %d %d\\n", Pending, Active, Deleted) // 0 1 2
+}
+`,
+          note: 'This is how Go does enums. The named type also stops you passing a plain number where a `Status` is expected by mistake.',
+        },
+      },
+      {
         heading: 'Which receiver do I use?',
         table: {
           headers: ['Use a pointer receiver when', 'Use a value receiver when'],
@@ -1206,6 +1828,53 @@ fmt.Println(u.Name)       // "new"`,
         callout: {
           tone: 'warn',
           text: 'Be consistent. Mixing value and pointer receivers on one type draws review comments, and it leads to the confusing "does not implement" error in the **Interfaces** topic: a `T` value only has the value-receiver methods, so it fails any interface that needs a pointer-receiver one. If one method needs a pointer, make them all pointers.',
+        },
+      },
+      {
+        heading: 'The same functions, written as methods',
+        body: [
+          'In **Structs** you wrote `display(u)` and `rename(&u, "new")`. Move the struct parameter in front of the name and they become methods: `u.Display()` and `u.Rename("new")`. The `*User` parameter becomes a pointer receiver.',
+        ],
+      },
+      {
+        heading: 'Embedding promotes methods too',
+        code: {
+          label: 'embed.go',
+          src: `type Base struct{ ID int }
+
+func (b Base) Describe() string { return fmt.Sprint("id=", b.ID) }
+
+type Admin struct {
+\tBase           // embedded — no field name
+\tLevel int
+}
+
+a := Admin{Base: Base{ID: 1}, Level: 5}
+fmt.Println(a.Describe())  // promoted method`,
+          run: `package main
+
+import "fmt"
+
+type Base struct{ ID int }
+
+func (b Base) Describe() string { return fmt.Sprint("id=", b.ID) }
+
+type User struct {
+	Base
+	Name string
+}
+
+func (u User) Display() string  { return u.Name }
+func (u *User) Rename(n string) { u.Name = n }
+
+func main() {
+	u := User{Base: Base{ID: 1}, Name: "first"}
+	fmt.Println(u.Display(), u.ID, u.Describe())
+
+	u.Rename("second") // Go takes the address for you
+	fmt.Println("after Rename:", u.Name)
+}
+`,
         },
       },
       {
@@ -1241,6 +1910,80 @@ fmt.Println(u.Name)       // "new"`,
           '`go vet` may stay quiet, but interface satisfaction breaks. Only `*T` has both kinds of method in its method set, so `var s Shape = User{}` fails when `Shape` needs a pointer-receiver method.',
       },
     ],
+    challenge: {
+      prompt:
+        'Give `Rect` two methods. `Area()` (value receiver) returns width times height. `Scale(f float64)` (pointer receiver) multiplies both sides by `f`, changing the original. Example: `Rect{W: 2, H: 3}.Area()` → 6; after `r.Scale(2)`, `r` is `{W: 4, H: 6}`.',
+      starter: `package main
+
+type Rect struct {
+\tW, H float64
+}
+
+// Area returns W times H.
+func (r Rect) Area() float64 {
+\treturn 0
+}
+
+// Scale multiplies both sides by f.
+func (r *Rect) Scale(f float64) {
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestArea(t *testing.T) {
+\ttests := []struct {
+\t\tr    Rect
+\t\twant float64
+\t}{
+\t\t{Rect{W: 2, H: 3}, 6},
+\t\t{Rect{W: 1.5, H: 2}, 3},
+\t\t{Rect{}, 0},
+\t}
+\tfor _, tt := range tests {
+\t\tif got := tt.r.Area(); got != tt.want {
+\t\t\tt.Errorf("%+v.Area() = %v, want %v", tt.r, got, tt.want)
+\t\t}
+\t}
+}
+
+func TestScale(t *testing.T) {
+\ttests := []struct {
+\t\tr    Rect
+\t\tf    float64
+\t\twant Rect
+\t}{
+\t\t{Rect{W: 2, H: 3}, 2, Rect{W: 4, H: 6}},
+\t\t{Rect{W: 4, H: 8}, 0.5, Rect{W: 2, H: 4}},
+\t}
+\tfor _, tt := range tests {
+\t\tr := tt.r
+\t\tr.Scale(tt.f)
+\t\tif r != tt.want {
+\t\t\tt.Errorf("%+v.Scale(%v) gave %+v, want %+v", tt.r, tt.f, r, tt.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+type Rect struct {
+\tW, H float64
+}
+
+// Area returns W times H.
+func (r Rect) Area() float64 {
+\treturn r.W * r.H
+}
+
+// Scale multiplies both sides by f.
+func (r *Rect) Scale(f float64) {
+\tr.W *= f
+\tr.H *= f
+}
+`,
+    },
     refs: [
       { label: 'A Tour of Go — Methods', href: 'https://go.dev/tour/methods/1' },
       { label: 'FAQ: pointer or value receiver?', href: 'https://go.dev/doc/faq#methods_on_values_or_pointers' },
@@ -1252,6 +1995,11 @@ fmt.Println(u.Name)       // "new"`,
     title: 'Interfaces',
     navTitle: 'Interfaces',
     oneLine: 'Go’s main abstraction, satisfied without ever being declared.',
+    objectives: [
+      'Write an interface and two types that satisfy it without declaring it.',
+      'Explain why an interface holding a nil pointer is not `nil`.',
+      'Fix a function that returns a typed nil pointer as an `error`.',
+    ],
     blocks: [
       {
         heading: 'There is no "implements" keyword',
@@ -1371,10 +2119,7 @@ func main() {
           label: 'press Run — this executes on the Go Playground',
           src: `package main
 
-import (
-	"errors"
-	"fmt"
-)
+import "fmt"
 
 type Shape interface{ Area() float64 }
 
@@ -1385,8 +2130,6 @@ func (r Rect) Area() float64 { return r.W * r.H }
 type MyError struct{ Field string }
 
 func (e *MyError) Error() string { return e.Field + " is invalid" }
-
-var ErrNotFound = errors.New("not found")
 
 func broken() error {
 	var e *MyError = nil
@@ -1401,18 +2144,12 @@ func main() {
 		fmt.Println("the nil trap: err != nil is TRUE") // surprising, and correct
 	}
 
-	wrapped := fmt.Errorf("loading user 5: %w", ErrNotFound)
-	fmt.Println(wrapped)
-	fmt.Println("errors.Is finds it:", errors.Is(wrapped, ErrNotFound))
-
-	var me *MyError
-	if errors.As(fmt.Errorf("wrap: %w", &MyError{Field: "email"}), &me) {
-		fmt.Println("errors.As gave us the field:", me.Field)
-	}
+	var err error = &MyError{Field: "email"} // *MyError has Error(), so it is an error
+	fmt.Println("as an error:", err)
 }
 `,
           canRun: true,
-          note: 'Implicit satisfaction, the nil-interface trap, and `errors.Is` / `errors.As` on a wrapped error.',
+          note: 'Implicit satisfaction, the nil-interface trap, and your own type used as an `error`. Checking wrapped errors (`errors.Is` / `errors.As`) comes in **Error values in depth**.',
         },
       },
     ],
@@ -1442,6 +2179,77 @@ func main() {
           'All three work unchanged. Each has a `Write` method, and that one method is all `io.Writer` asks for.',
       },
     ],
+    challenge: {
+      prompt:
+        '`Rect` already satisfies `Shape`. Make `Square` satisfy it too by writing its `Area` method (side times side), then write `TotalArea(shapes []Shape) float64`, which adds up the area of every shape. Example: `TotalArea([]Shape{Rect{W: 2, H: 3}, Square{Side: 2}})` → 10.',
+      starter: `package main
+
+type Shape interface {
+\tArea() float64
+}
+
+type Rect struct{ W, H float64 }
+
+func (r Rect) Area() float64 { return r.W * r.H }
+
+type Square struct{ Side float64 }
+
+func (s Square) Area() float64 {
+\treturn 0
+}
+
+// TotalArea adds up the area of every shape.
+func TotalArea(shapes []Shape) float64 {
+\treturn 0
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestTotalArea(t *testing.T) {
+\ttests := []struct {
+\t\tshapes []Shape
+\t\twant   float64
+\t}{
+\t\t{[]Shape{Rect{W: 2, H: 3}, Square{Side: 2}}, 10},
+\t\t{[]Shape{Square{Side: 3}}, 9},
+\t\t{[]Shape{Rect{W: 1, H: 1}, Rect{W: 2, H: 2}}, 5},
+\t\t{nil, 0},
+\t}
+\tfor _, tt := range tests {
+\t\tif got := TotalArea(tt.shapes); got != tt.want {
+\t\t\tt.Errorf("TotalArea(%v) = %v, want %v", tt.shapes, got, tt.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+type Shape interface {
+\tArea() float64
+}
+
+type Rect struct{ W, H float64 }
+
+func (r Rect) Area() float64 { return r.W * r.H }
+
+type Square struct{ Side float64 }
+
+func (s Square) Area() float64 {
+\treturn s.Side * s.Side
+}
+
+// TotalArea adds up the area of every shape.
+func TotalArea(shapes []Shape) float64 {
+\ttotal := 0.0
+\tfor _, s := range shapes {
+\t\ttotal += s.Area()
+\t}
+\treturn total
+}
+`,
+    },
     refs: [
       { label: 'A Tour of Go — Interfaces', href: 'https://go.dev/tour/methods/9' },
       { label: 'Go blog: Errors are values', href: 'https://go.dev/blog/errors-are-values' },
@@ -1453,6 +2261,11 @@ func main() {
     title: 'Error values in depth',
     navTitle: 'Error values',
     oneLine: 'Sentinels, custom types, wrapping, and handling each error once.',
+    objectives: [
+      'Write a sentinel error and a custom error type, and wrap them with `%w`.',
+      'Write checks with `errors.Is` for a specific error and `errors.As` for its data.',
+      'Explain the difference between wrapping with `%w` and with `%v`.',
+    ],
     blocks: [
       {
         heading: 'error is just an interface',
@@ -1466,23 +2279,71 @@ func main() {
         code: {
           label: 'errors.go',
           src: `// 1. Ad-hoc — a message, wrapping what went wrong underneath
-return fmt.Errorf("parsing config line %d: %w", n, err)
+func parseLine(n int, err error) error {
+\treturn fmt.Errorf("parsing config line %d: %w", n, err)
+}
 
 // 2. Sentinel — the caller needs to branch on this exact case
 var ErrNotFound = errors.New("not found")
-if errors.Is(err, ErrNotFound) { ... }
 
 // 3. Custom type — the caller needs DATA out of the error
 type ValidationError struct{ Field, Msg string }
+
 func (e *ValidationError) Error() string { return e.Field + ": " + e.Msg }
 
-var ve *ValidationError
-if errors.As(err, &ve) {
-\tfmt.Println("bad field:", ve.Field)
+// 4. Joined — report every failure, not just the first
+func validate(errs []error) error {
+\treturn errors.Join(errs...) // nil if errs is empty
 }
 
-// 4. Joined — report every failure, not just the first
-return errors.Join(errs...)`,
+func handle(err error) {
+\tif errors.Is(err, ErrNotFound) { // is this exact error anywhere in the chain?
+\t\tfmt.Println("not found")
+\t}
+\tvar ve *ValidationError
+\tif errors.As(err, &ve) { // is there a *ValidationError in the chain? give it to me
+\t\tfmt.Println("bad field:", ve.Field)
+\t}
+}`,
+          run: `package main
+
+import (
+\t"errors"
+\t"fmt"
+)
+
+func parseLine(n int, err error) error {
+\treturn fmt.Errorf("parsing config line %d: %w", n, err)
+}
+
+var ErrNotFound = errors.New("not found")
+
+type ValidationError struct{ Field, Msg string }
+
+func (e *ValidationError) Error() string { return e.Field + ": " + e.Msg }
+
+func validate(errs []error) error {
+\treturn errors.Join(errs...)
+}
+
+func handle(err error) {
+\tfmt.Println("got:", err)
+\tif errors.Is(err, ErrNotFound) {
+\t\tfmt.Println("  -> not found")
+\t}
+\tvar ve *ValidationError
+\tif errors.As(err, &ve) {
+\t\tfmt.Println("  -> bad field:", ve.Field)
+\t}
+}
+
+func main() {
+\thandle(parseLine(3, ErrNotFound))
+\thandle(parseLine(7, &ValidationError{Field: "port", Msg: "must be a number"}))
+\thandle(validate([]error{ErrNotFound, &ValidationError{Field: "name", Msg: "empty"}}))
+}
+`,
+          note: '`errors.As` is a type assertion that walks the whole wrap chain. **Type switches** shows the plain version it is built on.',
         },
       },
       {
@@ -1493,6 +2354,46 @@ return errors.Join(errs...)`,
           '**Add context, do not restate.** Six layers each saying "failed to" gives you a useless sentence. Say what you were doing, with what: `fmt.Errorf("get user %d: %w", id, err)`.',
           '**Handle an error once.** Either log it or return it, not both. Otherwise one failure passing up five layers is logged five times.',
         ],
+      },
+      {
+        heading: 'errors.As: getting the data back out',
+        body: [
+          '`errors.Is` answers "is this that exact error?". When the error is a custom type carrying data, you want the value itself. `errors.As` walks the wrap chain looking for an error of the type you ask for. If it finds one, it stores it in your variable and returns `true`.',
+          'You pass a **pointer to a variable** of the error type: `var ve *ValidationError` and then `errors.As(err, &ve)`. Forget the `&` and it panics, because it has nowhere to write the result.',
+        ],
+        code: {
+          label: 'errors-as.go',
+          src: `package main
+
+import (
+\t"errors"
+\t"fmt"
+)
+
+type ValidationError struct{ Field, Msg string }
+
+func (e *ValidationError) Error() string { return e.Field + ": " + e.Msg }
+
+func saveUser(age int) error {
+\tif age < 0 {
+\t\treturn &ValidationError{Field: "age", Msg: "cannot be negative"}
+\t}
+\treturn nil
+}
+
+func main() {
+\terr := fmt.Errorf("signup: %w", saveUser(-3)) // wrapped once
+
+\tvar ve *ValidationError
+\tif errors.As(err, &ve) { // found a *ValidationError in the chain
+\t\tfmt.Println("tell the user to fix:", ve.Field) // age
+\t}
+\tfmt.Println("full message:", err) // signup: age: cannot be negative
+}
+`,
+          canRun: true,
+          note: 'Use `errors.As` instead of a type assertion like `err.(*ValidationError)`: the assertion only checks the outer error and misses anything wrapped with `%w`.',
+        },
       },
     ],
     keyPoints: [
@@ -1521,6 +2422,100 @@ return errors.Join(errs...)`,
           'All three messages appear, and `errors.Is` still finds each one. This is how you validate a whole form at once.',
       },
     ],
+    challenge: {
+      prompt:
+        'Write `Price(prices map[string]int, item string) (int, error)`. A known item with a price of 0 or more returns that price and nil. A missing item returns an error that wraps `ErrNotFound` and reads `price of "kiwi": not found`. A negative price returns a `*BadPriceError` so the caller can get the item and price back with `errors.As`. Example: `Price(map[string]int{"apple": 30}, "apple")` → 30, nil.',
+      starter: `package main
+
+import "errors"
+
+var ErrNotFound = errors.New("not found")
+
+type BadPriceError struct {
+\tItem  string
+\tPrice int
+}
+
+func (e *BadPriceError) Error() string { return e.Item + " has a negative price" }
+
+// Price looks up item in prices.
+func Price(prices map[string]int, item string) (int, error) {
+\treturn 0, nil
+}
+`,
+      test: `package main
+
+import (
+\t"errors"
+\t"testing"
+)
+
+func TestPrice(t *testing.T) {
+\tprices := map[string]int{"apple": 30, "free": 0, "broken": -5}
+\ttests := []struct {
+\t\titem         string
+\t\twant         int
+\t\twantNotFound bool
+\t\twantBad      bool
+\t\twantMsg      string
+\t}{
+\t\t{"apple", 30, false, false, ""},
+\t\t{"free", 0, false, false, ""},
+\t\t{"kiwi", 0, true, false, \`price of "kiwi": not found\`},
+\t\t{"broken", 0, false, true, "broken has a negative price"},
+\t}
+\tfor _, tt := range tests {
+\t\tgot, err := Price(prices, tt.item)
+\t\tif got != tt.want {
+\t\t\tt.Errorf("Price(%v) = %v, want %v", tt.item, got, tt.want)
+\t\t}
+\t\tif errors.Is(err, ErrNotFound) != tt.wantNotFound {
+\t\t\tt.Errorf("Price(%v): errors.Is(err, ErrNotFound) = %v, want %v", tt.item, !tt.wantNotFound, tt.wantNotFound)
+\t\t}
+\t\tvar bp *BadPriceError
+\t\tif errors.As(err, &bp) != tt.wantBad {
+\t\t\tt.Errorf("Price(%v): errors.As(err, &bp) = %v, want %v", tt.item, !tt.wantBad, tt.wantBad)
+\t\t} else if tt.wantBad && (bp.Item != tt.item || bp.Price != prices[tt.item]) {
+\t\t\tt.Errorf("Price(%v): BadPriceError = %+v, want Item %v Price %v", tt.item, *bp, tt.item, prices[tt.item])
+\t\t}
+\t\tif tt.wantMsg == "" && err != nil {
+\t\t\tt.Errorf("Price(%v) error = %v, want nil", tt.item, err)
+\t\t}
+\t\tif tt.wantMsg != "" && (err == nil || err.Error() != tt.wantMsg) {
+\t\t\tt.Errorf("Price(%v) error = %v, want %v", tt.item, err, tt.wantMsg)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+import (
+\t"errors"
+\t"fmt"
+)
+
+var ErrNotFound = errors.New("not found")
+
+type BadPriceError struct {
+\tItem  string
+\tPrice int
+}
+
+func (e *BadPriceError) Error() string { return e.Item + " has a negative price" }
+
+// Price looks up item in prices.
+func Price(prices map[string]int, item string) (int, error) {
+\tp, ok := prices[item]
+\tif !ok {
+\t\treturn 0, fmt.Errorf("price of %q: %w", item, ErrNotFound)
+\t}
+\tif p < 0 {
+\t\treturn 0, &BadPriceError{Item: item, Price: p}
+\t}
+\treturn p, nil
+}
+`,
+    },
     refs: [
       { label: 'A Tour of Go — Interfaces', href: 'https://go.dev/tour/methods/9' },
       { label: 'Go blog: Errors are values', href: 'https://go.dev/blog/errors-are-values' },
@@ -1532,6 +2527,11 @@ return errors.Join(errs...)`,
     title: 'Packages and visibility',
     navTitle: 'Packages',
     oneLine: 'A folder is a package, and capitalisation is your access control.',
+    objectives: [
+      'Write a module with two packages and call one from the other.',
+      'Explain how capitalisation decides what a package exports.',
+      'Fix an `undefined` error caused by a lowercase name.',
+    ],
     blocks: [
       {
         heading: 'Three things you need before writing anything real',
@@ -1546,14 +2546,16 @@ return errors.Join(errs...)`,
         body: [
           'Every `.go` file declares a package, and every file in one folder must declare the same one. Visibility is decided by **capitalisation**: a name starting with a capital letter is exported and visible outside the package; a lowercase name is private to it. There is no `public` or `private` keyword.',
         ],
-        code: {
-          label: 'layout',
-          src: `d07/
-  go.mod            module d07
-  main.go           package main
-  calc/
-    calc.go         package calc
-    calc_test.go    package calc`,
+        tree: {
+          caption: 'a module with two packages',
+          nodes: [
+            { depth: 0, name: 'calc-demo', kind: 'dir' },
+            { depth: 1, name: 'go.mod', kind: 'file', note: 'module example.com/calc-demo' },
+            { depth: 1, name: 'main.go', kind: 'file', note: 'package main' },
+            { depth: 1, name: 'calc', kind: 'dir' },
+            { depth: 2, name: 'calc.go', kind: 'file', note: 'package calc' },
+            { depth: 2, name: 'calc_test.go', kind: 'file', note: 'package calc' },
+          ],
         },
       },
       {
@@ -1576,13 +2578,13 @@ func helper() {}`,
 import (
 \t"fmt"
 
-\t"d07/calc"        // module path + folder
+\t"example.com/calc-demo/calc"   // module path + folder
 )
 
 func main() {
 \tfmt.Println(calc.Add(2, 3))
 }`,
-          note: 'The package name is part of every call, so `calc.Add` reads well and `calc.CalcAdd` stutters. Do not repeat the package name in what it exports.',
+          note: 'This is one file of the two-package module above, so it only builds next to `calc/calc.go`; run it with `go run .` in the module folder. The package name is part of every call, so `calc.Add` reads well and `calc.CalcAdd` stutters. Do not repeat the package name in what it exports.',
         },
       },
     ],
@@ -1591,6 +2593,7 @@ func main() {
       'Capitalised names are exported; lowercase ones are private to the package.',
       'The import path is the module path plus the folder.',
       'There is no `public` or `private` keyword, and none is needed.',
+      'Once a module has many packages, `internal/` folders and import cycles come into play: see **Packages in code** in the tooling section.',
     ],
     remember:
       'Capitalisation is not style. It is the access modifier.',
@@ -1623,7 +2626,19 @@ func main() {
     title: 'JSON',
     navTitle: 'JSON',
     oneLine: 'Turning structs into JSON and back, and the field that disappears with no error.',
+    objectives: [
+      'Write struct tags that rename, drop and hide fields in JSON.',
+      'Explain why a lowercase field never appears in the output.',
+      'Predict which fields `omitempty` and `omitzero` leave out.',
+    ],
     blocks: [
+      {
+        heading: 'Struct tags',
+        body: [
+          'A **struct tag** is a short string in backticks after a field: `Name string \`json:"name"\``. Go itself ignores it; packages such as `encoding/json` read it while the program runs to decide how to treat that field.',
+          'The three you will use: `json:"name"` sets the key name in the JSON. Adding `,omitempty` (`json:"bio,omitempty"`) leaves the key out when the value is empty (0, "", nil). `json:"-"` means never put this field in the JSON at all, which is how you make it impossible to leak a password hash.',
+        ],
+      },
       {
         heading: 'JSON, both directions',
         code: {
@@ -1647,6 +2662,38 @@ err = json.Unmarshal(b, &u2)       // bytes -> struct. Note the & — it needs a
         callout: {
           tone: 'warn',
           text: 'Only **exported** (capitalised) fields are marshalled. A lowercase field is invisible to `encoding/json` and will silently be missing from your API response.',
+        },
+      },
+      {
+        heading: 'omitzero: leave out zero values, structs included',
+        body: [
+          '`omitempty` has a gap: a struct is never "empty" to it. A zero `time.Time` is printed as `"0001-01-01T00:00:00Z"`, which is almost never what you want. Go 1.24 added `,omitzero`. It leaves the field out when it holds its **zero value**, and that includes a zero struct. If the type has an `IsZero() bool` method, as `time.Time` does, that method decides.',
+        ],
+        code: {
+          label: 'omitzero.go',
+          src: `package main
+
+import (
+\t"encoding/json"
+\t"fmt"
+\t"time"
+)
+
+type Event struct {
+\tName    string    \`json:"name"\`
+\tStarted time.Time \`json:"started,omitempty"\` // a struct is never "empty": still printed
+\tEnded   time.Time \`json:"ended,omitzero"\`    // zero time: left out
+\tCount   int       \`json:"count,omitzero"\`    // 0: left out
+}
+
+func main() {
+\tb, _ := json.Marshal(Event{Name: "launch"})
+\tfmt.Println(string(b))
+\t// {"name":"launch","started":"0001-01-01T00:00:00Z"}
+}
+`,
+          canRun: true,
+          note: 'For numbers, strings and pointers the two behave the same. They differ for structs and arrays, and for empty slices and maps. A struct or a `[3]int{}` full of zeros is dropped by `omitzero` but never by `omitempty`. An empty (non-nil) slice or map is dropped by `omitempty`, while `omitzero` drops only a nil one.',
         },
       },
       {
@@ -1707,11 +2754,16 @@ func main() {
           'By default the unknown field is ignored with no error. `DisallowUnknownFields` is a method on `json.Decoder`, and with it you get an error, so a client typo becomes a 400 instead of being dropped.',
       },
       {
+        task: 'Add `omitempty` to a field and marshal with it both set and empty.',
+        answer: 'Set, it appears. Empty, the key is left out entirely. It is absent, not `null`.',
+      },
+      {
         task: 'Marshal a `time.Time` and see what format Go chooses.',
         answer:
           'RFC 3339, like `2026-09-08T16:04:05Z`, with fractional seconds added when the time has them. It is a sensible default for an API.',
       },
     ],
+    challenge: {"prompt":"Add struct tags to `Product` and write `Encode(p Product) (string, error)` that returns its JSON. Keys must be `id`, `name`, `price` and `tags`. `tags` is left out when there are none (nil or empty), `price` is always present, even when it is 0, and `Secret` never appears. Example: `Product{ID: 1, Name: \"Pen\", Price: 9.5}` → `{\"id\":1,\"name\":\"Pen\",\"price\":9.5}`.","starter":"package main\n\ntype Product struct {\n\tID     int\n\tName   string\n\tPrice  float64\n\tTags   []string\n\tSecret string\n}\n\nfunc Encode(p Product) (string, error) {\n\treturn \"{}\", nil // TODO: tags on the fields, then json.Marshal\n}\n","test":"package main\n\nimport \"testing\"\n\nfunc TestEncode(t *testing.T) {\n\ttests := []struct {\n\t\tin   Product\n\t\twant string\n\t}{\n\t\t{Product{ID: 1, Name: \"Pen\", Price: 9.5}, `{\"id\":1,\"name\":\"Pen\",\"price\":9.5}`},\n\t\t{Product{ID: 2, Name: \"Ink\", Price: 0, Tags: []string{}}, `{\"id\":2,\"name\":\"Ink\",\"price\":0}`},\n\t\t{Product{ID: 3, Name: \"Book\", Price: 120, Tags: []string{\"new\", \"sale\"}, Secret: \"cost=80\"}, `{\"id\":3,\"name\":\"Book\",\"price\":120,\"tags\":[\"new\",\"sale\"]}`},\n\t\t{Product{ID: -4, Name: \"Pen \\\"Pro\\\"\", Price: -1.25}, `{\"id\":-4,\"name\":\"Pen \\\"Pro\\\"\",\"price\":-1.25}`},\n\t}\n\tfor _, tc := range tests {\n\t\tgot, err := Encode(tc.in)\n\t\tif err != nil || got != tc.want {\n\t\t\tt.Errorf(\"Encode(%+v) = %v, %v, want %v, nil\", tc.in, got, err, tc.want)\n\t\t}\n\t}\n}\n","solution":"package main\n\nimport \"encoding/json\"\n\ntype Product struct {\n\tID     int      `json:\"id\"`\n\tName   string   `json:\"name\"`\n\tPrice  float64  `json:\"price\"`\n\tTags   []string `json:\"tags,omitempty\"`\n\tSecret string   `json:\"-\"`\n}\n\nfunc Encode(p Product) (string, error) {\n\tb, err := json.Marshal(p)\n\treturn string(b), err\n}\n"},
     refs: [
       { label: 'Tutorial: add a test', href: 'https://go.dev/doc/tutorial/add-a-test' },
       { label: 'Organizing a Go module', href: 'https://go.dev/doc/modules/layout' },
@@ -1723,6 +2775,11 @@ func main() {
     title: 'Testing',
     navTitle: 'Testing',
     oneLine: 'Part of the toolchain, not a library you pick.',
+    objectives: [
+      'Write a table-driven test with named subtests and clear failure messages.',
+      'Write a fuzz test and a `b.Loop` benchmark, and run them with `go test`.',
+      'Explain the difference between `t.Error` and `t.Fatal`.',
+    ],
     blocks: [
       {
         heading: 'Testing is part of the toolchain',
@@ -1772,6 +2829,46 @@ go test -v ./...                   # name every test as it runs
 go test -cover ./...               # how much of the package is exercised
 go test -run 'TestAdd/negative' ./calc    # exactly one subtest
 go test -race ./...                # find data races — run this in CI`,
+        },
+      },
+      {
+        heading: 'Fuzzing: let Go invent the inputs',
+        body: [
+          'A table test only checks the cases you thought of. A **fuzz test** makes up thousands of inputs for you and looks for one that breaks a rule you state. It is a function starting `Fuzz` that takes a `*testing.F`. `f.Add` gives it a few starting inputs (the **seed corpus**), and `f.Fuzz` holds the check that must hold for every input.',
+        ],
+        code: {
+          label: 'calc/reverse_test.go',
+          src: `package calc
+
+import "testing"
+
+func FuzzReverse(f *testing.F) {
+\tf.Add("hello") // seed inputs: Go starts from these and mutates them
+\tf.Add("héllo")
+\tf.Fuzz(func(t *testing.T, s string) {
+\t\t// the rule: reversing twice gives back what you started with
+\t\tif got := Reverse(Reverse(s)); got != s {
+\t\t\tt.Errorf("Reverse(Reverse(%q)) = %q, want %q", s, got, s)
+\t\t}
+\t})
+}`,
+          note: 'A plain `go test` runs only the seed inputs, so it is fast. `go test -fuzz=FuzzReverse ./calc` keeps generating new inputs until you press Ctrl+C or it finds a failure. A failing input is saved under `testdata/fuzz/`, and from then on every plain `go test` runs it too.',
+        },
+      },
+      {
+        heading: 'Benchmarks with b.Loop',
+        body: [
+          'A **benchmark** measures how fast code runs. It is a function starting `Benchmark` that takes a `*testing.B`. Since Go 1.24 you write the timed part inside `for b.Loop() { ... }`. Older code uses `for i := 0; i < b.N; i++`, which still works, but `b.Loop` is better: setup written before the loop is not timed, and the compiler cannot optimise away the call you are measuring.',
+        ],
+        code: {
+          label: 'calc/calc_test.go',
+          src: `func BenchmarkAdd(b *testing.B) {
+\tnums := []int{1, 2, 3} // setup: not timed
+\tfor b.Loop() {
+\t\tAdd(nums[0], nums[1])
+\t}
+}`,
+          note: 'Run it with `go test -bench=. ./calc`. The output shows how many nanoseconds one call took (`ns/op`).',
         },
       },
       {

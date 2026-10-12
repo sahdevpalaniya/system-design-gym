@@ -7,6 +7,11 @@ export const PRODUCTION: LangLesson[] = [
     title: 'Error mapping and structured logging',
     navTitle: 'Errors and logging',
     oneLine: 'One place turns domain errors into HTTP statuses, and your logs become searchable.',
+    objectives: [
+      'Build one error boundary that maps domain errors to HTTP statuses.',
+      'Write structured logs with `log/slog` that include a request ID.',
+      'Explain the difference between liveness and readiness health checks.',
+    ],
     blocks: [
       {
         heading: 'Two jobs that are easy to confuse',
@@ -159,6 +164,11 @@ mux.HandleFunc("GET /readyz", func(w http.ResponseWriter, r *http.Request) {
     title: 'Rate limiting, CORS, and security headers',
     navTitle: 'Rate limits, CORS, headers',
     oneLine: 'Stop somebody brute-forcing your login, and set the headers browsers rely on.',
+    objectives: [
+      'Build a per-IP rate limiter and apply the strictest limit to auth routes.',
+      'Explain what CORS protects and configure an allowed-origin list.',
+      'Set the standard security headers and an `http.Client` with a timeout.',
+    ],
     blocks: [
       {
         heading: 'Three defences, and what each one stops',
@@ -328,6 +338,11 @@ defer io.Copy(io.Discard, resp.Body)   // drain it, or the connection is not reu
     title: 'Docker, Makefile, and running in a container',
     navTitle: 'Docker and deployment',
     oneLine: 'A 15MB image with no operating system in it, and the two runtime settings a container needs.',
+    objectives: [
+      'Write a multi-stage Dockerfile that produces a small static Go image.',
+      'Explain the two runtime settings a container needs (GOMEMLIMIT and GOMAXPROCS).',
+      'Cross-compile for another OS and architecture with GOOS and GOARCH.',
+    ],
     blocks: [
       {
         heading: 'What containers give a Go program',
@@ -341,7 +356,7 @@ defer io.Copy(io.Discard, resp.Body)   // drain it, or the connection is not reu
         heading: 'A multi-stage Dockerfile',
         code: {
           label: 'Dockerfile',
-          src: `FROM golang:1.22-alpine AS build
+          src: `FROM golang:1.25-alpine AS build
 WORKDIR /src
 
 COPY go.mod go.sum ./
@@ -461,6 +476,11 @@ go tool dist list      # everything Go can target`,
     title: 'Polish: docs, seeds, and the finishing touches',
     navTitle: 'Polish and docs',
     oneLine: 'The difference between "it works on my machine" and something another person can run.',
+    objectives: [
+      'Version an API under `/v1` from the first route.',
+      'Write a README that someone else can follow from clone to first request.',
+      'Write doc comments that `go doc` shows correctly.',
+    ],
     blocks: [
       {
         heading: 'What polish means',
@@ -498,7 +518,7 @@ mux.HandleFunc("GET /livez", live)      // health checks stay unversioned`,
           label: 'README.md',
           src: `# SnapNotes API
 
-Notes with accounts and file attachments. Go 1.22, Postgres, no framework.
+Notes with accounts and file attachments. Go 1.25, Postgres, no framework.
 
 ## Run it
     cp .env.example .env
@@ -610,6 +630,11 @@ type Service struct{ repo Repository }`,
     title: 'Harden it, and review your own code',
     navTitle: 'Harden and review',
     oneLine: 'Read what you wrote as if a stranger wrote it, hunting for eight things that commonly break.',
+    objectives: [
+      'Run vet, staticcheck, the race detector and govulncheck before review.',
+      'Find common anti-patterns in your own code with the self-review checklist.',
+      'Attack your own API with bad input, missing auth and other users\' IDs.',
+    ],
     blocks: [
       {
         heading: 'What hardening and self-review mean',
@@ -736,6 +761,11 @@ curl -i "localhost:8080/v1/notes?limit=1;DROP%20TABLE%20users"`,
     title: 'Profile it, ship it, and what comes next',
     navTitle: 'Profile and ship',
     oneLine: 'Measure before you optimise, push it, and pick the right next thing to build.',
+    objectives: [
+      'Capture a CPU or memory profile with pprof and find the hot spot.',
+      'Write an honest benchmark with `b.Loop` or `b.N` and compare results with benchstat.',
+      'Explain why you measure before optimising.',
+    ],
     blocks: [
       {
         heading: 'What profiling is',
@@ -754,7 +784,11 @@ curl -i "localhost:8080/v1/notes?limit=1;DROP%20TABLE%20users"`,
 // a SEPARATE, localhost-only port — never your public one
 go func() {
 \tslog.Info("pprof on localhost:6060")
-\thttp.ListenAndServe("localhost:6060", nil)
+\t// Log the error: losing the profiler should not kill the service,
+\t// but you want to know it failed (port in use, for example).
+\tif err := http.ListenAndServe("localhost:6060", nil); err != nil {
+\t\tslog.Error("pprof server stopped", "err", err)
+\t}
 }()`,
           note: 'Exposing /debug/pprof publicly leaks your function names and source paths, and lets anyone start CPU profiles and heap dumps that cost you CPU. Bind it to localhost.',
         },

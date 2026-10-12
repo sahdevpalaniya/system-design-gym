@@ -4,4 +4,4 @@
  * tells Google the content churns when it does not.
  */
 export const CONTENT_PUBLISHED = '2026-09-07'
-export const CONTENT_MODIFIED = '2026-09-23'
+export const CONTENT_MODIFIED = '2026-10-12'

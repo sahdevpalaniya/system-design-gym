@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server'
+import { MAX_BODY, MAX_CODE, clientIp, makeLimiter, readCapped, sameOrigin } from '@/lib/play-guard'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 const COMPILE = 'https://go.dev/_/compile'
 const SHARE = 'https://go.dev/_/share'
-const MAX_CODE = 64 * 1024
 
 /*
  * Proxies the official Go Playground. It has to be server-side: the playground
- * does not send CORS headers, so a browser cannot call it directly.
- *
- * ponytail: no rate limiting beyond the size cap. Add a per-IP limiter if this
- * is ever exposed somewhere busy — the playground will throttle us first.
+ * does not send CORS headers, so a browser cannot call it directly. The abuse
+ * guards (origin, per-IP limit, body cap) live in lib/play-guard.ts.
  */
+
+const limited = makeLimiter()
 
 interface PlayEvent {
   Message: string
@@ -22,14 +22,29 @@ interface PlayEvent {
 }
 
 export async function POST(req: Request) {
+  if (!sameOrigin(req.headers)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
+
+  if (limited(clientIp(req.headers))) {
+    return NextResponse.json(
+      { error: 'Too many runs. Wait a minute and try again.' },
+      { status: 429, headers: { 'Retry-After': '60' } },
+    )
+  }
+
+  if (Number(req.headers.get('content-length') ?? 0) > MAX_BODY) {
+    return NextResponse.json({ error: 'code too long' }, { status: 413 })
+  }
+  const raw = await readCapped(req, MAX_BODY)
+  if (raw === null) return NextResponse.json({ error: 'code too long' }, { status: 413 })
+
   let body: { code?: string; action?: 'run' | 'share' }
   try {
-    body = await req.json()
+    body = JSON.parse(raw)
   } catch {
     return NextResponse.json({ error: 'invalid json' }, { status: 400 })
   }
 
-  const code = body.code ?? ''
+  const code = typeof body.code === 'string' ? body.code : ''
   if (!code.trim()) return NextResponse.json({ error: 'no code' }, { status: 400 })
   if (code.length > MAX_CODE) return NextResponse.json({ error: 'code too long' }, { status: 413 })
 

@@ -2,6 +2,7 @@ import { CONCEPTS, PATH, getConcept } from '@/content/system-design/concepts'
 import { PROBLEMS } from '@/content/system-design/problems'
 import { LESSONS } from '@/content/system-design/foundations'
 import { SITE_URL } from '@/lib/seo'
+import { LANGUAGES, getLanguage } from '@/content/languages'
 
 export const dynamic = 'force-static'
 
@@ -49,9 +50,25 @@ export function GET() {
       (p) => `- [${p.searchTitle ?? p.title}](${url(`/problems/${p.slug}`)}): ${p.prompt}`,
     ),
     '',
+    ...LANGUAGES.flatMap((l) => [
+      `## ${l.name} (${l.alias ?? l.name}) track`,
+      '',
+      `${l.tagline} ${l.blurb}`,
+      '',
+      ...l.sections.flatMap((s) => [
+        `### ${s.name}`,
+        '',
+        ...s.lessons.flatMap((slug) => {
+          const t = getLanguage(l.id)?.lessons.find((x) => x.slug === slug)
+          return t ? [`- [${t.title}](${url(`/languages/${l.id}/${slug}`)}): ${t.oneLine}`] : []
+        }),
+        '',
+      ]),
+    ]),
     '## Notes',
     '',
     `- ${CONCEPTS.length} concepts, ${PROBLEMS.length} problems, ${LESSONS.length} foundation lessons.`,
+    ...LANGUAGES.map((l) => `- ${l.name} (${l.alias ?? l.name}): ${l.lessons.length} topics, each with runnable examples and exercises.`),
     '- Every concept page states what the technique costs you, not only what it does.',
     '- On problem and concept pages, model answers are gated behind the reader writing their own first. Full worked solutions are on separate pages.',
     '',

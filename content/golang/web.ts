@@ -7,6 +7,12 @@ export const WEB: LangLesson[] = [
     title: 'An HTTP server with no framework',
     navTitle: 'HTTP server, no framework',
     oneLine: 'Go 1.22 routes by method and path in the standard library. You do not need gin, echo, or chi.',
+    objectives: [
+      'Build a JSON API with Go 1.22 method-and-path routing and `r.PathValue`.',
+      'Write handlers that set headers, then the status, then the body, and return after an error.',
+      'Explain why a bare `http.ListenAndServe` is unsafe and configure `http.Server` timeouts.',
+      'Embed a file or a static folder into the binary with `//go:embed` and serve it with `http.FileServerFS`.',
+    ],
     blocks: [
       {
         body: [
@@ -42,7 +48,32 @@ func main() {
 \tmux.HandleFunc("POST /users", createUser)
 
 \tlog.Println("listening on :8080")
+\t// Simple version: no timeouts. The next sections swap this for an
+\t// http.Server with timeouts, then add graceful shutdown.
+\t// It blocks on purpose: it serves until the process is stopped.
 \tlog.Fatal(http.ListenAndServe(":8080", mux))
+}
+
+func writeJSON(w http.ResponseWriter, status int, v any) {
+\tw.Header().Set("Content-Type", "application/json")
+\tw.WriteHeader(status)
+\tjson.NewEncoder(w).Encode(v)
+}
+
+func createUser(w http.ResponseWriter, r *http.Request) {
+\tvar in struct {
+\t\tName  string \`json:"name"\`
+\t\tEmail string \`json:"email"\`
+\t}
+\tif err := json.NewDecoder(r.Body).Decode(&in); err != nil {
+\t\twriteJSON(w, 400, map[string]string{"error": "invalid json"})
+\t\treturn
+\t}
+\tif in.Name == "" || in.Email == "" {
+\t\twriteJSON(w, 422, map[string]string{"error": "name and email are required"})
+\t\treturn
+\t}
+\twriteJSON(w, 201, in)
 }`,
         },
       },
@@ -52,7 +83,7 @@ func main() {
           'Everything in `net/http` is built on this signature. `w` is where you write the response; `r` is everything the client sent.',
         ],
         code: {
-          label: 'handler.go',
+          label: 'the two handlers from main.go, annotated',
           src: `func writeJSON(w http.ResponseWriter, status int, v any) {
 \tw.Header().Set("Content-Type", "application/json")   // headers FIRST
 \tw.WriteHeader(status)                                // then the status
@@ -116,6 +147,42 @@ curl -s -X POST localhost:8080/users -d 'not json' -i`,
 log.Fatal(srv.ListenAndServe())`,
         },
       },
+      {
+        heading: 'Shipping files inside the binary with //go:embed',
+        body: [
+          'Sometimes the server needs a file of its own: a welcome page, a SQL schema, a folder of CSS and images. `//go:embed` copies those files **into the binary at build time**, so you deploy one file and nothing can go missing on the server.',
+          'Put the comment directly above a package-level variable. For one file, use a `string` or `[]byte` and add `import _ "embed"` (the blank import switches the feature on). For many files, use `embed.FS`, which behaves like a small read-only folder, and hand it to `http.FileServerFS` (Go 1.22+; on older Go, `http.FileServer(http.FS(static))`).',
+          'The path is **relative to the folder of the package** containing the `.go` file, cannot use `..`, and the files **must exist when you build** or `go build` fails. Files starting with `.` or `_` are skipped unless you write `all:static`.',
+        ],
+        code: {
+          label: 'internal/web/static.go (excerpt — needs real files next to it, so it will not run on the playground)',
+          src: `package web
+
+import (
+\t"embed"
+\t"net/http"
+)
+
+// one file, as a string: welcome.txt sits next to this file, in internal/web/
+//
+//go:embed welcome.txt
+var welcome string
+
+// a whole folder: static/index.html, static/app.css, ...
+//
+//go:embed static
+var static embed.FS
+
+func routes(mux *http.ServeMux) {
+\tmux.HandleFunc("GET /welcome", func(w http.ResponseWriter, r *http.Request) {
+\t\tw.Write([]byte(welcome))
+\t})
+\t// GET /static/app.css serves the embedded static/app.css
+\tmux.Handle("GET /static/", http.FileServerFS(static))
+}`,
+          note: 'Using only a string or []byte? Then you import the package for its side effect alone: import _ "embed". Here embed.FS is used by name, so a normal import is enough.',
+        },
+      },
     ],
     keyPoints: [
       'Go 1.22 `net/http` routes on `"GET /users/{id}"` and reads params with `r.PathValue`. No framework needed.',
@@ -126,6 +193,7 @@ log.Fatal(srv.ListenAndServe())`,
     remember:
       'A handler reads the request and writes the response. Everything a framework adds is convenience on top of that one function shape.',
     task: 'Build an in-memory user API: GET, POST, GET by id, DELETE. Keep the users in a map behind a mutex, because net/http runs each request in its own goroutine. Test every route with curl, including the failure cases.',
+    challenge: {"prompt":"Write the handler `GetUser(w, r)` for the route `GET /users/{id}`. When `id` is a positive whole number, reply `200` with `Content-Type: application/json` and the body `{\"id\":7,\"name\":\"user-7\"}` (for id 7). Otherwise reply `400` with `Content-Type: application/json` and `{\"error\":\"bad id\"}`. Read the id with `r.PathValue(\"id\")` and convert it with `strconv.Atoi`. The hidden tests call it through a `ServeMux` with `httptest.NewRecorder` and `httptest.NewRequest`, no real server needed.","starter":"package main\n\nimport (\n\t\"fmt\"\n\t\"net/http\"\n)\n\nfunc GetUser(w http.ResponseWriter, r *http.Request) {\n\tfmt.Fprint(w, \"ok\") // your code here\n}\n","test":"package main\n\nimport (\n\t\"encoding/json\"\n\t\"net/http\"\n\t\"net/http/httptest\"\n\t\"testing\"\n)\n\nfunc TestGetUser(t *testing.T) {\n\tmux := http.NewServeMux()\n\tmux.HandleFunc(\"GET /users/{id}\", GetUser)\n\ttests := []struct {\n\t\tpath   string\n\t\tstatus int\n\t\twant   map[string]any\n\t}{\n\t\t{\"/users/7\", 200, map[string]any{\"id\": 7.0, \"name\": \"user-7\"}},\n\t\t{\"/users/1000000\", 200, map[string]any{\"id\": 1000000.0, \"name\": \"user-1000000\"}},\n\t\t{\"/users/abc\", 400, map[string]any{\"error\": \"bad id\"}},\n\t\t{\"/users/0\", 400, map[string]any{\"error\": \"bad id\"}},\n\t\t{\"/users/-3\", 400, map[string]any{\"error\": \"bad id\"}},\n\t}\n\tfor _, tc := range tests {\n\t\trec := httptest.NewRecorder()\n\t\tmux.ServeHTTP(rec, httptest.NewRequest(\"GET\", tc.path, nil))\n\t\tvar got map[string]any\n\t\terr := json.Unmarshal(rec.Body.Bytes(), &got)\n\t\tif rec.Code != tc.status {\n\t\t\tt.Errorf(\"GET %v status = %v, want %v\", tc.path, rec.Code, tc.status)\n\t\t}\n\t\tif ct := rec.Header().Get(\"Content-Type\"); ct != \"application/json\" {\n\t\t\tt.Errorf(\"GET %v Content-Type = %q, want %q\", tc.path, ct, \"application/json\")\n\t\t}\n\t\tif err != nil || len(got) != len(tc.want) {\n\t\t\tt.Errorf(\"GET %v body = %q, want %v\", tc.path, rec.Body.String(), tc.want)\n\t\t\tcontinue\n\t\t}\n\t\tfor k, v := range tc.want {\n\t\t\tif got[k] != v {\n\t\t\t\tt.Errorf(\"GET %v body[%q] = %v, want %v\", tc.path, k, got[k], v)\n\t\t\t}\n\t\t}\n\t}\n}\n","solution":"package main\n\nimport (\n\t\"encoding/json\"\n\t\"fmt\"\n\t\"net/http\"\n\t\"strconv\"\n)\n\nfunc GetUser(w http.ResponseWriter, r *http.Request) {\n\tw.Header().Set(\"Content-Type\", \"application/json\")\n\tid, err := strconv.Atoi(r.PathValue(\"id\"))\n\tif err != nil || id <= 0 {\n\t\tw.WriteHeader(http.StatusBadRequest)\n\t\tjson.NewEncoder(w).Encode(map[string]string{\"error\": \"bad id\"})\n\t\treturn\n\t}\n\tjson.NewEncoder(w).Encode(map[string]any{\"id\": id, \"name\": fmt.Sprint(\"user-\", id)})\n}\n"},
     refs: [
       { label: 'Routing Enhancements for Go 1.22', href: 'https://go.dev/blog/routing-enhancements' },
       { label: 'Go 1.22 release notes', href: 'https://go.dev/blog/go1.22' },
@@ -137,6 +205,11 @@ log.Fatal(srv.ListenAndServe())`,
     title: 'Middleware and graceful shutdown',
     navTitle: 'Middleware and shutdown',
     oneLine: 'Wrap every request with logging, panic recovery, and auth. Then stop the server without dropping anyone.',
+    objectives: [
+      'Write a middleware that wraps an `http.Handler` for logging or panic recovery.',
+      'Explain when to panic and when to return an error.',
+      'Build a server that shuts down gracefully on SIGINT without dropping in-flight requests.',
+    ],
     blocks: [
       {
         heading: 'What middleware is, and what graceful shutdown means',
@@ -258,6 +331,7 @@ case <-quit:
     remember:
       'A handler that wraps another handler is how you extend Go’s HTTP stack, and for an API it covers logging, auth, limits and recovery.',
     task: 'Add Logger, Recover, and RequestID middleware to yesterday’s API, plus graceful shutdown. Add a route that panics on purpose. Check you get a 500 and a stack trace in the log, and that the server is still running afterwards.',
+    challenge: {"prompt":"Write the middleware `Safe(next http.Handler) http.Handler`. It adds the header `X-Content-Type-Options: nosniff` to **every** response, and if `next` panics it recovers and replies `500` with the body `internal server error`. A handler that does not panic must keep its own status and body. Set the header before calling `next`: once a handler has written, headers can no longer change. The hidden tests use `httptest.NewRecorder`.","starter":"package main\n\nimport \"net/http\"\n\nfunc Safe(next http.Handler) http.Handler {\n\treturn next // your code here\n}\n","test":"package main\n\nimport (\n\t\"net/http\"\n\t\"net/http/httptest\"\n\t\"strings\"\n\t\"testing\"\n)\n\nfunc TestSafe(t *testing.T) {\n\ttests := []struct {\n\t\tname   string\n\t\th      http.HandlerFunc\n\t\tstatus int\n\t\tbody   string\n\t}{\n\t\t{\"ok\", func(w http.ResponseWriter, r *http.Request) { w.Write([]byte(\"hi\")) }, 200, \"hi\"},\n\t\t{\"created\", func(w http.ResponseWriter, r *http.Request) {\n\t\t\tw.WriteHeader(201)\n\t\t\tw.Write([]byte(\"made\"))\n\t\t}, 201, \"made\"},\n\t\t{\"panic\", func(w http.ResponseWriter, r *http.Request) { panic(\"boom\") }, 500, \"internal server error\"},\n\t\t{\"nil map panic\", func(w http.ResponseWriter, r *http.Request) {\n\t\t\tvar m map[string]int\n\t\t\tm[\"x\"] = 1\n\t\t}, 500, \"internal server error\"},\n\t}\n\tfor _, tc := range tests {\n\t\trec := httptest.NewRecorder()\n\t\tfunc() {\n\t\t\tdefer func() {\n\t\t\t\tif p := recover(); p != nil {\n\t\t\t\t\tt.Errorf(\"Safe(%v) panicked with %v, want %v\", tc.name, p, \"a 500 response\")\n\t\t\t\t}\n\t\t\t}()\n\t\t\tSafe(tc.h).ServeHTTP(rec, httptest.NewRequest(\"GET\", \"/\", nil))\n\t\t}()\n\t\tif rec.Code != tc.status {\n\t\t\tt.Errorf(\"Safe(%v) status = %v, want %v\", tc.name, rec.Code, tc.status)\n\t\t}\n\t\tif got := strings.TrimSpace(rec.Body.String()); got != tc.body {\n\t\t\tt.Errorf(\"Safe(%v) body = %q, want %q\", tc.name, got, tc.body)\n\t\t}\n\t\tif got := rec.Result().Header.Get(\"X-Content-Type-Options\"); got != \"nosniff\" {\n\t\t\tt.Errorf(\"Safe(%v) X-Content-Type-Options = %q, want %q\", tc.name, got, \"nosniff\")\n\t\t}\n\t}\n}\n","solution":"package main\n\nimport \"net/http\"\n\nfunc Safe(next http.Handler) http.Handler {\n\treturn http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {\n\t\tw.Header().Set(\"X-Content-Type-Options\", \"nosniff\")\n\t\tdefer func() {\n\t\t\tif rec := recover(); rec != nil {\n\t\t\t\thttp.Error(w, \"internal server error\", http.StatusInternalServerError)\n\t\t\t}\n\t\t}()\n\t\tnext.ServeHTTP(w, r)\n\t})\n}\n"},
     refs: [
       { label: 'net/http docs', href: 'https://pkg.go.dev/net/http' },
       { label: 'Effective Go — defer', href: 'https://go.dev/doc/effective_go#defer' },
@@ -269,6 +343,11 @@ case <-quit:
     title: 'How to lay a Go project out',
     navTitle: 'Project layouts',
     oneLine: 'What a package is, the three layouts you will meet, and what each common folder is for.',
+    objectives: [
+      'Explain what a package is and how `internal/` restricts imports.',
+      'Compare the flat, by-layer and by-domain layouts and pick one for a given project.',
+      'Name packages by what they provide, avoiding `utils` and `common`.',
+    ],
     blocks: [
       {
         heading: 'First, what a package is',
@@ -509,7 +588,7 @@ case <-quit:
           'The practical advice: put almost everything in `internal/`. Move something out only when you have decided, on purpose, that outsiders may depend on it. Once they do, you cannot change it freely.',
         ],
         code: {
-          label: 'what internal/ blocks',
+          label: 'what internal/ blocks (text diagram, not Go)',
           src: `github.com/you/shop/internal/user      ← lives here
 
 github.com/you/shop/cmd/api            ✅ can import it (same module)
@@ -553,6 +632,11 @@ github.com/other/thing                 ❌ compile error, always`,
     title: 'Practice 3 — CRUD, one folder per feature',
     navTitle: 'Practice 3 — by feature',
     oneLine: 'The final layout, and the one the rest of this track is built on.',
+    objectives: [
+      'Build a feature folder with model, repository, service and handler files.',
+      'Explain which layer owns HTTP, rules and storage, and why dependencies point one way.',
+      'Wire the layers by hand in main.go without a DI framework.',
+    ],
     blocks: [
       {
         heading: 'The problem this one solves',

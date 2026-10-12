@@ -14,7 +14,11 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }) {
   const a = getArchetype((await params).id as ArchetypeId)
   if (!a) return {}
-  return pageMeta(`${a.name} — interviewer archetype`, a.tagline, `/archetypes/${a.id}`)
+  return pageMeta(
+    `${a.name} — interviewer archetype`,
+    `${a.tagline} How this system design interviewer behaves, what they are really testing, and how to answer them.`,
+    `/archetypes/${a.id}`,
+  )
 }
 
 export default async function ArchetypePage({ params }: { params: Promise<{ id: string }> }) {

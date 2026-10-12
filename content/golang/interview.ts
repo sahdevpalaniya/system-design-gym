@@ -1,4 +1,255 @@
 import type { LangLesson } from '@/lib/types'
+import { CHANNEL_TABLE } from './concurrency'
+
+const POOL = `package main
+
+import (
+	"context"
+	"fmt"
+	"sync"
+	"time"
+)
+
+type Job struct{ id, n int }
+type Result struct{ id, square int }
+
+func process(j Job) Result {
+	time.Sleep(10 * time.Millisecond) // pretend work
+	return Result{j.id, j.n * j.n}
+}
+
+func pool(ctx context.Context, jobs []Job, workers int) []Result {
+	jobCh := make(chan Job)
+	resCh := make(chan Result, len(jobs)) // buffered: workers never block on send
+
+	var wg sync.WaitGroup
+	for i := 0; i < workers; i++ {
+		wg.Add(1) // BEFORE the go statement
+		go func() {
+			defer wg.Done()
+			for j := range jobCh { // exits when jobCh closes
+				select {
+				case resCh <- process(j):
+				case <-ctx.Done():
+					return
+				}
+			}
+		}()
+	}
+
+	go func() {
+		defer close(jobCh) // the sender closes
+		for _, j := range jobs {
+			select {
+			case jobCh <- j:
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	wg.Wait()
+	close(resCh)
+
+	out := make([]Result, 0, len(jobs))
+	for r := range resCh {
+		out = append(out, r)
+	}
+	return out
+}
+
+func main() {
+	jobs := make([]Job, 20)
+	for i := range jobs {
+		jobs[i] = Job{i, i}
+	}
+	start := time.Now()
+	res := pool(context.Background(), jobs, 4)
+	sum := 0
+	for _, r := range res {
+		sum += r.square
+	}
+	// 20 jobs x 10ms over 4 workers: about 50ms, not 200ms.
+	fmt.Println(len(res), "results, sum of squares =", sum)
+	fmt.Println("took under 150ms:", time.Since(start) < 150*time.Millisecond)
+
+	// Cancel early: the pool returns promptly with fewer results, no leak.
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Millisecond)
+	defer cancel()
+	fmt.Println("after cancel, got fewer than 20:", len(pool(ctx, jobs, 2)) < 20)
+}
+`
+
+const LIMITER = `package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
+// Limiter is a token bucket: burst tokens at most, one refilled every interval.
+type Limiter struct {
+	tokens chan struct{}
+	ticker *time.Ticker
+	done   chan struct{}
+}
+
+func NewLimiter(every time.Duration, burst int) *Limiter {
+	l := &Limiter{
+		tokens: make(chan struct{}, burst),
+		ticker: time.NewTicker(every),
+		done:   make(chan struct{}),
+	}
+	for i := 0; i < burst; i++ {
+		l.tokens <- struct{}{} // start full
+	}
+	go func() {
+		for {
+			select {
+			case <-l.ticker.C:
+				select {
+				case l.tokens <- struct{}{}: // refill one
+				default: // bucket full: drop the token, never block
+				}
+			case <-l.done:
+				return
+			}
+		}
+	}()
+	return l
+}
+
+// Wait blocks until a token is free or ctx is done.
+func (l *Limiter) Wait(ctx context.Context) error {
+	select {
+	case <-l.tokens:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+}
+
+// Allow takes a token if one is free, without waiting. For "429 Too Many Requests".
+func (l *Limiter) Allow() bool {
+	select {
+	case <-l.tokens:
+		return true
+	default:
+		return false
+	}
+}
+
+func (l *Limiter) Stop() {
+	l.ticker.Stop()
+	close(l.done)
+}
+
+func main() {
+	l := NewLimiter(20*time.Millisecond, 3)
+	defer l.Stop()
+
+	// The burst goes through at once, then the bucket is empty.
+	for i := 1; i <= 5; i++ {
+		fmt.Printf("request %d allowed: %v\\n", i, l.Allow())
+	}
+
+	// Wait paces the rest at one per interval.
+	start := time.Now()
+	for i := 0; i < 3; i++ {
+		if err := l.Wait(context.Background()); err != nil {
+			fmt.Println(err)
+		}
+	}
+	fmt.Println("3 more took at least 40ms:", time.Since(start) >= 40*time.Millisecond)
+
+	// And a deadline is respected instead of waiting forever.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Millisecond)
+	defer cancel()
+	fmt.Println("with 1ms deadline:", l.Wait(ctx))
+}
+`
+
+const CACHE = `package main
+
+import (
+	"fmt"
+	"sync"
+	"time"
+)
+
+type item[V any] struct {
+	val     V
+	expires time.Time
+}
+
+// Cache is safe for concurrent use. The zero value is not: use NewCache.
+type Cache[K comparable, V any] struct {
+	mu    sync.RWMutex
+	items map[K]item[V]
+	ttl   time.Duration
+}
+
+func NewCache[K comparable, V any](ttl time.Duration) *Cache[K, V] {
+	return &Cache[K, V]{items: make(map[K]item[V]), ttl: ttl}
+}
+
+func (c *Cache[K, V]) Get(key K) (V, bool) {
+	c.mu.RLock()
+	it, ok := c.items[key]
+	c.mu.RUnlock()
+	if !ok || time.Now().After(it.expires) {
+		var zero V
+		return zero, false // expired entries are dropped by Sweep
+	}
+	return it.val, true
+}
+
+func (c *Cache[K, V]) Set(key K, val V) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.items[key] = item[V]{val, time.Now().Add(c.ttl)}
+}
+
+// Sweep deletes expired entries. Call it from a ticker goroutine in a service.
+func (c *Cache[K, V]) Sweep() int {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	n := 0
+	now := time.Now()
+	for k, it := range c.items {
+		if now.After(it.expires) {
+			delete(c.items, k) // deleting during range is allowed in Go
+			n++
+		}
+	}
+	return n
+}
+
+func main() {
+	c := NewCache[string, int](30 * time.Millisecond)
+
+	var wg sync.WaitGroup
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			key := fmt.Sprint("k", i%10)
+			c.Set(key, i)
+			c.Get(key)
+		}()
+	}
+	wg.Wait()
+
+	_, ok := c.Get("k3")
+	fmt.Println("k3 present:", ok)
+
+	time.Sleep(40 * time.Millisecond)
+	_, ok = c.Get("k3")
+	fmt.Println("k3 after ttl:", ok)
+	fmt.Println("swept:", c.Sweep())
+}
+`
 
 /**
  * Interview preparation. Not a new syllabus — a pass back over everything in
@@ -11,6 +262,11 @@ export const INTERVIEW: LangLesson[] = [
     title: 'Interview: language fundamentals',
     navTitle: 'Interview — language',
     oneLine: 'The questions that open almost every Go interview, and the answer that shows you have actually written Go.',
+    objectives: [
+      'Explain zero values, slices versus arrays, and why `append` returns a value.',
+      'Predict why an interface holding a nil pointer is not equal to nil.',
+      'Explain value versus pointer receivers and what `defer` evaluates and when.',
+    ],
     blocks: [
       {
         body: [
@@ -147,6 +403,11 @@ if err := doWork(); err != nil {
     title: 'Interview: concurrency',
     navTitle: 'Interview — concurrency',
     oneLine: 'The half of the interview that usually decides it, and the code they will put in front of you.',
+    objectives: [
+      'Explain how goroutines differ from OS threads and what each channel operation does.',
+      'Spot and fix a goroutine leak and a data race in interview code.',
+      'Write a worker pool, a rate limiter and a concurrency-safe cache from memory.',
+    ],
     blocks: [
       {
         body: [
@@ -163,14 +424,7 @@ if err := doWork(); err != nil {
       },
       {
         heading: 'The channel table — know it cold',
-        table: {
-          headers: ['Operation', 'nil', 'open & empty', 'open & full', 'closed'],
-          rows: [
-            ['send', 'blocks forever', 'proceeds if buffered; unbuffered waits for a receiver', 'blocks', '**panic**'],
-            ['receive', 'blocks forever', 'blocks', 'proceeds', 'zero value, `ok=false`'],
-            ['close', 'panic', '—', '—', '**panic**'],
-          ],
-        },
+        table: CHANNEL_TABLE,
       },
       {
         bullets: [
@@ -257,7 +511,40 @@ if err := doWork(); err != nil {
       {
         callout: {
           tone: 'note',
-          text: 'Often the better answer is "I would use `errgroup` with `SetLimit`": bounded concurrency and first-error cancellation in a few lines. Knowing when *not* to hand-roll the pool is a senior signal. But be able to write the pool if they ask.',
+          text: 'Often the better answer is "I would use `errgroup` with `SetLimit`" ([`golang.org/x/sync/errgroup`](https://pkg.go.dev/golang.org/x/sync/errgroup), outside the stdlib: a WaitGroup that also returns the first error): bounded concurrency and first-error cancellation in a few lines. Knowing when *not* to hand-roll the pool is a senior signal. But be able to write the pool if they ask.',
+        },
+      },
+      {
+        heading: 'Worked solution: the worker pool, runnable',
+        code: {
+          label: 'pool.go',
+          src: POOL,
+          run: POOL,
+          note: 'Results come back in completion order, so they carry the job ID. If order matters, write into `out[j.id]` of a preallocated slice instead of a channel.',
+        },
+      },
+      {
+        heading: '"Write a rate limiter"',
+        body: [
+          'Say the algorithm first: a **token bucket**. Tokens refill at a fixed rate up to a burst size; each request takes one or waits. Then say that in production you would use [`golang.org/x/time/rate`](https://pkg.go.dev/golang.org/x/time/rate) (outside the stdlib, maintained by the Go team), which is exactly this. Then write it with the stdlib, because that is what they asked.',
+        ],
+        code: {
+          label: 'limiter.go',
+          src: LIMITER,
+          run: LIMITER,
+          note: 'Marked on: the buffered channel *is* the bucket (capacity = burst), the refill never blocks (`select` with `default`), `Stop` stops the ticker, and `Wait` honours `ctx`.',
+        },
+      },
+      {
+        heading: '"Write a concurrency-safe cache"',
+        body: [
+          'Clarify first: read-heavy or write-heavy? Do entries expire? Then the shape: a map behind a `sync.RWMutex`, an expiry stored with each value, and lazy deletion on read plus an optional sweeper. Mention `sync.Map` only to say why you did not use it: it is tuned for keys written once and read many times, or for disjoint key sets per goroutine.',
+        ],
+        code: {
+          label: 'cache.go',
+          src: CACHE,
+          run: CACHE,
+          note: 'Marked on: `RLock` for reads, `Lock` for writes, no lock held while calling out, and the expired-on-read check. The 100 goroutines prove it under `go run -race`.',
         },
       },
       {
@@ -285,7 +572,7 @@ if err := doWork(); err != nil {
     ],
     remember:
       'Anyone can start a goroutine. The interview is about stopping one: how it exits, who waits for it, and what happens when it panics.',
-    task: 'Write the worker pool from a blank file, with no reference, in under ten minutes. Then run it with `-race` and with `goleak` to prove nothing is left running.',
+    task: 'Write the worker pool from a blank file, with no reference, in under ten minutes. Then run it with `-race`. Bonus (outside the stdlib): add [`goleak`](https://pkg.go.dev/go.uber.org/goleak), a test helper from Uber that fails a test if any goroutine is still running at the end, to prove nothing leaked.',
     exercises: [
       {
         task: 'Write three different goroutine leaks and fix each one a different way.',
@@ -293,12 +580,12 @@ if err := doWork(); err != nil {
           'Blocked send with no receiver, a range over a channel nobody closes, and a loop with no `ctx.Done()`.',
       },
       {
-        task: 'Implement a rate limiter with a `time.Ticker` and a buffered channel, then compare it with `golang.org/x/time/rate`.',
+        task: 'Implement a rate limiter with a `time.Ticker` and a buffered channel. Bonus (outside the stdlib): compare it with [`golang.org/x/time/rate`](https://pkg.go.dev/golang.org/x/time/rate), the Go team\'s ready-made token-bucket limiter.',
         answer:
           'Yours will be roughly 40 lines; `x/time/rate` is one. Knowing when not to hand-roll is the senior signal.',
       },
       {
-        task: 'Take the worker pool and rewrite it with `errgroup.SetLimit`. Time how much shorter it is.',
+        task: 'Bonus (outside the stdlib): take the worker pool and rewrite it with [`errgroup`](https://pkg.go.dev/golang.org/x/sync/errgroup) `SetLimit`. errgroup is a WaitGroup that also collects the first error and cancels the rest; `SetLimit(n)` caps how many run at once. Time how much shorter it is.',
         answer:
           'About a third of the length, with first-error cancellation for free.',
       },
@@ -320,6 +607,11 @@ if err := doWork(); err != nil {
     title: 'Interview: backend, databases, and design',
     navTitle: 'Interview — backend design',
     oneLine: 'The round where they ask how you would actually build and run the service you just described.',
+    objectives: [
+      'Explain a Go service you built: its layers, storage and deployment.',
+      'Explain how you would debug a slow endpoint or an OOM-killed pod, step by step.',
+      'Explain how to stop one user reading another user\'s data.',
+    ],
     blocks: [
       {
         heading: 'What this round is testing',
@@ -422,7 +714,7 @@ if err := doWork(); err != nil {
       'Structure the project answer: what → layout → one decision and its cost → one thing you would change.',
       'Owner scoping belongs in the SQL. That single line answers the whole security question.',
       'Slow endpoint: measure, then N+1, then indexes, then the pool. Go code is last.',
-      '`GOMEMLIMIT` and `GOMAXPROCS` are the two answers to "it misbehaves in a container" (the second is automatic from Go 1.25).',
+      '`GOMEMLIMIT` and `GOMAXPROCS` are the two answers to "it misbehaves in a container" (the second is automatic from Go 1.25, but only when `go.mod` declares `go 1.25` or later).',
     ],
     remember:
       'Every design answer is stronger when you name what it costs you. "I chose X, it cost me Y, and here is when I would switch" is the sentence they are listening for.',
@@ -460,6 +752,11 @@ if err := doWork(); err != nil {
     title: 'Interview: the live coding round',
     navTitle: 'Interview — live coding',
     oneLine: 'What they score while you type, and the Go-specific things that lose marks.',
+    objectives: [
+      'Clarify inputs, edge cases and complexity before writing code.',
+      'Write bounded-concurrency code with a semaphore and errgroup from memory.',
+      'Fix the Go-specific mistakes that lose marks, such as ignored errors and unclosed resources.',
+    ],
     blocks: [
       {
         body: [
@@ -496,7 +793,7 @@ if err := doWork(); err != nil {
           '**Concurrent fetch of N URLs with a concurrency limit** — one of the most common Go live questions. `errgroup.SetLimit`, or a semaphore channel plus a `WaitGroup`.',
           '**Word frequency count, top K** — a map, then move it to a slice and `slices.SortFunc`, because maps have no order.',
           '**An LRU cache** — a map plus a doubly linked list, with a mutex if they say "thread-safe" (and ask whether they want it thread-safe).',
-          '**A rate limiter** — token bucket. Say `time.Ticker` plus a buffered channel, or that `x/time/rate` already does it.',
+          '**A rate limiter** — token bucket. Say `time.Ticker` plus a buffered channel, or that `x/time/rate` already does it. Worked solution in the concurrency interview topic, with the worker pool and a concurrency-safe cache.',
           '**Parse a log file / stream** — `bufio.Scanner`, not `io.ReadAll`, and say why: constant memory over a large file.',
           '**A worker pool** — see the concurrency topic. Marked on `Add` before `go`, sender closes, and `ctx.Done()`.',
         ],
@@ -594,6 +891,11 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
     title: 'Interview: the final checklist',
     navTitle: 'Interview — checklist',
     oneLine: 'The last pass before the call — what to revise, what to say, and what to ask them.',
+    objectives: [
+      'Revise the short list of topics that come up most often.',
+      'Answer a question you do not know by reasoning aloud from what you do know.',
+      'Prepare questions to ask the interviewer about the team and the codebase.',
+    ],
     blocks: [
       {
         heading: 'How to use this last topic',

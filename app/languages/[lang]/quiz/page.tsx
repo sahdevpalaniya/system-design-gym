@@ -1,10 +1,17 @@
 import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage } from '@/content/languages'
+import { pageMeta } from '@/lib/seo'
 import { QuizIndex } from '@/components/golang/QuizIndex'
 import { Page, PageHeader } from '@/components/common/ui'
 
 export function generateStaticParams() {
   return LANGUAGES.filter((l) => l.quizzes?.length).map((l) => ({ lang: l.id }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const l = getLanguage((await params).lang)
+  if (!l) return {}
+  return pageMeta(`${l.name} (${l.alias ?? l.name}) quiz: ${l.quizzes?.length ?? 0} practice tests`, `Test your ${l.alias ?? l.name} knowledge: predict the output, spot the bug and pick what compiles. Every answer explained.`, `/languages/${l.id}/quiz`, true)
 }
 
 export default async function QuizPage({ params }: { params: Promise<{ lang: string }> }) {

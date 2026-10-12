@@ -16,6 +16,15 @@ function shuffled<T>(xs: T[]): T[] {
   return a
 }
 
+/** Questions in a new order, and each question's options in a new order with
+ *  `answer` remapped, so neither the question nor the letter can be memorised. */
+function shuffledQuiz(qs: QuizQuestion[]): QuizQuestion[] {
+  return shuffled(qs).map((q) => {
+    const order = shuffled(q.options.map((_, i) => i))
+    return { ...q, options: order.map((i) => q.options[i]), answer: order.indexOf(q.answer) }
+  })
+}
+
 interface Answered {
   q: QuizQuestion
   picked: number
@@ -36,7 +45,7 @@ export function Quiz({
   // the client different orders, which is a hydration mismatch.
   const [questions, setQuestions] = useState(set.questions)
   useEffect(() => {
-    setQuestions(shuffled(set.questions))
+    setQuestions(shuffledQuiz(set.questions))
   }, [set.questions])
 
   const [i, setI] = useState(0)
@@ -66,7 +75,7 @@ export function Quiz({
   }
 
   function restart() {
-    setQuestions(shuffled(set.questions))
+    setQuestions(shuffledQuiz(set.questions))
     setI(0)
     setPicked(null)
     setLog([])

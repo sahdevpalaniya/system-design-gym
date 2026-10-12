@@ -15,7 +15,7 @@ export function QuizIndex({ lang }: { lang: Language }) {
   return (
     <>
       <p className="mb-7 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
-        {totalQs} questions across {sets.length} tests, one for each section. Every wrong option is a
+        {totalQs} questions across {sets.length} tests: one per section, plus checkpoints that mix earlier topics. Every wrong option is a
         mistake people really make, so getting one wrong teaches you something.
         {ready && taken > 0 ? ` You have taken ${taken} of ${sets.length}.` : ''}
       </p>

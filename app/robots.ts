@@ -1,9 +1,12 @@
 import type { MetadataRoute } from 'next'
 import { SITE_URL } from '@/lib/seo'
 
-/** Not ready to be indexed: admin, the language track, and personal or
- *  JavaScript-only pages that would be empty in a search result. */
-const DISALLOW = ['/admin', '/api', '/languages', '/progress', '/practice/blank']
+/** Not crawled: admin and the API. Everything else is open, both tracks are in
+ *  the sitemap, and personal pages (/progress, /practice/blank) carry `noindex`.
+ *  To hide a page from search, give it `noindex` rather than adding it here: a
+ *  crawler blocked by robots.txt never fetches the page, so it never sees the
+ *  noindex and can still list the bare URL. */
+const DISALLOW = ['/admin', '/api']
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -27,6 +30,5 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: 'Bytespider', disallow: '/' },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
   }
 }

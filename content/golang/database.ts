@@ -7,6 +7,11 @@ export const DATABASE: LangLesson[] = [
     title: 'Postgres with database/sql',
     navTitle: 'Postgres and database/sql',
     oneLine: 'No ORM. Learn what each query does, because SQL outlives every ORM.',
+    objectives: [
+      'Explain why `*sql.DB` is a connection pool and configure its limits.',
+      'Write single-row and multi-row queries that close rows and check `rows.Err()`.',
+      'Fix SQL injection by using placeholders, and handle nullable columns.',
+    ],
     blocks: [
       {
         heading: 'What a database layer is',
@@ -55,7 +60,12 @@ if err := db.PingContext(ctx); err != nil {   // Open is lazy — Ping actually 
         heading: 'One row',
         code: {
           label: 'query-one.go',
-          src: `var u User
+          src: `// ctx comes from the request (r.Context()), so a client that hangs up
+// cancels the query. Add a deadline so a slow query cannot hang forever.
+ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+defer cancel()
+
+var u User
 err := db.QueryRowContext(ctx,
 \t\`SELECT id, name, email FROM users WHERE id = $1\`, id,
 ).Scan(&u.ID, &u.Name, &u.Email)
@@ -64,9 +74,9 @@ if errors.Is(err, sql.ErrNoRows) {
 \treturn nil, ErrNotFound          // translate to YOUR domain error
 }
 if err != nil {
-\treturn nil, err
+\treturn nil, fmt.Errorf("get user %d: %w", id, err)   // wrap, keep the cause
 }`,
-          note: 'Scan takes pointers, in the same order as the columns in the SELECT.',
+          note: 'Scan takes pointers, in the same order as the columns in the SELECT. The `$1` placeholder sends `id` separately from the SQL, so it can never be run as SQL.',
         },
       },
       {
@@ -159,6 +169,11 @@ return tx.Commit()`,
     title: 'Joins, transactions, and the N+1 problem',
     navTitle: 'Joins, transactions, N+1',
     oneLine: 'A performance bug that turns up in almost any codebase that talks to a database.',
+    objectives: [
+      'Spot an N+1 query loop and fix it with a join or one batch query.',
+      'Write a transaction with a deferred rollback that commits only on success.',
+      'Read an `EXPLAIN ANALYZE` plan to find a missing index.',
+    ],
     blocks: [
       {
         heading: 'N+1: one query, then one per row',

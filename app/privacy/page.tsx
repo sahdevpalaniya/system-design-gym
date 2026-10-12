@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, POLICY_UPDATED } from '@/lib/legal'
 import { ADSENSE_CLIENT, pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
-  'Privacy policy',
+  'Privacy policy · Dev Skills',
   'What this site stores, where it stores it, and how to get it deleted. Signed out, your progress never leaves your browser.',
   '/privacy',
   true,

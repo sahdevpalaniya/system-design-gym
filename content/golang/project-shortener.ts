@@ -11,7 +11,27 @@ export const PROJECT_SHORTENER: LangLesson[] = [
     title: 'Project 1 — URL shortener: what we are building',
     navTitle: 'Overview and plan',
     oneLine: 'The plan, the endpoints, and the data before a single line of Go.',
+    objectives: [
+      'Explain the URL shortener\'s endpoints and data before writing code.',
+      'Explain the package-by-layer architecture and its one dependency rule.',
+      'Explain what the project deliberately leaves out, and why.',
+    ],
     blocks: [
+      {
+        heading: 'What you will build, and what it looks like when done',
+        body: [
+          'A small web service. You send it a long URL, it gives you a short code. Open the short code and it redirects you to the long URL. Here is the finished thing in a terminal. The rest of this page is the plan for getting there.',
+        ],
+        code: {
+          label: 'terminal — the finished project',
+          src: `$ curl -s -X POST localhost:8080/links -d '{"url":"https://go.dev/doc/effective_go"}'
+{"code":"aB3xK","long_url":"https://go.dev/doc/effective_go","clicks":0}
+
+$ curl -si localhost:8080/aB3xK | head -2
+HTTP/1.1 301 Moved Permanently
+Location: https://go.dev/doc/effective_go`,
+        },
+      },
       {
         heading: 'What a URL shortener does',
         body: [
@@ -25,16 +45,13 @@ export const PROJECT_SHORTENER: LangLesson[] = [
           'Each of the three projects in this track uses a **different** architecture on purpose, so you end up having built all three rather than read about them. This one is **layered**, also called package-by-layer or the n-tier layout. You will meet it often in tutorials and in older codebases.',
           'The idea is simple: a folder for each **kind** of code. Types in one place, storage in another, rules in another, HTTP in another. The folder answers the question *what kind of code is this?*',
         ],
-        table: {
-          headers: ['Layer', 'Folder', 'Job', 'May import'],
-          rows: [
-            ['Model', '`internal/model`', 'the types and their errors', 'nothing of yours'],
-            ['Store', '`internal/store`', 'putting data somewhere and getting it back', '`model`'],
-            ['Service', '`internal/service`', 'the rules — validation, code generation', '`model`, a store interface'],
-            ['Transport', '`internal/transport/web`', 'reading requests, writing responses', '`model`, `service`'],
-            ['Entry point', '`cmd/api`', 'build everything and start it', 'all of them'],
-          ],
-        },
+        bullets: [
+          '**Model** (`internal/model`) — the types and their errors.',
+          '**Store** (`internal/store`) — putting data somewhere and getting it back.',
+          '**Service** (`internal/service`) — the rules: validation, code generation.',
+          '**Transport** (`internal/transport/web`) — reading requests, writing responses.',
+          '**Entry point** (`cmd/api`) — build everything and start it.',
+        ],
       },
       {
         heading: 'The one rule',
@@ -56,15 +73,10 @@ model            ->  nothing
       },
       {
         heading: 'What it is good at, and what it is not',
-        table: {
-          headers: ['Good', 'Not so good'],
-          rows: [
-            ['Obvious where a new file goes', 'One feature is spread across four folders'],
-            ['Easy to explain to anyone', 'Adding a second feature makes every folder grow'],
-            ['Layer boundaries are easy to police', 'Import cycles appear once features need each other'],
-            ['Perfect for one or two features', 'Strains at roughly ten features'],
-          ],
-        },
+        bullets: [
+          '**Good:** it is obvious where a new file goes, easy to explain, and the layer boundaries are easy to police. Perfect for one or two features.',
+          '**Not so good:** one feature is spread across four folders, every folder grows with each feature, and it strains at around ten features.',
+        ],
       },
       {
         callout: {
@@ -100,15 +112,13 @@ model            ->  nothing
         body: [
           'One thing is being stored, so there is one table. Write it down before you write Go, because the struct will follow the table rather than the other way round.',
         ],
-        table: {
-          headers: ['Field', 'Type', 'Why it is there'],
-          rows: [
-            ['`id`', 'bigserial', 'the database’s own key'],
-            ['`code`', 'text, unique', 'the short part of the URL — what people type'],
-            ['`long_url`', 'text', 'where to send them'],
-            ['`clicks`', 'bigint', 'how many times it has been opened'],
-            ['`created_at`', 'timestamptz', 'so you can sort and expire old links'],
-          ],
+        code: {
+          label: 'the links table, in words',
+          src: `id          bigserial      the database's own key
+code        text, unique   the short part of the URL — what people type
+long_url    text           where to send them
+clicks      bigint         how many times it has been opened
+created_at  timestamptz    so you can sort and expire old links`,
         },
       },
       {
@@ -169,6 +179,11 @@ model            ->  nothing
     title: 'Step 1 — Set up the project',
     navTitle: 'Step 1 — Set up',
     oneLine: 'The module, the folders, and one route that proves it runs.',
+    objectives: [
+      'Create the module and folder layout for the shortener.',
+      'Write a JSON response helper and a main.go with one health route.',
+      'Run the server and check it with curl.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -183,6 +198,7 @@ mkdir -p cmd/api internal/transport/web
 touch cmd/api/main.go internal/transport/web/respond.go
 
 # 3. write the two files below, then
+# (go mod tidy adds and removes dependencies; see "Modules and tooling")
 go mod tidy
 go run ./cmd/api
 
@@ -200,12 +216,10 @@ curl -si -X POST localhost:8080/healthz | head -1   # 405, for free`,
       },
       {
         heading: 'Create the module',
-        code: {
-          label: 'terminal',
-          src: `mkdir shortener && cd shortener
-go mod init github.com/you/shortener`,
-          note: 'The module path is the import prefix for every package inside. Use your real repository path if you have one.',
-        },
+        body: [
+          'The first two commands above create the folder and the module.',
+          'The module path is the import prefix for every package inside. Use your real repository path if you have one.',
+        ],
       },
       {
         heading: 'The folders you are starting with',
@@ -354,6 +368,11 @@ curl -s localhost:8080/healthz
     title: 'Step 2 — The store, in memory',
     navTitle: 'Step 2 — The store',
     oneLine: 'Somewhere to keep links, so you can build the API before adding a database.',
+    objectives: [
+      'Build an in-memory link store behind a small set of methods.',
+      'Explain why an RWMutex suits a store that is read far more than written.',
+      'Return a sentinel error such as `ErrNotFound` from the store.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -439,6 +458,7 @@ var (
           src: `package store
 
 import (
+	"context"
 	"sync"
 
 	"github.com/you/shortener/internal/model"
@@ -455,7 +475,7 @@ func NewMemory() *Memory {
 	return &Memory{links: map[string]*model.Link{}}
 }
 
-func (s *Memory) Save(l *model.Link) error {
+func (s *Memory) Save(ctx context.Context, l *model.Link) error {
 	s.mu.Lock()                    // a write: exclusive
 	defer s.mu.Unlock()
 
@@ -466,7 +486,7 @@ func (s *Memory) Save(l *model.Link) error {
 	return nil
 }
 
-func (s *Memory) ByCode(code string) (*model.Link, error) {
+func (s *Memory) ByCode(ctx context.Context, code string) (*model.Link, error) {
 	s.mu.RLock()                   // a read: many at once are fine
 	defer s.mu.RUnlock()
 
@@ -530,6 +550,11 @@ func (s *Memory) ByCode(code string) (*model.Link, error) {
     title: 'Step 3 — Creating a short link',
     navTitle: 'Step 3 — Create a link',
     oneLine: 'Validate the URL you are given, generate a code, and store it.',
+    objectives: [
+      'Write a random short-code generator using crypto/rand.',
+      'Validate an incoming URL and reject bad input with a 400.',
+      'Build the create endpoint through handler, service and store.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -600,6 +625,7 @@ func NewCode(n int) (string, error) {
           src: `package service
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"time"
@@ -610,15 +636,16 @@ import (
 // Store is declared HERE, by the layer that uses it — not by the store package.
 // It is exactly as big as this service needs, so a test fake has two methods.
 type Store interface {
-	Save(l *model.Link) error
-	ByCode(code string) (*model.Link, error)
+	// ctx comes first: if the request is cancelled, the query stops too.
+	Save(ctx context.Context, l *model.Link) error
+	ByCode(ctx context.Context, code string) (*model.Link, error)
 }
 
 type Service struct{ store Store }
 
 func New(s Store) *Service { return &Service{store: s} }
 
-func (s *Service) Shorten(raw string) (*model.Link, error) {
+func (s *Service) Shorten(ctx context.Context, raw string) (*model.Link, error) {
 	long, err := validateURL(raw)
 	if err != nil {
 		return nil, err
@@ -633,7 +660,7 @@ func (s *Service) Shorten(raw string) (*model.Link, error) {
 		}
 
 		l := &model.Link{Code: code, LongURL: long, CreatedAt: time.Now()}
-		err = s.store.Save(l)
+		err = s.store.Save(ctx, l)
 		if err == nil {
 			return l, nil
 		}
@@ -715,7 +742,7 @@ func (h *Handler) create(w http.ResponseWriter, r *http.Request) {
 		return                          // always return after writing an error
 	}
 
-	l, err := h.svc.Shorten(in.URL)
+	l, err := h.svc.Shorten(r.Context(), in.URL)
 	if err != nil {
 		if errors.Is(err, model.ErrValidation) {
 			Error(w, 422, err.Error())
@@ -801,6 +828,11 @@ curl -s -X POST localhost:8080/links -d 'not json'
     title: 'Step 4 — The redirect',
     navTitle: 'Step 4 — The redirect',
     oneLine: 'The one endpoint the whole product exists for.',
+    objectives: [
+      'Build the redirect endpoint and choose between 301, 302 and 307.',
+      'Register the catch-all code route so it does not shadow other routes.',
+      'Count clicks without slowing down the redirect.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -890,23 +922,25 @@ go run -race ./cmd/api`,
         code: {
           label: 'internal/service/shortener.go — add this',
           src: `func (s *Service) Resolve(ctx context.Context, code string) (*Link, error) {
-\tl, err := s.store.ByCode(code)
+\tl, err := s.store.ByCode(ctx, code)
 \tif err != nil {
 \t\treturn nil, err
 \t}
 
 \t// Count in the background so the visitor does not wait for it.
-\t// NOTE: this goroutine must not use ctx — that context is cancelled the
-\t// moment the response is sent, which would cancel the count as well.
+\t// NOTE: this goroutine must not use ctx as-is — that context is cancelled
+\t// the moment the response is sent, which would cancel the count as well.
+\t// WithoutCancel (Go 1.21+) keeps its values but drops the cancellation.
+\tbg := context.WithoutCancel(ctx)
 \tgo func() {
-\t\tif err := s.store.Incr(code); err != nil {
+\t\tif err := s.store.Incr(bg, code); err != nil {
 \t\t\tslog.Error("click count failed", "code", code, "err", err)
 \t\t}
 \t}()
 
 \treturn l, nil
 }`,
-          note: 'The comment about ctx is the lesson here. The server cancels a request’s context when the handler returns, so background work that uses it is cancelled almost at once. If `Incr` later takes a context, give it `context.WithoutCancel(ctx)` (Go 1.21+) or a fresh one with its own timeout.',
+          note: 'The comment about ctx is the lesson here. The server cancels a request’s context when the handler returns, so background work that uses it is cancelled almost at once. That is why `Incr` gets `context.WithoutCancel(ctx)`; a fresh context with its own timeout would also work.',
         },
       },
       {
@@ -972,6 +1006,11 @@ curl -si localhost:8080/nope | head -1                                # 404`,
     title: 'Step 5 — Swap memory for Postgres',
     navTitle: 'Step 5 — Postgres',
     oneLine: 'The same API, now with data that survives a restart. The service and handlers do not change.',
+    objectives: [
+      'Write a Postgres store with the same methods as the memory store.',
+      'Open and configure a connection pool and apply the schema.',
+      'Swap stores in main.go without changing the service or handlers.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1072,6 +1111,7 @@ func Open(dsn string) (*sql.DB, error) {
           src: `package store
 
 import (
+\t"context"
 \t"database/sql"
 \t"errors"
 )
@@ -1080,8 +1120,8 @@ type Postgres struct{ db *sql.DB }
 
 func NewPostgres(db *sql.DB) *Postgres { return &Postgres{db: db} }
 
-func (s *Postgres) Save(l *Link) error {
-\terr := s.db.QueryRow(
+func (s *Postgres) Save(ctx context.Context, l *Link) error {
+\terr := s.db.QueryRowContext(ctx,
 \t\t\`INSERT INTO links (code, long_url) VALUES ($1, $2)
 \t\t RETURNING id, clicks, created_at\`,
 \t\tl.Code, l.LongURL,                   // $1 and $2 — never string formatting
@@ -1093,9 +1133,9 @@ func (s *Postgres) Save(l *Link) error {
 \treturn err
 }
 
-func (s *Postgres) ByCode(code string) (*Link, error) {
+func (s *Postgres) ByCode(ctx context.Context, code string) (*Link, error) {
 \tvar l Link
-\terr := s.db.QueryRow(
+\terr := s.db.QueryRowContext(ctx,
 \t\t\`SELECT code, long_url, clicks, created_at FROM links WHERE code = $1\`,
 \t\tcode,
 \t).Scan(&l.Code, &l.LongURL, &l.Clicks, &l.CreatedAt)
@@ -1103,14 +1143,17 @@ func (s *Postgres) ByCode(code string) (*Link, error) {
 \tif errors.Is(err, sql.ErrNoRows) {
 \t\treturn nil, ErrNotFound              // translate the driver's error to ours
 \t}
-\treturn &l, err
+\tif err != nil {
+\t\treturn nil, err                      // never hand back a half-filled link
+\t}
+\treturn &l, nil
 }
 
-func (s *Postgres) Incr(code string) error {
-\t_, err := s.db.Exec(\`UPDATE links SET clicks = clicks + 1 WHERE code = $1\`, code)
+func (s *Postgres) Incr(ctx context.Context, code string) error {
+\t_, err := s.db.ExecContext(ctx,\`UPDATE links SET clicks = clicks + 1 WHERE code = $1\`, code)
 \treturn err
 }`,
-          note: 'clicks = clicks + 1 is done by the database, so two redirects at the same moment cannot lose a count. Reading the value into Go and adding one would.',
+          note: 'clicks = clicks + 1 is done by the database, so two redirects at the same moment cannot lose a count. Reading the value into Go and adding one would. Every method takes ctx and uses the ...Context variant, so a cancelled request stops its query instead of leaving it running.',
         },
       },
       {
@@ -1180,6 +1223,11 @@ st := store.NewPostgres(db)      // everything below is unchanged`,
     title: 'Step 6 — List, delete, and finish the project',
     navTitle: 'Step 6 — Finish it',
     oneLine: 'The remaining endpoints, then shutdown, tests and a container.',
+    objectives: [
+      'Build list-with-pagination and delete endpoints, returning 404 when nothing was deleted.',
+      'Add graceful shutdown and one test that covers the main flow.',
+      'Package the finished service in a Dockerfile.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1216,8 +1264,8 @@ go run golang.org/x/vuln/cmd/govulncheck@latest ./...`,
         ],
         code: {
           label: 'internal/store/postgres.go — add this method',
-          src: `func (s *Postgres) List(limit, offset int) ([]Link, error) {
-\trows, err := s.db.Query(
+          src: `func (s *Postgres) List(ctx context.Context, limit, offset int) ([]Link, error) {
+\trows, err := s.db.QueryContext(ctx,
 \t\t\`SELECT code, long_url, clicks, created_at
 \t\t   FROM links ORDER BY created_at DESC LIMIT $1 OFFSET $2\`,
 \t\tlimit, offset,
@@ -1247,7 +1295,7 @@ go run golang.org/x/vuln/cmd/govulncheck@latest ./...`,
 \tlimit := intParam(r, "limit", 20, 1, 100)     // clamped, never unbounded
 \toffset := intParam(r, "offset", 0, 0, 1_000_000)
 
-\tlinks, err := h.svc.List(limit, offset)
+\tlinks, err := h.svc.List(r.Context(), limit, offset)
 \tif err != nil {
 \t\tError(w, 500, "could not list links")
 \t\treturn
@@ -1270,8 +1318,8 @@ func intParam(r *http.Request, key string, def, min, max int) int {
         heading: 'Delete: say when nothing happened',
         code: {
           label: 'internal/store/postgres.go',
-          src: `func (s *Postgres) Delete(code string) error {
-\tres, err := s.db.Exec(\`DELETE FROM links WHERE code = $1\`, code)
+          src: `func (s *Postgres) Delete(ctx context.Context, code string) error {
+\tres, err := s.db.ExecContext(ctx,\`DELETE FROM links WHERE code = $1\`, code)
 \tif err != nil {
 \t\treturn err
 \t}

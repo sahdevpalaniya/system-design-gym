@@ -3,7 +3,7 @@ import { CONTACT_EMAIL } from '@/lib/legal'
 import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
-  'Contact',
+  'Contact Dev Skills: questions and feedback',
   'How to report a mistake, ask a question, or have your account and stored answers deleted.',
   '/contact',
   true,

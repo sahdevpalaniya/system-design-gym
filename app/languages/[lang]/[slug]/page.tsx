@@ -5,14 +5,39 @@ import type { LangBlock } from '@/lib/types'
 import { CodeBlock } from '@/components/golang/Code'
 import { FolderTree } from '@/components/golang/FolderTree'
 import { Exercises } from '@/components/golang/Exercises'
+import { Challenge } from '@/components/golang/Challenge'
 import { Contents } from '@/components/golang/Contents'
 import { headingSlug } from '@/lib/slug'
 import { humanMinutes, practiceMinutes, readMinutes } from '@/lib/estimate'
 import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
+import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
+import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return LANGUAGES.flatMap((l) => l.lessons.map((t) => ({ lang: l.id, slug: t.slug })))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string; slug: string }> }) {
+  const { lang, slug } = await params
+  const l = getLanguage(lang)
+  const t = l?.lessons.find((x) => x.slug === slug)
+  if (!l || !t) return {}
+  // keyword first: people search "goroutines in golang", not the course name.
+  // Absolute, because the brand suffix would push the keyword past ~60 chars.
+  const short = t.navTitle ?? t.title
+  // project steps share names across projects ("Step 1 — Setup"), so they are
+  // titled by their project instead of as a topic tutorial
+  const section = sectionOf(l, t.slug)
+  const project = section?.id.startsWith('project-') ? section.name.replace(/^Project \d+ — /, '') : null
+  return pageMeta(
+    project
+      ? `${project} in ${l.alias ?? l.name}: ${short}`
+      : `${short} in ${l.name} (${l.alias ?? l.name}), with examples`,
+    `${t.oneLine} A ${l.alias ?? l.name} tutorial with runnable code, key points and practice exercises.`,
+    `/languages/${l.id}/${t.slug}`,
+    true,
+  )
 }
 
 const CALLOUT = {
@@ -106,9 +131,29 @@ export default async function LangLessonPage({
   const prev = i > 0 ? order[i - 1] : null
   const next = i >= 0 && i < order.length - 1 ? order[i + 1] : null
   const section = sectionOf(l, slug)
+  const path = `/languages/${l.id}/${t.slug}`
 
   return (
     <Page>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            breadcrumbJsonLd([
+              { name: l.name, path: `/languages/${l.id}` },
+              { name: t.navTitle ?? t.title, path },
+            ]),
+            articleJsonLd({
+              headline: `${t.title} (${l.alias ?? l.name})`,
+              description: t.oneLine,
+              path,
+              published: CONTENT_PUBLISHED,
+              modified: CONTENT_MODIFIED,
+              section: section?.name,
+            }),
+          ]),
+        }}
+      />
       <PageHeader
         eyebrow={
           <>
@@ -134,6 +179,15 @@ export default async function LangLessonPage({
           </span>
         }
       />
+
+      {t.objectives?.length ? (
+        <div className="mb-6 rounded-xl border px-5 py-4" style={{ borderColor: 'var(--border)' }}>
+          <div className="mb-2 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
+            After this topic you can
+          </div>
+          <Bullets items={t.objectives} />
+        </div>
+      ) : null}
 
       <Contents headings={t.blocks.map((b) => b.heading).filter((h): h is string => Boolean(h))} />
 
@@ -165,6 +219,19 @@ export default async function LangLessonPage({
           </div>
           <Rich text={t.task} />
         </div>
+      ) : null}
+
+      {t.challenge ? (
+        <section className="mb-8" aria-labelledby="challenge">
+          <div
+            id="challenge"
+            className="mb-1 text-[0.6875rem] font-bold tracking-[0.07em] uppercase"
+            style={{ color: 'var(--accent)' }}
+          >
+            Coding challenge · checked by tests
+          </div>
+          <Challenge c={t.challenge} />
+        </section>
       ) : null}
 
       {t.exercises?.length ? (

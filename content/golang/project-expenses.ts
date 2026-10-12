@@ -10,7 +10,31 @@ export const PROJECT_EXPENSES: LangLesson[] = [
     title: 'Project 2 — Expense tracker: what we are building',
     navTitle: 'Overview and plan',
     oneLine: 'A money app with accounts, which is why this is where login belongs.',
+    objectives: [
+      'Explain the package-by-feature architecture and how it differs from package by layer.',
+      'Explain the expense tracker\'s endpoints and data model.',
+      'Explain the difference between authentication and authorisation.',
+    ],
     blocks: [
+      {
+        heading: 'What you will build, and what it looks like when done',
+        body: [
+          'An API where people sign up, log in, record what they spend, and get a monthly report. Each person sees only their own data. Here is the finished thing in a terminal.',
+        ],
+        code: {
+          label: 'terminal — the finished project',
+          src: `$ curl -s -X POST localhost:8080/v1/auth/login \\
+    -d '{"email":"ana@example.com","password":"correct horse battery"}'
+{"access_token":"eyJhbGciOi...","refresh_token":"9f2c..."}
+
+$ curl -s -X POST localhost:8080/v1/expenses -H "Authorization: Bearer $TOKEN" \\
+    -d '{"amount_cents":1250,"category":"food","spent_on":"2026-09-14"}'
+{"id":41,"amount_cents":1250,"category":"food","spent_on":"2026-09-14"}
+
+$ curl -s localhost:8080/v1/reports/monthly?month=2026-09-01 -H "Authorization: Bearer $TOKEN"
+[{"category":"food","total_cents":18400,"count":15}]`,
+        },
+      },
       {
         heading: 'Why an expense tracker',
         body: [
@@ -58,15 +82,12 @@ four folders                      top to bottom`,
         body: [
           'Package-by-feature does not throw the layers away. It turns them into **files inside each folder**, so you keep the separation and gain locality.',
         ],
-        table: {
-          headers: ['File in each feature folder', 'Responsible for', 'Knows about'],
-          rows: [
-            ['`<name>.go`', 'the type, its request shapes, its errors', 'nothing outside its package'],
-            ['`repository.go`', 'SQL and nothing else', '`database/sql`'],
-            ['`service.go`', 'the rules — what is allowed, in what order', 'a repository interface it declares itself'],
-            ['`handler.go`', 'reading requests, writing responses', '`net/http` and the service'],
-          ],
-        },
+        bullets: [
+          '`<name>.go` — the type, its request shapes, its errors. Knows nothing outside its package.',
+          '`repository.go` — SQL and nothing else. Knows `database/sql`.',
+          '`service.go` — the rules: what is allowed, in what order. Knows only a repository interface it declares itself.',
+          '`handler.go` — reading requests, writing responses. Knows `net/http` and the service.',
+        ],
       },
       {
         heading: 'The rules',
@@ -167,7 +188,7 @@ refresh_tokens  ← one per active session, so logout can end it`,
       {
         task: 'Decide whether an expense amount should be stored as a float. Then look up why the answer is no.',
         answer:
-          'No. `0.1 + 0.2 != 0.3` in binary floating point, so totals drift. Store whole cents in an integer.',
+          'No. `0.1 + 0.2 != 0.3` in binary floating point, so totals drift. Store whole paise (₹1 = 100 paise) in an integer.',
       },
     ],
     refs: [
@@ -180,6 +201,11 @@ refresh_tokens  ← one per active session, so logout can end it`,
     title: 'Step 1 — Setup, config, and the schema',
     navTitle: 'Step 1 — Setup and schema',
     oneLine: 'Fail at startup rather than at 3am, and let the database enforce what it can.',
+    objectives: [
+      'Write a config loader that fails at startup when a required variable is missing.',
+      'Write a schema that uses constraints to enforce rules in the database.',
+      'Explain why money is stored as integer paise, not float.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -322,7 +348,7 @@ CREATE INDEX ON expenses (user_id, spent_on DESC);`,
           rows: [
             [
               '`amount_cents BIGINT`, not a decimal or float',
-              'Money in a float is wrong: `0.1 + 0.2` is not `0.3` in binary. Store whole cents as an integer and divide only when displaying.',
+              'Money in a float is wrong: `0.1 + 0.2` is not `0.3` in binary. Store whole paise as an integer and divide by 100 only when displaying rupees.',
             ],
             [
               '`REFERENCES users(id) ON DELETE CASCADE`',
@@ -338,7 +364,7 @@ CREATE INDEX ON expenses (user_id, spent_on DESC);`,
       {
         callout: {
           tone: 'warn',
-          text: 'Never store money in a `float64`. Each rounding error is tiny, and nobody notices until totals stop matching. Use integer cents, or a proper decimal type.',
+          text: 'Never store money in a `float64`. Each rounding error is tiny, and nobody notices until totals stop matching. Use integer paise, or a proper decimal type.',
         },
       },
       {
@@ -355,7 +381,7 @@ go get github.com/joho/godotenv           # .env in development`,
     ],
     keyPoints: [
       'Read config once at startup, check it, and refuse to start when something is missing.',
-      'Store money as whole cents in an integer. Never a float.',
+      'Store money as whole paise in an integer. Never a float.',
       'Let the database enforce what it can: foreign keys, cascades, unique and check constraints.',
       'Index the query you will actually run: here, `(user_id, spent_on DESC)`.',
     ],
@@ -395,6 +421,11 @@ go get github.com/joho/godotenv           # .env in development`,
     title: 'Step 2 — Register: storing a password safely',
     navTitle: 'Step 2 — Register',
     oneLine: 'What hashing is, why you can never read a password back, and how bcrypt works.',
+    objectives: [
+      'Hash a password with bcrypt and explain why SHA-256 is wrong for passwords.',
+      'Build a register endpoint that validates input and never stores the plain password.',
+      'Map a unique-constraint violation to a 409 Conflict.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -650,6 +681,11 @@ func isUniqueViolation(err error) bool {
     title: 'Step 3 — Login and what a token is',
     navTitle: 'Step 3 — Login and JWT',
     oneLine: 'Check a password without unhashing it, and hand back proof for the next request.',
+    objectives: [
+      'Check a password with `bcrypt.CompareHashAndPassword`.',
+      'Explain why "wrong email" and "wrong password" must return the same error.',
+      'Issue a short-lived signed JWT and decode it to read its claims.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -854,6 +890,11 @@ curl -s -X POST localhost:8080/v1/auth/login -d '{"email":"nope@x.c","password":
     title: 'Step 4 — Checking the token on every request',
     navTitle: 'Step 4 — Auth middleware',
     oneLine: 'One middleware, at the edge, so no handler ever has to remember.',
+    objectives: [
+      'Write auth middleware that checks a Bearer token and puts the user ID in the context.',
+      'Explain why the context key should be an unexported struct type.',
+      'Test the middleware against missing, expired and tampered tokens.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1057,6 +1098,11 @@ curl -si -H "Authorization: Bearer $BAD" localhost:8080/v1/me | head -1
     title: 'Step 5 — Expenses, locked to their owner',
     navTitle: 'Step 5 — Owner-scoped CRUD',
     oneLine: 'CRUD again, but now every query has to know whose data it is.',
+    objectives: [
+      'Write repository methods where every query is filtered by user ID.',
+      'Explain why another user\'s record should return 404, not 403.',
+      'Build partial updates using pointer fields for optional input.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1097,7 +1143,9 @@ if e.UserID != userID {
 }
 
 // RIGHT — one query. Not yours and not there give the same answer.
-SELECT id, amount_cents, category FROM expenses WHERE id = $1 AND user_id = $2`,
+err = db.QueryRowContext(ctx,
+\t\`SELECT id, amount_cents, category FROM expenses WHERE id = $1 AND user_id = $2\`,
+\texpenseID, userID).Scan(&e.ID, &e.AmountCents, &e.Category)`,
         },
       },
       {
@@ -1160,7 +1208,10 @@ func (r *Repository) GetByID(ctx context.Context, id, userID int64) (*Expense, e
 \tif errors.Is(err, sql.ErrNoRows) {
 \t\treturn nil, ErrNotFound        // covers both "not there" and "not yours"
 \t}
-\treturn &e, err
+\tif err != nil {
+\t\treturn nil, err
+\t}
+\treturn &e, nil
 }
 
 func (r *Repository) Delete(ctx context.Context, id, userID int64) error {
@@ -1323,6 +1374,11 @@ curl -si -X DELETE -H "Authorization: Bearer $B" localhost:8080/v1/expenses/$ID 
     title: 'Step 6 — Filtering, paging, and a monthly report',
     navTitle: 'Step 6 — Reports',
     oneLine: 'Let the database do the counting, and never return an unbounded list.',
+    objectives: [
+      'Build paginated, filtered list queries with a capped page size.',
+      'Add filters with placeholders instead of string concatenation.',
+      'Write a monthly report that groups and sums in SQL, avoiding N+1.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1501,6 +1557,11 @@ func (r *Repository) MonthlyReport(ctx context.Context, userID int64, month time
     title: 'Step 7 — Refresh tokens and logout',
     navTitle: 'Step 7 — Refresh tokens',
     oneLine: 'Make sessions endable, without a database lookup on every request.',
+    objectives: [
+      'Issue refresh tokens and store only their SHA-256 hash.',
+      'Rotate refresh tokens so each one can be used only once.',
+      'Build logout that revokes a session.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -1690,6 +1751,11 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
     title: 'Step 8 — Test that the walls actually hold',
     navTitle: 'Step 8 — Tests',
     oneLine: 'One test here matters more than the rest: the one that proves users are kept apart.',
+    objectives: [
+      'Write a test proving one user cannot read or change another user\'s expenses.',
+      'Write test helpers that call `t.Helper()` and a hand-written fake instead of a mock library.',
+      'Run tests with the race detector and coverage.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',

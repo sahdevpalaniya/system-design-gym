@@ -10,6 +10,11 @@ export const PRACTICE: LangLesson[] = [
     title: 'Practice 1 — CRUD, the easy way',
     navTitle: 'Practice 1 — flat',
     oneLine: 'One file, one package, no database. Get the four operations working before you add anything else.',
+    objectives: [
+      'Build a single-file in-memory CRUD API with create, read, update and delete routes.',
+      'Protect a shared map with a mutex because each request runs in its own goroutine.',
+      'Return the right status code for each success and failure case.',
+    ],
     blocks: [
       {
         heading: 'What CRUD means',
@@ -55,7 +60,7 @@ export const PRACTICE: LangLesson[] = [
         ],
         code: {
           label: 'main.go — the data',
-          src: `package main
+          src: `import "sync"
 
 type Task struct {
 \tID    int64  \`json:"id"\`
@@ -161,6 +166,9 @@ func (s *store) delete(id int64) bool {
 \tmux.HandleFunc("DELETE /tasks/{id}", s.handleDelete)
 
 \tlog.Println("listening on :8080")
+\t// The simple version: no timeouts, and log.Fatal skips deferred calls.
+\t// Fine for a practice app. The moderate CRUD practice uses http.Server
+\t// with timeouts; "Middleware and graceful shutdown" adds a clean stop.
 \tlog.Fatal(http.ListenAndServe(":8080", mux))
 }
 
@@ -252,6 +260,11 @@ func writeJSON(w http.ResponseWriter, status int, v any) {
     title: 'Practice 2 — CRUD, split into layers',
     navTitle: 'Practice 2 — layered',
     oneLine: 'The same task list, now in packages with a real database behind it.',
+    objectives: [
+      'Split a CRUD API into packages for HTTP, storage and wiring.',
+      'Replace an in-memory store with a Postgres-backed one behind the same methods.',
+      'Explain what splitting into layers gains and what it costs.',
+    ],
     blocks: [
       {
         heading: 'Why split it at all',
@@ -347,7 +360,10 @@ func (s *Store) GetByID(ctx context.Context, id int64) (*Task, error) {
 \tif errors.Is(err, sql.ErrNoRows) {
 \t\treturn nil, ErrNotFound        // translate to OUR error, not the driver's
 \t}
-\treturn &t, err
+\tif err != nil {
+\t\treturn nil, err
+\t}
+\treturn &t, nil
 }
 
 func (s *Store) Delete(ctx context.Context, id int64) error {

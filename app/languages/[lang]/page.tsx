@@ -3,9 +3,21 @@ import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage } from '@/content/languages'
 import { Card, Page, PageHeader } from '@/components/common/ui'
 import { humanMinutes, sectionMinutes, trackMinutes } from '@/lib/estimate'
+import { courseJsonLd, pageMeta } from '@/lib/seo'
 
 export function generateStaticParams() {
   return LANGUAGES.map((l) => ({ lang: l.id }))
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
+  const l = getLanguage((await params).lang)
+  if (!l) return {}
+  return pageMeta(
+    `Learn ${l.name} (${l.alias ?? l.name}) from scratch: tutorial with examples`,
+    `${l.alias ?? l.name} tutorial for beginners. ${l.tagline} ${l.blurb}`,
+    `/languages/${l.id}`,
+    true,
+  )
 }
 
 export default async function LanguagePage({ params }: { params: Promise<{ lang: string }> }) {
@@ -15,6 +27,20 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
 
   return (
     <Page>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            courseJsonLd({
+              name: `Learn ${l.name} (${l.alias ?? l.name}) from scratch`,
+              description: `${l.tagline} ${l.blurb}`,
+              path: `/languages/${l.id}`,
+              topics: l.lessons.length,
+              minutes: trackMinutes(l.sections, l.lessons),
+            }),
+          ),
+        }}
+      />
       <PageHeader
         eyebrow={
           <>

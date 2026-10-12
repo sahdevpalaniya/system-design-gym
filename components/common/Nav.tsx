@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Language } from '@/lib/types'
 import { CONCEPTS, PATH, getConcept } from '@/content/system-design/concepts'
 import { LESSONS } from '@/content/system-design/foundations'
@@ -10,7 +10,7 @@ import { GROUPS } from '@/content/system-design/method'
 import { PROBLEMS } from '@/content/system-design/problems'
 import { ARCHETYPES } from '@/content/system-design/archetypes'
 import { COMPANIES } from '@/content/system-design/companies'
-import { LANGUAGES, getLanguage } from '@/content/languages'
+import { LANGUAGES, getLanguage, orderedLessons } from '@/content/languages'
 import { hasDeepDive } from '@/content/system-design/deep'
 import { conceptState, dueConcepts, problemState, readCount, streakCount, useProgress } from '@/lib/store'
 import { AccountButton } from './Account'
@@ -29,7 +29,12 @@ type Track = { id: string; name: string; href: string }
 
 const TRACKS: Track[] = [
   { id: 'sd', name: 'System Design', href: '/' },
-  ...LANGUAGES.map((l) => ({ id: l.id, name: l.name, href: `/languages/${l.id}` })),
+  // a language tab starts the course: it opens the first lesson, not the index
+  ...LANGUAGES.map((l) => ({
+    id: l.id,
+    name: l.name,
+    href: orderedLessons(l)[0] ? `/languages/${l.id}/${orderedLessons(l)[0].slug}` : `/languages/${l.id}`,
+  })),
 ]
 
 /** The tab a path belongs to. Everything outside /languages is System Design. */
@@ -38,22 +43,12 @@ function trackFor(pathname: string): Track {
   return TRACKS.find((t) => t.id === m?.[1]) ?? TRACKS[0]
 }
 
-/** True when the track tab row is rendered, i.e. on a language route. */
-function hasTabs(pathname: string) {
-  return trackFor(pathname).id !== TRACKS[0].id
-}
-
 export function Shell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
-  const pathname = usePathname()
   return (
     <SidebarCtx.Provider value={{ open, setOpen }}>
       <Header />
-      <div
-        className="mx-auto flex w-full max-w-[var(--shell)] flex-1"
-        // the header loses the tab row when only one track is shown
-        style={{ '--header-h': hasTabs(pathname) ? '5.95rem' : '3.32rem' } as React.CSSProperties}
-      >
+      <div className="mx-auto flex w-full max-w-[var(--shell)] flex-1">
         <Sidebar />
         <div className="min-w-0 flex-1">{children}</div>
       </div>
@@ -93,9 +88,23 @@ function Header() {
   const { open, setOpen } = useContext(SidebarCtx)
   const { state, ready } = useProgress()
   const streak = ready ? streakCount(state) : 0
+  const ref = useRef<HTMLElement>(null)
+
+  // the sidebar sits under the header, so --header-h must be the real height:
+  // the tab row, user font size and wrapping all change it. globals.css keeps
+  // the usual value as the first-paint default.
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const set = () => document.documentElement.style.setProperty('--header-h', `${el.offsetHeight}px`)
+    set()
+    const ro = new ResizeObserver(set)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
 
   return (
-    <header className="sticky top-0 z-40 border-b" style={{ background: 'var(--surface)' }}>
+    <header ref={ref} className="sticky top-0 z-40 border-b" style={{ background: 'var(--surface)' }}>
       <div className="mx-auto flex w-full max-w-[var(--shell)] items-center gap-3 px-4 py-2.5">
         <button
           type="button"
@@ -146,18 +155,19 @@ function Header() {
   )
 }
 
-/** The row of track tabs. Clicking one swaps the entire sidebar. */
+/** The row of track tabs, always shown, w3schools style. Clicking one swaps the entire sidebar. */
 function TrackTabs() {
   const pathname = usePathname()
   const active = trackFor(pathname)
-  // Launch scope is System Design only: language tabs stay hidden until you are
-  // actually on a language route, which still loads fine when linked directly.
-  const shown = TRACKS.filter((t) => t.id === TRACKS[0].id || t.id === active.id)
-  if (!hasTabs(pathname)) return null
 
   return (
-    <nav aria-label="Tracks" className="mx-auto flex w-full max-w-[var(--shell)] gap-1 overflow-x-auto px-3">
-      {shown.map((t) => {
+    // scrolls sideways on narrow screens; the scrollbar is hidden so it never adds height
+    <nav
+      aria-label="Tracks"
+      className="mx-auto flex w-full max-w-[var(--shell)] gap-1 overflow-x-auto px-3"
+      style={{ scrollbarWidth: 'none' }}
+    >
+      {TRACKS.map((t) => {
         const on = t.id === active.id
         return (
           <Link
@@ -169,7 +179,8 @@ function TrackTabs() {
               color: on ? 'var(--accent)' : 'var(--muted)',
               fontWeight: on ? 700 : 500,
             }}
-            aria-current={on ? 'page' : undefined}
+            // 'page' only when this exact URL is open; otherwise it marks the section you are in
+            aria-current={on ? (pathname === t.href ? 'page' : 'true') : undefined}
           >
             {t.name}
           </Link>

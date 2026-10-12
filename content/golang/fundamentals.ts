@@ -7,12 +7,17 @@ export const FUNDAMENTALS: LangLesson[] = [
     title: 'Syntax, comments, and naming',
     navTitle: 'Syntax and comments',
     oneLine: 'The shape every Go file takes, and the naming rules the whole ecosystem follows.',
+    objectives: [
+      'Write a Go file with a package clause, an import block, and a doc-commented function.',
+      'Explain why the opening brace must stay on the same line as `func main()`.',
+      'Fix the compile errors caused by an unused import and an unused variable.',
+    ],
     blocks: [
       {
         heading: 'What syntax means here',
         body: [
           '**Syntax** is the set of rules for how Go code must be written down: where the braces go, what counts as a statement, what the compiler will and will not accept. Go keeps its set small on purpose, so there is usually one way to write something.',
-          'This topic covers the shape every Go file takes and how to write comments. The next one covers printing and naming. Printing gets that much space because it is how you will inspect your program before you ever touch a debugger.',
+          'This topic covers the shape every Go file takes and how to write comments. The next one covers printing. It gets a lesson of its own because it is how you will inspect your program before you ever touch a debugger.',
         ],
       },
       {
@@ -43,42 +48,91 @@ func main() {         // 3. the code
         heading: 'Comments',
         code: {
           label: 'comments.go',
-          src: `// A line comment. This is what you use nearly all the time.
+          src: `package main
+
+import "fmt"
+
+// A line comment. This is what you use nearly all the time.
 
 /*
 A block comment.
 Mostly used to comment out code temporarily.
 */
 
-// Package calc does arithmetic on money amounts.
-package calc
-
 // Add returns the sum of a and b.
 // A doc comment starts with the name of the thing it describes.
-func Add(a, b int) int { return a + b }`,
+func Add(a, b int) int { return a + b }
+
+func main() {
+\tfmt.Println(Add(2, 3)) // a comment can also sit at the end of a line
+}`,
+          canRun: true,
           note: 'Doc comments starting with the identifier name are read by `go doc` and pkg.go.dev. They are the documentation, not decoration.',
+        },
+      },
+      {
+        code: {
+          label: 'calc.go — a package doc comment (excerpt)',
+          src: `// Package calc does arithmetic on money amounts.
+package calc`,
+          note: 'A comment directly above the `package` line documents the whole package. You will write your own packages in **Packages**.',
         },
       },
       {
         heading: 'Multiple imports',
         code: {
           label: 'imports.go',
-          src: `import (
-\t"fmt"
-\t"os"
-\t"strings"
+          src: `package main
 
-\t"github.com/jackc/pgx/v5/stdlib"     // third-party in its own group (goimports does this)
+import (
+\t"fmt"
+\t"strings"
 )
 
-import _ "net/http/pprof"    // blank import: run its init(), use nothing from it
-import f "fmt"               // alias, when two packages share a name`,
+func main() {
+\tfmt.Println(strings.ToUpper("one import block, one name per line"))
+}`,
+          canRun: true,
+          note: 'Group imports in brackets once you need more than one. `go fmt` sorts them for you.',
         },
       },
       {
-        callout: {
-          tone: 'note',
-          text: 'Learn `%+v` early. When something is wrong with a struct, `fmt.Printf("%+v\\n", x)` shows every field with its name. It is often the quickest way to see what your program is holding.',
+        heading: 'Naming rules',
+        bullets: [
+          'Letters, digits, and underscore. Must not start with a digit. Case-sensitive.',
+          '**MixedCaps, never under_scores.** `userID`, not `user_id`.',
+          '**Capital = exported.** `Name` is visible outside the package, `name` is not.',
+          '**Short names for short lives.** `i` in a loop, `n` for a count. A package-level name gets a full word.',
+          '**Do not stutter.** Callers always write the package name first, so inside package `strings` the function is `ToUpper`, not `StringsToUpper`.',
+          'Initialisms stay uppercase: `URL`, `ID`, `HTTP`. So `userID` and `parseURL`, never `userId` or `parseUrl`.',
+        ],
+      },
+      {
+        heading: 'Build this: a name badge',
+        body: [
+          'Put the pieces together. Write a program with a doc comment on `main`, two imports, and a helper function, then run it. Every line here uses something from this lesson.',
+        ],
+        code: {
+          label: 'badge.go',
+          src: `package main
+
+import (
+\t"fmt"
+\t"strings"
+)
+
+// badge returns a name framed in a box of stars.
+func badge(name string) string {
+\tline := strings.Repeat("*", len(name)+4)
+\treturn line + "\\n* " + name + " *\\n" + line
+}
+
+// main prints one badge.
+func main() {
+\tfmt.Println(badge("gopher"))
+}`,
+          canRun: true,
+          note: 'Change the name and run it again. Then rename `badge` to `Badge` — it still works, because inside one package capitalisation does not matter.',
         },
       },
     ],
@@ -86,11 +140,11 @@ import f "fmt"               // alias, when two packages share a name`,
       'Package, imports, code: in that order, in every file. Semicolons are automatic.',
       'The opening brace must be on the same line, because Go inserts semicolons for you.',
       'Unused imports and unused variables are compile errors, not warnings.',
-      'MixedCaps naming, capital means exported, and never repeat the package name in a type.',
+      'MixedCaps naming, capital means exported, initialisms stay uppercase (`userID`, `parseURL`).',
     ],
     remember:
       'Capitalisation is not style in Go. It is the access modifier.',
-    task: 'Write a two-file package with one exported and one unexported function. Try calling the unexported one from the other file, then from a different package.',
+    task: 'Write a one-file program with a doc comment on every function, two imports, and a helper that `main` calls. Then break it three ways (brace on its own line, an unused import, an unused variable) and read each error.',
     exercises: [
       {
         task: 'Put the opening brace of `func main()` on its own line and read the error.',
@@ -103,9 +157,9 @@ import f "fmt"               // alias, when two packages share a name`,
           '`"os" imported and not used` and `declared and not used: x`. Both are errors, not warnings, on purpose.',
       },
       {
-        task: 'Write a doc comment on an exported function, then run `go doc ./yourpackage`.',
+        task: 'Comment out one line with `//` and three lines with `/* */`, and run the program each time.',
         answer:
-          '`go doc` prints your comment under the function signature. That comment is the documentation; there is no separate doc format.',
+          'Commented-out code is ignored by the compiler. Watch out: commenting out the only use of a variable or import turns it into an "unused" error.',
       },
     ],
     refs: [
@@ -120,6 +174,11 @@ import f "fmt"               // alias, when two packages share a name`,
     title: 'Printing and format verbs',
     navTitle: 'Printing and verbs',
     oneLine: 'The three printing functions, and the verbs you will use every day.',
+    objectives: [
+      'Choose between `Print`, `Println`, `Printf` and `Sprintf` for a given output.',
+      'Predict the output of `Printf` with `%v`, `%T`, `%q`, `%.2f` and `%5d`.',
+      'Write a literal percent sign and a padded column with format verbs.',
+    ],
     blocks: [
       {
         heading: 'The three printing functions',
@@ -131,9 +190,9 @@ fmt.Print("no newline, no spaces between strings")
 fmt.Println("adds spaces and a newline:", name, age)
 fmt.Printf("formatted: %s is %d\\n", name, age)    // Printf needs its own \\n
 
-s := fmt.Sprintf("%s is %d", name, age)            // returns the string instead
-fmt.Fprintln(os.Stderr, "goes to stderr")          // writes to any io.Writer`,
-          note: 'Sprintf builds a string; Fprintf writes to a Writer. The S and F prefixes work the same across the whole fmt package.',
+s := fmt.Sprintf("%s is %d", name, age)            // returns the string instead of printing it
+fmt.Println(s)`,
+          note: '`Sprintf` builds a string and hands it back to you. The `S` prefix means "give me a string" across the whole fmt package: `Sprint`, `Sprintln`, `Sprintf`.',
         },
       },
       {
@@ -141,31 +200,26 @@ fmt.Fprintln(os.Stderr, "goes to stderr")          // writes to any io.Writer`,
         table: {
           headers: ['Verb', 'What it prints', 'Example output'],
           rows: [
-            ['`%v`', 'the value in its default form — your default choice', '`{1 Sahdev}`'],
-            ['`%+v`', 'a struct **with field names** — best for debugging', '`{ID:1 Name:Sahdev}`'],
-            ['`%#v`', 'valid Go syntax for the value', '`main.User{ID:1, Name:"Sahdev"}`'],
-            ['`%T`', 'the type', '`main.User`'],
+            ['`%v`', 'the value in its default form — your default choice', '`25`'],
+            ['`%T`', 'the type of the value', '`int`'],
             ['`%d`', 'an integer', '`25`'],
             ['`%s`', 'a string', '`Sahdev`'],
             ['`%q`', 'a quoted string — shows whitespace clearly', '`"Sahdev"`'],
             ['`%f` / `%.2f`', 'a float / to two decimal places', '`3.140000` / `3.14`'],
             ['`%t`', 'a bool', '`true`'],
-            ['`%p`', 'a pointer address', '`0xc000010000`'],
             ['`%x`', 'hexadecimal', '`1f`'],
-            ['`%w`', '**wraps an error** — only in `fmt.Errorf`', '—'],
+            ['`%5d` / `%-5s`', 'pad to 5 wide, right / left aligned', '`   25` / `ab   `'],
             ['`%%`', 'a literal percent sign', '`%`'],
           ],
         },
       },
       {
-        heading: 'Naming rules',
+        heading: 'Verbs you will meet later',
         bullets: [
-          'Letters, digits, and underscore. Must not start with a digit. Case-sensitive.',
-          '**MixedCaps, never under_scores.** `userID`, not `user_id`.',
-          '**Capital = exported.** `Name` is visible outside the package, `name` is not.',
-          '**Short names for short lives.** `i` in a loop, `r` for a reader, `u` for a user. A package-level name gets a full word.',
-          '**Do not stutter.** In package `user`, the type is `Service`, so callers write `user.Service`, not `user.UserService`.',
-          'Initialisms stay uppercase: `URL`, `ID`, `HTTP`. So `userID` and `parseURL`, never `userId` or `parseUrl`.',
+          '`%+v` and `%#v` print a **struct** with its field names. A struct is a value made of several named fields; you will learn it properly in **Structs**.',
+          '`%p` prints a memory address. You will learn this in **Pointers**.',
+          '`%w` wraps one error inside another, and only works in `fmt.Errorf`. You will learn this in **Error values**.',
+          '`fmt.Fprintln` prints to a place you choose, such as the error stream `os.Stderr`, instead of the screen. It comes up in **Interfaces**.',
         ],
       },
       {
@@ -176,42 +230,37 @@ fmt.Fprintln(os.Stderr, "goes to stderr")          // writes to any io.Writer`,
 
 import "fmt"
 
-type User struct {
-	ID   int
-	Name string
-}
-
 func main() {
-	u := User{ID: 1, Name: "sahdev"}
+	name, age, height, student := "sahdev", 25, 1.72, true
 
-	fmt.Printf("%v\\n", u)    // just the values
-	fmt.Printf("%+v\\n", u)   // with field names  <- the debugging one
-	fmt.Printf("%#v\\n", u)   // valid Go syntax
-	fmt.Printf("%T\\n", u)    // the type
+	fmt.Printf("%v %v %v %v\\n", name, age, height, student) // %v works for anything
+	fmt.Printf("%T %T %T %T\\n", name, age, height, student) // the types
 
-	fmt.Printf("%s is %d years old (%.1f%% done)\\n", "sahdev", 25, 62.5)
+	fmt.Printf("%s is %d years old and %.2f m tall\\n", name, age, height)
+	fmt.Printf("student? %t (%.1f%% done)\\n", student, 62.5)
 	fmt.Printf("%q vs %s\\n", "  spaces  ", "  spaces  ")
+	fmt.Printf("[%5d] [%-6s]\\n", age, name)
 }
 `,
           canRun: true,
-          note: 'Compare the four ways of printing the same struct. `%+v` is the one you will use most.',
+          note: '`%v` prints anything sensibly; `%T` tells you what type Go thinks a value is. Those two cover most debugging.',
         },
       },
     ],
     keyPoints: [
       '`Println` for quick output, `Printf` for formatted, `Sprintf` to build a string.',
-      '`%v` is the default, `%+v` shows struct field names, `%T` shows the type.',
+      '`%v` is the default for any value, `%T` shows the type.',
       '`Printf` needs its own `\\n`; `Println` adds one for you.',
-      'The `S` and `F` prefixes work across the whole `fmt` package: `Sprintf`, `Fprintln`.',
+      'The `S` prefix (`Sprintf`, `Sprintln`) returns a string instead of printing it.',
     ],
     remember:
-      '`%+v` shows a struct with its field names. Learn it before you learn a debugger.',
-    task: 'Print the same struct with `%v`, `%+v`, `%#v` and `%T` and compare all four outputs.',
+      '`%v` prints anything and `%T` tells you its type. Learn them before you learn a debugger.',
+    task: 'Print a string, an int, a float and a bool with `%v` and then with `%T`, and compare the outputs.',
     exercises: [
       {
-        task: 'Use `Fprintln(os.Stderr, ...)`, then pipe stdout to a file and see your message still appear.',
+        task: 'Build a sentence with `Sprintf`, store it in a variable, then print it with `Println`.',
         answer:
-          'Your message still appears on screen. stderr is a separate stream, which is why logs and errors go there rather than to stdout.',
+          '`msg := fmt.Sprintf("%s scored %d", "asha", 91)` then `fmt.Println(msg)` prints `asha scored 91`. `Sprintf` prints nothing by itself; it returns the string.',
       },
       {
         task: 'Format a float to two decimal places, and print a literal percent sign.',
@@ -226,8 +275,7 @@ func main() {
     ],
     refs: [
       { label: 'fmt package', href: 'https://pkg.go.dev/fmt' },
-      { label: 'Effective Go — Names', href: 'https://go.dev/doc/effective_go#names' },
-      { label: 'Go Doc Comments', href: 'https://go.dev/doc/comment' },
+      { label: 'A Tour of Go — Printf', href: 'https://go.dev/tour/basics/11' },
     ],
   },
 
@@ -236,13 +284,17 @@ func main() {
     title: 'Basic data types',
     navTitle: 'Basic data types',
     oneLine: 'Every built-in type, why there are so many integer sizes, and what to actually use.',
+    objectives: [
+      'Choose the right built-in type for a count, an id, a decimal and a money amount.',
+      'Predict the output of overflowing an `int8` or a `uint8`.',
+      'Explain why `0.1 + 0.2` is not exactly `0.3` for float64 variables.',
+    ],
     blocks: [
       {
         heading: 'What a type is, and why there are so many',
         body: [
           'A **type** tells Go two things: what kind of value a variable holds, and what you are allowed to do with it. `int` holds whole numbers and can be added; `string` holds text and can be joined. The compiler checks this before your program runs, so passing a `string` where an `int` is expected never reaches production.',
           'Go\'s built-in types are called **basic types**. There are more of them than in a language like Python because Go lets you say how big a number is, 8 bits or 64. That matters when you are talking to a database, a file format, or another machine.',
-          'A **constant** is a value fixed when the program is compiled and never changed afterwards. It is not a variable you promise not to touch; the compiler enforces it.',
         ],
       },
       {
@@ -268,7 +320,7 @@ func main() {
           '**`int` for counting anything.** It is the default, it is 64-bit on the servers and laptops you will deploy to, and using `int32` "to save memory" on a loop counter saves nothing.',
           '**`int64` for database ids** and anything crossing a wire format where the size must be fixed.',
           '**`float64` for decimals.** `float32` only when you have a specific reason, like graphics.',
-          '**Never a float for money.** `0.1 + 0.2 != 0.3` in binary floating point. Use integer cents, or a decimal library.',
+          '**Never a float for money.** `0.1 + 0.2 != 0.3` in binary floating point. Use integer paise, or a decimal library.',
           '**`byte` for raw data, `rune` for characters.** They are the same thing as `uint8` and `int32`, but the alias tells the reader your intent.',
         ],
       },
@@ -310,27 +362,10 @@ func main() {
         },
       },
       {
-        heading: 'Conversion is always explicit',
-        code: {
-          label: 'convert.go',
-          src: `i := 42
-f := float64(i)          // required
-u := uint(i)
-s := string(rune(65))    // "A" — converts a code point, NOT a number
-
-// Number <-> string needs strconv, not a cast
-s2 := strconv.Itoa(42)                   // "42"
-n, err := strconv.Atoi("42")             // 42, nil
-f2, err := strconv.ParseFloat("3.14", 64)
-b, err := strconv.ParseBool("true")
-s3 := strconv.FormatInt(255, 16)         // "ff"`,
-        },
-      },
-      {
-        callout: {
-          tone: 'warn',
-          text: '`string(65)` gives you `"A"`, not `"65"`. It converts a code point to a character. To turn a number into its text form you need `strconv.Itoa`. `go vet` flags `string(n)` on an int for this reason, which is why the code above writes `string(rune(65))`.',
-        },
+        heading: 'Mixing types needs a conversion',
+        body: [
+          'Go will not add an `int` to a `float64` for you, and turning a number into text needs the `strconv` package. Both get a whole lesson of their own: **Type conversion**.',
+        ],
       },
       {
         heading: 'Try it yourself',
@@ -338,39 +373,31 @@ s3 := strconv.FormatInt(255, 16)         // "ff"`,
           label: 'press Run — this executes on the Go Playground',
           src: `package main
 
-import (
-	"fmt"
-	"strconv"
-)
-
-type Status int
-
-const (
-	Pending Status = iota // 0
-	Active                // 1
-	Done                  // 2
-)
-
-func (s Status) String() string {
-	return [...]string{"pending", "active", "done"}[s]
-}
+import "fmt"
 
 func main() {
 	var small int8 = 127
 	small++
 	fmt.Println("int8 overflow:", small) // -128, silently
 
-	fmt.Println("string(65) =", string(rune(65)))  // "A", a character
-	fmt.Println("Itoa(65)   =", strconv.Itoa(65))  // "65", the text
+	var count int = 3
+	var price float64 = 2.50
+	var name string = "tea"
+	var paid bool
+	var initial byte = 'T'
+	var letter rune = 'é'
 
-	n, err := strconv.Atoi("42")
-	fmt.Println("Atoi:", n, err)
+	fmt.Println(count, price, name, paid) // paid is false: its zero value
+	fmt.Println(initial, letter)           // 84 233 — both are just numbers
+	fmt.Printf("%c %c\\n", initial, letter) // T é — %c prints them as characters
 
-	fmt.Println(Active, "has value", int(Active))
+	fmt.Println(0.1+0.2 == 0.3) // true here, but only because constants are exact
+	a, b := 0.1, 0.2
+	fmt.Println(a+b == 0.3) // false: float64 variables are not
 }
 `,
           canRun: true,
-          note: 'Watch the int8 wrap around, and see what iota generates.',
+          note: 'Watch the int8 wrap around, see that `byte` and `rune` are numbers underneath, and see the float trap.',
         },
       },
     ],
@@ -378,11 +405,11 @@ func main() {
       '`int` for counting, `int64` for ids, `float64` for decimals, never a float for money.',
       'Overflow wraps silently. That is why every conversion between sizes is explicit.',
       '`byte` is `uint8` and `rune` is `int32`. The aliases exist to show intent.',
-      '`strconv` converts between numbers and text. `string(65)` gives "A", not "65".',
+      'Every type starts at its zero value: `0`, `""` or `false`.',
     ],
     remember:
       'Go gives you exact-size types for when it matters, and `int` for when it does not.',
-    task: 'Overflow an `int8` and a `uint8` on purpose, then convert between int, float64 and string in all six directions.',
+    task: 'Overflow an `int8` and a `uint8` on purpose. Then declare one variable of each type in the table without a value, and print them all on one line to see every zero value.',
     exercises: [
       {
         task: 'Print `math.MaxInt64` and `math.MinInt64`, then add one to each.',
@@ -392,18 +419,17 @@ func main() {
       {
         task: 'Add 0.1 and 0.2 as float64 and print the result. That is why money is not a float.',
         answer:
-          '0.30000000000000004. Binary floating point cannot represent 0.1 exactly, which is why money is stored as whole cents.',
+          '0.30000000000000004. Binary floating point cannot represent 0.1 exactly, which is why money is stored as whole paise.',
       },
       {
-        task: 'Convert a string to an int with `strconv.Atoi` and handle the error path.',
+        task: 'Store the price of three items as whole paise in an `int64`, add them, and print the total as rupees and paise with `/ 100` and `% 100`.',
         answer:
-          '`strconv.Atoi: parsing "abc": invalid syntax`, and the int is 0. Always check the error, or that 0 looks like a real value.',
+          'For 199 + 250 + 75 you get 524, printed as ₹5 and 24 paise. Integer paise never lose a paisa, which is why money code uses them instead of floats.',
       },
     ],
     refs: [
       { label: 'A Tour of Go — Basic types', href: 'https://go.dev/tour/basics/11' },
       { label: 'Go blog: Constants', href: 'https://go.dev/blog/constants' },
-      { label: 'strconv package', href: 'https://pkg.go.dev/strconv' },
     ],
   },
 
@@ -412,7 +438,19 @@ func main() {
     title: 'Constants and iota',
     navTitle: 'Constants and iota',
     oneLine: 'Values fixed at compile time, and how Go does enums without an enum keyword.',
+    objectives: [
+      'Write a const block that numbers a set of states with `iota`.',
+      'Explain why an untyped constant fits a float64 and an int64 but a typed one does not.',
+      'Predict the values `iota` produces in a block with a skipped first line and arithmetic.',
+    ],
     blocks: [
+      {
+        heading: 'What a constant is',
+        body: [
+          'A **constant** is a value fixed when the program is compiled and never changed afterwards. It is not a variable you promise not to touch; the compiler enforces it. Try to assign to one and the program will not build.',
+          'Use a constant for values that are true for the whole program: a limit, an app name, a tax rate.',
+        ],
+      },
       {
         heading: 'Constants',
         code: {
@@ -425,93 +463,87 @@ const (
 \tAppName     = "snapnotes"
 )
 
-// An UNTYPED constant adapts to where it is used. Unusual, and useful.
-const big = 1 << 40          // no type yet
-var f float64 = big          // fine
-var i int64 = big            // also fine
+// A constant with no type written adapts to where it is used.
+const ten = 10
+var f float64 = ten          // fine: becomes 10.0
+var i int64 = ten            // also fine
 
-// A typed constant does not adapt
+// A constant with a type written does not adapt
 const typed int32 = 100
 var x int64 = typed          // COMPILE ERROR`,
-          note: 'Untyped constants are arbitrary precision at compile time. `const huge = 1 << 100` is legal until you assign it to something that cannot hold it.',
+          note: 'A constant without a written type is called **untyped**. Go treats it as "just the number 10" until you put it somewhere, then it takes that type. That is why the same `ten` fits in both a `float64` and an `int64`.',
         },
       },
       {
         heading: 'iota — numbering without typing numbers',
         code: {
           label: 'iota.go',
-          src: `type Status int
-
-const (
-\tPending Status = iota    // 0
-\tActive                   // 1
-\tSuspended                // 2
-\tDeleted                  // 3
+          src: `const (
+\tPending   = iota   // 0
+\tActive             // 1
+\tSuspended          // 2
+\tDeleted            // 3
 )
 
-// It is an expression, so you can do arithmetic with it
+// iota is just a number, so you can do arithmetic with it
 const (
-\t_  = iota                // skip 0
-\tKB = 1 << (10 * iota)    // 1024
-\tMB                       // 1048576
-\tGB                       // 1073741824
-)
-
-// Give it a String method and it prints readably
-func (s Status) String() string {
-\treturn [...]string{"pending", "active", "suspended", "deleted"}[s]
-}`,
+\t_      = iota       // skip 0
+\tSmall  = iota * 10  // 10
+\tMedium              // 20
+\tLarge               // 30
+)`,
           run: `package main
 
-type Status int
+import "fmt"
 
 const (
-	Pending Status = iota    // 0
-	Active                   // 1
-	Suspended                // 2
-	Deleted                  // 3
+	Pending   = iota   // 0
+	Active             // 1
+	Suspended          // 2
+	Deleted            // 3
 )
 
-// It is an expression, so you can do arithmetic with it
+// iota is just a number, so you can do arithmetic with it
 const (
-	_  = iota                // skip 0
-	KB = 1 << (10 * iota)    // 1024
-	MB                       // 1048576
-	GB                       // 1073741824
+	_      = iota       // skip 0
+	Small  = iota * 10  // 10
+	Medium              // 20
+	Large               // 30
 )
-
-// Give it a String method and it prints readably
-func (s Status) String() string {
-	return [...]string{"pending", "active", "suspended", "deleted"}[s]
-}
 
 func main() {
-	_ = 0
+	fmt.Println(Pending, Active, Suspended, Deleted) // 0 1 2 3
+	fmt.Println(Small, Medium, Large)                // 10 20 30
+
+	status := Active
+	if status == Active {
+		fmt.Println("the account is active")
+	}
 }
 `,
-          note: 'A named type plus iota plus a String method is how Go does enums. There is no enum keyword.',
+          note: '`iota` starts at 0 in each `const` block and goes up by one per line. A line with no `=` repeats the previous expression with the next `iota`. Go has no `enum` keyword; this is how you number a set of choices. In **Methods and embedding** you will give them a type and make them print as words.',
         },
       },
     ],
     keyPoints: [
       'A constant is fixed at compile time. The compiler enforces it; it is not a promise.',
-      'An untyped constant adapts to where it is used; a typed one does not.',
-      '`iota` counts up through a const block, and it is an expression you can do maths with.',
-      'A named type + iota + a `String()` method is how Go does enums.',
+      'A constant without a written type adapts to where it is used; a typed one does not.',
+      '`iota` counts up from 0 through a const block, and you can do maths with it.',
+      'Go has no `enum` keyword. A const block with `iota` numbers a set of choices.',
     ],
     remember:
       'There are no constant slices, maps or structs. Those are `var`.',
-    task: 'Write a `Status` enum with `iota` and a `String()` method, then print a value with `%v` and `%d`.',
+    task: 'Write a const block of four order states with `iota`, then print each one and check one with an `if`.',
     exercises: [
       {
-        task: 'Use `iota` with a shift to generate KB, MB and GB.',
+        task: 'Use `iota` to generate the even numbers 2, 4, 6.',
         answer:
-          '`_ = iota` then `KB = 1 << (10 * iota)` gives 1024, 1048576, 1073741824. iota is an expression, so arithmetic works.',
+          '`_ = iota` then `Two = iota * 2` then `Four` and `Six` on their own lines. Each line repeats `iota * 2` with the next iota.',
       },
       {
-        task: 'Declare `const big = 1 << 40` and assign it to both a float64 and an int64.',
+        task: 'Declare `const ten = 10` and assign it to both a float64 and an int64.',
         answer:
-          'Both compile. An untyped constant takes the type of wherever it is used, and it is arbitrary precision until then.',
+          'Both compile. A constant without a written type takes the type of wherever it is used.',
       },
       {
         task: 'Give the same constant an explicit type and watch the second assignment stop compiling.',
@@ -520,9 +552,9 @@ func main() {
       },
     ],
     refs: [
-      { label: 'A Tour of Go — Basic types', href: 'https://go.dev/tour/basics/11' },
+      { label: 'A Tour of Go — Constants', href: 'https://go.dev/tour/basics/15' },
       { label: 'Go blog: Constants', href: 'https://go.dev/blog/constants' },
-      { label: 'strconv package', href: 'https://pkg.go.dev/strconv' },
+      { label: 'Effective Go — Constants', href: 'https://go.dev/doc/effective_go#constants' },
     ],
   },
 
@@ -531,6 +563,11 @@ func main() {
     title: 'Operators',
     navTitle: 'Operators',
     oneLine: 'Arithmetic, comparison, logical, and bitwise, plus what Go leaves out on purpose.',
+    objectives: [
+      'Predict the output of integer division, `%`, and shifts such as `3 << 10`.',
+      'Write a boolean expression with `%`, `&&` and `||` that answers a yes/no question.',
+      'Explain why `d != 0 && 10/d > 2` never divides by zero.',
+    ],
     blocks: [
       {
         heading: 'What an operator is',
@@ -545,13 +582,13 @@ func main() {
           label: 'arithmetic.go',
           src: `a, b := 10, 3
 
-a + b      // 13
-a - b      // 7
-a * b      // 30
-a / b      // 3   — INTEGER division truncates, it does not round
-a % b      // 1   — remainder
+fmt.Println(a + b)   // 13
+fmt.Println(a - b)   // 7
+fmt.Println(a * b)   // 30
+fmt.Println(a / b)   // 3   — INTEGER division truncates, it does not round
+fmt.Println(a % b)   // 1   — remainder
 
-float64(a) / float64(b)   // 3.333... — convert first if you want a decimal
+fmt.Println(float64(a) / float64(b))   // 3.3333333333333335 — convert first if you want a decimal
 
 a++        // a statement, NOT an expression. "x := a++" does not compile.
 a--        // and there is no ++a either`,
@@ -565,6 +602,7 @@ a--        // and there is no ++a either`,
           src: `x := 10        // declare and assign (only inside a function)
 x = 20         // assign to an existing variable
 var y int = 5  // declare with an explicit type
+fmt.Println(x, y)
 
 x += 5         // x = x + 5
 x -= 5
@@ -574,57 +612,77 @@ x %= 3
 x <<= 1        // the bitwise ones work too
 x &= 0xFF
 
-a, b = b, a    // swap in one line, no temp variable`,
+a, b := 1, 2
+a, b = b, a    // swap in one line, no temp variable
+fmt.Println(a, b) // 2 1`,
         },
       },
       {
         heading: 'Comparison',
         code: {
           label: 'comparison.go',
-          src: `a == b     // equal
-a != b
-a < b      // < <= > >= work on numbers and strings (lexicographic)
+          src: `package main
 
-// Structs compare field by field IF every field is comparable
-type Point struct{ X, Y int }
-Point{1, 2} == Point{1, 2}      // true
+import "fmt"
 
-// Slices, maps, and funcs are NOT comparable — this does not compile
-// []int{1} == []int{1}
-slices.Equal([]int{1}, []int{1})   // use this instead
-maps.Equal(m1, m2)
-reflect.DeepEqual(a, b)            // last resort; slow, use only in tests`,
+func main() {
+\ta, b := 3, 5
+\tfmt.Println(a == b)             // false
+\tfmt.Println(a != b)             // true
+\tfmt.Println(a < b, a >= b)      // true false
+\tfmt.Println(2.5 > 2.0)          // true — floats compare the same way
+\tfmt.Println("apple" < "banana") // true — strings compare byte by byte
+\tfmt.Println("Go" == "go")       // false — case matters
+\tfmt.Println(true == !false)     // true — bools compare with == and != only
+
+\t// Both sides must be the same type. This does not compile:
+\t// fmt.Println(a == 2.5) // a is an int, 2.5 is not
+}`,
+          canRun: true,
+          note: 'Every comparison gives back a `bool`. Later lessons show which other types can be compared with `==` and which cannot.',
         },
       },
       {
         heading: 'Logical, and short-circuiting',
         code: {
           label: 'logical.go',
-          src: `a && b     // and
-a || b     // or
-!a         // not
+          src: `package main
 
-// Both short-circuit, which is what makes this safe:
-if u != nil && u.Active {        // u.Active is never reached when u is nil
-\t...
-}
+import "fmt"
 
-if err == nil || retries > 3 {   // retries is not read when err is nil
-\t...
+func main() {
+\ta, b := true, false
+\tfmt.Println(a && b) // false — and
+\tfmt.Println(a || b) // true  — or
+\tfmt.Println(!a)     // false — not
+
+\t// Both short-circuit: if the left side already decides the answer,
+\t// the right side is never run. That is what makes this safe:
+\td := 0
+\tif d != 0 && 10/d > 2 { // 10/d is never reached when d is 0
+\t\tfmt.Println("big")
+\t} else {
+\t\tfmt.Println("d is zero, skipped the division")
+\t}
 }`,
-          note: 'Short-circuiting is not a micro-optimisation. Without it, the nil check above would panic.',
+          canRun: true,
+          note: 'Short-circuiting is not a micro-optimisation. Without it, `10/d` would crash the program with "integer divide by zero".',
         },
       },
       {
         heading: 'Bitwise',
+        body: [
+          'These work on the individual bits (the 1s and 0s) of an integer. `%b` prints a number in binary so you can watch them.',
+          '**Shifts** move every bit left or right. `x << n` moves the bits `n` places left, which is the same as multiplying by 2, `n` times. `x >> n` moves them right, which is dividing by 2, `n` times (rounding down). So `1 << 10` is 1024 and `10 << 20` is 10 × 2²⁰ = 10 × 1,048,576, which is 10 MB. You will see that last one in real code as an upload size limit.',
+        ],
         code: {
           label: 'bitwise.go',
-          src: `a & b      // AND
-a | b      // OR
-a ^ b      // XOR
-a &^ b     // AND NOT (bit clear) — this one is unique to Go
-a << 2     // shift left  (a * 4)
-a >> 2     // shift right (a / 4, rounding down for negatives)
+          src: `a, b := 0b1100, 0b1010
+fmt.Printf("%04b\\n", a&b)  // 1000  AND
+fmt.Printf("%04b\\n", a|b)  // 1110  OR
+fmt.Printf("%04b\\n", a^b)  // 0110  XOR
+fmt.Printf("%04b\\n", a&^b) // 0100  AND NOT (bit clear) — this one is unique to Go
+fmt.Println(a<<2, a>>2)     // 48 3 — shift left (a * 4), shift right (a / 4, rounding down)
 
 // A common use: flags packed into one integer
 const (
@@ -636,20 +694,22 @@ const (
 perms := CanRead | CanWrite          // set two flags
 has := perms&CanWrite != 0           // test one
 perms &^= CanWrite                   // clear one
+fmt.Println(has, perms)              // true 1
 
-// And sizes, which you have already seen
-const maxUpload = 10 << 20           // 10 MB`,
+// Shifts as sizes: 10 << 20 is 10 * 1,048,576 bytes
+const maxUpload = 10 << 20           // 10 MB
+fmt.Println(maxUpload)               // 10485760`,
         },
       },
       {
-        heading: 'Pointer and channel operators',
+        heading: 'Two operators for later',
+        body: [
+          'You will also meet `&` and `*` in front of a variable, and `<-` next to a channel. Those are not maths: they belong to pointers and channels, and each gets its own lesson.',
+        ],
         code: {
-          label: 'other.go',
-          src: `&x         // address of x
-*p         // the value p points at
-
-ch <- v    // send to a channel
-v := <-ch  // receive from a channel`,
+          label: '(preview — explained in Pointers, and Channels and select)',
+          src: `p := &x   // p holds the address of x
+v := <-ch // take a value out of channel ch`,
         },
       },
       {
@@ -707,13 +767,67 @@ func main() {
     ],
     keyPoints: [
       'Integer division truncates. Convert to float64 first if you want a decimal.',
-      '`==` works on structs when every field is comparable; use `slices.Equal` for slices.',
+      'Comparisons give a `bool`, and both sides must be the same type.',
       '`&&` and `||` short-circuit, which is what makes `x != nil && x.Field` safe.',
       'No ternary, no operator overloading, no pointer arithmetic. All three are left out on purpose.',
     ],
     remember:
       'None of Go’s operators can be redefined. `a + b` means addition, or concatenation for strings, in every file you will ever read.',
     task: 'Build a permissions integer with `iota` bit flags: set two permissions, test for one, clear one, and print the result with `%b` to watch the bits move.',
+    exercises: [
+      {
+        task: 'Print `17 / 5`, `17 % 5`, and `float64(17) / 5`. Predict each before you run it.',
+        answer: '`3`, `2`, `3.4`. Integer division throws away the remainder; `%` gives you the remainder; converting to float64 first keeps the decimal.',
+      },
+      {
+        task: 'Write a permissions integer with three `iota` bit flags. Set two, test one, clear one, and print with `%03b` after each step.',
+        answer:
+          'With flags 1, 2 and 4: `001` after the first, `011` after the second, then `001` or `010` after clearing one, depending on which. Each flag owns one bit.',
+      },
+      {
+        task: 'Prove short-circuiting to yourself: write `f()` and `g()` that each print their name and return a bool, then run `f() && g()`. Make `f` return false and see that `g` never runs.',
+        answer: '`g` never prints when `f` returns false, because `false && anything` is already false. This is why `d != 0 && 10/d > 2` is safe.',
+      },
+      {
+        task: 'Without running it, work out `1 << 3`, `40 >> 2`, and `3 << 10`. Then check.',
+        answer: '`8` (1 × 2 × 2 × 2), `10` (40 ÷ 2 ÷ 2), `3072` (3 × 1024).',
+      },
+    ],
+    challenge: {
+      prompt: `Write \`IsLeapYear(year int) bool\` using only \`%\`, \`==\`, \`!=\`, \`&&\` and \`||\` (no \`if\`). A year is a leap year if it divides by 4, except years that divide by 100, unless they also divide by 400. Examples: \`2024 → true\`, \`1900 → false\`, \`2000 → true\`, \`2023 → false\`.`,
+      starter: `package main
+
+// IsLeapYear reports whether year is a leap year.
+func IsLeapYear(year int) bool {
+\treturn false
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestIsLeapYear(t *testing.T) {
+\tcases := []struct {
+\t\tin   int
+\t\twant bool
+\t}{
+\t\t{2024, true}, {2023, false}, {1900, false}, {2000, true}, {2100, false}, {1996, true},
+\t}
+\tfor _, c := range cases {
+\t\tif got := IsLeapYear(c.in); got != c.want {
+\t\t\tt.Errorf("IsLeapYear(%v) = %v, want %v", c.in, got, c.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+// IsLeapYear reports whether year is a leap year.
+func IsLeapYear(year int) bool {
+\treturn year%4 == 0 && (year%100 != 0 || year%400 == 0)
+}
+`,
+    },
     refs: [
       { label: 'Language Specification — Operators', href: 'https://go.dev/ref/spec#Operators' },
       { label: 'FAQ: why no ternary operator?', href: 'https://go.dev/doc/faq#Does_Go_have_a_ternary_form' },
@@ -725,6 +839,11 @@ func main() {
     title: 'Strings, bytes, and runes',
     navTitle: 'Strings and runes',
     oneLine: 'Why `len("héllo")` is 6, and the string operations you will use every day.',
+    objectives: [
+      'Explain why `len("héllo")` is 6 and not 5.',
+      'Write a function that works per character with `[]rune` or `range` instead of bytes.',
+      'Fix a string-building loop that uses `+=` by switching to `strings.Builder` or `strings.Join`.',
+    ],
     blocks: [
       {
         heading: 'What a string is',
@@ -892,6 +1011,42 @@ func main() {
     remember:
       'A string is bytes, not characters. The moment you index or slice one, ask yourself whether you meant a byte or a character.',
     task: 'Write a function that reverses a string correctly for "héllo" and for an emoji. Do it with `[]byte` first and watch it break. That failure is the lesson.',
+    challenge: {
+      prompt: `Write \`Reverse(s string) string\` that reverses a string by characters, not bytes, so accents and emoji survive. Examples: \`"abc" → "cba"\`, \`"héllo" → "olléh"\`, \`"" → ""\`.`,
+      starter: `package main
+
+// Reverse returns s with its characters in reverse order.
+func Reverse(s string) string {
+\treturn s
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestReverse(t *testing.T) {
+\tcases := []struct{ in, want string }{
+\t\t{"abc", "cba"}, {"héllo", "olléh"}, {"", ""}, {"go🙂", "🙂og"}, {"a", "a"},
+\t}
+\tfor _, c := range cases {
+\t\tif got := Reverse(c.in); got != c.want {
+\t\t\tt.Errorf("Reverse(%q) = %q, want %q", c.in, got, c.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+// Reverse returns s with its characters in reverse order.
+func Reverse(s string) string {
+\tr := []rune(s)
+\tfor i, j := 0, len(r)-1; i < j; i, j = i+1, j-1 {
+\t\tr[i], r[j] = r[j], r[i]
+\t}
+\treturn string(r)
+}
+`,
+    },
     refs: [
       { label: 'strings package', href: 'https://pkg.go.dev/strings' },
       { label: 'Go blog: Strings, bytes, runes and characters', href: 'https://go.dev/blog/strings' },
@@ -903,12 +1058,17 @@ func main() {
     title: 'Pointers',
     navTitle: 'Pointers',
     oneLine: 'What `&` and `*` do, when you need them, and why Go pointers cannot hurt you the way C ones can.',
+    objectives: [
+      'Predict whether a function call changes the caller\'s value when it takes a value versus a pointer.',
+      'Write a function that changes its argument through a pointer.',
+      'Explain how a nil `*int` tells "no value" apart from zero.',
+    ],
     blocks: [
       {
         heading: 'What a pointer is',
         body: [
           'Every value your program holds lives somewhere in memory, and every location has an address. A **pointer** is a value that holds one of those addresses instead of the data itself. It is a way of saying “the thing over there” rather than carrying a copy of the thing around.',
-          'You need them for two reasons. Go copies values when you pass them to a function, so without a pointer a function cannot change what the caller gave it. And copying a large struct on every call costs time you may not want to spend.',
+          'You need them for two reasons. Go copies values when you pass them to a function, so without a pointer a function cannot change what the caller gave it. And copying a large value on every call costs time you may not want to spend.',
           'Pointers have a bad reputation from C, where they can be moved around arithmetically and freed by hand. Go removes both of those, which takes away almost everything that made them dangerous.',
         ],
       },
@@ -920,6 +1080,7 @@ func main() {
 
 p := &x           // & takes the ADDRESS. p is of type *int.
 fmt.Println(p)    // 0xc000018030 — an address
+fmt.Printf("%p\\n", p) // %p is the verb for printing an address
 fmt.Println(*p)   // 42 — * DEREFERENCES: "the value at this address"
 
 *p = 100          // write through the pointer
@@ -937,6 +1098,7 @@ func main() {
 
 	p := &x           // & takes the ADDRESS. p is of type *int.
 	fmt.Println(p)    // 0xc000018030 — an address
+	fmt.Printf("%p\\n", p) // %p is the verb for printing an address
 	fmt.Println(*p)   // 42 — * DEREFERENCES: "the value at this address"
 
 	*p = 100          // write through the pointer
@@ -952,33 +1114,19 @@ func main() {
       {
         heading: 'Why you would want one',
         body: [
-          'Go passes everything by value, so a function receives a **copy**. A pointer is how you let a function change the caller’s data, and how you avoid copying something large.',
+          'Go passes everything by value, so a function receives a **copy**. A pointer is how you let a function change the caller’s variable.',
         ],
         code: {
           label: 'why.go',
-          src: `func rename(u User)  { u.Name = "new" }   // changes the copy. Caller sees nothing.
-func renameP(u *User) { u.Name = "new" }   // changes the caller's User.
+          src: `func double(n int)   { n *= 2 }    // changes the copy. Caller sees nothing.
+func doubleP(n *int) { *n *= 2 }   // changes the caller's variable.
 
-u := User{Name: "old"}
-rename(u)
-fmt.Println(u.Name)     // "old"
-renameP(&u)
-fmt.Println(u.Name)     // "new"`,
-        },
-      },
-      {
-        heading: 'Go dereferences struct fields for you',
-        code: {
-          label: 'auto.go',
-          src: `p := &User{Name: "sahdev"}
-
-fmt.Println(p.Name)      // Go rewrites this as (*p).Name
-p.Name = "changed"       // and this too
-p.Rename("again")        // methods work the same way
-
-// For non-struct types you still write * yourself
-n := &count
-*n++`,
+x := 5
+double(x)
+fmt.Println(x)     // 5
+doubleP(&x)
+fmt.Println(x)     // 10`,
+          note: 'Pointers to structs (`&User{...}`, and why you can write `p.Name` without a `*`) come in **Structs**, once you have met structs.',
         },
       },
       {
@@ -986,28 +1134,26 @@ n := &count
         table: {
           headers: ['Use a pointer', 'Use a value'],
           rows: [
-            ['the function must change the argument', 'the struct is small and you never mutate it'],
-            ['the struct is large and copying is measurable', 'you want `==` and map keys to compare contents, not addresses'],
-            ['the type contains a `sync.Mutex` (never copy a lock)', 'the type is naturally a value: `time.Time`, `Point`'],
-            ['"absent" and "zero" must be different (see below)', 'you want each goroutine to get its own copy'],
+            ['the function must change the argument', 'the function only reads it'],
+            ['"no value" and zero must be different (see below)', 'zero is a fine default'],
+            ['the value is large and copying is measurable', 'the value is a number, a bool or a short string'],
           ],
         },
       },
       {
-        heading: 'The pointer-as-optional trick',
+        heading: 'A pointer as "maybe a value"',
         body: [
-          'Because a pointer can be `nil`, a pointer field distinguishes "the client did not send this" from "the client sent an empty value". A PATCH endpoint needs that distinction: `{"title": ""}` should clear the title, while `{}` should leave it alone.',
+          'Because a pointer can be `nil`, it can say "there is no value here", which a plain `int` cannot: an `int` is always some number, even if it is 0. `*int` lets `nil` mean "not given" while `0` still means zero.',
         ],
         code: {
           label: 'optional.go',
-          src: `type UpdateRequest struct {
-\tTitle *string \`json:"title"\`   // nil = not provided at all
-\tBody  *string \`json:"body"\`
-}
-
-if req.Title != nil {
-\tn.Title = *req.Title           // they DID send it, even if it is ""
+          src: `func describe(age *int) string {
+	if age == nil {
+		return "age not given"
+	}
+	return fmt.Sprint("age ", *age)   // could be 0, and that is a real answer
 }`,
+          note: 'This trick matters most for struct fields read from JSON, where it tells "the client did not send this" from "the client sent 0 or an empty string". You will see it in **Structs** and **JSON**.',
         },
       },
       {
@@ -1015,7 +1161,6 @@ if req.Title != nil {
         code: {
           label: 'new-make.go',
           src: `p := new(int)              // *int pointing at a zero int. Rarely used.
-u := &User{Name: "x"}      // the idiomatic way to get a pointer to a struct
 
 // make is ONLY for slices, maps, and channels — it initialises them
 s := make([]int, 0, 10)
@@ -1023,7 +1168,7 @@ m := make(map[string]int)
 ch := make(chan int, 5)
 
 // new(map[string]int) gives you a POINTER TO A NIL MAP. Writing to it panics.`,
-          note: 'Rule of thumb: `&T{}` for structs, `make` for slices/maps/channels, and you will almost never type `new`.',
+          note: 'Rule of thumb: `make` for slices, maps and channels, and you will almost never type `new`. For structs you will write `&T{...}`, shown in **Structs**.',
         },
       },
       {
@@ -1038,7 +1183,7 @@ ch := make(chan int, 5)
       {
         callout: {
           tone: 'note',
-          text: 'Do not sprinkle pointers everywhere "for performance". A copy of a small struct is often faster than a pointer, because it can stay on the stack or in registers, while a pointer can force the value onto the heap where the garbage collector has to track it. Reach for a pointer when you need to mutate or when you have measured a copy cost, not by default.',
+          text: 'Do not sprinkle pointers everywhere "for performance". A copy of a small value is often faster than a pointer, because it can stay on the stack or in registers, while a pointer can force the value onto the heap where the garbage collector has to track it. Reach for a pointer when you need to mutate or when you have measured a copy cost, not by default.',
         },
       },
       {
@@ -1049,52 +1194,451 @@ ch := make(chan int, 5)
 
 import "fmt"
 
-type User struct{ Name string }
+func double(n int)   { n *= 2 }  // gets a copy
+func doubleP(n *int) { *n *= 2 } // gets the address
 
-func rename(u User)   { u.Name = "changed" } // gets a copy
-func renameP(u *User) { u.Name = "changed" } // gets the address
+func describe(age *int) string {
+	if age == nil {
+		return "age not given"
+	}
+	return fmt.Sprint("age ", *age)
+}
 
 func main() {
-	u := User{Name: "original"}
+	x := 5
+	double(x)
+	fmt.Println("after value call  :", x)
+	doubleP(&x)
+	fmt.Println("after pointer call:", x)
 
-	rename(u)
-	fmt.Println("after value call  :", u.Name)
-	renameP(&u)
-	fmt.Println("after pointer call:", u.Name)
-
-	x := 42
-	p := &x
-	*p = 100
-	fmt.Println("x through the pointer:", x)
-
-	var absent *string
-	empty := ""
-	for _, f := range []*string{absent, &empty} {
-		if f == nil {
-			fmt.Println("field was not sent")
-		} else {
-			fmt.Printf("field was sent as %q\\n", *f)
-		}
-	}
+	var missing *int
+	zero := 0
+	fmt.Println(describe(missing)) // age not given
+	fmt.Println(describe(&zero))   // age 0
 }
 `,
           canRun: true,
-          note: 'A copy versus a pointer, and the nil-able field trick.',
+          note: 'A copy versus a pointer, and nil as "no value".',
         },
       },
     ],
     keyPoints: [
-      '`&x` takes an address, `*p` reads through it. Go dereferences struct fields automatically.',
-      'Pointers let a function mutate the caller’s value, and avoid copying large structs.',
-      'A `nil`-able pointer field separates "absent" from "empty". PATCH handlers depend on it.',
-      '`&T{}` for structs, `make` for slices/maps/channels. No pointer arithmetic, no manual free.',
+      '`&x` takes an address, `*p` reads and writes through it.',
+      'Pointers let a function change the caller’s variable instead of a copy.',
+      'A `nil` pointer can mean "no value", which zero cannot.',
+      '`make` for slices/maps/channels. No pointer arithmetic, no manual free.',
     ],
     remember:
       'A pointer is a value holding an address. Go removes the dangerous parts (arithmetic and manual freeing) and keeps the useful part.',
-    task: 'Write `func double(n *int)` and call it. Then write a struct with a `*string` field, unmarshal `{}` and `{"name":""}` into it, and print whether the field is nil in each case.',
+    task: 'Write `func swap(a, b *int)` that swaps two variables, and `func maxOf(nums []int) *int` that returns `nil` for an empty slice. Call both and print the results.',
     refs: [
       { label: 'A Tour of Go — Pointers', href: 'https://go.dev/tour/moretypes/1' },
       { label: 'FAQ: pointer or value receiver?', href: 'https://go.dev/doc/faq#methods_on_values_or_pointers' },
+    ],
+  },
+
+  {
+    slug: 'type-switches',
+    title: 'Type assertions and type switches',
+    navTitle: 'Type switches',
+    oneLine: 'Getting the concrete value back out of an interface, safely.',
+    objectives: [
+      'Write a comma-ok type assertion that never panics.',
+      'Write a type switch that handles several concrete types and a default.',
+      'Fix a type switch where a broad interface case hides a more specific one.',
+    ],
+    blocks: [
+      {
+        heading: 'The problem',
+        body: [
+          'An interface value hides what is inside it. A variable of type `any` might hold an `int`, a `string`, or your own struct. Most of the time that is the point: you call the methods and do not care.',
+          'Sometimes you do care. A **type assertion** asks "is the value inside this interface of type T?", and if so gives it back to you as a T.',
+        ],
+      },
+      {
+        heading: 'Type assertions, and the comma-ok form',
+        code: {
+          label: 'assert.go',
+          src: `package main
+
+import "fmt"
+
+func main() {
+	var v any = "hello"
+
+	s := v.(string) // "I am sure it is a string"
+	fmt.Println(s, len(s))
+
+	n, ok := v.(int) // "is it an int?" — no panic, just ok=false
+	fmt.Println(n, ok) // 0 false
+
+	if s, ok := v.(string); ok {
+		fmt.Println("it was a string:", s)
+	}
+
+	// v.(int) without the ok would panic:
+	// interface conversion: interface {} is string, not int
+}
+`,
+          canRun: true,
+          note: 'Use the one-value form only when a wrong type is a bug that should crash. Everywhere else, use comma-ok.',
+        },
+      },
+      {
+        heading: 'Type switches',
+        body: [
+          'When there are several types to check, a **type switch** does all the assertions in one go. Inside each case, the variable already has that case’s type.',
+        ],
+        code: {
+          label: 'switch.go',
+          src: `package main
+
+import "fmt"
+
+type Point struct{ X, Y int }
+
+func describe(v any) string {
+	switch x := v.(type) {
+	case nil:
+		return "nothing"
+	case int:
+		return fmt.Sprintf("an int, doubled is %d", x*2) // x is an int here
+	case string:
+		return fmt.Sprintf("a string of %d bytes", len(x)) // x is a string here
+	case Point:
+		return fmt.Sprintf("a point at %d,%d", x.X, x.Y)
+	case error:
+		return "an error: " + x.Error() // cases can be interfaces too
+	default:
+		return fmt.Sprintf("something else: %T", x)
+	}
+}
+
+func main() {
+	fmt.Println(describe(nil))
+	fmt.Println(describe(21))
+	fmt.Println(describe("héllo"))
+	fmt.Println(describe(Point{1, 2}))
+	fmt.Println(describe(fmt.Errorf("boom")))
+	fmt.Println(describe(3.5))
+}
+`,
+          canRun: true,
+          note: '`.(type)` only works inside a `switch`. Cases are checked top to bottom, so put specific types before broad interfaces.',
+        },
+      },
+      {
+        body: [
+          'Errors are often wrapped inside other errors, which a plain type assertion cannot see through. The tool for that is covered in **Error values in depth**.',
+        ],
+      },
+      {
+        callout: {
+          tone: 'warn',
+          text: 'A long type switch over your own types is often a sign that a method is missing. If every case calls a different "area" formula, give the types an `Area()` method and an interface instead. Switch on types at the edges, where values arrive as `any` (JSON, config, errors).',
+        },
+      },
+    ],
+    keyPoints: [
+      '`v.(T)` gets a T out of an interface, and panics if it is not one.',
+      '`t, ok := v.(T)` never panics. `ok` tells you whether it worked.',
+      '`switch x := v.(type)` checks many types at once; in each case `x` has that type.',
+      'Cases run top to bottom, so put specific types before broad interfaces.',
+    ],
+    remember:
+      'Comma-ok unless a wrong type is a bug.',
+    task: 'Write `func sum(values []any) (float64, error)` that adds up ints, float64s and numeric strings (use `strconv.ParseFloat`), and returns an error naming the first value of any other type.',
+    exercises: [
+      {
+        task: 'Assert `any(42).(string)` without comma-ok and read the panic.',
+        answer:
+          '`panic: interface conversion: interface {} is int, not string`. The message names both types, which makes it easy to debug, but it is still a crash.',
+      },
+      {
+        task: 'In a type switch, put `case error:` above `case *MyError:` and see what happens.',
+        answer:
+          '`*MyError` implements `error`, so the first case always wins and the second never runs. Order specific types before broad interfaces.',
+      },
+      {
+        task: 'Write a case that lists two types, `case int, int64:`, and print `%T` of the variable inside it.',
+        answer:
+          'With more than one type in a case, the variable keeps the type of the switch expression (here, `any`), because Go cannot know which one it is. `%T` still shows the real type underneath.',
+      },
+    ],
+    challenge: {
+      prompt: `Write \`Describe(v any) string\` with a type switch. An \`int\` gives \`"int N"\`, a \`string\` gives \`"string of N bytes"\`, a \`bool\` gives \`"bool"\`, and anything else gives \`"unknown"\`. Examples: \`21 → "int 21"\`, \`"héllo" → "string of 6 bytes"\`, \`true → "bool"\`, \`3.5 → "unknown"\`.`,
+      starter: `package main
+
+// Describe names the type of v.
+func Describe(v any) string {
+\treturn ""
+}
+`,
+      test: `package main
+
+import "testing"
+
+func TestDescribe(t *testing.T) {
+\tcases := []struct {
+\t\tin   any
+\t\twant string
+\t}{
+\t\t{21, "int 21"}, {"héllo", "string of 6 bytes"}, {true, "bool"}, {3.5, "unknown"}, {nil, "unknown"},
+\t}
+\tfor _, c := range cases {
+\t\tif got := Describe(c.in); got != c.want {
+\t\t\tt.Errorf("Describe(%v) = %v, want %v", c.in, got, c.want)
+\t\t}
+\t}
+}
+`,
+      solution: `package main
+
+import "fmt"
+
+// Describe names the type of v.
+func Describe(v any) string {
+\tswitch x := v.(type) {
+\tcase int:
+\t\treturn fmt.Sprintf("int %d", x)
+\tcase string:
+\t\treturn fmt.Sprintf("string of %d bytes", len(x))
+\tcase bool:
+\t\treturn "bool"
+\tdefault:
+\t\treturn "unknown"
+\t}
+}
+`,
+    },
+    refs: [
+      { label: 'A Tour of Go — Type assertions', href: 'https://go.dev/tour/methods/15' },
+      { label: 'A Tour of Go — Type switches', href: 'https://go.dev/tour/methods/16' },
+    ],
+  },
+
+  {
+    slug: 'iterators',
+    title: 'Iterators and range over functions',
+    navTitle: 'Iterators',
+    oneLine: 'What `range` can loop over since Go 1.22 and 1.23, and why `maps.Keys` returns a function.',
+    objectives: [
+      'Write a loop with `range` over an integer.',
+      'Write an `iter.Seq[int]` function that stops when `yield` returns false.',
+      'Predict what printing `maps.Keys(m)` shows, and fix it with `slices.Sorted`.',
+    ],
+    blocks: [
+      {
+        heading: 'range over an int',
+        body: [
+          'Since Go 1.22, `range` works on a plain integer. `for i := range 5` counts 0 to 4. It is the three-part loop with less to get wrong.',
+        ],
+        code: {
+          label: 'range-int.go',
+          src: `package main
+
+import "fmt"
+
+func main() {
+	for i := range 3 {
+		fmt.Println("attempt", i+1)
+	}
+}
+`,
+          canRun: true,
+        },
+      },
+      {
+        heading: 'What an iterator is',
+        body: [
+          'An **iterator** is a function that produces values one at a time by calling a function you give it, called `yield`. When `yield` returns false, the loop has stopped (a `break`, say), and the iterator must stop too.',
+          'Since Go 1.23 you can `range` over such a function directly. The `iter` package names the two shapes: `iter.Seq[V]` gives one value per step, `iter.Seq2[K, V]` gives two, like a map’s key and value.',
+        ],
+        code: {
+          label: 'countdown.go',
+          src: `package main
+
+import (
+	"fmt"
+	"iter"
+)
+
+// Countdown yields n, n-1, ... 1.
+func Countdown(n int) iter.Seq[int] {
+	return func(yield func(int) bool) {
+		for i := n; i > 0; i-- {
+			if !yield(i) { // the loop said stop
+				return
+			}
+		}
+	}
+}
+
+func main() {
+	for v := range Countdown(5) {
+		if v == 2 {
+			break // yield returns false, and Countdown returns
+		}
+		fmt.Println(v)
+	}
+}
+`,
+          canRun: true,
+          note: 'Forget the `if !yield(...)` check and the program panics when the loop breaks early. Always check it.',
+        },
+      },
+      {
+        heading: 'Two values per step: iter.Seq2',
+        code: {
+          label: 'seq2.go',
+          src: `package main
+
+import (
+	"fmt"
+	"iter"
+)
+
+// Lines yields each line number with its text.
+func Lines(lines []string) iter.Seq2[int, string] {
+	return func(yield func(int, string) bool) {
+		for i, l := range lines {
+			if !yield(i+1, l) {
+				return
+			}
+		}
+	}
+}
+
+func main() {
+	for n, text := range Lines([]string{"package main", "", "func main() {}"}) {
+		fmt.Printf("%d: %q\\n", n, text)
+	}
+}
+`,
+          canRun: true,
+        },
+      },
+      {
+        heading: 'The standard library speaks iterators',
+        body: [
+          '`maps.Keys(m)` and `maps.Values(m)` return an `iter.Seq`, not a slice, so nothing is copied until you ask. `slices.Collect` turns any `iter.Seq` into a slice, and `slices.Sorted` collects and sorts in one step. `slices.All` and `slices.Values` go the other way, turning a slice into an iterator.',
+        ],
+        code: {
+          label: 'stdlib-iter.go',
+          src: `package main
+
+import (
+	"fmt"
+	"maps"
+	"slices"
+)
+
+func main() {
+	stock := map[string]int{"pears": 3, "apples": 5, "figs": 1}
+
+	keys := slices.Sorted(maps.Keys(stock)) // sorted []string, every run
+	fmt.Println(keys)
+
+	counts := slices.Collect(maps.Values(stock)) // a []int, in random order
+	fmt.Println(len(counts), "values")
+
+	for _, k := range keys {
+		fmt.Println(k, stock[k])
+	}
+}
+`,
+          canRun: true,
+          note: '`slices.Sorted(maps.Keys(m))` is the one-line answer to "print a map in order".',
+        },
+      },
+      {
+        callout: {
+          tone: 'note',
+          text: 'Do not turn every loop into an iterator. Return a slice when the caller wants all the values anyway. Iterators earn their place when the sequence is large, endless, or expensive to build, or when the caller may stop early.',
+        },
+      },
+    ],
+    keyPoints: [
+      '`for i := range n` counts from 0 to n-1 (Go 1.22).',
+      'An iterator is a function that calls `yield` for each value, and stops when `yield` returns false (Go 1.23).',
+      '`iter.Seq[V]` yields one value per step, `iter.Seq2[K, V]` yields two.',
+      '`maps.Keys` returns an iterator. `slices.Collect` and `slices.Sorted` turn one into a slice.',
+    ],
+    remember:
+      'An iterator is just a function you can range over. Always check what yield returns.',
+    task: 'Write `func Fib() iter.Seq[int]` that yields Fibonacci numbers forever. Range over it and break after the first value above 1000. Then write `Evens(seq iter.Seq[int]) iter.Seq[int]` that filters another iterator.',
+    exercises: [
+      {
+        task: 'Remove the `if !yield(i)` check from `Countdown`, call `yield(i)` on its own, and break out of the loop early.',
+        answer:
+          'It panics: `range function continued iteration after function for loop body returned false`. Go checks that an iterator stops when it is told to.',
+      },
+      {
+        task: 'Print `maps.Keys(m)` directly with `fmt.Println`.',
+        answer:
+          'You get a function address like `0x47b0e0`, not the keys. It is a function, so collect it first with `slices.Collect` or `slices.Sorted`.',
+      },
+      {
+        task: 'Loop over `slices.All([]string{"a", "b"})` and print what you get each step.',
+        answer:
+          'The index and the value, exactly like ranging over the slice itself. `slices.All` is an `iter.Seq2[int, E]`, so you can pass a slice to anything that accepts one.',
+      },
+    ],
+    challenge: {
+      prompt: `Write \`Evens(seq iter.Seq[int]) iter.Seq[int]\` that yields only the even numbers from \`seq\`, and stops when \`yield\` returns false. Examples: \`1 2 3 4 → 2 4\`, \`1 3 5 → (nothing)\`, \`0 -2 7 → 0 -2\`.`,
+      starter: `package main
+
+import "iter"
+
+// Evens yields the even numbers from seq.
+func Evens(seq iter.Seq[int]) iter.Seq[int] {
+\treturn func(yield func(int) bool) {}
+}
+`,
+      test: `package main
+
+import (
+\t"slices"
+\t"testing"
+)
+
+func TestEvens(t *testing.T) {
+\tcases := []struct{ in, want []int }{
+\t\t{[]int{1, 2, 3, 4}, []int{2, 4}}, {[]int{1, 3, 5}, nil}, {[]int{0, -2, 7}, []int{0, -2}},
+\t}
+\tfor _, c := range cases {
+\t\tif got := slices.Collect(Evens(slices.Values(c.in))); !slices.Equal(got, c.want) {
+\t\t\tt.Errorf("Evens(%v) = %v, want %v", c.in, got, c.want)
+\t\t}
+\t}
+\tfor v := range Evens(slices.Values([]int{2, 4, 6})) {
+\t\tif v != 2 {
+\t\t\tt.Errorf("Evens([2 4 6]) after break = %v, want %v", v, 2)
+\t\t}
+\t\tbreak
+\t}
+}
+`,
+      solution: `package main
+
+import "iter"
+
+// Evens yields the even numbers from seq.
+func Evens(seq iter.Seq[int]) iter.Seq[int] {
+\treturn func(yield func(int) bool) {
+\t\tfor v := range seq {
+\t\t\tif v%2 == 0 && !yield(v) {
+\t\t\t\treturn
+\t\t\t}
+\t\t}
+\t}
+}
+`,
+    },
+    refs: [
+      { label: 'Go blog: Range over function types', href: 'https://go.dev/blog/range-functions' },
+      { label: 'iter package', href: 'https://pkg.go.dev/iter' },
+      { label: 'Language Specification — For range', href: 'https://go.dev/ref/spec#For_range' },
     ],
   },
 ]

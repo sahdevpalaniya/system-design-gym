@@ -6,7 +6,7 @@ import { CONTACT_EMAIL } from '@/lib/legal'
 import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
-  'About this site',
+  'About Dev Skills: who builds it and why',
   'Why this exists, who writes it, and how it differs from the usual system design catalogue.',
   '/about',
   true,

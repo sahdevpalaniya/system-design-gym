@@ -10,7 +10,29 @@ export const PROJECT_SHOP: LangLesson[] = [
     title: 'Project 3 — Small shop: what we are building',
     navTitle: 'Overview and plan',
     oneLine: 'Products, images, a cart and a checkout. This is where roles, files and transactions arrive.',
+    objectives: [
+      'Explain ports and adapters and why its dependencies point inwards.',
+      'Compare the layered, by-feature and hexagonal architectures.',
+      'Explain why authentication and authorisation are separate checks.',
+    ],
     blocks: [
+      {
+        heading: 'What you will build, and what it looks like when done',
+        body: [
+          'A small shop API. Admins add products and upload photos. Customers browse, fill a cart and check out. Checkout takes the stock and creates the order together, or does neither. Here is the finished thing in a terminal.',
+        ],
+        code: {
+          label: 'terminal — the finished project',
+          src: `$ curl -s localhost:8080/v1/products
+[{"id":1,"name":"Mug","price_cents":900,"stock":12}]
+
+$ curl -s -X POST localhost:8080/v1/cart/items -H "Authorization: Bearer $TOKEN" \\
+    -d '{"product_id":1,"quantity":2}'
+
+$ curl -s -X POST localhost:8080/v1/checkout -H "Authorization: Bearer $TOKEN"
+{"id":7,"total_cents":1800,"status":"placed"}`,
+        },
+      },
       {
         heading: 'Why a shop is the right third project',
         body: [
@@ -27,26 +49,11 @@ export const PROJECT_SHOP: LangLesson[] = [
       },
       {
         heading: 'The three words you need',
-        table: {
-          headers: ['Word', 'What it means', 'In this project'],
-          rows: [
-            [
-              '**Domain**',
-              'The types and rules that would still be true with no database and no API. Pure Go.',
-              '`internal/core/domain` — Product, Order, Cart',
-            ],
-            [
-              '**Port**',
-              'An interface the core declares, describing something it needs. A hole in the side of the hexagon.',
-              '`internal/core/port` — `ProductRepository`, `Storage`',
-            ],
-            [
-              '**Adapter**',
-              'A concrete implementation that plugs into a port, or drives the core from outside.',
-              '`internal/adapter/storage/postgres`, `internal/adapter/handler/http`',
-            ],
-          ],
-        },
+        bullets: [
+          '**Domain** — the types and rules that would still be true with no database and no API. Pure Go. Here: `internal/core/domain` (Product, Order, Cart).',
+          '**Port** — an interface the core declares, describing something it needs. A hole in the side of the hexagon. Here: `internal/core/port` (`ProductRepository`, `Storage`).',
+          '**Adapter** — a concrete implementation that plugs into a port, or drives the core from outside. Here: `internal/adapter/storage/postgres`, `internal/adapter/handler/http`.',
+        ],
       },
       {
         heading: 'The rule that makes it work: dependencies point inwards',
@@ -86,17 +93,11 @@ export const PROJECT_SHOP: LangLesson[] = [
       },
       {
         heading: 'The three architectures side by side',
-        table: {
-          headers: ['', 'Layered (P1)', 'By feature (P2)', 'Ports & adapters (P3)'],
-          rows: [
-            ['Folders named after', 'the kind of code', 'the business concept', 'inside vs outside'],
-            ['Best when', 'one concept', 'several concepts, growing', 'the outside world will change'],
-            ['Interfaces declared by', 'rarely used', 'the service that needs one', 'always, by the core'],
-            ['Cost', 'lowest', 'low', 'highest — more indirection'],
-            ['Fails when', 'you add features', 'features start needing each other', 'the app is small (overkill)'],
-            ['Common name', 'n-tier, standard layout', 'package-by-feature, DDD-lite', 'hexagonal, clean, onion'],
-          ],
-        },
+        bullets: [
+          '**Layered (Project 1)** — also called n-tier or the standard layout. Folders are named after the kind of code. Best for one concept, with the lowest cost and interfaces rarely used. It fails once you add features.',
+          '**By feature (Project 2)** — also called package-by-feature or DDD-lite. Folders are named after the business concept. Best for several growing concepts; the service that needs an interface declares it. Low cost, but it fails when features start needing each other.',
+          '**Ports and adapters (Project 3)** — also called hexagonal, clean or onion. Folders split inside from outside. Best when the outside world will change; the core always declares the interfaces. Highest cost (more indirection), and overkill for a small app.',
+        ],
       },
       {
         callout: {
@@ -184,6 +185,11 @@ export const PROJECT_SHOP: LangLesson[] = [
     title: 'Step 1 — Setup and the schema',
     navTitle: 'Step 1 — Setup and schema',
     oneLine: 'Every command to get from an empty folder to a running server with tables.',
+    objectives: [
+      'Set up the shop module, .env file and database from an empty folder.',
+      'Write a schema with stock checks, foreign keys and price in integer cents.',
+      'Run the migration and confirm the server starts.',
+    ],
     blocks: [
       {
         heading: 'Every command for this step',
@@ -202,7 +208,7 @@ go get github.com/joho/godotenv
 # 3. folders
 mkdir -p cmd/api
 mkdir -p internal/core/{domain,port,service}
-mkdir -p internal/adapter/handler/http/middleware
+mkdir -p internal/adapter/handler/http/{middleware,httpx}
 mkdir -p internal/adapter/storage/{postgres,file}
 mkdir -p internal/adapter/auth
 mkdir -p internal/config
@@ -212,7 +218,7 @@ echo ".env"     >> .gitignore
 
 # 4. empty files, so the layout is visible before you fill them
 touch cmd/api/main.go
-touch internal/config/config.go internal/adapter/storage/postgres/db.go internal/adapter/handler/http/respond.go
+touch internal/config/config.go internal/adapter/storage/postgres/db.go internal/adapter/handler/http/httpx/json.go
 touch migrations/001_init.up.sql
 touch .env .env.example
 
@@ -326,7 +332,8 @@ CREATE INDEX ON orders (user_id, created_at DESC);`,
             { depth: 4, name: 'http', kind: 'dir' },
             { depth: 5, name: 'product.go', kind: 'file' },
             { depth: 5, name: 'image.go', kind: 'file' },
-            { depth: 5, name: 'respond.go', kind: 'file' },
+            { depth: 5, name: 'httpx', kind: 'dir', note: 'the JSON helpers from project two, still package httpx' },
+            { depth: 6, name: 'json.go', kind: 'file' },
             { depth: 5, name: 'middleware', kind: 'dir' },
             { depth: 6, name: 'role.go', kind: 'file' },
             { depth: 3, name: 'storage', kind: 'dir', note: 'driven adapters: things the core calls' },
@@ -397,7 +404,7 @@ docker exec -it shop-pg psql -U postgres -d shop -c '\\d products'
           src: `# The same code, but it moves to where this architecture expects it.
 cp    ../expenses/internal/config/config.go        internal/config/
 cp    ../expenses/internal/database/db.go          internal/adapter/storage/postgres/
-cp    ../expenses/internal/httpx/json.go           internal/adapter/handler/http/respond.go
+cp    ../expenses/internal/httpx/json.go           internal/adapter/handler/http/httpx/
 cp    ../expenses/internal/middleware/auth.go      internal/adapter/handler/http/middleware/
 cp    ../expenses/internal/user/user.go            internal/core/domain/user.go
 cp    ../expenses/internal/user/service.go         internal/core/service/user.go
@@ -470,6 +477,11 @@ docker exec -it shop-pg psql -U postgres -d shop \\
     title: 'Step 2 — Products and the admin role',
     navTitle: 'Step 2 — Roles',
     oneLine: 'A second middleware, because knowing who somebody is does not tell you what they may do.',
+    objectives: [
+      'Carry a role in the token and write middleware that requires admin.',
+      'Wire public, logged-in and admin-only routes separately.',
+      'Validate prices as positive integer cents and test all three access levels.',
+    ],
     blocks: [
       {
         heading: 'What a role is',
@@ -676,6 +688,11 @@ curl -si localhost:8080/v1/products | head -1`,
     title: 'Step 3 — Uploading a product image',
     navTitle: 'Step 3 — Image upload',
     oneLine: 'The endpoint with the most ways to go wrong, and the four defences that fix them.',
+    objectives: [
+      'Build an upload endpoint that caps the body size with `http.MaxBytesReader`.',
+      'Check a file\'s real type with `http.DetectContentType`, not its extension.',
+      'Stream the file to a server-chosen name with `io.Copy` and clean up on failure.',
+    ],
     blocks: [
       {
         heading: 'What multipart means',
@@ -699,9 +716,8 @@ curl -si localhost:8080/v1/products | head -1`,
           'The size cap has to come first, before anything reads the body. `MaxBytesReader` enforces the limit. The number passed to `ParseMultipartForm` is how much it keeps in memory; anything larger spills to temporary files on disk.',
         ],
         code: {
-          label: 'internal/adapter/handler/http/image.go — start the file',
-          src: `func (h *Handler) Upload(w http.ResponseWriter, r *http.Request) {
-\tconst maxBytes = 5 << 20                       // 5 MB
+          label: 'image.go, part 1 of 4 — the top of Upload (the body of func (h *Handler) Upload(w http.ResponseWriter, r *http.Request))',
+          src: `\tconst maxBytes = 5 << 20                       // 5 MB
 
 \t// DEFENCE 1 — cap the body before anything reads it.
 \tr.Body = http.MaxBytesReader(w, r.Body, maxBytes)
@@ -724,7 +740,7 @@ curl -si localhost:8080/v1/products | head -1`,
           'Read the first 512 bytes, ask Go what they look like, and reject anything not on your list. Then rewind, because you have just consumed part of the file.',
         ],
         code: {
-          label: 'internal/adapter/handler/http/image.go — continue',
+          label: 'image.go, part 2 of 4 — inside Upload',
           src: `\t// DEFENCE 2 — sniff the real type from the first 512 bytes.
 \thead := make([]byte, 512)
 \tn, _ := file.Read(head)
@@ -746,7 +762,7 @@ curl -si localhost:8080/v1/products | head -1`,
           'The client never gets to influence the path. Generate a random name, join it to your upload directory, and stream the bytes across.',
         ],
         code: {
-          label: 'internal/adapter/handler/http/image.go — continue',
+          label: 'image.go, part 3 of 4 — inside Upload',
           src: `\t// DEFENCE 3 — we choose the filename. The client never touches the path.
 \tvar b [16]byte
 \tif _, err := rand.Read(b[:]); err != nil {              // crypto/rand
@@ -777,7 +793,7 @@ curl -si localhost:8080/v1/products | head -1`,
           'The file is on disk. If the database row fails now, that file is orphaned: nothing points at it and nothing will delete it. So remove it on the failure path.',
         ],
         code: {
-          label: 'internal/adapter/handler/http/image.go — finish the file',
+          label: 'image.go, part 4 of 4 — the end of Upload',
           src: `\timg := &Image{StoredName: stored, MIME: mime, SizeBytes: size}
 
 \t// DEFENCE 4 — no orphans. If the row fails, the file goes too.
@@ -788,7 +804,35 @@ curl -si localhost:8080/v1/products | head -1`,
 \t}
 
 \t_ = hdr.Filename          // keep only for display, never for a path
-\thttpx.JSON(w, 201, img)
+\thttpx.JSON(w, 201, img)`,
+        },
+      },
+      {
+        heading: 'The whole file, assembled',
+        body: [
+          'Here is how the four parts fit together, with the imports and the two small helpers the parts use. Parts 2 to 4 go where the comment says.',
+        ],
+        code: {
+          label: 'internal/adapter/handler/http/image.go',
+          src: `package http
+
+import (
+\t"crypto/rand"
+\t"encoding/hex"
+\t"io"
+\t"net/http"
+\t"os"
+\t"path/filepath"
+
+\t"github.com/you/shop/internal/adapter/handler/http/httpx"
+)
+
+// httpx.Error, httpx.JSON and httpx.FromError are the JSON helpers you
+// copied across in step 1. They stay in their own package, httpx, so the
+// calls read the same as in project two.
+
+func (h *Handler) Upload(w http.ResponseWriter, r *http.Request) {
+\t// part 1, part 2, part 3, part 4 — in that order
 }
 
 var allowed = map[string]bool{
@@ -796,6 +840,21 @@ var allowed = map[string]bool{
 \t"image/png":  true,
 \t"image/gif":  true,
 \t"image/webp": true,
+}
+
+// extFor picks the extension from the sniffed type, never from the client.
+func extFor(mime string) string {
+\tswitch mime {
+\tcase "image/jpeg":
+\t\treturn ".jpg"
+\tcase "image/png":
+\t\treturn ".png"
+\tcase "image/gif":
+\t\treturn ".gif"
+\tcase "image/webp":
+\t\treturn ".webp"
+\t}
+\treturn ""
 }`,
         },
       },
@@ -884,6 +943,11 @@ curl -si -X POST localhost:8080/v1/products/1/image \\
     title: 'Step 4 — Serving images, and what io gives you',
     navTitle: 'Step 4 — Serving files',
     oneLine: 'Send the file back safely, and see why one-method interfaces make everything fit together.',
+    objectives: [
+      'Build a download handler that serves files safely with nosniff.',
+      'Explain what io.Reader and io.Writer are and why one-method interfaces compose.',
+      'Explain when local disk storage stops being enough.',
+    ],
     blocks: [
       {
         heading: 'The download handler',
@@ -1039,6 +1103,11 @@ open http://localhost:8080/v1/images/$ID`,
     title: 'Step 5 — The cart',
     navTitle: 'Step 5 — The cart',
     oneLine: 'Per-user rows again, plus one SQL trick that removes a whole branch of Go.',
+    objectives: [
+      'Write an upsert with `ON CONFLICT` to add or increase a cart item.',
+      'Read the cart with a join instead of one query per item.',
+      'Validate product and quantity before inserting.',
+    ],
     blocks: [
       {
         heading: 'What a cart is, in database terms',
@@ -1210,6 +1279,11 @@ curl -s -H "Authorization: Bearer $CUST2" localhost:8080/v1/cart | jq`,
     title: 'Step 6 — Checkout, and what a transaction is for',
     navTitle: 'Step 6 — Checkout',
     oneLine: 'Five things must all happen, or none of them. This is what transactions exist for.',
+    objectives: [
+      'Write a checkout transaction with a deferred rollback.',
+      'Lock product rows with `SELECT ... FOR UPDATE` to prevent overselling.',
+      'Explain why all five checkout steps must succeed or fail together.',
+    ],
     blocks: [
       {
         heading: 'What a transaction is',
@@ -1447,6 +1521,11 @@ docker exec -it shop-pg psql -U postgres -d shop \\
     title: 'Step 7 — Orders, and getting it ready to deploy',
     navTitle: 'Step 7 — Ship it',
     oneLine: 'The last endpoints, then logging, limits, a container and the hardening pass.',
+    objectives: [
+      'Build order endpoints that are scoped to the user, paged and joined.',
+      'Add structured logging and rate limits to the shop.',
+      'Containerise the service and run the hardening checks before shipping.',
+    ],
     blocks: [
       {
         heading: 'Orders: scoped, paged, and joined',
@@ -1464,9 +1543,9 @@ docker exec -it shop-pg psql -U postgres -d shop \\
 \t\t WHERE o.user_id = $1                       -- scoped, always
 \t\t GROUP BY o.id
 \t\t ORDER BY o.created_at DESC
-\t\t LIMIT $2 OFFSET $3\`,                      -- paged, always
-\t\tuserID, limit, offset)
-\t...
+\t\t LIMIT $2 OFFSET $3                        -- paged, always
+\t\`, userID, limit, offset)
+\t// ... scan rows exactly as in step 5
 }`,
           note: 'The LEFT JOIN with count is what stops this being N+1. Without it you would loop and query per order.',
         },

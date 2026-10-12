@@ -11,6 +11,7 @@ import { PROJECT_SHOP } from './project-shop'
 import { DATABASE } from './database'
 import { PRODUCTION } from './production'
 import { INTERVIEW } from './interview'
+import { DSA } from './dsa'
 import { EXERCISES } from './exercises'
 import { QUIZZES } from './quiz'
 
@@ -21,9 +22,10 @@ import { QUIZZES } from './quiz'
 export const GO: Language = {
   id: 'go',
   name: 'Go',
+  alias: 'Golang',
   tagline: 'Start from nothing. Finish with a real API you could put online.',
   blurb:
-    'Go is small enough to learn well, and big enough to build real things with. You start with variables. You finish with a working JSON API that has user accounts, a database, file uploads and tests. It uses only four outside packages. Everything else comes with Go.',
+    'Go is small enough to learn well, and big enough to build real things with. You start with variables. You finish with a working JSON API that has user accounts, a database, file uploads and tests. It uses only four outside packages. Everything else comes with Go. **Placement path:** if you are preparing for campus placements or online assessments, do Getting started → Core language → Go for coding rounds → Interview preparation first, and come back for the rest.',
   home: 'https://go.dev/',
   sections: [
     {
@@ -55,6 +57,7 @@ export const GO: Language = {
         'structs',
         'methods-and-embedding',
         'interfaces',
+        'type-switches',
         'error-values',
         'packages',
         'json',
@@ -62,22 +65,57 @@ export const GO: Language = {
       ],
     },
     {
+      id: 'dsa',
+      name: 'Go for coding rounds',
+      blurb: 'How to read judge input fast, then fifteen problems placement tests and online assessments ask most (maps, slices, linked lists, trees, recursion, DP, graphs, sliding windows), each solved idiomatically in Go with the trap that costs marks.',
+      lessons: [
+        'dsa-fast-io',
+        'dsa-two-sum',
+        'dsa-reverse-rotate',
+        'dsa-frequency-top-k',
+        'dsa-valid-parentheses',
+        'dsa-binary-search',
+        'dsa-lru-cache',
+        'dsa-reverse-linked-list',
+        'dsa-detect-cycle',
+        'dsa-merge-sorted-lists',
+        'dsa-binary-tree',
+        'dsa-subsets-permutations',
+        'dsa-dynamic-programming',
+        'dsa-number-of-islands',
+        'dsa-merge-intervals',
+        'dsa-sliding-window',
+      ],
+    },
+    {
       id: 'concurrency',
       name: 'Concurrency',
       blurb: 'The part people come to Go for. Run things at the same time, safely, and stop them when you need to.',
-      lessons: ['goroutines', 'channels-and-select', 'mutex-and-races', 'context'],
+      lessons: ['goroutines', 'channels-and-select', 'mutex-and-races', 'context', 'concurrency-patterns'],
     },
     {
       id: 'generics',
       name: 'Generics and stdlib',
       blurb: 'Write one function that works for many types, and learn which built-in packages you will use most.',
-      lessons: ['generics', 'standard-library'],
+      lessons: ['generics', 'iterators', 'standard-library'],
     },
     {
       id: 'web',
       name: 'Web services',
       blurb: 'Build an HTTP API with no framework, add middleware, shut it down cleanly, and lay the folders out well.',
       lessons: ['http-server', 'middleware-and-shutdown'],
+    },
+    {
+      id: 'tooling',
+      name: 'Modules and packages',
+      blurb: 'How Go finds your code, the third-party packages you will meet most, and the four commands to run before every push.',
+      lessons: ['modules-and-tooling', 'popular-packages', 'packages-in-code'],
+    },
+    {
+      id: 'database',
+      name: 'Databases',
+      blurb: 'Postgres through database/sql. No ORM, so you write and see every query that runs.',
+      lessons: ['postgres-and-sql', 'joins-transactions-n-plus-one'],
     },
     {
       id: 'practice',
@@ -87,16 +125,10 @@ export const GO: Language = {
       lessons: ['project-layouts', 'practice-crud-easy', 'practice-crud-moderate', 'folder-structure-crud'],
     },
     {
-      id: 'database',
-      name: 'Databases',
-      blurb: 'Postgres through database/sql. No ORM, so you write and see every query that runs.',
-      lessons: ['postgres-and-sql', 'joins-transactions-n-plus-one'],
-    },
-    {
       id: 'project-shortener',
       name: 'Project 1 — URL shortener',
       blurb:
-        'Built with a **layered** structure: a folder per kind of code. Validation, storage, a redirect, then Postgres and a container.',
+        'Optional — after you finish the basics. Built with a **layered** structure: a folder per kind of code. Validation, storage, a redirect, then Postgres and a container.',
       lessons: [
         'shortener-overview',
         'shortener-step-1-setup',
@@ -141,15 +173,9 @@ export const GO: Language = {
       ],
     },
     {
-      id: 'tooling',
-      name: 'Modules and packages',
-      blurb: 'How Go finds your code, the third-party packages you will meet most, and the four commands to run before every push.',
-      lessons: ['modules-and-tooling', 'popular-packages', 'packages-in-code'],
-    },
-    {
       id: 'production',
       name: 'Production',
-      blurb: 'The difference between something that works and something you can put online and keep running.',
+      blurb: 'Optional — after you finish the basics. The difference between something that works and something you can put online and keep running.',
       lessons: [
         'errors-and-logging',
         'rate-limiting-cors-headers',
@@ -185,6 +211,7 @@ export const GO: Language = {
     ...PROJECT_SHOP,
     ...DATABASE,
     ...PRODUCTION,
+    ...DSA,
     ...INTERVIEW,
   ]),
 }

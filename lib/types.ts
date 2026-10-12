@@ -533,6 +533,8 @@ export interface LangLesson {
    */
   navTitle?: string
   oneLine: string
+  /** 2–3 measurable outcomes, each starting with a verb: "Write a function that…" */
+  objectives?: string[]
   blocks: LangBlock[]
   keyPoints: string[]
   /** the one thing to remember */
@@ -543,6 +545,23 @@ export interface LangLesson {
   exercises?: (string | LangExercise)[]
   /** official documentation for this topic */
   refs?: { label: string; href: string }[]
+  /** an auto-graded coding exercise, checked by hidden tests on the Playground */
+  challenge?: LangChallenge
+}
+
+/**
+ * The learner edits `starter` (package main, no func main) until the hidden
+ * `test` passes. Both are merged into one file before running, because the
+ * Playground runs `go test` only for a single file with Test funcs and no main.
+ */
+export interface LangChallenge {
+  prompt: string
+  /** package main, the function(s) to implement, no func main */
+  starter: string
+  /** package main, imports "testing", Test funcs only */
+  test: string
+  /** a passing implementation, revealed after an attempt */
+  solution: string
 }
 
 /** A topic group in the sidebar. Order is a suggestion, not a schedule. */
@@ -557,6 +576,8 @@ export interface LangSection {
 export interface Language {
   id: string
   name: string
+  /** the other name people search for, e.g. "Golang"; used in page titles */
+  alias?: string
   tagline: string
   blurb: string
   /** where the official docs live */
@@ -582,7 +603,8 @@ export interface QuizQuestion {
 }
 
 export interface QuizSet {
-  /** matches a LangSection id, or "all" for the mixed final test */
+  /** a LangSection id (that section's test), "all" (the mixed final test), or any
+   *  other id for a cross-section set such as a checkpoint */
   id: string
   name: string
   blurb: string

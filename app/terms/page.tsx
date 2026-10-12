@@ -4,7 +4,7 @@ import { CONTACT_EMAIL, POLICY_UPDATED } from '@/lib/legal'
 import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
-  'Terms of use',
+  'Terms of use · Dev Skills',
   'The terms for using this site: what it is, what it is not, and what is and is not promised.',
   '/terms',
   true,

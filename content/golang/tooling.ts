@@ -7,6 +7,11 @@ export const TOOLING: LangLesson[] = [
     title: 'Modules, dependencies, and the go command',
     navTitle: 'Modules and the go command',
     oneLine: 'How Go finds your code and other people’s, and the commands worth memorising.',
+    objectives: [
+      'Create a module with `go mod init` and explain what go.mod and go.sum each record.',
+      'Explain why Minimal Version Selection picks the oldest version that satisfies every requirement.',
+      'Run `go vet`, `gofmt` and `go test -race` the way CI would.',
+    ],
     blocks: [
       {
         heading: 'What a module is, and what the go command does',
@@ -22,16 +27,16 @@ export const TOOLING: LangLesson[] = [
           label: 'go.mod',
           src: `module github.com/you/snapnotes
 
-go 1.22
+go 1.25
 
 require (
-\tgithub.com/golang-jwt/jwt/v5 v5.2.1
-\tgithub.com/jackc/pgx/v5 v5.5.5
-\tgolang.org/x/crypto v0.21.0
+\tgithub.com/golang-jwt/jwt/v5 v5.3.0
+\tgithub.com/jackc/pgx/v5 v5.7.5
+\tgolang.org/x/crypto v0.43.0
 )
 
 require (
-\tgithub.com/jackc/puddle/v2 v2.2.1 // indirect
+\tgithub.com/jackc/puddle/v2 v2.2.2 // indirect
 )`,
           note: 'Direct dependencies in the first block, transitive ones marked // indirect. Commit both go.mod and go.sum.',
         },
@@ -157,11 +162,16 @@ go build -gcflags='-m' ./... 2>&1 | head         # what escaped to the heap`,
     title: 'The packages everyone actually uses',
     navTitle: 'Popular packages',
     oneLine: 'The well-known third-party libraries, what each is for, and when the standard library is still the better choice.',
+    objectives: [
+      'Explain when the standard library is a better choice than a popular third-party package.',
+      'Judge a package before adding it, using maintenance, licence and dependency count.',
+      'Name the usual library for routing, databases, config, logging and testing.',
+    ],
     blocks: [
       {
         heading: 'Why this topic exists',
         body: [
-          'Go has an unusually strong standard library, so for most problems the advice is **use the stdlib**. That is why this whole track ships three real projects on four dependencies.',
+          'Go has an unusually strong standard library, so for most problems the advice is **use the stdlib**. That is why the three projects ahead in this track need only four dependencies.',
           'But you will read other people\'s code, join teams with existing choices, and hit problems the stdlib does not solve. This is the map: what the well-known packages are, what each one is for, and, where one exists, the stdlib alternative to try first.',
         ],
       },
@@ -334,13 +344,13 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`,
         code: {
           label: 'go.mod — a normal, boring, production service',
           src: `require (
-	github.com/go-chi/chi/v5 v5.1.0            // routing niceties
-	github.com/jackc/pgx/v5 v5.6.0             // Postgres
-	github.com/golang-jwt/jwt/v5 v5.2.1        // tokens
+	github.com/go-chi/chi/v5 v5.2.3            // routing niceties
+	github.com/jackc/pgx/v5 v5.7.5             // Postgres
+	github.com/golang-jwt/jwt/v5 v5.3.0        // tokens
 	github.com/google/uuid v1.6.0              // ids
-	github.com/prometheus/client_golang v1.20.0 // metrics
-	golang.org/x/crypto v0.27.0                // bcrypt
-	golang.org/x/sync v0.8.0                   // errgroup
+	github.com/prometheus/client_golang v1.23.2 // metrics
+	golang.org/x/crypto v0.43.0                // bcrypt
+	golang.org/x/sync v0.17.0                  // errgroup
 )
 
 // Everything else — HTTP, JSON, SQL interface, logging, context,
@@ -396,8 +406,63 @@ go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest`,
     slug: 'packages-in-code',
     title: 'What the famous packages look like in code',
     navTitle: 'Packages in code',
-    oneLine: 'The same job written with each popular library, so you recognise them the moment you open somebody else\'s repo.',
+    oneLine: 'The follow-up to Packages: how a real module splits into many packages, what `internal/` hides, why imports cannot go in a circle, and what the popular libraries look like in code.',
+    objectives: [
+      'Lay out a module with several packages, and use `internal/` to keep a package private to it.',
+      'Fix an "import cycle not allowed" error by moving the shared type into its own package.',
+      'Recognise the same HTTP route written with net/http, chi, gin, echo and fiber.',
+      'Compare a database query written with database/sql, sqlx, sqlc and GORM.',
+      'Find the entry point, routes and storage of an unfamiliar Go repo in a few minutes.',
+    ],
     blocks: [
+      {
+        heading: 'Before the libraries: a module with many packages',
+        body: [
+          'This builds on **Packages** (in Core language), which covered one folder = one package, capitalised names being exported, and import paths. That is not repeated here. This section is what changes once a module has more than two packages.',
+        ],
+        tree: {
+          caption: 'a typical multi-package module',
+          nodes: [
+            { depth: 0, name: 'shop', kind: 'dir' },
+            { depth: 1, name: 'go.mod', kind: 'file', note: 'module example.com/shop' },
+            { depth: 1, name: 'cmd', kind: 'dir' },
+            { depth: 2, name: 'api', kind: 'dir' },
+            { depth: 3, name: 'main.go', kind: 'file', note: 'package main: wires everything together' },
+            { depth: 1, name: 'internal', kind: 'dir', note: 'only code inside shop/ may import these' },
+            { depth: 2, name: 'order', kind: 'dir', note: 'package order: business rules' },
+            { depth: 2, name: 'store', kind: 'dir', note: 'package store: talks to the database' },
+            { depth: 1, name: 'money', kind: 'dir', note: 'package money: other modules may import this' },
+          ],
+        },
+      },
+      {
+        heading: 'internal/ is enforced by the compiler',
+        bullets: [
+          'A package under a folder named `internal` can be imported only by code rooted at the parent of that `internal` folder. `example.com/shop/cmd/api` may import `example.com/shop/internal/order`; another module that tries gets `use of internal package not allowed`.',
+          'Use it for everything you do not want to promise to other people. You can rename or delete an internal package without breaking anyone outside your module.',
+          '`cmd/<name>/main.go` is the convention for programs: one folder per binary, each `package main`, built with `go build ./cmd/api`.',
+        ],
+      },
+      {
+        heading: 'Imports cannot go in a circle',
+        body: [
+          'If `order` imports `store` and `store` imports `order`, the build stops with `import cycle not allowed`. Go needs to compile each package after the ones it imports, so a circle has no starting point.',
+          'The usual fix: move the type both sides need into a small third package (or into the lower one), so imports only point one way. Another fix: the lower package declares a small interface for what it needs, and the upper package passes in something that satisfies it.',
+        ],
+        code: {
+          label: 'internal/store/store.go',
+          src: `// Before: order imported store for Save, and store imported order for
+// the Order type: a cycle. After: the shared type lives in the lower
+// package, store imports nothing of ours, and order imports store.
+package store
+
+type Order struct{ ID, Total int }
+
+func Save(o Order) error { return nil }
+
+// in package order: store.Save(store.Order{Total: 500})`,
+        },
+      },
       {
         heading: 'Why compare them side by side',
         body: [
@@ -417,6 +482,7 @@ mux.HandleFunc("GET /users/{id}", func(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"id": id})
 })
 
+// for real use, an http.Server with timeouts: see "Middleware and graceful shutdown"
 http.ListenAndServe(":8080", mux)`,
           note: 'No dependency. Since 1.22 this handles method + path params, which was the main reason people added a router.',
         },
@@ -434,7 +500,7 @@ r.Route("/users", func(r chi.Router) {       // route groups
 	})
 })
 
-http.ListenAndServe(":8080", r)`,
+http.ListenAndServe(":8080", r)   // hardened version: see "Middleware and graceful shutdown"`,
           note: 'The handler signature is still `func(http.ResponseWriter, *http.Request)`, so every standard middleware works. That is chi\'s whole selling point.',
         },
       },

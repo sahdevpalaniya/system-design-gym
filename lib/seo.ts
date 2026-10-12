@@ -7,8 +7,8 @@ export const SITE_URL =
  *  or advertising section in the privacy policy is emitted at all. */
 export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
 
-/** Appended to every page title. Each page re-declares it so that nesting a
- *  titled layout (e.g. /concepts) does not strip the suffix from its children. */
+/** Appended to every page title by the root layout's template. Pages pass a
+ *  plain string title (see pageMeta) so the template reaches them. */
 export const SITE_NAME = 'Dev Skills'
 
 export const TITLE_TEMPLATE = `%s · ${SITE_NAME}`
@@ -35,7 +35,11 @@ export function pageMeta(
 ): Metadata {
   const d = clamp(description)
   return {
-    title: absolute ? { absolute: title } : { default: title, template: TITLE_TEMPLATE },
+    // a plain string, so the nearest ancestor's template (the root's
+    // TITLE_TEMPLATE) appends the brand. An object here would set this page's
+    // own template, which Next applies only to children, never to the page
+    // itself, and the suffix silently disappeared.
+    title: absolute ? { absolute: title } : title,
     description: d,
     alternates: { canonical: path },
     // every field is repeated on purpose: declaring openGraph on a nested route
@@ -90,9 +94,49 @@ export function articleJsonLd(a: {
     articleSection: a.section,
     inLanguage: 'en',
     isAccessibleForFree: true,
-    author: { '@type': 'Person', name: 'Dev Skills' },
-    publisher: { '@type': 'Organization', name: 'Dev Skills', url: SITE_URL },
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${a.path}` },
+  }
+}
+
+/** Site-wide identity, on every page: who publishes this and what the site is.
+ *  No SearchAction, because search is client-side and has no results URL. */
+export const SITE_JSONLD = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/icon.svg`,
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    inLanguage: 'en',
+    description: 'System design interview preparation and a Go (Golang) course, with runnable examples.',
+  },
+]
+
+/** Course schema for a language track, so it can show as a course result. */
+export function courseJsonLd(c: { name: string; description: string; path: string; topics: number; minutes: number }) {
+  const plain = c.description.replace(/\*\*|__|`/g, '').replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Course',
+    name: c.name,
+    description: plain,
+    url: `${SITE_URL}${c.path}`,
+    inLanguage: 'en',
+    isAccessibleForFree: true,
+    educationalLevel: 'Beginner',
+    numberOfLessons: c.topics,
+    provider: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    offers: { '@type': 'Offer', price: 0, priceCurrency: 'USD', category: 'Free', availability: 'https://schema.org/InStock' },
+    // from the same reading + practice estimate the track page shows
+    hasCourseInstance: { '@type': 'CourseInstance', courseMode: 'online', courseWorkload: `PT${Math.max(1, Math.round(c.minutes / 60))}H` },
   }
 }
 

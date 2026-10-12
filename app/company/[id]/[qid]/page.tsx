@@ -20,7 +20,8 @@ export async function generateMetadata({
   const co = getCompany(id)
   if (!q || !co || q.company !== co.id) return {}
   return pageMeta(
-    `${q.title} — ${co.name} system design`,
+    // drop the generic tail when it would push the title past what results show
+    `${q.title} — ${co.name}${`${q.title} — ${co.name} system design`.length > 60 ? '' : ' system design'}`,
     `${q.prompt} How ${co.name} runs this round, and what a strong answer covers.`,
     `/company/${co.id}/${q.id}`,
     true,
