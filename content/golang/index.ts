@@ -115,6 +115,7 @@ export const GO: Language = {
     },
     {
       id: 'database',
+      searchTitle: 'Databases in Go (Golang): PostgreSQL, SQL and pgx',
       name: 'Databases',
       blurb: 'Postgres through database/sql. No ORM, so you write and see every query that runs.',
       lessons: ['postgres-and-sql', 'joins-transactions-n-plus-one'],
