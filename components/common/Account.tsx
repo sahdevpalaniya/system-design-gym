@@ -75,7 +75,7 @@ export function AccountButton() {
       <button
         type="button"
         onClick={() => signIn('google')}
-        className="flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[0.7812rem] font-semibold transition hover:opacity-75"
+        className="flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[0.7812rem] font-semibold transition hover:opacity-75 sm:min-h-0 sm:min-w-0"
         style={{ borderColor: 'var(--border-strong)' }}
       >
         <GoogleMark />
@@ -91,7 +91,7 @@ export function AccountButton() {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         aria-label="Account"
-        className="flex items-center gap-1.5 rounded-lg px-1 py-1 transition hover:opacity-75"
+        className="flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-lg px-1 py-1 transition hover:opacity-75 sm:min-h-0 sm:min-w-0"
       >
         {user?.image ? (
           // eslint-disable-next-line @next/next/no-img-element

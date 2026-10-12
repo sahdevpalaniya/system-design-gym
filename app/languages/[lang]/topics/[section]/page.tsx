@@ -104,7 +104,7 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
         ))}
       </ol>
 
-      <nav aria-label="Other sections" className="flex flex-wrap justify-between gap-3 text-[0.875rem]">
+      <nav aria-label="Other sections" className="tap-children flex flex-wrap justify-between gap-3 text-[0.875rem]">
         {prev ? (
           <Link href={`/languages/${l.id}/topics/${prev.id}`} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
             ← {prev.name}

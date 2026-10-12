@@ -108,7 +108,7 @@ export function CodeBlock({
               type="button"
               onClick={runIt}
               disabled={busy}
-              className="shrink-0 rounded px-2 py-0.5 font-bold transition hover:opacity-80"
+              className="min-h-9 shrink-0 rounded px-3 py-1 font-bold transition hover:opacity-80 sm:min-h-0 sm:px-2 sm:py-0.5"
               style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
               title="Run this on the Go Playground"
             >
@@ -123,7 +123,7 @@ export function CodeBlock({
                 setTimeout(() => setCopied(false), 1200)
               })
             }}
-            className="shrink-0 rounded px-1.5 py-0.5 transition hover:opacity-70"
+            className="min-h-9 shrink-0 rounded px-2.5 py-1 transition hover:opacity-70 sm:min-h-0 sm:px-1.5 sm:py-0.5"
             style={{ color: copied ? 'var(--ok)' : 'var(--muted)' }}
           >
             {copied ? 'Copied' : 'Copy'}

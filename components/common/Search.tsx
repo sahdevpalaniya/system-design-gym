@@ -136,15 +136,17 @@ export function Search() {
             go(results[active].href)
           }
         }}
-        placeholder="Search topics…"
+        placeholder="Search…"
         aria-label="Search topics"
-        className="w-full rounded-lg border px-3 py-1.5 text-[0.8125rem] outline-none transition"
+        // 16px on phones: anything smaller makes iOS zoom the page on focus
+        className="w-full rounded-lg border px-3 py-2 text-[16px] outline-none transition sm:py-1.5 sm:text-[0.8125rem]"
         style={{ borderColor: 'var(--border)', background: 'var(--surface-2)', color: 'var(--text)' }}
       />
 
       {open && q.trim() ? (
         <div
-          className="absolute top-full right-0 left-0 z-50 mt-1.5 max-h-[70vh] overflow-y-auto rounded-xl border shadow-lg"
+          // the box is narrow on a phone, so results span the screen under the header there
+          className="fixed top-[calc(var(--header-h)-2.6rem)] right-3 left-3 z-50 mt-1.5 max-h-[70vh] overflow-y-auto rounded-xl border shadow-lg sm:absolute sm:top-full sm:right-0 sm:left-0"
           style={{ background: 'var(--surface)', borderColor: 'var(--border-strong)' }}
         >
           {results.length ? (

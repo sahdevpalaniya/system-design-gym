@@ -51,7 +51,7 @@ export default function AboutPage() {
         />
         <p className="mt-3 flex flex-wrap gap-4 text-[0.9375rem]">
           {AUTHOR.links.map((l) => (
-            <a key={l.href} href={l.href} target="_blank" rel="noreferrer me" className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+            <a key={l.href} href={l.href} target="_blank" rel="noreferrer me" className="tap font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
               {l.label}
             </a>
           ))}

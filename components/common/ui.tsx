@@ -84,7 +84,7 @@ export function PageHeader({
   return (
     <header className="mb-8">
       {eyebrow ? (
-        <div className="mb-2.5 flex flex-wrap items-center gap-2 text-[0.75rem] font-semibold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+        <div className="tap-children mb-2.5 flex flex-wrap items-center gap-2 text-[0.75rem] font-semibold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
           {eyebrow}
         </div>
       ) : null}

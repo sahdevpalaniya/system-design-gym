@@ -55,7 +55,7 @@ export function Contents({ headings }: { headings: string[] }) {
               </span>
               <a
                 href={`#${id}`}
-                className="min-w-0 transition hover:opacity-70"
+                className="inline-block min-w-0 py-1.5 transition hover:opacity-70 sm:py-0"
                 style={{ color: on ? 'var(--accent)' : 'var(--muted)', fontWeight: on ? 600 : 400 }}
               >
                 {h}

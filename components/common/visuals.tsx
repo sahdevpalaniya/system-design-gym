@@ -1255,7 +1255,7 @@ ${pathKeyframes(t.points)}
         <button
           type="button"
           onClick={() => setPaused((p) => !p)}
-          className="rounded-md px-2.5 py-1 text-[0.75rem] font-medium transition hover:opacity-70"
+          className="min-h-10 rounded-md px-3 py-1 text-[0.8125rem] font-medium transition hover:opacity-70 sm:min-h-0 sm:px-2.5 sm:text-[0.75rem]"
           style={{ color: 'var(--muted)' }}
           aria-pressed={paused}
         >

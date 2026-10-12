@@ -11,7 +11,7 @@ export function CrossLinks({ path }: { path: string }) {
       <div id="crosslinks" className="mb-2.5 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
         Same idea, other tracks
       </div>
-      <ul className="space-y-2">
+      <ul className="tap-children space-y-2">
         {links.map((x) => (
           <li key={x.path} className="text-[0.9062rem]">
             <Link href={x.path} className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>

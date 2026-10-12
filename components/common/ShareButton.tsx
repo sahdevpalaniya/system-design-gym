@@ -25,7 +25,7 @@ export function ShareButton({ title }: { title: string }) {
   }
 
   return (
-    <button type="button" onClick={share} className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+    <button type="button" onClick={share} className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--accent)' }}>
       {copied ? 'Link copied' : 'Share'}
     </button>
   )

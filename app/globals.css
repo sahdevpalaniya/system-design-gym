@@ -284,3 +284,22 @@ input::placeholder {
 summary::-webkit-details-marker {
   display: none;
 }
+
+/* phones: every text field at 16px, or iOS zooms the whole page on focus */
+@media (max-width: 639px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* touch screens: small text links get a taller hit area without changing how
+   they look. Apply `tap` to links that sit outside running prose. */
+@media (pointer: coarse) {
+  .tap,
+  .tap-children a {
+    display: inline-block;
+    padding-block: 0.55rem;
+  }
+}

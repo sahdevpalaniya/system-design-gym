@@ -56,7 +56,7 @@ function ThemeToggle() {
       onClick={() => setTheme(next)}
       aria-label={`Switch to ${next} mode`}
       title={`Switch to ${next} mode`}
-      className="flex h-8 w-8 items-center justify-center rounded-lg transition hover:opacity-70"
+      className="flex h-10 w-10 items-center justify-center rounded-lg transition hover:opacity-70 sm:h-8 sm:w-8"
       style={{ color: 'var(--muted)' }}
     >
       {state.theme === 'dark' ? (
@@ -100,7 +100,7 @@ function Header() {
           onClick={() => setOpen(!open)}
           aria-label="Menu"
           aria-expanded={open}
-          className="flex h-8 w-8 items-center justify-center rounded-lg lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-lg lg:hidden"
           style={{ color: 'var(--muted)' }}
         >
           <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
@@ -108,7 +108,7 @@ function Header() {
           </svg>
         </button>
 
-        <Link href="/" className="flex shrink-0 items-center gap-2">
+        <Link href="/" className="flex min-h-10 shrink-0 items-center gap-2">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
             <rect x="1.5" y="4" width="8" height="6" rx="1.6" stroke="var(--accent)" strokeWidth="1.7" />
             <rect x="14.5" y="4" width="8" height="6" rx="1.6" stroke="var(--border-strong)" strokeWidth="1.7" />
@@ -162,7 +162,7 @@ function TrackTabs() {
           <Link
             key={t.id}
             href={t.href}
-            className="shrink-0 border-b-2 px-3 py-2 text-[0.8438rem] whitespace-nowrap transition"
+            className="shrink-0 border-b-2 px-3 py-2.5 text-[0.9062rem] whitespace-nowrap transition sm:py-2 sm:text-[0.8438rem]"
             style={{
               borderBottomColor: on ? 'var(--accent)' : 'transparent',
               color: on ? 'var(--accent)' : 'var(--muted)',
@@ -203,7 +203,8 @@ function Item({
     <Link
       href={href}
       onClick={() => setOpen(false)}
-      className="flex items-center gap-2 border-l-2 py-[5px] pr-2 pl-3 text-[0.8438rem] leading-snug transition"
+      // 44px rows in the phone drawer, so a thumb hits the link it aims at
+      className="flex min-h-11 items-center gap-2 border-l-2 py-2 pr-2 pl-3 text-[0.9062rem] leading-snug transition lg:min-h-0 lg:py-[5px] lg:text-[0.8438rem]"
       style={{
         borderLeftColor: active ? 'var(--accent)' : 'transparent',
         background: active ? 'var(--accent-soft)' : 'transparent',
@@ -295,7 +296,7 @@ function Group({
   return (
     // keyed on whether we are inside, so navigating into a group opens it
     <details key={String(here)} open={here} className="group mb-3">
-      <summary className={`${headerClass} cursor-pointer list-none py-1 hover:opacity-80`} style={{ color: 'var(--faint)' }}>
+      <summary className={`${headerClass} min-h-11 cursor-pointer list-none items-center py-2 hover:opacity-80 lg:min-h-0 lg:py-1`} style={{ color: 'var(--faint)' }}>
         <span aria-hidden className="inline-block w-2 transition group-open:rotate-90">
           ›
         </span>
@@ -573,19 +574,19 @@ export function Footer() {
             : 'Write your own answer before you read ours.'}
         </p>
         <nav aria-label="Site information" className="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <Link href="/about" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+          <Link href="/about" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             About
           </Link>
-          <Link href="/privacy" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+          <Link href="/privacy" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Privacy
           </Link>
-          <Link href="/terms" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+          <Link href="/terms" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Terms
           </Link>
-          <Link href="/contact" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+          <Link href="/contact" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Contact
           </Link>
-          <Link href="/progress" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+          <Link href="/progress" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Export or clear your data →
           </Link>
         </nav>

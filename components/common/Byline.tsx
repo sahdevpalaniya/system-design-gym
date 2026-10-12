@@ -25,7 +25,7 @@ export function Byline({ title, path }: { title: string; path: string }) {
           Written by{" "}
           <Link
             href="/about"
-            className="font-medium hover:opacity-70"
+            className="inline-block py-2 font-medium hover:opacity-70 sm:py-0"
             style={{ color: "var(--muted)" }}
           >
             {AUTHOR.name}
@@ -34,7 +34,7 @@ export function Byline({ title, path }: { title: string; path: string }) {
         <span>Last reviewed {reviewed}</span>
         <a
           href={reportHref(CONTACT_EMAIL, title, path)}
-          className="font-medium hover:opacity-70"
+          className="inline-block py-2 font-medium hover:opacity-70 sm:py-0"
           style={{ color: "var(--accent)" }}
         >
           Report a mistake

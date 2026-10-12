@@ -152,7 +152,7 @@ export function Dashboard() {
         <section>
           <div className="mb-3 flex items-baseline justify-between gap-3">
             <h2 className="text-[1.1875rem] font-semibold">Your six-axis profile</h2>
-            <Link href="/progress" className="text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+            <Link href="/progress" className="tap text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
               Full progress →
             </Link>
           </div>
@@ -184,7 +184,7 @@ export function Dashboard() {
         <section>
           <div className="mb-3 flex items-baseline justify-between gap-3">
             <h2 className="text-[1.1875rem] font-semibold">Your recurring gaps</h2>
-            <Link href="/progress#gaps" className="text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+            <Link href="/progress#gaps" className="tap text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
               Gap log →
             </Link>
           </div>
@@ -294,7 +294,7 @@ export function Dashboard() {
       <section className="mt-10">
         <div className="mb-3 flex items-baseline justify-between gap-3">
           <h2 className="text-[1.1875rem] font-semibold">Problems are grouped by shape, not by product</h2>
-          <Link href="/problems" className="text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+          <Link href="/problems" className="tap text-[0.8125rem] font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
             All problems →
           </Link>
         </div>
