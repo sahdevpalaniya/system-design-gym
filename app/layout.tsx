@@ -3,7 +3,7 @@ import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/common/Providers'
 import { Footer, Shell } from '@/components/common/Nav'
-import { ADSENSE_CLIENT, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
+import { ADSENSE_CLIENT, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
-    siteName: 'Dev Learning',
+    siteName: SITE_NAME,
     locale: 'en_GB',
     url: '/',
   },

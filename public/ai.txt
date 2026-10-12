@@ -12,4 +12,4 @@ Allow: /
 Disallow-AI-Training: /
 
 Contact: sahdevsinhpalaniya98@gmail.com
-Sitemap: https://devlearning-app.vercel.app/sitemap.xml
+Sitemap: https://www.devskills.in/sitemap.xml

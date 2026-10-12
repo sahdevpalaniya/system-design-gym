@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://devlearning-app.vercel.app'
+  process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.devskills.in'
 
 /** AdSense publisher id (ca-pub-XXXXXXXXXXXXXXXX). Unset, no ad code, ads.txt
  *  or advertising section in the privacy policy is emitted at all. */
@@ -9,7 +9,9 @@ export const ADSENSE_CLIENT = process.env.NEXT_PUBLIC_ADSENSE_CLIENT
 
 /** Appended to every page title. Each page re-declares it so that nesting a
  *  titled layout (e.g. /concepts) does not strip the suffix from its children. */
-export const TITLE_TEMPLATE = '%s · Dev Learning'
+export const SITE_NAME = 'Dev Skills'
+
+export const TITLE_TEMPLATE = `%s · ${SITE_NAME}`
 
 /** Trim to a length search results will actually show, without cutting a word. */
 function clamp(text: string, max = 155): string {
@@ -21,7 +23,7 @@ function clamp(text: string, max = 155): string {
 /**
  * Per-page title, description and canonical. Every indexable page gets one.
  *
- * `absolute` drops the " · Dev Learning" suffix. Worth doing when the title is
+ * `absolute` drops the " · Dev Skills" suffix. Worth doing when the title is
  * already carrying its target keyword: a search result truncates around 60
  * characters, and on a new domain the keyword earns the click, not the brand.
  */
@@ -36,13 +38,16 @@ export function pageMeta(
     title: absolute ? { absolute: title } : { default: title, template: TITLE_TEMPLATE },
     description: d,
     alternates: { canonical: path },
-    // the images are repeated on purpose: declaring openGraph on a nested route
-    // replaces the parent's object, so leaving them out drops the social card
+    // every field is repeated on purpose: declaring openGraph on a nested route
+    // REPLACES the parent's object rather than merging into it, so anything
+    // left out here is simply absent from the page
     openGraph: {
       title,
       description: d,
       url: path,
       type: 'article',
+      siteName: SITE_NAME,
+      locale: 'en_GB',
       images: [{ url: '/opengraph-image', width: 1200, height: 630 }],
     },
   }
@@ -85,8 +90,8 @@ export function articleJsonLd(a: {
     articleSection: a.section,
     inLanguage: 'en',
     isAccessibleForFree: true,
-    author: { '@type': 'Person', name: 'Dev Learning' },
-    publisher: { '@type': 'Organization', name: 'Dev Learning', url: SITE_URL },
+    author: { '@type': 'Person', name: 'Dev Skills' },
+    publisher: { '@type': 'Organization', name: 'Dev Skills', url: SITE_URL },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${a.path}` },
   }
 }
@@ -112,7 +117,7 @@ export function breadcrumbJsonLd(trail: { name: string; path: string }[]) {
 export function withUtm(href: string, medium = 'concept', campaign = 'system-design'): string {
   try {
     const u = new URL(href)
-    u.searchParams.set('utm_source', 'devlearning')
+    u.searchParams.set('utm_source', 'devskills')
     u.searchParams.set('utm_medium', medium)
     u.searchParams.set('utm_campaign', campaign)
     return u.toString()

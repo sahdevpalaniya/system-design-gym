@@ -1,6 +1,6 @@
 {
-  "name": "Dev Learning — system design interview preparation",
-  "short_name": "Dev Learning",
+  "name": "Dev Skills — system design interview preparation",
+  "short_name": "Dev Skills",
   "description": "Learn the method for answering system design interviews: requirements, lifecycle, numbers, design, tradeoffs. Write your own answer first, then compare.",
   "start_url": "/",
   "scope": "/",

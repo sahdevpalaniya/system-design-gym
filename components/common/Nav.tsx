@@ -118,7 +118,7 @@ function Header() {
             <path d="M9.5 7h5M6 10v2.5a2 2 0 0 0 2 2h.5M18.5 10v2.5a2 2 0 0 1-2 2H16" stroke="var(--accent)" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
           <span className="text-[0.9375rem] font-bold tracking-[-0.01em] whitespace-nowrap">
-            Dev Learning
+            Dev Skills
           </span>
         </Link>
 

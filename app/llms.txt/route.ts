@@ -14,7 +14,7 @@ export const dynamic = 'force-static'
 export function GET() {
   const url = (p: string) => `${SITE_URL}${p}`
   const lines: string[] = [
-    '# Dev Learning — system design interview preparation',
+    '# Dev Skills — system design interview preparation',
     '',
     '> Teaches the method for answering system design interviews (requirements,',
     '> lifecycle, numbers, design, tradeoffs) rather than a catalogue of components.',

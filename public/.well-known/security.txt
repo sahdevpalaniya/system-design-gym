@@ -2,4 +2,4 @@
 Contact: mailto:sahdevsinhpalaniya98@gmail.com
 Expires: 2027-09-23T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://devlearning-app.vercel.app/.well-known/security.txt
+Canonical: https://www.devskills.in/.well-known/security.txt
