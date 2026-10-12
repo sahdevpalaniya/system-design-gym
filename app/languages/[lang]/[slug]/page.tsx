@@ -33,9 +33,10 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const section = sectionOf(l, t.slug)
   const project = section?.id.startsWith('project-') ? section.name.replace(/^Project \d+ — /, '') : null
   return pageMeta(
-    project
-      ? `${project} in ${l.alias ?? l.name}: ${short}`
-      : `${short} in ${l.name} (${l.alias ?? l.name}), with examples`,
+    t.searchTitle ??
+      (project
+        ? `${project} in ${l.alias ?? l.name}: ${short}`
+        : `${short} in ${l.name} (${l.alias ?? l.name}), with examples`),
     `${t.oneLine} A ${l.alias ?? l.name} tutorial with runnable code, key points and practice exercises.`,
     `/languages/${l.id}/${t.slug}`,
     true,

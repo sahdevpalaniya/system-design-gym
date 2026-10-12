@@ -259,6 +259,7 @@ func main() {
 export const INTERVIEW: LangLesson[] = [
   {
     slug: 'go-interview-questions',
+    searchTitle: 'Golang interview questions and answers (2026)',
     title: 'Golang interview questions and answers (2026)',
     navTitle: 'Interview questions',
     oneLine: '60 Go interview questions for freshers, new grads and 1–3 year developers, each with a short answer and the lesson that explains it.',

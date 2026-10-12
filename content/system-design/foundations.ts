@@ -55,6 +55,7 @@ export const LESSONS: Lesson[] = [
 
   {
     slug: 'system-design-for-freshers',
+    searchTitle: 'System design for freshers and new grads',
     title: 'System design for freshers and new grads: is it asked, and what to learn first',
     navTitle: 'For new grads',
     oneLine: 'An honest answer on whether new grads get system design rounds, and a 30-day plan if you do.',

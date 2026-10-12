@@ -400,6 +400,8 @@ export interface Lesson {
   title: string
   /** short title for the sidebar; falls back to `title` */
   navTitle?: string
+  /** the exact phrase people search for, used as the page <title> when set */
+  searchTitle?: string
   oneLine: string
   /** why a total beginner should care, before any jargon */
   body: string[]
@@ -532,6 +534,9 @@ export interface LangLesson {
    * characters. Falls back to `title`. The page heading stays descriptive.
    */
   navTitle?: string
+  /** the exact phrase people search for (e.g. "Golang interview questions
+   *  and answers"), used as the page <title> instead of the generated one */
+  searchTitle?: string
   oneLine: string
   /** 2–3 measurable outcomes, each starting with a verb: "Write a function that…" */
   objectives?: string[]

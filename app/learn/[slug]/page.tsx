@@ -17,9 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!l) return {}
   return pageMeta(
     // the lesson titles already say "system design"; do not say it twice
-    /^What is system design/.test(l.title)
+    l.searchTitle ??
+    (/^What is system design/.test(l.title)
       ? 'What is system design? A beginner\u2019s introduction'
-      : `${l.navTitle ?? l.title} — system design basics`,
+      : `${l.navTitle ?? l.title} — system design basics`),
     `${l.oneLine} ${l.body[0] ?? ''}`,
     `/learn/${l.slug}`,
     true,

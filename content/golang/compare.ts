@@ -4,6 +4,7 @@ import type { LangLesson } from '@/lib/types'
 export const COMPARE: LangLesson[] = [
   {
     slug: 'goroutines-vs-threads',
+    searchTitle: 'Goroutines vs threads: 8 differences that matter',
     title: 'Goroutines vs threads: 8 differences that matter',
     navTitle: 'Goroutines vs threads',
     oneLine: 'Why Go can run a hundred thousand goroutines when the same number of OS threads would sink your machine.',
@@ -160,6 +161,7 @@ func main() {
 
   {
     slug: 'mutex-vs-channel',
+    searchTitle: 'Mutex vs channel in Go: when to use which',
     title: 'Mutex vs channel in Go: when to use which',
     navTitle: 'Mutex vs channel',
     oneLine: 'Both make concurrent code safe. The Go team’s own advice is to use whichever is simpler.',
@@ -310,6 +312,7 @@ func main() {
 
   {
     slug: 'arrays-vs-slices',
+    searchTitle: 'Arrays vs slices in Go (Golang), with examples',
     title: 'Arrays vs slices in Go: the differences, with examples',
     navTitle: 'Arrays vs slices',
     oneLine: 'An array is a fixed box of values. A slice is a window onto one. You will use slices 99% of the time.',
@@ -442,6 +445,7 @@ func main() {
 
   {
     slug: 'buffered-vs-unbuffered-channels',
+    searchTitle: 'Buffered vs unbuffered channels in Go',
     title: 'Buffered vs unbuffered channels in Go',
     navTitle: 'Buffered vs unbuffered',
     oneLine: 'An unbuffered channel is a handshake. A buffered channel is a small queue.',
@@ -591,6 +595,7 @@ func main() {
 
   {
     slug: 'go-vs-java-vs-python-for-placements',
+    searchTitle: 'Go vs Java vs Python for first-job interviews',
     title: 'Go vs Java vs Python for your first job interviews: which should you pick?',
     navTitle: 'Go vs Java vs Python',
     oneLine: 'An honest comparison for campus hiring, new-grad interviews and your first backend job.',
