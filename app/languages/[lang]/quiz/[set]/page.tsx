@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const s = l?.quizzes?.find((q) => q.id === set)
   if (!l || !s) return {}
   return pageMeta(
-    `${s.name}: ${l.name} (${l.alias ?? l.name}) quiz, ${s.questions.length} questions`,
+    `${s.name}: ${l.alias ?? l.name} quiz (${s.questions.length} questions)`,
     `${s.blurb} ${s.questions.length} ${l.alias ?? l.name} questions, every answer explained.`,
     `/languages/${l.id}/quiz/${s.id}`,
     true,

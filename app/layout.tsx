@@ -8,7 +8,7 @@ import { SITE_JSONLD, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'System design interview preparation — answer first, then compare',
+    default: 'System design interview prep: answer first, then compare',
     template: TITLE_TEMPLATE,
   },
   alternates: { canonical: '/' },
