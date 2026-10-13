@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage } from '@/content/languages'
 import { Quiz } from '@/components/golang/Quiz'
-import { Page, PageHeader } from '@/components/common/ui'
+import { Page, PageHeader, Rich } from '@/components/common/ui'
 import { pageMeta } from '@/lib/seo'
 
 export function generateStaticParams() {
@@ -52,6 +52,27 @@ export default async function QuizSetPage({
       />
       <div className="max-w-3xl">
         <Quiz set={s} langID={l.id} nextSet={nextSet ? { id: nextSet.id, name: nextSet.name } : undefined} />
+        {/* collapsed static copy: crawlable, and a study sheet once you have taken the test */}
+        <details className="card mt-10 overflow-hidden">
+          <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
+            All questions with explanations (answers shown)
+          </summary>
+          <ol className="space-y-5 border-t px-5 py-4">
+            {s.questions.map((x, n) => (
+              <li key={x.id} className="text-[0.9062rem] leading-relaxed">
+                <p className="font-semibold">
+                  {n + 1}. <Rich text={x.q} />
+                </p>
+                <p className="mt-1">
+                  <span style={{ color: 'var(--ok)' }}>Answer:</span> <Rich text={x.options[x.answer]} />
+                </p>
+                <p className="mt-1" style={{ color: 'var(--muted)' }}>
+                  <Rich text={x.why} />
+                </p>
+              </li>
+            ))}
+          </ol>
+        </details>
       </div>
     </Page>
   )

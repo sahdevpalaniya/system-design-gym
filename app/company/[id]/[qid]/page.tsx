@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { COMPANY_QUESTIONS, getCompany, getQuestion } from '@/content/system-design/companies'
 import { getConcept } from '@/content/system-design/concepts'
 import { CompanyDrill } from '@/components/system-design/CompanyDrill'
-import { Badge, Page, PageHeader } from '@/components/common/ui'
+import { Badge, Bullets, Page, PageHeader, Rich } from '@/components/common/ui'
 import { pageMeta } from '@/lib/seo'
 
 export function generateStaticParams() {
@@ -66,6 +66,46 @@ export default async function QuestionPage({
       />
 
       <CompanyDrill question={q} />
+
+      {/* static copies so the page reads fully without JS; the model answers stay gated in the drill */}
+      <div className="mt-8 space-y-3">
+        <details className="card overflow-hidden">
+          <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
+            All {q.hints.length} hints
+          </summary>
+          <ol className="space-y-2.5 border-t px-5 py-4">
+            {q.hints.map((h, i) => (
+              <li key={i} className="text-[0.9062rem] leading-relaxed">
+                <strong>
+                  Hint {i + 1} — {h.label}:
+                </strong>{' '}
+                <Rich text={h.text} />
+              </li>
+            ))}
+          </ol>
+        </details>
+        <details className="card overflow-hidden">
+          <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
+            The follow-up they will ask next
+          </summary>
+          <p className="border-t px-5 py-4 text-[0.9062rem] leading-relaxed">
+            <Rich text={q.followUp.q} />
+          </p>
+        </details>
+        <details className="card overflow-hidden">
+          <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
+            What a strong answer covers (the rubric)
+          </summary>
+          <div className="border-t px-5 py-4">
+            <Bullets items={q.checklist} />
+          </div>
+        </details>
+      </div>
+
+      <p className="mt-6 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
+        This question is written in the style of {co.name}&rsquo;s interview round. This site is not affiliated
+        with or endorsed by {co.name}.
+      </p>
 
       {q.relatedProblem ? (
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t pt-6">

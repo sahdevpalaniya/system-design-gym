@@ -129,8 +129,8 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
                   [
                     [1, 'Missed it', 'back tomorrow'],
                     [2, 'Partly', 'back in 3 days'],
-                    [3, 'Mostly', 'back in a week'],
-                    [4, 'Had it', 'back in 3 weeks'],
+                    [3, 'Mostly', 'back in a week+'],
+                    [4, 'Had it', 'back in 3 weeks+'],
                   ] as const
                 ).map(([v, label, when]) => (
                   <button

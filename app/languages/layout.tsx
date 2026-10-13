@@ -6,7 +6,7 @@ import { pageMeta } from '@/lib/seo'
 // Each page below overrides it with its own title and canonical.
 export const metadata: Metadata = pageMeta(
   'Programming language courses',
-  'Programming language courses that start from nothing and end with a real project. Go (Golang) first: syntax to a working JSON API, with runnable examples.',
+  'Programming language courses that start from nothing and build toward real projects. Go (Golang) first: syntax to a working JSON API, with runnable examples.',
   '/languages',
 )
 

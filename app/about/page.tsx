@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { CONCEPTS } from '@/content/system-design/concepts'
 import { PROBLEMS } from '@/content/system-design/problems'
+import { LANGUAGES } from '@/content/languages'
 import { Page, PageHeader, Prose, Section } from '@/components/common/ui'
 import { CONTACT_EMAIL } from '@/lib/legal'
 import { pageMeta } from '@/lib/seo'
@@ -34,7 +35,7 @@ export default function AboutPage() {
       <Section n="2" title="How it works">
         <Prose
           paragraphs={[
-            `There are ${CONCEPTS.length} topics and ${PROBLEMS.length} worked problems. The topics are ordered as a dependency chain rather than a menu (caching before CDNs, replication before partitioning), so reading top to bottom never asks you to assume something you have not met.`,
+            `System Design has ${CONCEPTS.length} topics and ${PROBLEMS.length} worked problems; ${LANGUAGES.map((l) => `${l.name} has ${l.lessons.length} lessons`).join(', ')}. Each track is ordered as a dependency chain rather than a menu (caching before CDNs, replication before partitioning), so reading top to bottom never asks you to assume something you have not met.`,
             'Every page makes you write your own answer before it shows you one. That gap, between what you wrote and what you then read, is where the learning happens. Hints are available throughout, and each one is a question to ask yourself rather than the answer.',
             'Every topic also states what the technique **costs** you, not just what it does. Naming the cost out loud is one of the clearest differences between a senior answer and a junior one, so every topic page is required to have it.',
           ]}
