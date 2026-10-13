@@ -96,7 +96,7 @@ function DrillsInner() {
                 color: active ? 'var(--accent)' : 'var(--muted)',
               }}
             >
-              {c === 'all' ? `All (${FOLLOW_UPS.length})` : `${CATEGORY_INFO[c].name} (8)`}
+              {c === 'all' ? `All (${FOLLOW_UPS.length})` : `${CATEGORY_INFO[c].name} (${followUpsByCategory(c).length})`}
             </button>
           )
         })}
