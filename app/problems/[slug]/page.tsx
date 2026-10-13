@@ -34,9 +34,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 const ALL_STAGES: StageId[] = [1, 2, 3, 4, 5]
 
-// the client gets prompts and rubric only; StageEngine fetches the model answers after submit
+// the client gets only what StageEngine reads (prompts and rubric, no worked-solution text);
+// it fetches the model answers after submit
 function practiceOnly(p: Problem): Problem {
-  return { ...p, stages: p.stages.map(({ id, ask, nudges, checklist }) => ({ id, ask, nudges, checklist, model: [] })) }
+  return {
+    slug: p.slug,
+    title: p.title,
+    followUps: p.followUps,
+    stages: p.stages.map(({ id, ask, nudges, checklist }) => ({ id, ask, nudges, checklist, model: [] })),
+  } as unknown as Problem
 }
 
 export default async function ProblemPage({ params }: { params: Promise<{ slug: string }> }) {
