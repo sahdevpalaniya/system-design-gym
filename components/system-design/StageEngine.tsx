@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { startTransition, useEffect, useMemo, useRef, useState } from 'react'
+import { revealStages } from '@/lib/reveal'
 import { Sketchpad } from './Sketchpad'
 import { unsupportedTicks } from '@/lib/grade'
 import { getStage, STAGE_AXIS } from '@/content/system-design/method'
@@ -128,7 +129,9 @@ function StageBlock({
   reveal,
   timed,
   archetypeNote,
+  onRetryReveal,
 }: {
+  onRetryReveal?: () => void
   problem: Problem
   stageId: StageId
   answer: string
@@ -256,7 +259,7 @@ function StageBlock({
           recognition — writing first is what builds the ability to produce an answer on a blank whiteboard.
         </div>
       ) : reveal ? (
-        <ModelAnswer ps={ps} checked={checked} onCheck={onCheck} answer={answer} />
+        <ModelAnswer ps={ps} checked={checked} onCheck={onCheck} answer={answer} onRetryReveal={onRetryReveal} />
       ) : (
         <div
           className="rounded-xl border px-4 py-5 text-center text-[0.8438rem]"
@@ -276,13 +279,31 @@ function ModelAnswer({
   checked,
   onCheck,
   answer,
+  onRetryReveal,
 }: {
+  onRetryReveal?: () => void
   ps: Problem['stages'][number]
   checked: number[]
   onCheck: (i: number) => void
   answer: string
 }) {
   const score = Math.round((checked.length / ps.checklist.length) * 10)
+  if (!ps.model.length) {
+    return (
+      <div className="mt-6 py-8 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
+        {onRetryReveal ? (
+          <>
+            Could not load the model answer.{' '}
+            <button type="button" className="underline" onClick={onRetryReveal}>
+              Try again
+            </button>
+          </>
+        ) : (
+          'Loading the model answer…'
+        )}
+      </div>
+    )
+  }
   // self-scoring inflates, so flag ticks whose subject never appears in what you wrote
   const unsupported = new Set(unsupportedTicks(answer, ps.checklist, checked))
   return (
@@ -464,7 +485,7 @@ function ReportCard({
    ============================================================ */
 
 export function StageEngine({
-  problem,
+  problem: given,
   stageIds,
   revealMode = 'immediate',
   timed = false,
@@ -475,6 +496,12 @@ export function StageEngine({
   timed?: boolean
 }) {
   const { state, ready, saveStage, completeProblem, addGap, addMock } = useProgress()
+  // a page may pass stages without model answers (kept out of its payload); fetch them on first reveal
+  const [revealed, setRevealed] = useState<Awaited<ReturnType<typeof revealStages>>>(null)
+  const problem = useMemo<Problem>(
+    () => (revealed ? { ...given, stages: given.stages.map((s) => ({ ...s, ...revealed.find((r) => r.id === s.id) })) } : given),
+    [given, revealed],
+  )
   const [answers, setAnswers] = useState<Record<number, string>>({})
   const [submitted, setSubmitted] = useState<Record<number, boolean>>({})
   const [checked, setChecked] = useState<Record<number, number[]>>({})
@@ -513,6 +540,19 @@ export function StageEngine({
 
   const allSubmitted = stageIds.every((id) => submitted[id])
   const reveal = revealMode === 'immediate' || graded
+
+  const needsReveal = reveal && Object.values(submitted).some(Boolean) && problem.stages.some((s) => !s.model.length)
+  const [revealTry, setRevealTry] = useState(0)
+  const [revealFailed, setRevealFailed] = useState(false)
+  useEffect(() => {
+    if (!needsReveal) return
+    setRevealFailed(false)
+    startTransition(async () => {
+      const r = await revealStages(given.slug).catch(() => null)
+      if (r) setRevealed(r)
+      else setRevealFailed(true)
+    })
+  }, [needsReveal, given.slug, revealTry])
 
   const scores = useMemo(() => {
     const out = {} as Scores
@@ -627,6 +667,7 @@ export function StageEngine({
         onSubmit={() => submitStage(active)}
         checked={checked[active] ?? []}
         onCheck={(i) => toggleCheck(active, i)}
+        onRetryReveal={revealFailed ? () => setRevealTry((n) => n + 1) : undefined}
         reveal={reveal}
         timed={timed}
         archetypeNote={active === stageIds[0] ? archetypeNote : undefined}

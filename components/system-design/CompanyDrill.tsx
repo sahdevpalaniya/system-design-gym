@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { startTransition, useState } from 'react'
+import { revealCompanyAnswer } from '@/lib/reveal'
 import { useProgress } from '@/lib/store'
 import type { CompanyQuestion } from '@/lib/types'
 import { Callout } from '@/components/common/visuals'
@@ -14,13 +15,32 @@ const MIN_CHARS = 60
  * something. Hints are available before submitting — they are nudges that make
  * you think, never the answer itself.
  */
-export function CompanyDrill({ question }: { question: CompanyQuestion }) {
+/** the question minus its answers; those are fetched from the server after submit */
+export type DrillQuestion = Omit<CompanyQuestion, 'model' | 'followUp'> & { followUp: { q: string } }
+
+export function CompanyDrill({ question }: { question: DrillQuestion }) {
   const { saveStage, addGap, ready } = useProgress()
   const [answer, setAnswer] = useState('')
   const [shown, setShown] = useState(0)
   const [submitted, setSubmitted] = useState(false)
   const [checked, setChecked] = useState<number[]>([])
   const [showFollowUp, setShowFollowUp] = useState(false)
+  const [revealed, setRevealed] = useState<Awaited<ReturnType<typeof revealCompanyAnswer>>>(null)
+  const [revealFailed, setRevealFailed] = useState(false)
+
+  function loadAnswer() {
+    setRevealFailed(false)
+    startTransition(async () => {
+      const r = await revealCompanyAnswer(question.id).catch(() => null)
+      if (r) setRevealed(r)
+      else setRevealFailed(true)
+    })
+  }
+
+  function submit() {
+    setSubmitted(true)
+    loadAnswer()
+  }
 
   const enough = answer.trim().length >= MIN_CHARS
   const score = Math.round((checked.length / question.checklist.length) * 10)
@@ -88,7 +108,7 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
                 : `${answer.trim().length} / ${MIN_CHARS} characters`}
           </span>
           {!submitted ? (
-            <Button onClick={() => setSubmitted(true)} disabled={!enough}>
+            <Button onClick={submit} disabled={!enough}>
               Submit and compare
             </Button>
           ) : null}
@@ -165,7 +185,22 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
           </div>
 
           <div className="card mb-6 p-5">
-            <Prose paragraphs={question.model} />
+            {revealed ? (
+              <Prose paragraphs={revealed.model} />
+            ) : (
+              <p className="text-[0.875rem]" style={{ color: 'var(--faint)' }}>
+                {revealFailed ? (
+                  <>
+                    Could not load the model answer.{' '}
+                    <button type="button" className="underline" onClick={loadAnswer}>
+                      Try again
+                    </button>
+                  </>
+                ) : (
+                  'Loading the model answer…'
+                )}
+              </p>
+            )}
           </div>
 
           <div className="card mb-6 p-5">
@@ -226,7 +261,7 @@ export function CompanyDrill({ question }: { question: CompanyQuestion }) {
                   What a strong answer sounds like
                 </div>
                 <p className="prose text-[0.9375rem]">
-                  <Rich text={question.followUp.answer} />
+                  <Rich text={revealed?.followUpAnswer ?? ''} />
                 </p>
               </div>
             ) : (

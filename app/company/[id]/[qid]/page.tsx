@@ -2,7 +2,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { COMPANY_QUESTIONS, getCompany, getQuestion } from '@/content/system-design/companies'
 import { getConcept } from '@/content/system-design/concepts'
-import { CompanyDrill } from '@/components/system-design/CompanyDrill'
+import { CompanyDrill, type DrillQuestion } from '@/components/system-design/CompanyDrill'
+import type { CompanyQuestion } from '@/lib/types'
 import { Badge, Bullets, Page, PageHeader, Rich } from '@/components/common/ui'
 import { pageMeta } from '@/lib/seo'
 
@@ -26,6 +27,11 @@ export async function generateMetadata({
     `/company/${co.id}/${q.id}`,
     true,
   )
+}
+
+function withoutAnswers({ model, followUp, ...rest }: CompanyQuestion): DrillQuestion {
+  void model
+  return { ...rest, followUp: { q: followUp.q } }
 }
 
 export default async function QuestionPage({
@@ -65,7 +71,8 @@ export default async function QuestionPage({
         }
       />
 
-      <CompanyDrill question={q} />
+      {/* answers stay on the server until submit; CompanyDrill fetches them */}
+      <CompanyDrill question={withoutAnswers(q)} />
 
       {/* static copies so the page reads fully without JS; the model answers stay gated in the drill */}
       <div className="mt-8 space-y-3">

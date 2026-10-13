@@ -3,13 +3,12 @@ import { Byline } from '@/components/common/Byline'
 import { CrossLinks } from '@/components/common/CrossLinks'
 import { notFound } from 'next/navigation'
 import { PROBLEMS, getProblem } from '@/content/system-design/problems'
-import { getGroup } from '@/content/system-design/method'
+import { getGroup, getStage } from '@/content/system-design/method'
 import { getConcept } from '@/content/system-design/concepts'
-import { getFollowUp } from '@/content/system-design/followups'
-import { AnimatedFlow, Callout, CompareCards, Diagram, LifecycleChain, NumbersBar } from '@/components/common/visuals'
+import { Callout } from '@/components/common/visuals'
 import { StageEngine } from '@/components/system-design/StageEngine'
-import { Badge, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
-import type { StageId } from '@/lib/types'
+import { Badge, Bullets, Page, PageHeader } from '@/components/common/ui'
+import type { Problem, StageId } from '@/lib/types'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta, withUtm } from '@/lib/seo'
 import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
 
@@ -34,6 +33,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 }
 
 const ALL_STAGES: StageId[] = [1, 2, 3, 4, 5]
+
+// the client gets prompts and rubric only; StageEngine fetches the model answers after submit
+function practiceOnly(p: Problem): Problem {
+  return { ...p, stages: p.stages.map(({ id, ask, nudges, checklist }) => ({ id, ask, nudges, checklist, model: [] })) }
+}
 
 export default async function ProblemPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
@@ -93,23 +97,33 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         }
       />
 
-      {/* ---------- where's the slack ---------- */}
+      {/* ---------- the brief: practice prompts only, the worked answer lives on /solution ---------- */}
       <section className="mb-12">
-        <div
-          className="rounded-2xl border px-6 py-6"
-          style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
+        <h2 className="mb-2 text-[1.1875rem] font-bold tracking-[-0.01em]">Before you start</h2>
+        <p className="mb-5 text-[0.9375rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          You will work this in five timed stages. Here is what each one asks you to think about. None of it is
+          the answer; the answers unlock in the workspace below once you have written your own.
+        </p>
+        <ol className="space-y-4">
+          {p.stages.map((ps) => {
+            const def = getStage(ps.id)
+            return (
+              <li key={ps.id} className="card p-5">
+                <div className="mb-2 text-[0.75rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+                  Stage {ps.id} · {def.name} · {def.minutes} min
+                </div>
+                <Bullets items={ps.nudges} />
+              </li>
+            )
+          })}
+        </ol>
+        <Link
+          href={`/problems/${p.slug}/solution`}
+          className="mt-5 inline-block text-[0.875rem] font-semibold hover:opacity-70"
+          style={{ color: 'var(--accent)' }}
         >
-          <div className="mb-2 flex flex-wrap items-center gap-2">
-            <h2 className="text-[1.1875rem] font-bold tracking-[-0.01em]">Where&rsquo;s the slack?</h2>
-            <Badge tone="accent">{p.slack.budget}</Badge>
-          </div>
-          <p className="mb-4 text-[1.0312rem] leading-snug font-semibold">{p.slack.headline}</p>
-          <Prose paragraphs={p.slack.body} className="text-[0.9375rem]" />
-          <p className="mt-4 border-t pt-4 text-[0.9062rem] leading-relaxed" style={{ borderColor: 'var(--accent-line)' }}>
-            <strong>So: </strong>
-            {p.slack.consequence}
-          </p>
-        </div>
+          Prefer to read first? The worked solution, end to end →
+        </Link>
       </section>
 
       {/* ---------- the gated walkthrough ---------- */}
@@ -121,74 +135,15 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
             is the core of the method.
           </p>
         </div>
-        <StageEngine problem={p} stageIds={ALL_STAGES} />
+        <StageEngine problem={practiceOnly(p)} stageIds={ALL_STAGES} />
       </section>
 
       {/* ---------- reference material, after the work ---------- */}
       <section className="border-t pt-10">
         <p className="mb-8 text-[0.8438rem]" style={{ color: 'var(--faint)' }}>
-          Reference material for this problem. The diagrams below are here to check your own against once you
-          have drawn it, not to read first.
+          Done all five? The diagrams, numbers, trade-offs and follow-ups for this problem are on the worked
+          solution page, to check your own design against.
         </p>
-
-        <Section title="The lifecycle">
-          <LifecycleChain spec={p.lifecycle} />
-        </Section>
-
-        <Section title="The numbers">
-          <NumbersBar spec={p.numbers} />
-        </Section>
-
-        <Section title="The architecture">
-          <Diagram spec={p.architecture} />
-        </Section>
-
-        {p.flow ? (
-          <Section title="The mechanism">
-            <AnimatedFlow scenario={p.flow.scenario} caption={p.flow.caption} />
-          </Section>
-        ) : null}
-
-        {p.compare ? (
-          <Section title="The decision this turns on">
-            <CompareCards spec={p.compare} />
-          </Section>
-        ) : null}
-
-        <Section title="Follow-ups you should expect" sub="Many interviews are decided in the follow-ups, not the first diagram.">
-          <div className="space-y-2">
-            {p.followUps.map((id) => {
-              const f = getFollowUp(id)
-              if (!f) return null
-              return (
-                <Link
-                  key={id}
-                  href={`/drills?q=${id}`}
-                  className="card flex items-center justify-between gap-4 p-4 transition hover:-translate-y-px"
-                >
-                  <span className="text-[0.9375rem] font-medium">
-                    <Rich text={f.q} />
-                  </span>
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--faint)" strokeWidth="1.6" className="shrink-0" aria-hidden>
-                    <path d="M6 3.5L10.5 8 6 12.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </Link>
-              )
-            })}
-          </div>
-        </Section>
-
-        <Section title="Same shape, other products">
-          <Card>
-            <p className="text-[0.9375rem] leading-relaxed">{group.shape}</p>
-            <p className="mt-3 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-              {group.tell}
-            </p>
-            <p className="mt-3 text-[0.8438rem]" style={{ color: 'var(--faint)' }}>
-              Others with this shape: {group.examples.join(' · ')}
-            </p>
-          </Card>
-        </Section>
 
         <Callout variant="say-this" title="Before you leave">
           Try this problem again in a week without reading anything. Comparing what you write then with
