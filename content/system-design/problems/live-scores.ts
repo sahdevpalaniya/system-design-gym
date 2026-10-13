@@ -2,7 +2,7 @@ import type { Problem } from '@/lib/types'
 
 export const LIVE_SCORES: Problem = {
   slug: 'live-scores',
-  searchTitle: "Design a live score feed",
+  searchTitle: "Design a live sports scores system",
   title: 'Live score push',
   navTitle: 'Live scores',
   group: 'live-push',
@@ -80,6 +80,7 @@ export const LIVE_SCORES: Problem = {
         'Failure branches. At received: the provider sends the same event twice, so every event needs a provider event id and deduplication. Otherwise the score goes to 2-1 and then 3-1. At received: the provider sends a correction, a goal disallowed after review. This is the branch that makes the problem interesting: it means updates are not append-only, so clients must be able to handle a value going backwards, and I should push full current state rather than increments. Pushing "score is now 1-1" is idempotent and self-correcting; pushing "add one goal" is not, and any missed or duplicated message corrupts the display permanently. That is a design decision, and it belongs in the lifecycle.',
         'At received: the provider goes down entirely. The app should show the last known state with a timestamp rather than a blank or a stale-looking score presented as live. At published: the fan-out layer is behind, so the score is late; because the payload is full state, a late message is still correct, just late.',
         'At delivered: the client is disconnected (a tunnel, or the app backgrounded). They must reconnect and catch up, and because we push full current state, catching up means fetching the current state, which is the same cached endpoint everyone else uses. That is a large simplification and it falls directly out of the full-state decision.',
+        'At published: updates arrive out of order. Full state does not fix this on its own: if "1-0" and then "2-0" are published, and a retry, a second region or a different connection server delivers "1-0" last, the client shows a goal disappearing. So the ingest service stamps every match state with a per-match version number, incremented on each change (corrections included), and the client and every cache apply a message only if its version is higher than the one they hold. Older messages are dropped silently. One writer per match makes the counter trivial; the provider\'s own timestamps are not enough, because they come from clocks you do not control.',
         'At delivered: a deploy restarts every server, so millions reconnect at once. Without jittered backoff this is a self-inflicted denial of service that is worse than the traffic being served.',
         'One branch the system handles on its own: when a match ends, ten million connections should be released rather than held open for hours by clients that have stopped caring.',
       ],
@@ -88,6 +89,7 @@ export const LIVE_SCORES: Problem = {
         'Wrote the event lifecycle from provider to phone',
         'Handled duplicate events from the provider with an event id',
         'Handled corrections, and chose full-state pushes because of them',
+        'Handled out-of-order delivery with a per-match version the client compares',
         'Handled provider outage — last known state with a timestamp',
         'Handled client reconnect and catch-up, simplified by full-state',
         'Handled the deploy reconnection storm',
@@ -238,6 +240,7 @@ export const LIVE_SCORES: Problem = {
     failures: [
       { after: 'recv', label: 'Duplicate event', handling: 'deduplicate on provider event id' },
       { after: 'recv', label: 'Provider goes down', handling: 'show last known state with a visible timestamp' },
+      { after: 'pub', label: 'Older update arrives last', handling: 'per-match version; client ignores anything not newer' },
       { after: 'state', label: 'Correction — goal disallowed', handling: 'push full current state, so it self-heals' },
       { after: 'del', label: 'Client in a tunnel', handling: 'reconnect with last-event-id, fetch current state to catch up' },
       { after: 'del', label: 'Deploy drops everyone', handling: 'slow roll plus jittered client backoff' },
@@ -306,7 +309,7 @@ export const LIVE_SCORES: Problem = {
       ],
     },
     verdict:
-      'Full current state. The payload difference is meaningless at this size, and it removes the need for ordering guarantees, a replay log, and correction handling: three subsystems deleted by one decision. When state is this small, push state.',
+      'Full current state. The payload difference is meaningless at this size, and it removes the need for a replay log, correction handling and strict delivery ordering: three subsystems deleted by one decision. You still need a version number on each state so a stale message never overwrites a newer one, but that is one integer comparison on the client, not an ordered pipeline. When state is this small, push state.',
   },
 
   followUps: [

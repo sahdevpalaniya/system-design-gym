@@ -1554,7 +1554,8 @@ func (r *Repository) MonthlyReport(ctx context.Context, userID int64, month time
 
   {
     slug: 'expenses-step-7-refresh',
-    title: 'Step 7 — Refresh tokens and logout',
+    searchTitle: 'Refresh token rotation in Go with net/http: reuse detection and logout',
+    title: 'Step 7 — Refresh token rotation and logout',
     navTitle: 'Step 7 — Refresh tokens',
     oneLine: 'Make sessions endable, without a database lookup on every request.',
     objectives: [
@@ -1681,8 +1682,47 @@ docker exec -it exp-pg psql -U postgres -d expenses -c 'SELECT token_hash, revok
         heading: 'Why single-use matters',
         body: [
           'Rotation is what makes theft **detectable**. If a refresh token is ever used twice, one of two things happened: your client has a bug, or somebody stole it and both parties are now using it.',
-          'The safe response is to cancel every refresh token for that user and force a fresh login. The `Refresh` above only rejects the reused token; to react to reuse, look the hash up again when the UPDATE matches nothing. Without rotation you cannot detect the theft at all: the attacker keeps refreshing alongside the real user for as long as the token lives.',
+          'The safe response is to cancel every refresh token for that user and force a fresh login. Without rotation you cannot detect the theft at all: the attacker keeps refreshing alongside the real user for as long as the token lives.',
         ],
+      },
+      {
+        heading: 'Reuse detection: revoke every session',
+        body: [
+          'When the UPDATE in `Refresh` matches nothing, look the hash up once more. If the row exists and is already revoked, a used token came back: cancel every live refresh token for that user. Call it in the `sql.ErrNoRows` branch, before returning `ErrInvalidCredentials`.',
+        ],
+        code: {
+          label: 'internal/auth/service.go — add this',
+          src: `func (s *Service) revokeOnReuse(ctx context.Context, hash string) error {
+\tvar userID int64
+\terr := s.db.QueryRowContext(ctx,
+\t\t\`SELECT user_id FROM refresh_tokens
+\t\t  WHERE token_hash = $1 AND revoked_at IS NOT NULL\`,
+\t\thash,
+\t).Scan(&userID)
+\tif errors.Is(err, sql.ErrNoRows) {
+\t\treturn nil        // unknown or expired token, not a reuse
+\t}
+\tif err != nil {
+\t\treturn err
+\t}
+
+\tslog.Warn("refresh token reused, revoking all sessions", "user_id", userID)
+\t_, err = s.db.ExecContext(ctx,
+\t\t\`UPDATE refresh_tokens SET revoked_at = now()
+\t\t  WHERE user_id = $1 AND revoked_at IS NULL\`,
+\t\tuserID)
+\treturn err
+}
+
+// in Refresh:
+//   if errors.Is(err, sql.ErrNoRows) {
+//   \tif err := s.revokeOnReuse(ctx, hash); err != nil {
+//   \t\treturn "", "", err
+//   \t}
+//   \treturn "", "", ErrInvalidCredentials
+//   }`,
+          note: 'A token cancelled by logout also counts as reused here. That is fine: nobody should still be sending it. Test it by refreshing once, replaying the old token, and checking that the new refresh token now fails too.',
+        },
       },
       {
         heading: 'File 3 — logout',

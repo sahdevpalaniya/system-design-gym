@@ -321,6 +321,23 @@ case <-quit:
           note: 'The signal channel MUST be buffered. signal.Notify never blocks when it sends, so if nobody is receiving yet on an unbuffered channel, the signal is dropped with no error.',
         },
       },
+      {
+        heading: 'ErrServerClosed and RegisterOnShutdown',
+        body: [
+          'Once `Shutdown` is called, `ListenAndServe` returns `http.ErrServerClosed` straight away, while requests are still draining. That is why the goroutine above ignores that error, and why `main` must wait for `Shutdown` to return instead of exiting when `ListenAndServe` does.',
+          '`Shutdown` does not wait for hijacked connections such as WebSockets, or for goroutines you started yourself. `srv.RegisterOnShutdown(f)` runs `f` in its own goroutine when shutdown begins, so you can tell them to stop.',
+        ],
+        code: {
+          label: 'on-shutdown.go',
+          src: `workerCtx, cancelWorkers := context.WithCancel(context.Background())
+go runWorkers(workerCtx)
+
+srv.RegisterOnShutdown(func() {
+\tslog.Info("shutdown started: stopping background workers")
+\tcancelWorkers()
+})`,
+        },
+      },
     ],
     keyPoints: [
       'Middleware is `func(http.Handler) http.Handler`. Compose by nesting; no framework required.',

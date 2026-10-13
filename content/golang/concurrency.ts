@@ -251,6 +251,7 @@ func main() {
         body: [
           'A channel lets goroutines hand each other values safely, and tells the receiver exactly when a value is ready. Goroutines run at the same time, so they need a safe way to hand each other results. Writing to a shared variable is a data race unless you add a lock, and even then the reader does not know *when* the value is ready.',
           'A channel fixes both. One goroutine sends a value, another receives it, and the receive waits until the value is there. The handoff is the synchronisation: everything the sender did before the send is visible to the receiver after the receive.',
+          'Choosing a buffer size? See [Buffered vs unbuffered channels](/languages/go/buffered-vs-unbuffered-channels). Not sure a channel is the right tool at all? See [Mutex vs channel](/languages/go/mutex-vs-channel).',
         ],
       },
       {
@@ -429,6 +430,7 @@ func main() {
         heading: 'Use a mutex when you are guarding state',
         body: [
           '"Share memory by communicating" is Go’s slogan, but do not force it. A mutex around a cache is simpler, faster, and more obvious than a goroutine owning a map behind a channel. Channels are for transferring ownership of a value; a mutex is for protecting a field.',
+          'For the full "which one?" comparison, with the same counter written both ways, see [Mutex vs channel](/languages/go/mutex-vs-channel).',
         ],
         code: {
           label: 'cache.go',

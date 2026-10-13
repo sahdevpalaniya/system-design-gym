@@ -102,6 +102,7 @@ export const FILE_SYNC: Problem = {
       model: [
         'Assume 50 million users, 50 GB each on average, so 2.5 exabytes of raw data. It goes straight to object storage. The one decision it forces is a retention and tiering policy, because keeping every version of everything on hot storage is not affordable.',
         'Chunking is where the arithmetic becomes interesting. Split files into fixed 4 MB chunks and store each by content hash. A user edits one paragraph in a 2 GB presentation: without chunking that is a 2 GB upload, with chunking it is one 4 MB chunk, because every other chunk hashes the same and is already on the server. That is a 500-fold reduction for a common case, and an interrupted upload can resume at chunk granularity. No other decision on the board does as much for the product.',
+        'That 500-fold figure quietly assumes the edit overwrote bytes in place. Insert 100 bytes at the 1 MB mark of the same 2 GB file and fixed-size chunking falls apart: every byte after the insert moves 100 positions, so all 512 chunks, from the one holding the insert onward, hash differently and the full 2 GB goes up again. Content-defined chunking fixes this by choosing boundaries from the data itself: slide a rolling hash (Rabin, or the faster Gear hash used by FastCDC) over a window of ~48 bytes and cut wherever the low bits of the hash are zero, tuned so chunks average 4 MB, with a minimum and maximum size. After the insert, the cut points beyond the edit sit on the same content they always did, so the edited chunk changes (and occasionally its neighbour) and the other ~510 match: about 4 to 8 MB uploaded instead of 2 GB. The cost is a hash computed over every byte on the client, and variable chunk sizes, so a chunk\'s offset in the file is no longer a multiplication; the client needs the full chunk list to seek. Fixed-size is fine, and simpler, when edits overwrite in place (VM images, database files); content-defined chunking wins wherever bytes get inserted or deleted, which is most documents.',
         'Metadata is the part people underestimate. 50 million users times, say, 20,000 files each is a trillion file records. That does not fit on one machine and it is not object storage\'s job. It needs a partitioned database, and the partition key has to be the user or the account, so that "list my folder" is one partition and never a scatter across the cluster.',
         'Change notifications: if 10 million devices are online and each sees a few changes an hour, that is roughly 10,000 notifications a second, which is small. The cost is holding 10 million open connections, not the messages. It is the same shape as chat.',
         'So the hard part here is conflict handling and metadata at a trillion rows, not bandwidth. Chunking and object storage make the bytes a solved problem. The design is about knowing which version is current for every file on every device, and detecting when two devices disagree.',
@@ -109,6 +110,7 @@ export const FILE_SYNC: Problem = {
       checklist: [
         'Separated bulk data (object storage) from metadata (partitioned database)',
         'Quantified the chunking saving with a concrete example',
+        'Showed why an insertion breaks fixed-size chunks, and when content-defined chunking is worth its cost',
         'Estimated the metadata row count and said it must be partitioned by user',
         'Noted connections rather than message volume as the notification cost',
         'Finished the sentence: conflicts and metadata, not bandwidth',
@@ -117,6 +119,10 @@ export const FILE_SYNC: Problem = {
         {
           decision: 'Content-addressed 4 MB chunks',
           cost: 'A chunk index per file and a garbage collection problem when versions are deleted: a chunk can only go when nothing references it. Worth it for a 500-fold saving on large-file edits.',
+        },
+        {
+          decision: 'Content-defined chunk boundaries over fixed offsets',
+          cost: 'A rolling hash over every byte on the client and variable-size chunks, so seeking needs the chunk list. Without it, one inserted byte near the start of a file re-uploads the whole file.',
         },
       ],
       sayThis:

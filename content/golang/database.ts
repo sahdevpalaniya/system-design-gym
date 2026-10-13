@@ -218,9 +218,66 @@ rows, err := db.QueryContext(ctx,
         },
       },
       {
+        heading: 'MySQL and SQLite: build the IN (...) placeholders',
+        body: [
+          '`ANY($1)` with a slice is Postgres only. MySQL and SQLite have no array parameter, so you write one `?` per id and pass the ids as separate arguments. Never paste the ids into the SQL string yourself.',
+        ],
+        code: {
+          label: 'in-placeholders.go',
+          src: `if len(ids) == 0 {
+\treturn nil, nil // "IN ()" is a syntax error, so skip the query
+}
+marks := make([]string, len(ids))
+args := make([]any, len(ids))
+for i, id := range ids {
+\tmarks[i] = "?"
+\targs[i] = id
+}
+q := \`SELECT note_id, id, filename FROM attachments WHERE note_id IN (\` +
+\tstrings.Join(marks, ",") + \`)\`
+rows, err := db.QueryContext(ctx, q, args...)`,
+          note: 'Databases cap the number of parameters in one query (SQLite’s default limit is 32,766 since 3.32). For very long id lists, send them in chunks.',
+        },
+      },
+      {
         callout: {
           tone: 'note',
           text: 'Turn on your database’s slow query log during development, or count queries in a test. When you read the Go code, the loop looks harmless. Count the round trips and N+1 is obvious.',
+        },
+      },
+      {
+        heading: 'Catch N+1 in a test: count the queries',
+        body: [
+          'Let the repository take a small interface instead of `*sql.DB`. In the test, wrap the real database in a type that counts calls. If someone puts a query back inside the loop, the count jumps and the test fails.',
+        ],
+        code: {
+          label: 'notes_test.go',
+          src: `type DBTX interface {
+\tQueryContext(ctx context.Context, query string, args ...any) (*sql.Rows, error)
+}
+
+type countingDB struct {
+\tDBTX
+\tn int
+}
+
+func (c *countingDB) QueryContext(ctx context.Context, q string, args ...any) (*sql.Rows, error) {
+\tc.n++
+\treturn c.DBTX.QueryContext(ctx, q, args...)
+}
+
+func TestListIsNotNPlusOne(t *testing.T) {
+\tdb := &countingDB{DBTX: testDB}  // testDB: a real *sql.DB with 20 seeded notes
+\trepo := &Repository{db: db}
+
+\tif _, err := repo.ListWithAttachments(context.Background(), 1); err != nil {
+\t\tt.Fatal(err)
+\t}
+\tif db.n > 2 {
+\t\tt.Errorf("ListWithAttachments ran %d queries, want at most 2", db.n)
+\t}
+}`,
+          note: 'Add `QueryRowContext` and `ExecContext` to the interface and the wrapper if the repository uses them. `*sql.DB` and `*sql.Tx` both satisfy it.',
         },
       },
       {
