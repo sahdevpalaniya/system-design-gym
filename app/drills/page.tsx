@@ -89,6 +89,7 @@ function DrillsInner() {
                 setCategory(c)
                 setIndex(0)
               }}
+              aria-pressed={active}
               className="rounded-lg border px-3 py-1.5 text-[0.8125rem] font-medium transition"
               style={{
                 borderColor: active ? 'var(--accent)' : 'var(--border)',

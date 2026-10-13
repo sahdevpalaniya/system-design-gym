@@ -379,6 +379,14 @@ function Sidebar() {
     setOpen(false)
   }, [pathname, setOpen])
 
+  // Escape closes the mobile drawer
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false)
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, setOpen])
+
   return (
     <>
       {open ? (

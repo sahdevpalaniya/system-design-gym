@@ -222,7 +222,9 @@ function StageBlock({
         <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
           <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
             {submitted
-              ? 'Submitted and saved. You can reread this any time from your answer history.'
+              ? checked.length || !reveal
+                ? 'Submitted and saved. You can reread this any time from your answer history.'
+                : 'Submitted. Tick what you actually had below to save it to your history.'
               : enough
                 ? 'Ready. Grade your thinking, not your English.'
                 : `${answer.trim().length} / ${MIN_CHARS} characters — write something real first.`}
