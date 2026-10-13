@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { PROBLEMS, getProblem } from '@/content/system-design/problems'
 import { STAGES, getGroup } from '@/content/system-design/method'
 import { getConcept } from '@/content/system-design/concepts'
+import { CompanyQuestionLinks } from '@/components/system-design/CompanyQuestionLinks'
+import { COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { getFollowUp } from '@/content/system-design/followups'
 import {
   AnimatedFlow,
@@ -301,6 +303,11 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           })}
         </div>
       </section>
+
+      <CompanyQuestionLinks
+        title="Asked in the style of"
+        qs={COMPANY_QUESTIONS.filter((q) => q.relatedProblem === p.slug)}
+      />
 
       <div
         className="rounded-xl px-5 py-5"

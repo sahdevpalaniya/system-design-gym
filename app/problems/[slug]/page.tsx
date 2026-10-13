@@ -6,6 +6,8 @@ import { PROBLEMS, getProblem } from '@/content/system-design/problems'
 import { getGroup, getStage } from '@/content/system-design/method'
 import { getConcept } from '@/content/system-design/concepts'
 import { Callout } from '@/components/common/visuals'
+import { CompanyQuestionLinks } from '@/components/system-design/CompanyQuestionLinks'
+import { COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { StageEngine } from '@/components/system-design/StageEngine'
 import { Badge, Bullets, Page, PageHeader } from '@/components/common/ui'
 import type { Problem, StageId } from '@/lib/types'
@@ -209,6 +211,10 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         </section>
       ) : null}
 
+      <CompanyQuestionLinks
+        title="Asked in the style of"
+        qs={COMPANY_QUESTIONS.filter((q) => q.relatedProblem === p.slug)}
+      />
       <CrossLinks path={`/problems/${p.slug}`} />
       <Byline title={p.searchTitle ?? p.title} path={`/problems/${p.slug}`} />
     </Page>

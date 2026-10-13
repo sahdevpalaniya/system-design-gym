@@ -175,6 +175,7 @@ export const COMPANY_QUESTIONS: CompanyQuestion[] = [
       answer:
         'Two different problems, and they need different tools. Identical content is caught by hashing the normalised body and checking the hash, which is cheap and exact. Near-identical content is the harder and more common case: the same article with a different sidebar, or a page with a rotating advert. An exact hash is useless there because one changed byte gives a completely different hash. So I would use a similarity-preserving hash like SimHash or MinHash, where similar documents produce similar fingerprints and you can cheaply find pairs within a small Hamming distance. Before either of those, normalise the URL: lowercase the host, strip the default port and fragment, drop known tracking parameters, and follow redirects to the final URL. A large share of duplication is the same page reachable at cosmetically different addresses.',
     },
+    relatedProblem: 'web-crawler',
   },
 
   /* ---------------- Amazon ---------------- */
@@ -293,6 +294,7 @@ export const COMPANY_QUESTIONS: CompanyQuestion[] = [
       answer:
         'Ideally nobody gets paged for the provider being down, because the system should absorb it. That is what the circuit breaker and the failover provider are for. What should page someone is user-visible impact: the oldest undelivered message in the transactional queue crossing a threshold, or the DLQ receiving messages at an unusual rate. When that fires, the runbook is: check whether it is one provider or all of them, flip the affected traffic to the secondary provider if the breaker has not already, and if there is no secondary, decide explicitly whether to hold messages or drop the ones whose TTL has passed. The thing I would want in place beforehand is per-provider dashboards, so the first minute is not spent working out which of three vendors is the problem. And I would treat "we had no secondary SMS provider" as the actual bug to fix afterwards.',
     },
+    relatedProblem: 'notification-system',
   },
 
   /* ---------------- Meta ---------------- */

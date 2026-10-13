@@ -4,6 +4,8 @@ import { CrossLinks } from '@/components/common/CrossLinks'
 import { notFound } from 'next/navigation'
 import { CONCEPTS, TIER_INFO, getConcept } from '@/content/system-design/concepts'
 import { PROBLEMS } from '@/content/system-design/problems'
+import { CompanyQuestionLinks } from '@/components/system-design/CompanyQuestionLinks'
+import { COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { Callout } from '@/components/common/visuals'
 import { getDeepDive, getExample } from '@/content/system-design/deep'
 import { WorkedExampleBlock } from '@/components/system-design/DeepDive'
@@ -43,6 +45,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
   const subj = c.subject ?? subject(c.navTitle ?? c.title)
   const related = (c.related ?? []).map(getConcept).filter(Boolean)
   const usedIn = PROBLEMS.filter((p) => p.concepts.includes(c.slug))
+  const askedIn = COMPANY_QUESTIONS.filter((q) => q.concepts.includes(c.slug))
   const deep = getDeepDive(c.slug)
   const example = getExample(c.slug)
   const i = CONCEPTS.findIndex((x) => x.slug === c.slug)
@@ -276,7 +279,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         )}
       </nav>
 
-      {(related.length || usedIn.length) > 0 ? (
+      {(related.length || usedIn.length || askedIn.length) > 0 ? (
         <section className="border-t pt-8">
           {related.length ? (
             <div className="mb-6">
@@ -296,7 +299,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
             </div>
           ) : null}
           {usedIn.length ? (
-            <div>
+            <div className="mb-6">
               <h3 className="mb-3 text-[0.875rem] font-semibold">Where you will use this</h3>
               <div className="flex flex-wrap gap-2">
                 {usedIn.map((p) => (
@@ -313,6 +316,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           ) : null}
+          <CompanyQuestionLinks title="Practise it in a company-style round" qs={askedIn} />
         </section>
       ) : null}
       <CrossLinks path={`/concepts/${c.slug}`} />
