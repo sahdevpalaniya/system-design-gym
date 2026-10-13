@@ -9,6 +9,10 @@ export const SITE_URL =
  *  plain string title (see pageMeta) so the template reaches them. */
 export const SITE_NAME = 'Dev Skills'
 
+/** Raster logo for structured data: Google wants a 112px+ PNG, not an SVG.
+ *  public/logo.png is rendered from app/icon.svg. */
+export const LOGO_URL = `${SITE_URL}/logo.png`
+
 export const TITLE_TEMPLATE = `%s · ${SITE_NAME}`
 
 /** Trim to a length search results will actually show, without cutting a word. */
@@ -58,19 +62,6 @@ export function pageMeta(
   }
 }
 
-/** FAQPage JSON-LD — the concept Q&A pairs are already in this shape. */
-export function faqJsonLd(qa: { q: string; a: string }[]) {
-  return {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: qa.map(({ q, a }) => ({
-      '@type': 'Question',
-      name: q,
-      acceptedAnswer: { '@type': 'Answer', text: a },
-    })),
-  }
-}
-
 /**
  * Article schema. Evergreen content still needs dates — without them Google has
  * no way to judge freshness, and a 2019-looking page loses to a 2026-looking one
@@ -96,7 +87,7 @@ export function articleJsonLd(a: {
     inLanguage: 'en',
     isAccessibleForFree: true,
     author: { '@type': 'Person', name: AUTHOR.name, jobTitle: AUTHOR.role, url: `${SITE_URL}/about`, sameAs: AUTHOR.links.map((l) => l.href) },
-    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL, logo: { '@type': 'ImageObject', url: LOGO_URL, width: 512, height: 512 } },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${a.path}` },
   }
 }
@@ -111,7 +102,7 @@ export const SITE_JSONLD = [
     // a different company uses "DevSkills" (devskills.co); the domain disambiguates
     alternateName: 'devskills.in',
     url: SITE_URL,
-    logo: `${SITE_URL}/icon.svg`,
+    logo: LOGO_URL,
     founder: { '@type': 'Person', name: AUTHOR.name, sameAs: AUTHOR.links.map((l) => l.href) },
   },
   {

@@ -1,6 +1,6 @@
 # Dev Learning
 
-Two learning tracks in one app: **System Design** and **Go**. Pick a track from the tabs in the
+Several learning tracks in one app (the registry is `content/tracks.ts`), currently **System Design** and **Go**. Pick a track from the tabs in the
 header and the whole sidebar switches to it.
 
 **One rule above all others: you write your own answer before you see ours.** Reading solutions
@@ -46,7 +46,7 @@ The header tab and the whole sidebar appear on their own.
 
 ## The Go track
 
-73 topics in 13 sections, in a fixed order. Every topic opens with a plain-English definition
+Topics grouped into sections, in a fixed order. Every topic opens with a plain-English definition
 before any code, and ends with one thing to build plus a few short drills for your own editor.
 
 **The ecosystem** — two topics on the packages people actually use (gin, chi, echo, fiber, GORM,
@@ -57,7 +57,7 @@ can recognise any Go codebase on sight.
 type conversion, control flow, functions, defer, slices, maps, strings, pointers, structs, methods,
 interfaces, errors, packages, JSON, testing, goroutines, channels, mutexes, context, generics, tooling.
 
-**Runnable examples** — 34 complete programs with a **▶ Run** button that executes them on the
+**Runnable examples** — complete programs with a **▶ Run** button that executes them on the
 official Go Playground and shows the output inline. Every one is compiled and run by a verification
 script before it ships, and the button never appears on code that has not passed. You can work through the whole
 language section in a browser before installing anything.
@@ -76,9 +76,9 @@ one folder per feature, so the trade-offs are something you have felt rather tha
 **Interview preparation** — five topics covering language, concurrency, backend design, the live
 coding round, and a final checklist.
 
-**Testing yourself** — a quick-revision page with every topic condensed, and 118 multiple choice
-questions across 13 tests — one for each major section, plus a mixed final. Every answer is explained,
-and a wrong one links back to its topic. The 187 editor drills have revealable answers for when you
+**Testing yourself** — a quick-revision page with every topic condensed, and multiple choice
+questions in a set of tests — one for each major section, plus a mixed final. Every answer is explained,
+and a wrong one links back to its topic. The editor drills have revealable answers for when you
 get stuck.
 
 ## The System Design track
@@ -87,11 +87,11 @@ get stuck.
 Numbers → High-level design → Deep dive and tradeoffs. The UI gates them: stage N's model answer
 stays locked until you submit your own attempt.
 
-**26 concepts** across three tiers. Every page has the same shape: what problem it solves, what it
+**Concepts** across three tiers. Every page has the same shape: what problem it solves, what it
 costs you (mandatory — no cost, no page), when to use it and when not to, a visual, the follow-up
 an interviewer will ask, and a 60-second self-check.
 
-**16 problems** grouped by shape, worked solutions, company question banks, interviewer
+**Problems** grouped by shape, worked solutions, company question banks, interviewer
 archetypes, timed mocks, and spaced-repetition concept checks.
 
 ## Progress

@@ -11,7 +11,7 @@ import { ConceptCheck, ConceptVisualBlock } from '@/components/system-design/Con
 import { AnimatedFlow } from '@/components/common/visuals'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
-import { articleJsonLd, breadcrumbJsonLd, faqJsonLd, pageMeta, subject, withUtm } from '@/lib/seo'
+import { articleJsonLd, breadcrumbJsonLd, pageMeta, subject, withUtm } from '@/lib/seo'
 import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
 
 export function generateStaticParams() {
@@ -51,18 +51,15 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
 
   return (
     <Page>
-      {/* the Q&A already on the page, in the shape Google reads for rich results */}
+      {/* no FAQPage here: the self-check answer stays hidden until the reader
+          answers, and FAQ markup must describe text visible on the page */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
           __html: JSON.stringify(
             [
-              faqJsonLd([
-                { q: c.followUp.q, a: c.followUp.answer },
-                { q: c.selfCheck.q, a: c.selfCheck.answer },
-              ]),
               breadcrumbJsonLd([
-                { name: 'System design', path: '/' },
+                { name: 'Home', path: '/' },
                 { name: 'Concepts', path: '/concepts' },
                 { name: c.navTitle ?? c.title, path: `/concepts/${c.slug}` },
               ]),

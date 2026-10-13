@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return pageMeta(
     // the generic tail goes when it would push the brand-name title past ~60 chars
     `${search} — system design interview`.length > 60 ? `${search}` : `${search} — system design interview`,
-    `${search} in a system design interview: requirements, the lifecycle, the numbers, the architecture and the tradeoffs, worked in five stages. ${p.prompt}`,
+    `${search}: a system design interview practice question. Write your own answer stage by stage, then compare with the worked solution. ${p.prompt}`,
     `/problems/${p.slug}`,
     true,
     true, // own opengraph-image
@@ -51,7 +51,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
           __html: JSON.stringify(
             [
               breadcrumbJsonLd([
-                { name: 'System design', path: '/' },
+                { name: 'Home', path: '/' },
                 { name: 'Problems', path: '/problems' },
                 { name: p.navTitle ?? p.title, path: `/problems/${p.slug}` },
               ]),

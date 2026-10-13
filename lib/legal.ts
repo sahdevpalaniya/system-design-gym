@@ -2,4 +2,4 @@
 export const CONTACT_EMAIL = 'sahdevsinhpalaniya98@gmail.com'
 
 /** Bump when the policy text materially changes, and say so on the page. */
-export const POLICY_UPDATED = '28 September 2026'
+export const POLICY_UPDATED = '13 October 2026'

@@ -4,7 +4,7 @@ import { PROBLEMS } from '@/content/system-design/problems'
 import { LESSONS } from '@/content/system-design/foundations'
 import { STAGES } from '@/content/system-design/method'
 import { Page } from '@/components/common/ui'
-import { TRACKS } from '@/content/tracks'
+import { TRACKS, trackList } from '@/content/tracks'
 import { Newsletter } from '@/components/common/Newsletter'
 import { Dashboard } from './dashboard'
 
@@ -19,10 +19,15 @@ export default function Home() {
     <Page wide>
       <section className="mb-12">
         <h1 className="max-w-3xl text-[1.75rem] leading-tight font-bold tracking-[-0.015em] sm:text-[2.125rem]">
-          System design interview preparation that makes you answer first
+          Learn {trackList()} by writing your own answer first
         </h1>
         <p className="mt-4 max-w-2xl text-[1.0625rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-          Most system design material is a catalogue of components. You finish it knowing more words
+          Every track here works the same way: a short explanation in plain English, then you write your
+          own answer or code before you see ours. The gap between the two is where the learning happens.
+          Free, no sign-in needed, and your progress is saved as you go.
+        </p>
+        <p className="mt-3 max-w-2xl text-[1.0625rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          For system design interviews in particular: most material is a catalogue of components. You finish it knowing more words
           and still freeze when someone says &ldquo;design a ride-hailing app&rdquo;. What is usually
           missing is not the components. It is the order you make decisions in, and the habit of saying
           what each one costs. That is what this site drills.

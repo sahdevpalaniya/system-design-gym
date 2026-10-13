@@ -96,7 +96,6 @@ html[data-theme="dark"] {
   --color-bad: var(--bad);
   --font-sans: var(--font-ui);
   --font-serif: var(--font-body);
-  --font-mono: var(--font-mono);
 }
 
 /* one knob for the whole UI: a bigger root on a big monitor scales every rem

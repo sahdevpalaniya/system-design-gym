@@ -57,7 +57,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([
             breadcrumbJsonLd([
-              { name: 'System design', path: '/' },
+              { name: 'Home', path: '/' },
               { name: 'Problems', path: '/problems' },
               { name: p.navTitle ?? p.title, path: `/problems/${p.slug}` },
               { name: 'Solution', path: `/problems/${p.slug}/solution` },

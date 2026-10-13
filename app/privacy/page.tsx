@@ -62,7 +62,7 @@ export default function PrivacyPage() {
         <Prose
           paragraphs={[
             'Your theme choice and progress live in localStorage, which is not a cookie and is not transmitted anywhere.',
-            '**Google Analytics** sets its own cookies (`_ga`, `_ga_*`) to count visits and see which pages are read. It records pages viewed, rough location, device and browser — never your answers or progress. You can block it with any tracker blocker and the site works the same. See [how Google uses information from sites that use its services](https://policies.google.com/technologies/partner-sites).',
+            '**Google Analytics** sets its own cookies (`_ga`, `_ga_*`) to count visits and see which pages are read. It records pages viewed, rough location, device and browser — never your answers or progress. Visitors in the EEA, the UK and Switzerland get Google Consent Mode defaults that deny analytics and advertising storage, so no Analytics cookies are set for them and Google receives only cookieless pings that carry no identifier. Elsewhere those defaults are granted. You can block it with any tracker blocker and the site works the same. See [how Google uses information from sites that use its services](https://policies.google.com/technologies/partner-sites).',
             'Signed in, there is one session cookie so the site knows it is still you between page loads. It is strictly necessary for sign-in to work and does nothing else.',
           ]}
         />
@@ -80,8 +80,10 @@ export default function PrivacyPage() {
       <Section n="5" title="Who else is involved">
         <Prose
           paragraphs={[
-            '**Vercel** hosts the site and processes standard server request logs, including IP addresses, as any web host does. **Google** provides sign-in, if you choose to use it, and Google Analytics for anonymous usage statistics. **Neon or an equivalent PostgreSQL host** stores the database.',
-            'If advertising is ever added to this site, this section will name the provider and say what it collects **before** any ad is served, and a cookie banner will ask for your consent first where the law requires it.',
+            '**Vercel** hosts the site and processes standard server request logs, including IP addresses, as any web host does. **Google** provides sign-in, if you choose to use it, and Google Analytics for usage statistics. **Neon or an equivalent PostgreSQL host** stores the database.',
+            '**Buttondown** runs the newsletter. If you subscribe, your email address is sent straight from your browser to Buttondown, which emails you to confirm and stores your subscription. Every email has an unsubscribe link.',
+            '**The Go Playground (go.dev)**: when you press Run or Share on a Go example, the code in the editor is sent through this site to the official Go Playground, which compiles and runs it. Share stores that code on go.dev under a public link. Do not put anything private in code you run.',
+            'There is **no advertising on this site** at present. If advertising is ever added to this site, this section will name the provider and say what it collects **before** any ad is served, and a cookie banner will ask for your consent first where the law requires it.',
           ]}
         />
       </Section>

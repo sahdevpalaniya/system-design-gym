@@ -9,8 +9,8 @@ import { SITE_URL } from '@/lib/seo'
 import { CONTENT_MODIFIED } from '@/lib/content-dates'
 import { LANGUAGES } from '@/content/languages'
 
-/** Static System Design routes worth indexing. Excludes /admin and /progress,
- *  which robots.ts also disallows. Language tracks are added below. */
+/** Static System Design routes worth indexing. Excludes /admin (disallowed in robots.ts)
+ *  and /progress (personal, served with noindex). Language tracks are added below. */
 const STATIC = [
   '/',
   '/learn',

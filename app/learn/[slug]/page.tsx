@@ -6,7 +6,8 @@ import { PATH, getConcept } from '@/content/system-design/concepts'
 import { ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
 import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
-import { pageMeta } from '@/lib/seo'
+import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
+import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return LESSONS.map((l) => ({ slug: l.slug }))
@@ -24,6 +25,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     `${l.oneLine} ${l.body[0] ?? ''}`,
     `/learn/${l.slug}`,
     true,
+    true, // own opengraph-image
   )
 }
 
@@ -39,6 +41,26 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
 
   return (
     <Page>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Start from scratch', path: '/learn' },
+              { name: l.navTitle ?? l.title, path: `/learn/${l.slug}` },
+            ]),
+            articleJsonLd({
+              headline: l.title,
+              description: l.oneLine,
+              path: `/learn/${l.slug}`,
+              published: CONTENT_PUBLISHED,
+              modified: CONTENT_MODIFIED,
+              section: 'System design basics',
+            }),
+          ]),
+        }}
+      />
       <PageHeader
         eyebrow={
           <>

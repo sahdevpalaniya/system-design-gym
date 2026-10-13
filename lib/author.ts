@@ -15,8 +15,8 @@ export const AUTHOR = {
 }
 
 /** Where a reader reports a mistake: a prefilled email naming the page. */
-export function reportHref(email: string, pageTitle: string, path: string): string {
+export function reportHref(email: string, pageTitle: string, url: string): string {
   const subject = `Mistake on "${pageTitle}"`
-  const body = `Page: https://www.devskills.in${path}\n\nWhat is wrong, and what should it say instead?\n\n`
+  const body = `Page: ${url}\n\nWhat is wrong, and what should it say instead?\n\n`
   return `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
 }

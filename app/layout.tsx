@@ -4,11 +4,12 @@ import './globals.css'
 import { Providers } from '@/components/common/Providers'
 import { Footer, Shell } from '@/components/common/Nav'
 import { SITE_JSONLD, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
+import { trackList } from '@/content/tracks'
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: 'System design interview prep: answer first, then compare',
+    default: `Learn ${trackList()} step by step`,
     template: TITLE_TEMPLATE,
   },
   alternates: { canonical: '/' },
@@ -19,7 +20,6 @@ export const metadata: Metadata = {
     url: '/',
   },
   twitter: { card: 'summary_large_image' },
-  manifest: '/manifest.webmanifest',
   // set NEXT_PUBLIC_GOOGLE_VERIFICATION / _BING_VERIFICATION in Vercel to verify
   // ownership; unset, no tag is emitted at all
   verification: {
@@ -29,8 +29,7 @@ export const metadata: Metadata = {
       : {},
   },
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
-  description:
-    'Learn the method for system design interviews: requirements, numbers, design, tradeoffs. Write your answer first, then compare. 44 topics, 16 worked problems.',
+  description: `Free step-by-step courses in plain English: ${trackList()}. Lessons, practice problems and progress tracking. Write your own answer first, then compare.`,
 }
 
 export const viewport: Viewport = {
@@ -48,6 +47,11 @@ const THEME_SCRIPT = `try{var s=JSON.parse(localStorage.getItem('sdgym.v1')||'{}
 /** GA4 measurement id (G-XXXXXXX). Unset, no Google tag is loaded at all. */
 const GA_ID = process.env.NEXT_PUBLIC_GA_ID
 
+/** Consent Mode v2 defaults: storage denied in the EEA, UK and Switzerland
+ *  (GA then sends cookieless pings only), granted elsewhere. A consent banner
+ *  that calls gtag('consent','update',…) is still needed before ads. */
+const CONSENT_REGIONS = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IS','IE','IT','LV','LI','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','GB','CH']
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -64,7 +68,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
             <Script id="ga" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_ID}');`}
+              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:${JSON.stringify(CONSENT_REGIONS)}});gtag('consent','default',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'});gtag('js',new Date());gtag('config','${GA_ID}');`}
             </Script>
           </>
         )}

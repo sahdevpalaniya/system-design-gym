@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AUTHOR, reportHref } from "@/lib/author";
 import { CONTACT_EMAIL } from "@/lib/legal";
+import { SITE_URL } from "@/lib/seo";
 import { CONTENT_MODIFIED } from "@/lib/content-dates";
 import { ShareButton } from "./ShareButton";
 import { Newsletter } from "./Newsletter";
@@ -33,7 +34,7 @@ export function Byline({ title, path }: { title: string; path: string }) {
         </span>
         <span>Last reviewed {reviewed}</span>
         <a
-          href={reportHref(CONTACT_EMAIL, title, path)}
+          href={reportHref(CONTACT_EMAIL, title, `${SITE_URL}${path}`)}
           className="inline-block py-2 font-medium hover:opacity-70 sm:py-0"
           style={{ color: "var(--accent)" }}
         >

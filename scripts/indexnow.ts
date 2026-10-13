@@ -8,7 +8,7 @@
  * The key is public by design: it proves we own the site because the same
  * value is served at https://www.devskills.in/<key>.txt (public/<key>.txt).
  */
-const SITE = 'https://www.devskills.in'
+import { SITE_URL as SITE } from '../lib/seo'
 const KEY = '83079f97cdde9c68940fcf34afb8f1fd'
 
 async function main() {

@@ -144,7 +144,9 @@ export default async function LangLessonPage({
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([
             breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
               { name: l.name, path: `/languages/${l.id}` },
+              ...(section ? [{ name: section.name, path: `/languages/${l.id}/topics/${section.id}` }] : []),
               { name: t.navTitle ?? t.title, path },
             ]),
             articleJsonLd({

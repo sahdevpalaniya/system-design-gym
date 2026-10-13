@@ -55,6 +55,7 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
         dangerouslySetInnerHTML={{
           __html: JSON.stringify([
             breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
               { name: l.name, path: `/languages/${l.id}` },
               { name: s.name, path },
             ]),
