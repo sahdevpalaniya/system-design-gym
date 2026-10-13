@@ -75,6 +75,7 @@ export function AccountButton() {
       <button
         type="button"
         onClick={() => signIn('google')}
+        aria-label="Sign in with Google"
         className="flex min-h-10 min-w-10 items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-[0.7812rem] font-semibold transition hover:opacity-75 sm:min-h-0 sm:min-w-0"
         style={{ borderColor: 'var(--border-strong)' }}
       >
