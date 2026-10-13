@@ -56,7 +56,7 @@ export const TIER2: Concept[] = [
       'Multi-leader with no plan for conflicts. That plan is the whole question.',
     ],
     sayThis:
-      '"Single leader with two async followers, plus one semi-sync follower so a failover does not lose committed writes. Reads go to followers, except within ten seconds of a user\'s own write, which go to the leader. Cost: the leader is still my write ceiling, and failover means a few seconds of write errors."',
+      '"Single leader with two async followers, plus one semi-sync follower so a failover to that follower does not lose committed writes. Reads go to followers, except within ten seconds of a user\'s own write, which go to the leader. Cost: the leader is still my write ceiling, and failover means a few seconds of write errors."',
     related: ['partitioning', 'consistency-models', 'cap-pacelc', 'consensus'],
     refs: [
       {
@@ -503,7 +503,7 @@ export const TIER2: Concept[] = [
       },
     },
     body: [
-      'There are two shapes. A work queue hands each message to one consumer, and you scale by adding consumers. Use it for jobs, tasks, sending email. A log, like Kafka, keeps an ordered record that many independent consumers read at their own position, and can be read again from the start. Use a log when several teams need the same events, or when replay matters.',
+      'There are two shapes. A work queue hands each message to one consumer, and you scale by adding consumers. Use it for jobs, tasks, sending email. A log, like Kafka, keeps an ordered record that many independent consumers read at their own position, and can be replayed from any point still within its retention window. Use a log when several teams need the same events, or when replay matters.',
       'Ordering. Putting a whole topic in one global order is expensive and usually unnecessary. What you almost always want is ordering per key: all events for one order in sequence, while different orders move in parallel. That is what partitioning by key gives you. Say "ordered per user, not globally" and you have answered the question properly.',
       'Retries need a limit and a delay. Retry immediately and forever, and a message that always fails, from bad data or a bug, spins forever, burns capacity and hides real work behind it. So use exponential backoff with jitter, a maximum number of attempts, and then move it aside.',
       'Where it moves to is the dead letter queue, where poison messages wait for a human. The part people forget: a dead letter queue nobody watches loses data without anyone noticing. Alert when messages arrive in it, and have a way to fix and replay them.',
@@ -521,7 +521,7 @@ export const TIER2: Concept[] = [
         'The stock check and reservation. The user is standing there wanting to know whether they bought the thing, and a queue can only say "we will let you know". So either you show a confirmation you cannot back up, or you make them wait for an async result, which is the same delay with more moving parts. Worse, if two people queue a purchase for the last item, both requests are accepted and one of them gets a cancellation email later. That is a far worse experience than an immediate "sorry, sold out". Take payment and reserve stock synchronously against the real record. Queue everything after it: the receipt email, the warehouse notification, the analytics event. None of those need the user to be waiting.',
     },
     traps: [
-      'Adding a queue and never mentioning idempotency. Duplicate delivery is guaranteed.',
+      'Adding a queue and never mentioning idempotency. Duplicate delivery will happen sometimes.',
       'No dead letter queue, or one nobody watches.',
       'Assuming global ordering. You almost certainly want ordering per key.',
       'Treating a queue with no size limit as infinite capacity. It is failure, postponed.',

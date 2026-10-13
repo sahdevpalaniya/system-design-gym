@@ -63,7 +63,7 @@ export const TIER3: Concept[] = [
       {
         label: "RFC 6585 \u2014 Additional HTTP Status Codes",
         href: "https://datatracker.ietf.org/doc/html/rfc6585",
-        note: "Where 429 Too Many Requests is defined, along with Retry-After.",
+        note: "Where 429 Too Many Requests is defined; it may carry a Retry-After header (defined in RFC 9110).",
       },
     ],
     hints: [
@@ -98,7 +98,7 @@ export const TIER3: Concept[] = [
         caption: 'Going from 4 servers to 5. How many keys have to move?',
         items: [
           { label: 'hash(key) % N', value: 80, display: '~80% of keys move', tone: 'bad' },
-          { label: 'Consistent hashing', value: 20, display: '~20% of keys move (1/N)', tone: 'accent' },
+          { label: 'Consistent hashing', value: 20, display: '~20% of keys move (1/5)', tone: 'accent' },
         ],
         note: 'With a remainder, a key that hashed to 7 moves from server 3 to server 2 for no reason except that the divisor changed. Consistent hashing only reassigns the slice the new server takes over.',
       },

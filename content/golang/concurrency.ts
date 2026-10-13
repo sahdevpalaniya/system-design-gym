@@ -717,7 +717,7 @@ func main() {
 }
 `,
           canRun: true,
-          note: '`stop()` returns false if `f` has already started, so you know whether the cleanup happened.',
+          note: '`stop()` returns false if `f` has already started or was already stopped, so you know whether the cleanup happened.',
         },
       },
       {

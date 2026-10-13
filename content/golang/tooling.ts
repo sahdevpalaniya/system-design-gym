@@ -27,7 +27,7 @@ export const TOOLING: LangLesson[] = [
           label: 'go.mod',
           src: `module github.com/you/snapnotes
 
-go 1.25
+go 1.27
 
 require (
 \tgithub.com/golang-jwt/jwt/v5 v5.3.0

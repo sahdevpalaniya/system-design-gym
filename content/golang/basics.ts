@@ -18,7 +18,7 @@ export const BASICS: LangLesson[] = [
           'Go is a compiled language. You write a `.go` file, the compiler turns it into a single machine-code binary, and you run that. There is no interpreter to install on the server and no virtual machine. That one fact explains most of what people like about Go: you build one file and copy it anywhere.',
           'First, install it. Pick your system below. Every option installs the same thing: the compiler, the standard library and the `go` command.',
         ],
-        code: { label: 'terminal', src: 'go version\n# go version go1.25.1 linux/amd64' },
+        code: { label: 'terminal', src: 'go version\n# go version go1.27.2 linux/amd64' },
       },
       {
         heading: 'Install Go',
@@ -47,9 +47,9 @@ winget install GoLang.Go
         code: {
           label: 'Linux',
           src: `# the official way — distribution packages are often far behind
-curl -LO https://go.dev/dl/go1.25.1.linux-amd64.tar.gz
+curl -LO https://go.dev/dl/go1.27.2.linux-amd64.tar.gz
 sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf go1.25.1.linux-amd64.tar.gz
+sudo tar -C /usr/local -xzf go1.27.2.linux-amd64.tar.gz
 
 # then add Go to your PATH, and reload your shell
 echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.profile
@@ -61,7 +61,7 @@ source ~/.profile`,
         code: {
           label: 'check it worked',
           src: `go version
-# go version go1.25.1 linux/amd64
+# go version go1.27.2 linux/amd64
 
 go env GOPATH
 # /home/you/go   — where downloaded packages live. You rarely need to touch it.`,
