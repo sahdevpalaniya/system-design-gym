@@ -498,6 +498,7 @@ function Sidebar() {
         ))}
 
         <Group title="Practice">
+          <Item href="/practice">All practice modes</Item>
           <Item href="/practice/daily">Daily rep · 15 min</Item>
           <Item href="/practice/mock">Timed mock · 45 min</Item>
           <Item href="/practice/blitz">Follow-up blitz · 10 min</Item>
@@ -542,6 +543,7 @@ function Sidebar() {
         })}
 
         <Group title="Interviewers">
+          <Item href="/archetypes">All interviewer types</Item>
           {ARCHETYPES.map((a) => (
             <Item key={a.id} href={`/archetypes/${a.id}`}>
               {a.name.replace(/^The /, '')}
