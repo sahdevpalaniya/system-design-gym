@@ -6,9 +6,10 @@ import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
 import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
-  'Company-wise system design practice',
+  'System design interview questions by company',
   'What Google, Amazon, Meta, Microsoft, Netflix and Uber press on in a system design round, and the questions to rehearse for each.',
   '/company',
+  true,
 )
 
 export default function CompanyIndex() {
