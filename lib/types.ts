@@ -184,6 +184,14 @@ export interface Concept {
   hints?: string[]
   /** a second, moving visual — shows the mechanism the static one only labels */
   animation?: { scenario: FlowScenario; caption: string }
+  /** full <title> override, for topics people search for outside interview prep */
+  metaTitle?: string
+  /** meta description override; keep it under 155 characters */
+  metaDescription?: string
+  /** real configuration or code, shown under "How it works" */
+  examples?: { label: string; src: string; note?: string }[]
+  /** visible questions and answers; also published as FAQPage markup */
+  faq?: { q: string; a: string }[]
 }
 
 // ---------- problems ----------

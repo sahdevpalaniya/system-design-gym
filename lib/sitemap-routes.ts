@@ -50,7 +50,7 @@ export function sitemapRoutes(): SitemapRoute[] {
 
   // hubs and site pages
   add('/', 'pages', 1, ['app/page.tsx', 'app/dashboard.tsx'])
-  for (const p of ['/learn', '/concepts', '/problems', '/solutions', '/archetypes', '/company', '/map', '/revise', '/drills', '/practice'])
+  for (const p of ['/learn', '/concepts', '/cheat-sheet', '/problems', '/solutions', '/archetypes', '/company', '/map', '/revise', '/drills', '/practice'])
     add(p, 'pages', 0.7, [page(p)])
   for (const p of ['/about', '/privacy', '/terms', '/contact']) add(p, 'pages', 0.3, [page(p)])
   for (const l of LESSONS) add(`/learn/${l.slug}`, 'pages', 0.8, ['content/system-design/foundations.ts'])

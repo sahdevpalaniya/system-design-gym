@@ -21,6 +21,10 @@ export default function ConceptsPage() {
               {CONCEPTS.length} concepts
             </span>
             <span style={{ color: 'var(--border-strong)' }}>·</span>
+            <Link href="/cheat-sheet" className="text-[0.8125rem] font-semibold" style={{ color: 'var(--accent)' }}>
+              All of them on one page: the cheat sheet
+            </Link>
+            <span style={{ color: 'var(--border-strong)' }}>·</span>
             {(['untouched', 'attempted', 'solid', 'review'] as const).map((s) => (
               <span key={s} className="flex items-center gap-1.5 text-[0.7812rem]" style={{ color: 'var(--muted)' }}>
                 <StateDot state={s} size={7} />

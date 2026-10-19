@@ -413,7 +413,7 @@ export const TIER3_OPS: Concept[] = [
     ],
     sayThis:
       '"Bandwidth dominates this bill by an order of magnitude, so the CDN is a cost decision before it is a latency one. A 95% hit rate takes the origin down to a twentieth of the traffic. Raw uploads move to cold storage after 30 days. Each region is sized to absorb another one failing, which is why utilisation looks low. I would track cost per video minute served rather than the total."',
-    related: ['back-of-envelope', 'cdn', 'object-storage', 'multi-region'],
+    related: ['back-of-envelope', 'connection-pooling', 'cdn', 'object-storage', 'multi-region'],
     refs: [
       {
         label: "Reliability and constant work",

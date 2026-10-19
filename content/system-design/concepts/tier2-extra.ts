@@ -83,7 +83,7 @@ export const TIER2_EXTRA: Concept[] = [
     ],
     sayThis:
       '"The reservation is one conditional update (set the seat to held where it is still free), so there is no gap between checking and writing, and the loser gets zero rows changed. Holds expire after ten minutes. Cost: that row is a serialisation point, so a single hot event has a write ceiling on it, which I accept because the inventory is finite anyway."',
-    related: ['consistency-models', 'idempotency', 'distributed-transactions', 'sql-vs-nosql'],
+    related: ['connection-pooling', 'consistency-models', 'idempotency', 'distributed-transactions', 'sql-vs-nosql'],
     refs: [
       {
         label: "PostgreSQL \u2014 Transaction Isolation",

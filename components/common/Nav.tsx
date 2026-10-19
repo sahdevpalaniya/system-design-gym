@@ -434,6 +434,7 @@ function Sidebar() {
         >
           <Item href="/learn">All topics</Item>
           <Item href="/revise">Quick revision</Item>
+          <Item href="/cheat-sheet">Cheat sheet</Item>
           <Item href="/practice/check">
             Concept check
             {due > 0 ? (

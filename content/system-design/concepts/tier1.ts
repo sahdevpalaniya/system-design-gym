@@ -380,7 +380,7 @@ export const TIER1: Concept[] = [
     ],
     sayThis:
       '"Postgres for the core, because bookings need a real transaction. The event stream is 50k writes a second and only ever read by device id, so that goes in a partitioned key-value store. Cost: two systems to run, and no transaction covers both, so I will make writes to the stream safe to repeat."',
-    related: ['indexes', 'partitioning', 'distributed-transactions'],
+    related: ['indexes', 'connection-pooling', 'partitioning', 'distributed-transactions'],
     refs: [
       {
         label: "PostgreSQL \u2014 Indexes",
@@ -456,7 +456,7 @@ export const TIER1: Concept[] = [
     ],
     sayThis:
       '"That query filters by user and sorts by time, so a composite index on (user_id, created_at desc) serves both the filter and the sort. Cost: another index to maintain on a write-heavy table, and it will not help any query that filters on time alone."',
-    related: ['sql-vs-nosql', 'search-indexing', 'geospatial-indexing'],
+    related: ['sql-vs-nosql', 'connection-pooling', 'search-indexing', 'geospatial-indexing'],
     refs: [
       {
         label: "Use The Index, Luke!",
@@ -477,12 +477,17 @@ export const TIER1: Concept[] = [
 
   {
     slug: 'connection-pooling',
-    title: 'Connection pooling',
+    title: 'Connection pooling: what it is, how to size a pool, and the pitfalls',
+    navTitle: 'Connection pooling',
+    metaTitle: 'Connection pooling explained: pool sizing, HikariCP, pgbouncer',
+    metaDescription:
+      'What database connection pooling is, why it matters, how to size a pool, and real HikariCP, pgbouncer and Go database/sql settings, with the common pitfalls.',
     tier: 1,
     oneLine: 'Reuse a small set of open database connections, instead of opening one per request.',
     problem: [
-      'Opening a database connection is expensive. There is a TCP handshake, TLS, a login, and on some databases a whole new process. Doing that for every request can take longer than the query itself.',
-      'Worse, databases have a hard limit on how many connections they allow at once. Go past it and new connections are refused, which looks like a total outage even though the database is barely doing any work.',
+      'A **connection pool** is a set of database connections that your application opens once and keeps open. When a request needs the database it borrows a connection from the pool, runs its queries, and hands the connection back for the next request. Nobody opens or closes a connection on the hot path.',
+      'Opening a database connection is expensive. There is a TCP handshake, TLS, a login, and on PostgreSQL a whole new server process per connection. Doing that for every request can take longer than the query itself.',
+      'Worse, databases have a hard limit on how many connections they allow at once (`max_connections` is 100 by default on PostgreSQL). Go past it and new connections are refused, which looks like a total outage even though the database is barely doing any work.',
     ],
     cost: 'The pool is a queue, so when it is full, requests wait. A pool that is too small becomes your bottleneck while the database sits idle. Pools also carry state. A connection handed back mid-transaction, or with a session setting still on, causes bugs that show up in unrelated requests later.',
     useWhen: [
@@ -516,6 +521,82 @@ export const TIER1: Concept[] = [
       'The failure has a recognisable shape. Response times climb on every endpoint at once. Database CPU is not high. Errors say "timed out waiting for connection". That is pool exhaustion. The usual cause is slow queries holding connections, rather than too much traffic. One endpoint running a 10-second report can starve the whole service.',
       'Set a timeout on getting a connection. Waiting forever turns a slow dependency into an endless pile of stuck requests. Failing fast lets you drop traffic and stay up.',
       'For serverless, or for a very large number of instances, put a dedicated pooler in front. In transaction mode it lends a real connection to a request only for the length of one transaction, so hundreds of clients share a handful of connections. The cost is that anything spanning transactions breaks, including session-level settings and some prepared-statement behaviour.',
+      '**Sizing with arithmetic, not instinct.** A connection is busy only while a query or transaction runs, so the number you need is throughput times hold time (Little\'s law). 2,000 queries a second that each hold a connection for 5 ms keep about 10 connections busy on average. Add headroom for bursts and you get a pool in the low tens, not hundreds. The HikariCP project\'s well-known starting formula points the same way: connections = (cores × 2) + effective spindle count, so about 17 for an 8-core server on SSD. Treat either number as a starting point and load test.',
+      '**Budget across the fleet.** The figure that matters to the database is the total: pool size × instances, plus migrations, cron jobs, admin consoles and replicas of your workers. Keep that total below `max_connections` with room for superuser and maintenance connections. If autoscaling can double your instances, the budget must survive the doubled count.',
+      '**Two layers of pooling.** Most stacks have an in-process pool (HikariCP in Java, `database/sql` in Go, the pool inside node-postgres or SQLAlchemy). It removes the connect cost and caps one process. An external pooler such as pgbouncer, RDS Proxy or Supavisor sits between many processes and the database and caps the whole fleet. Small services need only the first; serverless and large fleets need both.',
+      '**Pitfalls that show up in production:** connections leaked because a result set or transaction was never closed; a transaction left open while the code calls another service; connections silently killed by a firewall or load balancer idle timeout, so the first query after a quiet period fails (set a max lifetime shorter than that timeout); session state such as `SET search_path` or temporary tables leaking to the next borrower; and prepared statements or advisory locks breaking under transaction-mode pooling.',
+    ],
+    examples: [
+      {
+        label: 'Go — database/sql pool settings',
+        src: `db, err := sql.Open("pgx", dsn) // *sql.DB is a pool, not one connection
+if err != nil {
+	return err
+}
+db.SetMaxOpenConns(20)                 // default 0 means unlimited: always set it
+db.SetMaxIdleConns(20)                 // default is 2, which causes connection churn
+db.SetConnMaxLifetime(30 * time.Minute) // recycle before any idle timeout in between
+db.SetConnMaxIdleTime(5 * time.Minute)
+
+// database/sql has no "wait for a connection" timeout of its own:
+// the context deadline covers both waiting for a connection and the query.
+ctx, cancel := context.WithTimeout(r.Context(), 2*time.Second)
+defer cancel()
+rows, err := db.QueryContext(ctx, "SELECT id, name FROM users WHERE team_id = $1", teamID)
+if err != nil {
+	return err
+}
+defer rows.Close() // forgetting this leaks the connection`,
+        note: 'Open the *sql.DB once at startup and share it. db.Stats() reports WaitCount and WaitDuration, the two numbers that reveal pool exhaustion. More in the Go lesson on Postgres and SQL.',
+      },
+      {
+        label: 'Java — HikariCP (application.properties, Spring Boot)',
+        src: `spring.datasource.hikari.maximum-pool-size=20     # default 10
+spring.datasource.hikari.minimum-idle=20           # fixed-size pool, as HikariCP recommends
+spring.datasource.hikari.connection-timeout=2000   # ms to wait for a connection; default 30000
+spring.datasource.hikari.max-lifetime=1800000      # 30 min; keep below any network idle timeout
+spring.datasource.hikari.leak-detection-threshold=10000  # log connections held over 10 s`,
+        note: 'connection-timeout is the setting that turns an endless pile-up into a fast, visible failure. leak-detection-threshold logs the stack trace of whoever held the connection too long.',
+      },
+      {
+        label: 'pgbouncer.ini — transaction pooling in front of PostgreSQL',
+        src: `[databases]
+app = host=10.0.0.5 port=5432 dbname=app
+
+[pgbouncer]
+listen_port = 6432
+pool_mode = transaction    ; lend a server connection per transaction
+max_client_conn = 2000     ; app-side connections pgbouncer will accept
+default_pool_size = 20     ; real server connections per database/user pair
+max_prepared_statements = 100  ; 1.21+: protocol-level prepared statements in transaction mode`,
+        note: 'Two thousand client connections share twenty real ones. Point the application at port 6432 instead of 5432; its own pool can stay small.',
+      },
+    ],
+    faq: [
+      {
+        q: 'What is connection pooling?',
+        a: 'Keeping a set of open database connections and lending them to requests, instead of opening and closing a connection for each request. It removes the connect cost (TCP, TLS, authentication, and on PostgreSQL a new backend process) and caps how many connections the database has to handle.',
+      },
+      {
+        q: 'How big should a database connection pool be?',
+        a: 'Smaller than most people expect. Start from throughput × average time a connection is held, add headroom, and sanity-check against the HikariCP rule of thumb of (cores × 2) + spindles on the database server. Then multiply by the number of application instances and make sure the total fits under the database\'s `max_connections`. Load test and watch pool wait time, not just CPU.',
+      },
+      {
+        q: 'What is the difference between session, transaction and statement pooling in pgbouncer?',
+        a: 'In session mode a client keeps one server connection until it disconnects, which is safe but saves little. In transaction mode it holds a server connection only for one transaction, which lets thousands of clients share a few connections but breaks session-level features such as `SET`, `LISTEN` and session advisory locks. Statement mode returns the connection after every statement and forbids multi-statement transactions.',
+      },
+      {
+        q: 'Is Go\'s sql.DB a connection pool?',
+        a: 'Yes. `*sql.DB` manages a pool and is safe for concurrent use, so open it once and share it. Set `SetMaxOpenConns`, because the default is unlimited, and raise `SetMaxIdleConns` above its default of 2. See [Postgres and SQL in Go](/languages/go/postgres-and-sql).',
+      },
+      {
+        q: 'Do I still need pgbouncer if my application already has a pool?',
+        a: 'For a few long-lived servers, usually not: the in-process pools are enough if their total fits the database. You need an external pooler when instance count is large or unpredictable, as with serverless functions or aggressive autoscaling, because every instance brings its own pool.',
+      },
+      {
+        q: 'How do I tell that the pool is the bottleneck?',
+        a: 'Latency rises on every endpoint at once, errors mention timeouts acquiring a connection, and the database itself is not busy. Pool metrics confirm it: active connections pinned at the maximum and a growing wait count. HikariCP exposes these as metrics; Go exposes them through `db.Stats()`.',
+      },
     ],
     followUp: {
       q: '"You added more application servers and the database got slower. Why?"',
@@ -534,12 +615,27 @@ export const TIER1: Concept[] = [
     ],
     sayThis:
       '"Pooled connections, sized at roughly four times the database core count, with a two-second timeout on getting one so we fail fast instead of piling up. With autoscaling I would put pgbouncer in front, so total connections stay flat no matter how many app servers we run."',
-    related: ['load-balancing', 'circuit-breakers', 'indexes'],
+    related: ['load-balancing', 'circuit-breakers', 'indexes', 'transactions-and-locking', 'capacity-and-cost'],
     refs: [
       {
         label: "PostgreSQL \u2014 Connection Settings",
         href: "https://www.postgresql.org/docs/current/runtime-config-connection.html",
         note: "What max_connections costs on the server side, which is the reason pooling exists.",
+      },
+      {
+        label: 'HikariCP \u2014 About Pool Sizing',
+        href: 'https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing',
+        note: 'The argument for small pools, with the cores \u00d7 2 + spindles starting formula.',
+      },
+      {
+        label: 'PgBouncer \u2014 Configuration',
+        href: 'https://www.pgbouncer.org/config.html',
+        note: 'pool_mode, default_pool_size, max_client_conn and the features each pool mode breaks.',
+      },
+      {
+        label: 'Go \u2014 Managing connections (database/sql)',
+        href: 'https://go.dev/doc/database/manage-connections',
+        note: 'What SetMaxOpenConns, SetMaxIdleConns and the lifetime settings actually do.',
       },
     ],
     hints: [

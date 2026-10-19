@@ -12,9 +12,13 @@ import { WorkedExampleBlock } from '@/components/system-design/DeepDive'
 import { ConceptCheck, ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
 import { AnimatedFlow } from '@/components/common/visuals'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
+import { CodeBlock } from '@/components/golang/Code'
 import { MarkRead } from '@/components/common/MarkRead'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta, subject, withUtm } from '@/lib/seo'
 import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
+
+/** FAQ answers are written with the same light markup as the page; schema wants plain text */
+const plain = (s: string) => s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|`/g, '')
 
 export function generateStaticParams() {
   return CONCEPTS.map((c) => ({ slug: c.slug }))
@@ -39,8 +43,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       line,
     ].find((d) => d.length <= 155) ?? line
   return pageMeta(
-    `${short} — system design interview`,
-    description,
+    c.metaTitle ?? `${short} — system design interview`,
+    c.metaDescription ?? description,
     `/concepts/${c.slug}`,
     true,
     true, // own opengraph-image
@@ -66,8 +70,8 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
 
   return (
     <Page>
-      {/* no FAQPage here: the self-check answer stays hidden until the reader
-          answers, and FAQ markup must describe text visible on the page */}
+      {/* the self-check answer stays hidden until the reader answers, so it is
+          never FAQ markup; only the always-visible `faq` list below is */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -86,6 +90,19 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
                 modified: CONTENT_MODIFIED,
                 section: TIER_INFO[c.tier].name,
               }),
+              ...(c.faq?.length
+                ? [
+                    {
+                      '@context': 'https://schema.org',
+                      '@type': 'FAQPage',
+                      mainEntity: c.faq.map((f) => ({
+                        '@type': 'Question',
+                        name: f.q,
+                        acceptedAnswer: { '@type': 'Answer', text: plain(f.a) },
+                      })),
+                    },
+                  ]
+                : []),
             ],
           ),
         }}
@@ -142,6 +159,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
       <Section n="4" title={`How ${subj} actually works`}>
         <ConceptVisualBlock visual={c.visual} />
         {c.body?.length ? <Prose paragraphs={c.body} /> : null}
+        {c.examples?.map((e) => <CodeBlock key={e.label} label={e.label} src={e.src} note={e.note} />)}
         {c.animation ? (
           <div className="my-8">
             <AnimatedFlow scenario={c.animation.scenario} caption={c.animation.caption} />
@@ -209,7 +227,22 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         </Card>
       </Section>
 
-      <Section n="6" title="Your turn">
+      {c.faq?.length ? (
+        <Section n="6" title={`${c.navTitle ?? c.title}: common questions`}>
+          <div className="space-y-5">
+            {c.faq.map((f) => (
+              <div key={f.q}>
+                <h3 className="mb-1.5 text-[1rem] font-semibold">{f.q}</h3>
+                <p className="prose text-[0.9375rem]">
+                  <Rich text={f.a} />
+                </p>
+              </div>
+            ))}
+          </div>
+        </Section>
+      ) : null}
+
+      <Section n={c.faq?.length ? '7' : '6'} title="Your turn">
         <ConceptCheck concept={c} />
       </Section>
 
@@ -220,7 +253,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
       ) : null}
 
       {c.refs?.length ? (
-        <Section n="7" title="Learn it from the source">
+        <Section n={c.faq?.length ? '8' : '7'} title="Learn it from the source">
           <p className="mb-4 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
             This page gets you interview-ready. These take you to where the idea
             is actually specified or measured — read them when you want the real depth.

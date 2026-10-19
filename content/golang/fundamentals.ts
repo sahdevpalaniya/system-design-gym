@@ -171,9 +171,10 @@ func main() {
 
   {
     slug: 'printing-and-format-verbs',
-    title: 'Printing and format verbs',
+    title: 'Printing in Go: Println, Printf and format verbs',
     navTitle: 'Printing and verbs',
-    oneLine: 'The three printing functions, and the verbs you will use every day.',
+    searchTitle: 'Printing in Golang: Printf format verbs, with examples',
+    oneLine: 'How to print in Go with Print, Println and Printf, and the Printf format verbs you will use every day.',
     objectives: [
       'Choose between `Print`, `Println`, `Printf` and `Sprintf` for a given output.',
       'Predict the output of `Printf` with `%v`, `%T`, `%q`, `%.2f` and `%5d`.',
@@ -211,6 +212,30 @@ fmt.Println(s)`,
             ['`%5d` / `%-5s`', 'pad to 5 wide, right / left aligned', '`   25` / `ab   `'],
             ['`%%`', 'a literal percent sign', '`%`'],
           ],
+        },
+      },
+      {
+        heading: 'Width, precision and flags',
+        body: [
+          'Between the `%` and the verb letter you can put flags, a width and a precision. The width pads the value to at least that many characters. The precision means digits after the point for a float, and the maximum number of characters for a string.',
+        ],
+        table: {
+          headers: ['Format', 'Value', 'Output'],
+          rows: [
+            ['`%8.2f`', '`3.14159`', '4 spaces then `3.14` (8 wide, 2 decimals)'],
+            ['`%-8.2f|`', '`3.14159`', '`3.14` then 4 spaces, then `|` (left aligned)'],
+            ['`%05d`', '`42`', '`00042` (padded with zeros)'],
+            ['`%+d`', '`42`', '`+42` (always show the sign)'],
+            ['`%.3s`', '`"golang"`', '`gol` (cut to 3 characters)'],
+            ['`%*d`', '`6, 42`', '4 spaces then `42` (width 6, taken from an argument)'],
+            ['`%b` / `%o` / `%X`', '`10` / `8` / `255`', '`1010` / `10` / `FF`'],
+            ['`%c` / `%U`', "`'G'`", '`G` / `U+0047`'],
+            ['`%e`', '`1234.5678`', '`1.234568e+03`'],
+          ],
+        },
+        callout: {
+          tone: 'warn',
+          text: 'A wrong verb does not stop the program. `fmt.Printf("%d", "hi")` prints `%!d(string=hi)`, and a missing argument prints `%!d(MISSING)`. `go vet` reports both before you run, so run it.',
         },
       },
       {
