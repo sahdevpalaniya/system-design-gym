@@ -9,12 +9,49 @@ import { problemState, useProgress } from '@/lib/store'
 import type { StageId } from '@/lib/types'
 import { StageEngine } from '@/components/system-design/StageEngine'
 import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/common/ui'
-import { ModeIntro } from '@/components/common/ModeIntro'
+import { ModeIntro, type ModeFaq, type ModeSection } from '@/components/common/ModeIntro'
 
 /** server-rendered in every branch (and the Suspense fallback), so the static HTML explains the tool */
 const INTRO = [
   "The timed mock is a 45-minute system design interview on one problem, under interview conditions. It covers all five stages, from requirements to the deep dive, and each stage has its own timer. The timers keep running past zero instead of cutting you off, because going over is useful information, not a failure.",
   "Pick a problem, read the rules, then start. Nothing is revealed until all five stages are submitted: no model answers, checklists or hints along the way. At the end you read the model answers, mark honestly what you actually had, and get a report card across six axes. If you have chosen an [interviewer archetype](/archetypes), it decides which follow-up you face at the end."
+]
+
+const SECTIONS: ModeSection[] = [
+  {
+    heading: 'Who it is for',
+    paragraphs: [
+      "Someone close to a real interview who has already worked a few [problems](/problems) stage by stage and now wants to rehearse the whole thing at full pace, with nobody to lean on. The mock tests whether you can manage the clock as well as the content: knowing when to stop asking questions and start drawing is a skill of its own.",
+      "If you have not tried any problems yet, start gentler. The [daily rep](/practice/daily) covers the first two stages in fifteen minutes, and a problem's own page lets you see each model answer as soon as you submit that stage.",
+    ],
+  },
+  {
+    heading: 'How the 45 minutes are split',
+    paragraphs: [
+      "Requirements get 5 minutes, actors and lifecycle 6, numbers 6, the high-level design 12, and the deep dive and tradeoffs 14. That is 43 minutes of stages, with the last couple left for the follow-up question. The split is deliberate: the design and the deep dive get the most time, but only after the requirements and numbers have told you what the design has to do.",
+    ],
+  },
+  {
+    heading: 'An example: the first five minutes',
+    paragraphs: [
+      'On the link shortener, a strong first stage states its assumptions in one breath: global users, a few hundred million links, far more reads than writes, links that last until someone deletes them. It asks a question that would change the design, such as whether users can pick their own short code, and says what it will assume if nobody answers. Then it proposes a scope (create a link, follow a link, rough click counts) and names what is left out on purpose. No boxes or databases yet: those wait for stage 4.',
+    ],
+  },
+]
+
+const FAQ: ModeFaq[] = [
+  {
+    q: 'What happens when a stage timer reaches zero?',
+    a: 'It keeps counting, and shows how far over you are. You are never cut off. Overrunning one stage is a useful thing to learn about yourself before the real interview.',
+  },
+  {
+    q: 'What is on the report card?',
+    a: 'A score on each of six axes: requirements, lifecycle, numbers, design, tradeoffs and defence. It comes from you ticking, stage by stage, the checklist points your answer actually covered, so it is only as good as your honesty. Your past mocks are listed on this page with their average.',
+  },
+  {
+    q: 'How is this different from a problem page?',
+    a: 'On a problem page you see the model answer for each stage as soon as you submit it. In the mock nothing is shown until all five stages are done, which is closer to an interview, where nobody tells you how you are doing until it is over.',
+  },
 ]
 
 const ALL: StageId[] = [1, 2, 3, 4, 5]
@@ -43,7 +80,7 @@ function MockInner() {
           }
         />
         <StageEngine problem={problem} stageIds={ALL} revealMode="end" timed />
-        <ModeIntro inPage paragraphs={INTRO} />
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -95,7 +132,7 @@ function MockInner() {
             </Button>
           </div>
         </Card>
-        <ModeIntro inPage paragraphs={INTRO} />
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -160,7 +197,7 @@ function MockInner() {
           </div>
         </section>
       ) : null}
-      <ModeIntro inPage paragraphs={INTRO} />
+      <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
     </Page>
   )
 }
@@ -176,7 +213,7 @@ export default function MockPage() {
           <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>
-          <ModeIntro inPage paragraphs={INTRO} />
+          <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
         </Page>
       }
     >

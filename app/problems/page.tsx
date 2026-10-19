@@ -13,7 +13,7 @@ export default function ProblemsPage() {
     <Page wide>
       <PageHeader
         eyebrow="Track B"
-        title="Problem library"
+        title="System design interview questions"
         lede="Grouped by the **shape of the problem**, not by product name. Two products that look different are often the same problem, and two that look alike often are not."
         meta={
           <>

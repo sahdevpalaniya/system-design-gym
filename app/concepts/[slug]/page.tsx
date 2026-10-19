@@ -15,7 +15,7 @@ import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/
 import { CodeBlock } from '@/components/golang/Code'
 import { MarkRead } from '@/components/common/MarkRead'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta, subject, withUtm } from '@/lib/seo'
-import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
+import { pageDates } from '@/lib/content-dates'
 
 /** FAQ answers are written with the same light markup as the page; schema wants plain text */
 const plain = (s: string) => s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|`/g, '')
@@ -86,8 +86,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
                 headline: c.title,
                 description: c.oneLine,
                 path: `/concepts/${c.slug}`,
-                published: CONTENT_PUBLISHED,
-                modified: CONTENT_MODIFIED,
+                ...pageDates(`/concepts/${c.slug}`),
                 section: TIER_INFO[c.tier].name,
               }),
               ...(c.faq?.length

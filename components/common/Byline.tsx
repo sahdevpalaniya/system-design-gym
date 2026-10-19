@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AUTHOR, reportHref } from "@/lib/author";
 import { CONTACT_EMAIL } from "@/lib/legal";
 import { SITE_URL } from "@/lib/seo";
-import { CONTENT_MODIFIED } from "@/lib/content-dates";
+import { pageDates } from "@/lib/content-dates";
 import { ShareButton } from "./ShareButton";
 import { Newsletter } from "./Newsletter";
 
@@ -10,7 +10,7 @@ import { Newsletter } from "./Newsletter";
  *  mistake. On every lesson, concept and problem, so trust is never one
  *  click away. */
 export function Byline({ title, path }: { title: string; path: string }) {
-  const reviewed = new Date(CONTENT_MODIFIED).toLocaleDateString("en-GB", {
+  const reviewed = new Date(pageDates(path).modified).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",

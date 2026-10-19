@@ -54,7 +54,7 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
             </span>
           </>
         }
-        title={l.name}
+        title={`${l.name}${l.alias && l.alias !== l.name ? ` (${l.alias})` : ''} tutorial`}
         lede={l.blurb}
       />
 

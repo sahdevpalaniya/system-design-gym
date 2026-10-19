@@ -16,7 +16,7 @@ import {
 } from '@/components/common/visuals'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
-import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
+import { pageDates } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return PROBLEMS.map((p) => ({ slug: p.slug }))
@@ -68,8 +68,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
               headline: `${p.searchTitle ?? p.title} — worked solution`,
               description: p.prompt,
               path: `/problems/${p.slug}/solution`,
-              published: CONTENT_PUBLISHED,
-              modified: CONTENT_MODIFIED,
+              ...pageDates(`/problems/${p.slug}/solution`),
               section: 'Worked solutions',
             }),
           ]),

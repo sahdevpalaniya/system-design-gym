@@ -221,6 +221,36 @@ export default function DrillsPage() {
           'Practise one at a time, across all of them or filtered to one category. Write your answer before you look at anything. Then compare it against a weak answer, a strong answer and the trap hidden in the question, and rate yourself out of 3.',
           'Your ratings build a record per category, so you can see which kind of follow-up you are weakest at and drill that one. Every answer also feeds the Defence axis on your progress profile.',
         ]}
+        sections={[
+          {
+            heading: 'Who it is for',
+            paragraphs: [
+              'Candidates whose first diagram is fine but whose answers fall apart under "why?" and "what if?". Interviewers rarely stop at the design you draw. They multiply the traffic, kill a server, or ask what the whole thing costs, and the drills let you rehearse each of those pushes on its own, as many times as you need.',
+              'They work best after you have worked through a couple of [problems](/problems), so the designs being questioned are familiar. If you want a timed round of mixed questions instead, use the [follow-up blitz](/practice/blitz).',
+            ],
+          },
+          {
+            heading: 'An example',
+            paragraphs: [
+              'From the break-the-scale category: "One user has 200 million followers. What happens?" The weak answer says the fan-out would be slow but would finish eventually. It would, hours late, with everyone else\'s posts stuck behind it.',
+              'The strong answer treats it as a design change: above a follower threshold, stop fanning out that account\'s posts and merge them in when a reader opens their timeline, which works because a huge account\'s recent posts are the easiest data in the system to cache. Then it names the cost: two code paths for one feature, a threshold to tune, and timelines built from two sources. The trap is that the average follower count in your estimate hid the skew that breaks the design.',
+            ],
+          },
+        ]}
+        faq={[
+          {
+            q: 'Should I type or speak my answer?',
+            a: 'Type it here, but write it the way you would say it in the room: short sentences, the decision first, then the cost. You need at least a sentence before the answers unlock.',
+          },
+          {
+            q: 'Is it worth answering a question again?',
+            a: 'Yes. Answering from scratch a second time, days later, is worth more than rereading the strong answer. The panel beside each question tells you how many times you have answered it before.',
+          },
+          {
+            q: 'What do the category scores mean?',
+            a: 'Each is your average self-rating out of 3 in that category. Below 2 shows red and below 2.5 amber, which is a good signal of where to spend your next session.',
+          },
+        ]}
       />
     </Page>
   )

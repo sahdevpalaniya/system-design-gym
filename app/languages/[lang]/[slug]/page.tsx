@@ -14,7 +14,7 @@ import { humanMinutes, practiceMinutes, readMinutes } from '@/lib/estimate'
 import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
-import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
+import { pageDates } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return LANGUAGES.flatMap((l) => l.lessons.map((t) => ({ lang: l.id, slug: t.slug })))
@@ -153,8 +153,7 @@ export default async function LangLessonPage({
               headline: `${t.title} (${l.alias ?? l.name})`,
               description: t.oneLine,
               path,
-              published: CONTENT_PUBLISHED,
-              modified: CONTENT_MODIFIED,
+              ...pageDates(path),
               section: section?.name,
             }),
           ]),

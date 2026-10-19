@@ -272,7 +272,7 @@ export const INTERVIEW: LangLesson[] = [
       {
         body: [
           'These are the questions that come up most in Go interviews for freshers, new grads and developers with 1–3 years of experience. Each answer is short on purpose: say it in an interview, then stop. The link after each answer goes to the lesson with the full explanation and runnable code.',
-          'Groups: basics, slices and maps, interfaces and errors, concurrency, web and databases, and tricky output. For the deeper "how would you answer this" versions, see [Interview: language fundamentals](/languages/go/interview-language-fundamentals) and [Interview: concurrency](/languages/go/interview-concurrency).',
+          'Groups: basics, slices and maps, interfaces and errors, concurrency, web and databases, and tricky output, then a set for experienced developers. For the deeper "how would you answer this" versions, see [Interview: language fundamentals](/languages/go/interview-language-fundamentals) and [Interview: concurrency](/languages/go/interview-concurrency).',
         ],
       },
       {
@@ -363,6 +363,22 @@ export const INTERVIEW: LangLesson[] = [
           '**58. `fmt.Println(len("héllo"))` prints?** `6`. `é` takes 2 bytes in UTF-8, and `len` counts bytes. → [Strings and formatting](/languages/go/strings-and-formatting)',
           '**59. `var x []int; y := []int{}; fmt.Println(x == nil, y == nil)` prints?** `true false`. Only the declared-but-unset slice is nil. → [Arrays and slices](/languages/go/arrays-and-slices)',
           '**60. In Go 1.22+, `for i := range 3 { go func() { fmt.Print(i) }() }` prints?** `0`, `1` and `2` in some order (if you wait for them). Since 1.22 each iteration has its own `i`. → [Goroutines](/languages/go/goroutines)',
+        ],
+      },
+      {
+        heading: 'Go interview questions for experienced developers',
+        body: [
+          'With three or more years of Go, expect fewer definitions and more questions about running Go in production. These go beyond the 60 above. The answers are still short; the linked lessons have the detail and the code.',
+        ],
+        bullets: [
+          '**How do you stop a Go service being OOM-killed in a container?** Set `GOMEMLIMIT` to about 90% of the container’s memory limit, so the garbage collector works harder before the heap reaches it. `GOGC` alone knows nothing about the container limit. Then look for the real cause: goroutines that never exit, small slices keeping large buffers alive, and unbounded caches. → [Interview: backend and design](/languages/go/interview-backend-and-design)',
+          '**What does `GOMAXPROCS` default to in a container?** Before Go 1.25, the host’s core count, so a service with a 2-core quota on a 64-core node ran 64 schedulers and was throttled, which showed up as latency spikes. Since Go 1.25 the runtime reads the cgroup CPU limit on Linux, so say which version you run. → [Interview: backend and design](/languages/go/interview-backend-and-design)',
+          '**How do you find out why a service is slow or using too much memory?** Profile it under load with pprof (CPU, heap and goroutine profiles) instead of guessing. Confirm the fix with a benchmark, and compare before and after with benchstat. → [Profile and ship](/languages/go/profiling-and-shipping)',
+          '**How do you run several tasks at once and stop on the first error?** `errgroup.WithContext` from `golang.org/x/sync/errgroup`. `Wait` returns the first error, the shared context is cancelled so the other tasks can stop early, and `SetLimit` caps how many run at the same time. → [Concurrency patterns](/languages/go/concurrency-patterns)',
+          '**How do you catch goroutine leaks?** In production, watch the goroutine count and read the goroutine profile. In tests, compare `runtime.NumGoroutine()` before and after, or use `go.uber.org/goleak`, which fails the test if goroutines are left running. → [Concurrency patterns](/languages/go/concurrency-patterns)',
+          '**How do you size the database pool?** `*sql.DB` has no limit on open connections by default, so always call `SetMaxOpenConns`, and keep the total across all instances under the database’s connection limit. The pool is also your backpressure: 500 goroutines against a pool of 25 means 475 are waiting. → [Postgres and SQL](/languages/go/postgres-and-sql)',
+          '**When do you use generics instead of an interface?** Generics for containers and for functions over any slice or map, where the code is identical for every type. An interface when what matters is what a type does. Be wary of a generic `Repository[T]` for the data layer: it tends to grow constraints for every query and gets harder to read than separate repositories. → [Generics](/languages/go/generics)',
+          '**How do you add context to an error without losing the original?** Wrap it with `fmt.Errorf("loading user %d: %w", id, err)`. Callers can still match it with `errors.Is` for a sentinel error or `errors.As` for a custom error type. Wrapping with `%v` flattens it to text and breaks both, which you want only when hiding an internal error from the caller. → [Error values](/languages/go/error-values)',
         ],
       },
     ],

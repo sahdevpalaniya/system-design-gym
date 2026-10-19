@@ -479,7 +479,7 @@ export const TIER1: Concept[] = [
     slug: 'connection-pooling',
     title: 'Connection pooling: what it is, how to size a pool, and the pitfalls',
     navTitle: 'Connection pooling',
-    metaTitle: 'Connection pooling explained: pool sizing, HikariCP, pgbouncer',
+    metaTitle: 'Connection pooling explained: sizing, HikariCP, pgbouncer',
     metaDescription:
       'What database connection pooling is, why it matters, how to size a pool, and real HikariCP, pgbouncer and Go database/sql settings, with the common pitfalls.',
     tier: 1,

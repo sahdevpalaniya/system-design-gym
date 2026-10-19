@@ -16,7 +16,7 @@ export default function CompanyIndex() {
     <Page wide>
       <PageHeader
         eyebrow="Practice · company questions"
-        title="Company-wise practice"
+        title="System design interview questions by company"
         lede="Practice questions written in the style of each company's round. You write your answer first; **hints are available one at a time** if you get stuck, and the model answer only unlocks after you submit."
         meta={
           <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>

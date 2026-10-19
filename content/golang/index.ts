@@ -99,12 +99,47 @@ export const GO: Language = {
       id: 'generics',
       name: 'Generics and stdlib',
       blurb: 'Write one function that works for many types, and learn which built-in packages you will use most.',
+      intro: {
+        about: [
+          'This section is about writing less code. **Generics**, added in Go 1.18, let one function or type work for many types: a single `Max` that handles `int`, `float64` and your own `type Celsius float64`, instead of three copies that differ only in the type name. **Iterators** let a function hand values to a `for ... range` loop one at a time. Range over functions arrived in Go 1.23, and it is why `maps.Keys` now returns a function rather than a slice.',
+          'The third lesson is a tour of the **standard library** packages you will reach for most: `strings`, `strconv`, `time`, `slices`, `maps`, `errors`, `encoding/json`, `log/slog`, `crypto/rand` and more. A lot of beginner Go code is a hand-written helper for something the standard library already does, tested and fast.',
+          'Generics are also the feature people overuse most, so the first lesson spends as much time on when not to use them, and when an interface is the better answer, as on the syntax.',
+        ],
+        outcomes: [
+          'Write and read generic functions, including constraints such as `cmp.Ordered` and `~int | ~float64`.',
+          'Choose between a type parameter and an interface, and explain why a generic `Repository[T]` usually costs more than it saves.',
+          'Write your own iterator, and turn any iterator into a sorted slice with `slices.Sorted`.',
+          'Find the standard library function that replaces a loop you were about to write.',
+        ],
+        order: [
+          'Finish **Core language** first, especially functions, slices, maps and interfaces. Generics only make sense once you have felt the duplication they remove, and the comparison with interfaces assumes you have written some.',
+          'Then read the lessons in order: Generics, then Iterators (`iter.Seq[V]` is itself a generic type), then The standard library. Do the graded `Max` challenge in Generics before you move on.',
+          'Next comes **Web services**, which leans on `encoding/json` and `log/slog` from here and on `context` from Concurrency.',
+        ],
+      },
       lessons: ['generics', 'iterators', 'standard-library'],
     },
     {
       id: 'web',
       name: 'Web services',
-      blurb: 'Build an HTTP API with no framework, add middleware, shut it down cleanly, and lay the folders out well.',
+      blurb: 'Build an HTTP API with no framework, add middleware, and shut it down cleanly.',
+      intro: {
+        about: [
+          'This section builds an HTTP JSON API with nothing but the standard library. Since Go 1.22, `net/http` routes on method and path (`GET /tasks/{id}`) and reads path parameters with `r.PathValue`. That routing was the main reason projects used to add a framework such as gin, echo or chi. Learning the plain version first means any framework you meet later reads as a thin layer over code you already understand.',
+          'The two lessons take you from a first handler to a server you could deploy: timeouts on `http.Server` (a zero-value server has none, so a slow client can hold a connection open forever), files embedded in the binary with `//go:embed`, middleware for logging and panic recovery, and a graceful shutdown that lets requests already in flight finish when the process is told to stop.',
+        ],
+        outcomes: [
+          'Build a JSON API with method-and-path routing, where every handler sets headers, then the status, then the body, and returns straight after an error.',
+          'Configure the server timeouts that a bare `http.ListenAndServe` leaves out.',
+          'Wrap every route in middleware: a function that takes an `http.Handler` and returns one.',
+          'Stop the server on SIGINT or SIGTERM without dropping anyone, inside the grace period your platform allows (30 seconds by default on Kubernetes).',
+        ],
+        order: [
+          'Before you start, be comfortable with structs, methods, interfaces and JSON from **Core language**, and with `context` from **Concurrency**: every request carries a context, and the shutdown is built on one.',
+          'Read An HTTP server with no framework first and get it answering curl requests. Then read Middleware and graceful shutdown, which wraps that same server.',
+          'After this, **Modules and packages** and **Databases** fill in the rest, and the **Practice projects** rebuild the same API in three folder layouts so you can compare them.',
+        ],
+      },
       lessons: ['http-server', 'middleware-and-shutdown'],
     },
     {
@@ -118,10 +153,30 @@ export const GO: Language = {
       searchTitle: 'Databases in Go (Golang): PostgreSQL, SQL and pgx',
       name: 'Databases',
       blurb: 'Postgres through database/sql. No ORM, so you write and see every query that runs.',
+      intro: {
+        about: [
+          'This section connects a Go program to PostgreSQL through `database/sql`, the database interface in the standard library, with `pgx` as the driver behind it. There is no ORM: you write each SQL query yourself, so you always know exactly what runs against the database, and the skill carries over to any language or framework you use later.',
+          'The first lesson covers the everyday mechanics: why `*sql.DB` is a connection pool rather than one connection, reading one row and many rows, placeholders that stop SQL injection, and nullable columns. The second covers the problems that appear once there is real data: the N+1 query loop, transactions that either commit completely or roll back completely, and reading a query plan to find a missing index.',
+        ],
+        outcomes: [
+          'Run Postgres locally in Docker and connect to it with one dependency, the `pgx` driver.',
+          'Write queries that cannot be injected, that stop when the client goes away, and that never leak a connection.',
+          'Turn an endpoint that makes one query per row into one that makes a single query, with a join or one batch query.',
+          'Group writes in a transaction that rolls back on any error.',
+        ],
+        order: [
+          'You need **Core language** (structs, errors, interfaces) and `context` from **Concurrency** first. You do not need to know Postgres already; knowing what SELECT, INSERT and WHERE do is enough to follow along.',
+          'Read Postgres with database/sql first, then Joins, transactions, and the N+1 problem.',
+          'Then put it to work: the second **Practice projects** lesson puts the CRUD API on a real database, and step 5 of **Project 1 — URL shortener** moves its storage to Postgres.',
+        ],
+      },
       lessons: ['postgres-and-sql', 'joins-transactions-n-plus-one'],
     },
     {
       id: 'practice',
+      // not "with source code": the lessons show the key files and leave the
+      // remaining handlers for you to write
+      searchTitle: 'Golang practice projects for beginners: build a CRUD API',
       name: 'Practice projects',
       blurb:
         'Build the same CRUD API three times, in three layouts, so the trade-offs are something you have felt rather than read.',

@@ -600,6 +600,16 @@ export interface LangSection {
    *  (e.g. "DSA in Go"); falls back to "<name> in <language>" */
   searchTitle?: string
   blurb: string
+  /** longer copy for the section hub, for sections whose blurb and lesson
+   *  list alone do not explain what the section is for */
+  intro?: {
+    /** what the section covers and why, one paragraph each */
+    about: string[]
+    /** what you can do by the end, at the level of the whole section */
+    outcomes: string[]
+    /** what to finish first, the order to read in, and where to go next */
+    order: string[]
+  }
   /** lesson slugs, in the order they build on each other */
   lessons: string[]
 }

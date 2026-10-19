@@ -7,8 +7,53 @@ import { failingCategories, useProgress } from '@/lib/store'
 import type { FollowUp } from '@/lib/types'
 import { FollowUpDrill } from '@/components/system-design/FollowUpDrill'
 import { Badge, Button, Card, Page, PageHeader } from '@/components/common/ui'
+import { ModeIntro, type ModeFaq, type ModeSection } from '@/components/common/ModeIntro'
 
 const ROUND = 6
+
+/** server-rendered in every branch, so the static HTML explains the tool */
+const INTRO = [
+  "A round of six interviewer follow-up questions with ninety seconds each. Answer as if someone just asked and is waiting: talk, do not plan.",
+  "After each answer you see what a weak answer sounds like, what a strong one sounds like, and the trap hidden in the question, then rate yourself out of 3. Rounds lean toward the categories you keep rating low and toward your chosen interviewer archetype's favourites.",
+]
+
+const SECTIONS: ModeSection[] = [
+  {
+    heading: 'Who it is for',
+    paragraphs: [
+      "Anyone who can sketch a first design but goes quiet when the interviewer starts pushing on it. Many system design interviews are decided in the follow-ups, and the blitz is ten minutes of nothing else.",
+      "It assumes you already know what a cache, a queue and a replica are for. If you have not worked through a full problem yet, start with a [worked problem](/problems) or the [concept pages](/concepts) and come back.",
+    ],
+  },
+  {
+    heading: 'An example',
+    paragraphs: [
+      'A typical question: "10x traffic tomorrow. What fails first?" The weak answer is "we would add more servers and scale horizontally", which names nothing. A strong answer names the part that cannot simply be copied, usually the database primary, says roughly how close to its limit it already is, and gives the order things break in: database writes first, then the cache hit rate, then the connection pool, all visible in p99 write latency before anything errors.',
+      'The trap is that "add more servers" is true for the stateless tier, which makes it feel safe. It answers a question about the part that was never going to break.',
+    ],
+  },
+  {
+    heading: 'Blitz or defence drills?',
+    paragraphs: [
+      "The [defence drills](/drills) let you choose a category and take questions one at a time, starting each clock yourself. The blitz picks six questions for you, starts each clock straight away, and ends with your average for the round, so it is closer to the pace of a real interview.",
+    ],
+  },
+]
+
+const FAQ: ModeFaq[] = [
+  {
+    q: 'Is ninety seconds a hard limit?',
+    a: 'No. The clock keeps counting past zero and shows how far over you went, but it never cuts you off. You do need to write at least a sentence before you can see the answers.',
+  },
+  {
+    q: 'How are the six questions chosen?',
+    a: `From a pool of ${FOLLOW_UPS.length} follow-ups. Categories where your average is below 2.5 out of 3, over at least two answers, are favoured, then your interviewer archetype's categories, and questions you have answered more often are less likely to come up.`,
+  },
+  {
+    q: 'Where are my ratings kept?',
+    a: 'In this browser, or in your account too if you are signed in. They decide what later rounds lean toward, and each one feeds the Defence axis on your [progress profile](/progress).',
+  },
+]
 
 /** deterministic-enough shuffle so a round is stable while you work through it */
 function pickRound(state: ReturnType<typeof useProgress>['state']): FollowUp[] {
@@ -87,6 +132,7 @@ export default function BlitzPage() {
             Start the blitz
           </Button>
         </Card>
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -127,6 +173,7 @@ export default function BlitzPage() {
             </Button>
           </div>
         </Card>
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -152,6 +199,7 @@ export default function BlitzPage() {
         autoStart
         onNext={() => setI((x) => x + 1)}
       />
+      <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
     </Page>
   )
 }

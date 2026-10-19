@@ -12,7 +12,7 @@ import { StageEngine } from '@/components/system-design/StageEngine'
 import { Badge, Bullets, Page, PageHeader } from '@/components/common/ui'
 import type { Problem, StageId } from '@/lib/types'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta, withUtm } from '@/lib/seo'
-import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
+import { pageDates } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return PROBLEMS.map((p) => ({ slug: p.slug }))
@@ -24,10 +24,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // "design a url shortener" is the phrase people actually type, so it is
   // written out per problem rather than derived from the display title
   const search = p.searchTitle ?? `Design ${(p.navTitle ?? p.title).toLowerCase()}`
+  // this page is where you answer; the solution page is where the answer is.
+  // A practice-intent title stops the two competing for the same query, so
+  // the solution page can rank for the plain "design a ..." search
+  const task = search.charAt(0).toLowerCase() + search.slice(1)
+  const full = `Practice: ${task} (mock interview workspace)`
   return pageMeta(
-    // the generic tail goes when it would push the brand-name title past ~60 chars
-    `${search} — system design interview`.length > 60 ? `${search}` : `${search} — system design interview`,
-    `${search}: a system design interview practice question. Write your own answer stage by stage, then compare with the worked solution. ${p.prompt}`,
+    // the generic tail goes when it would push the title past ~60 chars
+    full.length > 60 ? `Practice: ${task}` : full,
+    `Mock interview practice: ${task}. Write your own answer stage by stage, then compare with the worked solution. ${p.prompt}`,
     `/problems/${p.slug}`,
     true,
     true, // own opengraph-image
@@ -71,8 +76,7 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
                 headline: p.searchTitle ?? p.title,
                 description: p.prompt,
                 path: `/problems/${p.slug}`,
-                published: CONTENT_PUBLISHED,
-                modified: CONTENT_MODIFIED,
+                ...pageDates(`/problems/${p.slug}`),
                 section: 'Worked problems',
               }),
             ],

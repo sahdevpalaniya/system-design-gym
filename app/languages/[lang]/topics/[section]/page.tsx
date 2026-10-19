@@ -82,6 +82,16 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
         lede={s.blurb.replace(/\*\*/g, '')}
       />
 
+      {s.intro ? (
+        <div className="mb-8 max-w-3xl space-y-3 text-[0.9375rem] leading-relaxed">
+          {s.intro.about.map((p) => (
+            <p key={p}>
+              <Rich text={p} />
+            </p>
+          ))}
+        </div>
+      ) : null}
+
       <ol className="mb-10 grid gap-2.5 sm:grid-cols-2">
         {lessons.map((t, n) => (
           <li key={t.slug}>
@@ -104,6 +114,31 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
           </li>
         ))}
       </ol>
+
+      {s.intro ? (
+        <section className="mb-10 max-w-3xl space-y-8">
+          <div>
+            <h2 className="mb-3 text-[1.25rem] font-bold tracking-[-0.01em]">What you will be able to do</h2>
+            <ul className="list-disc space-y-1.5 pl-5 text-[0.9062rem] leading-relaxed">
+              {s.intro.outcomes.map((o) => (
+                <li key={o}>
+                  <Rich text={o} />
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h2 className="mb-3 text-[1.25rem] font-bold tracking-[-0.01em]">The order to study it in</h2>
+            <ol className="list-decimal space-y-1.5 pl-5 text-[0.9062rem] leading-relaxed">
+              {s.intro.order.map((o) => (
+                <li key={o}>
+                  <Rich text={o} />
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+      ) : null}
 
       {/* The cards above are navigation. This is the substance: what each lesson
           teaches, in the lesson's own words, so the hub is worth reading (and

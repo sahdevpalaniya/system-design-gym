@@ -7,12 +7,44 @@ import { conceptState, dueConcepts, useProgress } from '@/lib/store'
 import type { Concept } from '@/lib/types'
 import { ConceptCheck } from '@/components/system-design/ConceptCheck'
 import { Badge, Button, Card, Page, PageHeader } from '@/components/common/ui'
-import { ModeIntro } from '@/components/common/ModeIntro'
+import { ModeIntro, type ModeFaq, type ModeSection } from '@/components/common/ModeIntro'
 
 /** server-rendered in every branch (including the loading state), so the static HTML explains the tool */
 const INTRO = [
   "The concept check is a five-minute spaced-repetition quiz over the system design concepts on this site. Each round takes five concepts: the ones due for review come first, then concepts you have not tried yet. For each one you answer from memory with **what the technique costs you**, not its definition, then compare with the concept's own answer.",
   "Then rate how close you were. That rating schedules the concept: **missed it** brings it back tomorrow, **partly** in three days, **mostly** in a week or more, and **had it** in three weeks or more; those two gaps keep stretching each time you get the concept right. The schedule only works if the ratings are honest."
+]
+
+const SECTIONS: ModeSection[] = [
+  {
+    heading: 'Who it is for',
+    paragraphs: [
+      `People who have read the [concept pages](/concepts) and want them to stay put until the interview. Reading a page once feels like learning it, but a week later most of it has gone. Recalling the answer from memory, at growing intervals, is what makes it stick. There are ${CONCEPTS.length} concepts in the pool.`,
+      "It is not the place to meet a concept for the first time. If a card comes up that you have never read, follow the link under it to the full page, read that, and let the concept come back in a later round.",
+    ],
+  },
+  {
+    heading: 'An example',
+    paragraphs: [
+      'Say the round shows **caching**. The definition, "a cache keeps frequently used data close to whoever needs it", earns almost nothing, because anyone can recite it. The question is what caching costs you. A good answer: you now have two copies of the truth and they can disagree, so users may see old data; the cache is one more part that can fail, and when it does, the database takes every request at once; and from then on you have to decide when each cached item stops being true.',
+      'If you named two of those three, **mostly** is an honest rating. If you only gave the definition, rate it **missed it** and the concept will be back tomorrow.',
+    ],
+  },
+]
+
+const FAQ: ModeFaq[] = [
+  {
+    q: 'Why ask for the cost instead of the definition?',
+    a: 'Because that is what interviewers press on. Saying what a technique gives up, and when that matters, is the clearest sign you have chosen it rather than copied it.',
+  },
+  {
+    q: 'What if nothing is due?',
+    a: 'The round fills up with concepts you have not tried yet, so it is still useful work. Once everything has been seen, a round with nothing due simply starts from the first concepts again.',
+  },
+  {
+    q: 'Do I need an account?',
+    a: 'No. Your schedule is saved in this browser. If you sign in, it is saved to your account as well, so it follows you to another device.',
+  },
 ]
 
 const ROUND = 5
@@ -49,7 +81,7 @@ export default function ConceptCheckPage() {
         <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
           Loading…
         </div>
-        <ModeIntro inPage paragraphs={INTRO} />
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -93,7 +125,7 @@ export default function ConceptCheckPage() {
             Start a round of {Math.min(ROUND, Math.max(1, due.length + untouched.length))}
           </Button>
         </Card>
-        <ModeIntro inPage paragraphs={INTRO} />
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -114,7 +146,7 @@ export default function ConceptCheckPage() {
             </Button>
           </div>
         </Card>
-        <ModeIntro inPage paragraphs={INTRO} />
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -149,7 +181,7 @@ export default function ConceptCheckPage() {
           {i === round.length - 1 ? 'Finish round' : 'Next concept →'}
         </Button>
       </div>
-      <ModeIntro inPage paragraphs={INTRO} />
+      <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
     </Page>
   )
 }

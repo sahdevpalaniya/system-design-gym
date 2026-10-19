@@ -4,7 +4,7 @@ import { STAGES } from '@/content/system-design/method'
 import { Byline } from '@/components/common/Byline'
 import { Page, PageHeader, Rich, Section } from '@/components/common/ui'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
-import { CONTENT_MODIFIED, CONTENT_PUBLISHED } from '@/lib/content-dates'
+import { pageDates } from '@/lib/content-dates'
 
 export const metadata = pageMeta(
   'System design cheat sheet: numbers, patterns and tradeoffs',
@@ -62,8 +62,7 @@ export default function CheatSheetPage() {
               headline: 'System design cheat sheet',
               description: 'The interview stages, key numbers, which pattern fixes which problem, and every core concept in one line.',
               path: '/cheat-sheet',
-              published: CONTENT_PUBLISHED,
-              modified: CONTENT_MODIFIED,
+              ...pageDates('/cheat-sheet'),
               section: 'System design',
             }),
           ]),

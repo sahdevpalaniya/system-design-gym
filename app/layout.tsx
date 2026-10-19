@@ -32,7 +32,7 @@ export const metadata: Metadata = {
   },
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
   other: { 'google-adsense-account': 'ca-pub-6252978753553349' },
-  description: `Free step-by-step courses in plain English: ${trackList()}. Lessons, practice problems and progress tracking. Write your own answer first, then compare.`,
+  description: `Free step-by-step courses in plain English: ${trackList()}. Lessons, practice problems and progress tracking. Answer first, then compare.`,
 }
 
 export const viewport: Viewport = {

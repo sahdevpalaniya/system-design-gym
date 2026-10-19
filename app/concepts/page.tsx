@@ -13,7 +13,7 @@ export default function ConceptsPage() {
     <Page wide>
       <PageHeader
         eyebrow="Track A"
-        title="Fundamentals"
+        title="System design concepts"
         lede="Short pages, always the same shape: what problem it solves, **what it costs you**, when to use it and when not to, a visual, the follow-up an interviewer will ask, and a 60-second self-check you answer before you see ours."
         meta={
           <>

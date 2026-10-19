@@ -7,9 +7,10 @@ import { Card, Page, PageHeader } from '@/components/common/ui'
 import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
-  'Learn system design from nothing',
-  'Start from zero: what system design is, how the interview works, the vocabulary, the five stages, and where the slack hides.',
+  'System design for beginners: a step-by-step guide',
+  'System design for beginners, from zero: what it is, how the interview works, the vocabulary and the five stages, then each concept in order.',
   '/learn',
+  true,
 )
 
 export default function LearnPage() {
@@ -17,14 +18,14 @@ export default function LearnPage() {
     <Page wide>
       <PageHeader
         eyebrow="Start from scratch"
-        title="Learn system design from nothing"
-        lede="No prior knowledge assumed. Read these five in order, then work through the topics one at a time. Every topic has a **View more** deep dive and a worked example at the end."
+        title="System design for beginners"
+        lede={`No prior knowledge assumed. Read these ${LESSONS.length} short lessons in order, then work through the topics one at a time. The core topics also have a **View more** deep dive and a worked example.`}
       />
 
       <section className="mb-12">
         <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">First, the ground floor</h2>
         <p className="mb-5 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
-          Five short lessons. After these, the vocabulary on the topic pages should be familiar.
+          {LESSONS.length} short lessons. After these, the vocabulary on the topic pages should be familiar.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {LESSONS.map((l, i) => (

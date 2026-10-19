@@ -8,13 +8,45 @@ import { problemState, useProgress } from '@/lib/store'
 import type { StageId } from '@/lib/types'
 import { StageEngine } from '@/components/system-design/StageEngine'
 import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/common/ui'
-import { ModeIntro } from '@/components/common/ModeIntro'
+import { ModeIntro, type ModeFaq, type ModeSection } from '@/components/common/ModeIntro'
 
 /** server-rendered in every branch (and the Suspense fallback), so the static HTML explains the tool */
 const INTRO = [
   "The daily rep is a fifteen-minute system design exercise on one problem. It covers only the first two stages: **requirements**, and the **actors and request lifecycle**. There are no numbers, no architecture and no deep dive; those belong to a full session on the problem's own page.",
   "To use it, take the suggested problem, which is a shape you have not worked yet, or pick any problem from the list. Write your own answer to each stage first, the way you would say it in an interview. The model answer and checklist appear only after you submit, so compare honestly and note what you missed.",
   "Progress is kept in this browser, or in your account if you are signed in, so the next suggestion moves you on to a new kind of problem."
+]
+
+const SECTIONS: ModeSection[] = [
+  {
+    heading: 'Who it is for',
+    paragraphs: [
+      "Anyone preparing over several weeks who would rather build a habit than cram. Fifteen minutes fits before work or between classes, and a short session you actually do every day beats a long one you keep putting off.",
+      "It suits beginners and freshers especially. Requirements and the request lifecycle need no knowledge of databases or infrastructure, only careful thinking about what the system must do and what can go wrong, and they are the two stages nervous candidates rush past to get to the drawing.",
+    ],
+  },
+  {
+    heading: 'An example',
+    paragraphs: [
+      'Take the ticket booking problem (think BookMyShow or Ticketmaster). Stage 1 settles what is being built: which features are in scope, what you are assuming, and the one or two questions whose answers would change the design.',
+      'Stage 2 follows the seat, not the user, because the seat is what people compete for. Its life is available, then held, then paid, then confirmed, and sometimes released back to available. The useful part is the failure branches: two people holding the same seat in the same millisecond, a checkout abandoned so the hold has to expire, and a payment that succeeds after the hold has already lapsed.',
+    ],
+  },
+]
+
+const FAQ: ModeFaq[] = [
+  {
+    q: 'Why only two stages?',
+    a: 'They fit in fifteen minutes, and they are where most people lose marks. Numbers, the high-level design and the deep dive take about another half hour: do those on the problem\'s own page, or all five at once in the [timed mock](/practice/mock).',
+  },
+  {
+    q: 'Is there a timer?',
+    a: 'No. Fifteen minutes is a guide, not a clock. If you want interview pressure, use the timed mock instead.',
+  },
+  {
+    q: 'How is the suggested problem chosen?',
+    a: 'It is a problem you have not started, from a problem shape you have not tried yet. Once you have tried every shape, it is any problem you have not started.',
+  },
 ]
 
 const DAILY_STAGES: StageId[] = [1, 2]
@@ -71,7 +103,7 @@ function DailyInner() {
             Open all five stages →
           </Button>
         </div>
-        <ModeIntro inPage paragraphs={INTRO} />
+        <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
       </Page>
     )
   }
@@ -122,7 +154,7 @@ function DailyInner() {
           )
         })}
       </div>
-      <ModeIntro inPage paragraphs={INTRO} />
+      <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
     </Page>
   )
 }
@@ -134,11 +166,11 @@ export default function DailyPage() {
         <Page>
           {/* the static HTML is this fallback alone (the page reads the URL in the
               browser), so it carries the page's one <h1>; the dev server streams both */}
-          <PageHeader eyebrow={'Daily rep'} title={'Daily rep · 15 minutes'} lede={'One stage of one problem, every day. Short enough that you actually do it.'} />
+          <PageHeader eyebrow={'Daily rep'} title={'Daily rep · 15 minutes'} lede={'The first two stages of one problem, every day. Short enough that you actually do it.'} />
           <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>
-          <ModeIntro inPage paragraphs={INTRO} />
+          <ModeIntro inPage paragraphs={INTRO} sections={SECTIONS} faq={FAQ} />
         </Page>
       }
     >
