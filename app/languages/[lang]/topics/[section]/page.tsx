@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage } from '@/content/languages'
-import { Card, Page, PageHeader } from '@/components/common/ui'
+import { Card, Page, PageHeader, Rich } from '@/components/common/ui'
 import { humanMinutes, sectionMinutes } from '@/lib/estimate'
 import { breadcrumbJsonLd, itemListJsonLd, pageMeta } from '@/lib/seo'
 
@@ -104,6 +104,40 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
           </li>
         ))}
       </ol>
+
+      {/* The cards above are navigation. This is the substance: what each lesson
+          teaches, in the lesson's own words, so the hub is worth reading (and
+          worth indexing) on its own rather than being a list of links. */}
+      <section className="mb-10 max-w-3xl">
+        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">What each lesson covers</h2>
+        <p className="mb-6 text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          By the end of this section you will be able to do everything below. Each lesson has runnable{' '}
+          {l.name} examples you can edit and run in the browser.
+        </p>
+        <ol className="space-y-7">
+          {lessons.map((t, n) => (
+            <li key={t.slug}>
+              <h3 className="text-[1rem] font-semibold">
+                <Link href={`/languages/${l.id}/${t.slug}`} className="hover:opacity-70">
+                  {n + 1}. {t.title}
+                </Link>
+              </h3>
+              {t.objectives?.length ? (
+                <ul className="mt-2 list-disc space-y-1 pl-5 text-[0.9062rem] leading-relaxed">
+                  {t.objectives.map((o) => (
+                    <li key={o}>
+                      <Rich text={o} />
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <p className="mt-2 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                <strong style={{ color: 'var(--text)' }}>Remember:</strong> <Rich text={t.remember} />
+              </p>
+            </li>
+          ))}
+        </ol>
+      </section>
 
       <nav aria-label="Other sections" className="tap-children flex flex-wrap justify-between gap-3 text-[0.875rem]">
         {prev ? (

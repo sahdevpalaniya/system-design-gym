@@ -6,7 +6,23 @@ import { STAGES } from '@/content/system-design/method'
 import { Page } from '@/components/common/ui'
 import { TRACKS, trackList } from '@/content/tracks'
 import { Newsletter } from '@/components/common/Newsletter'
+import { LANGUAGES } from '@/content/languages'
 import { Dashboard } from './dashboard'
+
+/** Per track, the lessons with the most search demand (from Search Console and
+ *  keyword research), linked straight from the home page. Unknown slugs are skipped. */
+const POPULAR: Record<string, string[]> = {
+  go: [
+    'goroutines-vs-threads',
+    'go-interview-questions',
+    'goroutines',
+    'channels-and-select',
+    'context',
+    'mutex-and-races',
+    'interfaces',
+    'http-server',
+  ],
+}
 
 /**
  * The introduction is a server component on purpose. The dashboard below it is
@@ -106,6 +122,55 @@ export default function Home() {
             ))}
           </ol>
         </div>
+
+        {/* each language track's map, from its own data: one link per section
+            hub, plus the lessons people search for most. Without this the home
+            page, the strongest page on the site, reached a track only through
+            its first lesson. */}
+        {LANGUAGES.map((lang) => {
+          const popular = (POPULAR[lang.id] ?? [])
+            .map((slug) => lang.lessons.find((t) => t.slug === slug))
+            .filter((t) => t !== undefined)
+          return (
+            <div key={lang.id} className="mt-10">
+              <h2 className="mb-1 text-[1.0625rem] font-semibold">
+                <Link href={`/languages/${lang.id}`} className="hover:opacity-70">
+                  Learn {lang.name}
+                  {lang.alias && lang.alias !== lang.name ? ` (${lang.alias})` : ''}: {lang.lessons.length} lessons in{' '}
+                  {lang.sections.length} sections
+                </Link>
+              </h2>
+              <p className="mb-4 max-w-2xl text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                {lang.tagline} Every lesson has examples you can run in the browser, and the coding-round
+                lessons come with challenges checked by real tests.
+              </p>
+              <ul className="grid max-w-4xl gap-x-6 gap-y-1.5 text-[0.9062rem] sm:grid-cols-2 lg:grid-cols-3">
+                {lang.sections.map((s) => (
+                  <li key={s.id}>
+                    <Link href={`/languages/${lang.id}/topics/${s.id}`} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
+                      {s.name}
+                    </Link>{' '}
+                    <span style={{ color: 'var(--faint)' }}>· {s.lessons.length}</span>
+                  </li>
+                ))}
+              </ul>
+              {popular.length ? (
+                <>
+                  <h3 className="mt-5 mb-2 text-[0.9375rem] font-semibold">Most read</h3>
+                  <ul className="grid max-w-4xl gap-x-6 gap-y-1.5 text-[0.9062rem] sm:grid-cols-2">
+                    {popular.map((t) => (
+                      <li key={t.slug}>
+                        <Link href={`/languages/${lang.id}/${t.slug}`} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
+                          {t.title}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              ) : null}
+            </div>
+          )
+        })}
 
         <div className="mt-10">
           <h2 className="mb-1 text-[1.0625rem] font-semibold">How to use it</h2>

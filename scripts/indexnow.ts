@@ -12,8 +12,10 @@ import { SITE_URL as SITE } from '../lib/seo'
 const KEY = '83079f97cdde9c68940fcf34afb8f1fd'
 
 async function main() {
-  const xml = await (await fetch(`${SITE}/sitemap.xml`)).text()
-  const urls = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
+  const locs = async (url: string) =>
+    [...(await (await fetch(url)).text()).matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1])
+  // /sitemap.xml is an index of per-section sitemaps; the page URLs are one level down
+  const urls = (await Promise.all((await locs(`${SITE}/sitemap.xml`)).map(locs))).flat()
   if (!urls.length) throw new Error('sitemap has no URLs')
   const res = await fetch('https://api.indexnow.org/indexnow', {
     method: 'POST',
