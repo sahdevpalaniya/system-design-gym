@@ -1,5 +1,4 @@
 import { pageMeta } from '@/lib/seo'
-import { ModeIntro } from '@/components/common/ModeIntro'
 
 // the page itself is a client component, so its metadata lives here
 export const metadata = pageMeta(
@@ -10,15 +9,6 @@ export const metadata = pageMeta(
 )
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      {children}
-      <ModeIntro
-        paragraphs={[
-          "Practise follow-up questions one at a time, filtered by category or across all of them. Each question gives you ninety seconds to write your defence of a design decision.",
-          "Then compare against a weak answer, a strong answer and the trap in the question, and rate yourself out of 3. Your ratings build a per-category record, so you can see which kind of follow-up you are weakest at and drill that category.",
-        ]}
-      />
-    </>
-  )
+  // the "How this works" copy is rendered inside the page itself, so it sits in <main>
+  return children
 }

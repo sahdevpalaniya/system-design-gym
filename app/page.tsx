@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react'
 import Link from 'next/link'
 import { CONCEPTS } from '@/content/system-design/concepts'
 import { PROBLEMS } from '@/content/system-design/problems'
@@ -7,6 +8,7 @@ import { Page } from '@/components/common/ui'
 import { TRACKS, trackList } from '@/content/tracks'
 import { Newsletter } from '@/components/common/Newsletter'
 import { LANGUAGES } from '@/content/languages'
+import { CATEGORY_INFO } from '@/content/system-design/followups'
 import { Dashboard } from './dashboard'
 
 /** Per track, the lessons with the most search demand (from Search Console and
@@ -192,7 +194,11 @@ export default function Home() {
         </div>
       </section>
 
-      <Dashboard />
+      <Dashboard
+        categoryInfo={Object.fromEntries(
+          Object.entries(CATEGORY_INFO).map(([k, v]) => [k, { name: v.name, tell: v.tell }]),
+        ) as ComponentProps<typeof Dashboard>['categoryInfo']}
+      />
     </Page>
   )
 }

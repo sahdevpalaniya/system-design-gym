@@ -3,61 +3,28 @@
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { LANGUAGES } from '@/content/languages'
-import { CONCEPTS } from '@/content/system-design/concepts'
-import { LESSONS } from '@/content/system-design/foundations'
-import { PROBLEMS } from '@/content/system-design/problems'
+import type { SearchRow as Row } from '@/lib/nav-index'
 
-interface Row {
-  title: string
-  sub: string
-  href: string
-  group: string
-  /** lowercase haystack, built once */
-  hay: string
+/* The rows (a few hundred, so no index is needed) are fetched from
+ * /search-index.json the first time the box is used, not bundled. */
+let cached: Promise<Row[]> | null = null
+function loadRows(): Promise<Row[]> {
+  cached ??= fetch('/search-index.json')
+    .then((r) => (r.ok ? (r.json() as Promise<Row[]>) : Promise.reject(new Error(String(r.status)))))
+    .catch((e) => {
+      cached = null
+      throw e
+    })
+  return cached
 }
 
-/* Built once at module load — a few hundred rows, so no index is needed. */
-const ROWS: Row[] = [
-  ...LANGUAGES.flatMap((l) =>
-    l.lessons.map((t) => ({
-      title: t.title,
-      sub: t.oneLine,
-      href: `/languages/${l.id}/${t.slug}`,
-      group: l.name,
-      hay: `${t.title} ${t.oneLine} ${t.blocks.map((b) => b.heading ?? '').join(' ')}`.toLowerCase(),
-    })),
-  ),
-  ...LESSONS.map((l) => ({
-    title: l.title,
-    sub: l.oneLine,
-    href: `/learn/${l.slug}`,
-    group: 'System Design · basics',
-    hay: `${l.title} ${l.oneLine}`.toLowerCase(),
-  })),
-  ...CONCEPTS.map((c) => ({
-    title: c.title,
-    sub: c.oneLine,
-    href: `/concepts/${c.slug}`,
-    group: 'System Design · concepts',
-    hay: `${c.title} ${c.oneLine}`.toLowerCase(),
-  })),
-  ...PROBLEMS.map((p) => ({
-    title: p.title,
-    sub: p.prompt,
-    href: `/problems/${p.slug}`,
-    group: 'System Design · problems',
-    hay: `${p.title} ${p.prompt} ${p.concepts.join(' ')}`.toLowerCase(),
-  })),
-]
-
 /** Every term must appear somewhere. Title matches rank above body matches. */
-function search(q: string): Row[] {
+function search(rows: Row[], q: string): Row[] {
   const terms = q.toLowerCase().split(/\s+/).filter(Boolean)
   if (!terms.length) return []
 
   const hits: { row: Row; score: number }[] = []
-  for (const row of ROWS) {
+  for (const row of rows) {
     if (!terms.every((t) => row.hay.includes(t))) continue
     const title = row.title.toLowerCase()
     let score = 0
@@ -79,7 +46,27 @@ export function Search() {
   const input = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
-  const results = useMemo(() => search(q), [q])
+  const [rows, setRows] = useState<Row[] | null>(null)
+  const [failed, setFailed] = useState(false)
+  const results = useMemo(() => (rows ? search(rows, q) : []), [rows, q])
+
+  // fetch the index once the box is opened; after a failed load, the next
+  // keystroke or open tries again
+  useEffect(() => {
+    if (!open || rows) return
+    let live = true
+    loadRows().then(
+      (r) => {
+        if (!live) return
+        setFailed(false)
+        setRows(r)
+      },
+      () => live && setFailed(true),
+    )
+    return () => {
+      live = false
+    }
+  }, [open, rows, q])
 
   // "/" focuses the box from anywhere, Escape closes it
   useEffect(() => {
@@ -149,7 +136,11 @@ export function Search() {
           className="fixed top-[calc(var(--header-h)-2.6rem)] right-3 left-3 z-50 mt-1.5 max-h-[70vh] overflow-y-auto rounded-xl border shadow-lg sm:absolute sm:top-full sm:right-0 sm:left-0"
           style={{ background: 'var(--surface)', borderColor: 'var(--border-strong)' }}
         >
-          {results.length ? (
+          {!rows ? (
+            <div className="px-3.5 py-4 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
+              {failed ? 'Search unavailable, try again' : 'Loading…'}
+            </div>
+          ) : results.length ? (
             results.map((r, i) => (
               <Link
                 key={r.href}

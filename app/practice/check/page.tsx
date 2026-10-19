@@ -7,6 +7,13 @@ import { conceptState, dueConcepts, useProgress } from '@/lib/store'
 import type { Concept } from '@/lib/types'
 import { ConceptCheck } from '@/components/system-design/ConceptCheck'
 import { Badge, Button, Card, Page, PageHeader } from '@/components/common/ui'
+import { ModeIntro } from '@/components/common/ModeIntro'
+
+/** server-rendered in every branch (including the loading state), so the static HTML explains the tool */
+const INTRO = [
+  "The concept check is a five-minute spaced-repetition quiz over the system design concepts on this site. Each round takes five concepts: the ones due for review come first, then concepts you have not tried yet. For each one you answer from memory with **what the technique costs you**, not its definition, then compare with the concept's own answer.",
+  "Then rate how close you were. That rating schedules the concept: **missed it** brings it back tomorrow, **partly** in three days, **mostly** in a week or more, and **had it** in three weeks or more; those two gaps keep stretching each time you get the concept right. The schedule only works if the ratings are honest."
+]
 
 const ROUND = 5
 
@@ -42,6 +49,7 @@ export default function ConceptCheckPage() {
         <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
           Loading…
         </div>
+        <ModeIntro inPage paragraphs={INTRO} />
       </Page>
     )
   }
@@ -85,6 +93,7 @@ export default function ConceptCheckPage() {
             Start a round of {Math.min(ROUND, Math.max(1, due.length + untouched.length))}
           </Button>
         </Card>
+        <ModeIntro inPage paragraphs={INTRO} />
       </Page>
     )
   }
@@ -105,6 +114,7 @@ export default function ConceptCheckPage() {
             </Button>
           </div>
         </Card>
+        <ModeIntro inPage paragraphs={INTRO} />
       </Page>
     )
   }
@@ -139,6 +149,7 @@ export default function ConceptCheckPage() {
           {i === round.length - 1 ? 'Finish round' : 'Next concept →'}
         </Button>
       </div>
+      <ModeIntro inPage paragraphs={INTRO} />
     </Page>
   )
 }

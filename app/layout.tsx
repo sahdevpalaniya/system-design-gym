@@ -3,6 +3,8 @@ import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/common/Providers'
 import { Footer, Shell } from '@/components/common/Nav'
+import { NavIndexProvider } from '@/components/common/NavIndex'
+import { buildNavIndex } from '@/lib/nav-index'
 import { SITE_JSONLD, SITE_NAME, SITE_URL, TITLE_TEMPLATE } from '@/lib/seo'
 import { trackList } from '@/content/tracks'
 
@@ -29,6 +31,7 @@ export const metadata: Metadata = {
       : {},
   },
   robots: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  other: { 'google-adsense-account': 'ca-pub-6252978753553349' },
   description: `Free step-by-step courses in plain English: ${trackList()}. Lessons, practice problems and progress tracking. Write your own answer first, then compare.`,
 }
 
@@ -52,24 +55,40 @@ const GA_ID = process.env.NEXT_PUBLIC_GA_ID
  *  that calls gtag('consent','update',…) is still needed before ads. */
 const CONSENT_REGIONS = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE','GR','HU','IS','IE','IT','LV','LI','LT','LU','MT','NL','NO','PL','PT','RO','SK','SI','ES','SE','GB','CH']
 
+/** Inline in <head>, always (not only with GA_ID), so it runs before the ad tag.
+ *  wait_for_update gives a consent banner time to send its update first. */
+const CONSENT_SCRIPT = `window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:${JSON.stringify(CONSENT_REGIONS)},wait_for_update:500});gtag('consent','default',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'});`
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_JSONLD) }} />
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6252978753553349" crossOrigin="anonymous" />
+        {/* consent defaults must exist before any Google tag loads, ads included */}
+        <script dangerouslySetInnerHTML={{ __html: CONSENT_SCRIPT }} />
+        {/* plain tag, not next/script: it must be in the server HTML for AdSense's code check.
+            itemProp stops React 19 hoisting this async script above the consent defaults
+            (it renders an async src script in place only when itemProp is set) */}
+        <script
+          itemProp="adsbygoogle"
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6252978753553349"
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="flex min-h-screen flex-col">
         <Providers>
-          <Shell>{children}</Shell>
-          <Footer />
+          <NavIndexProvider index={buildNavIndex()}>
+            <Shell>{children}</Shell>
+            <Footer />
+          </NavIndexProvider>
         </Providers>
         {GA_ID && (
           <>
             <Script src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`} strategy="afterInteractive" />
             <Script id="ga" strategy="afterInteractive">
-              {`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('consent','default',{analytics_storage:'denied',ad_storage:'denied',ad_user_data:'denied',ad_personalization:'denied',region:${JSON.stringify(CONSENT_REGIONS)}});gtag('consent','default',{analytics_storage:'granted',ad_storage:'granted',ad_user_data:'granted',ad_personalization:'granted'});gtag('js',new Date());gtag('config','${GA_ID}');`}
+              {`gtag('js',new Date());gtag('config','${GA_ID}');`}
             </Script>
           </>
         )}

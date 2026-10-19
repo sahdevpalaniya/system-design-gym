@@ -1587,7 +1587,7 @@ mux.Handle("POST /v1/checkout", apiLimit(protect(http.HandlerFunc(orderH.Checkou
           label: 'terminal',
           src: `# 1. the Dockerfile
 cat > Dockerfile <<'EOF'
-FROM golang:1.22-alpine AS build
+FROM golang:1.25-alpine AS build
 WORKDIR /src
 COPY go.mod go.sum ./
 RUN go mod download
@@ -1627,7 +1627,7 @@ docker compose exec db psql -U postgres -d shop`,
   GOMAXPROCS: "2"             # match the CPU limit, not the host
 volumes:
   - uploads:/data/uploads     # uploads must outlive the container`,
-          note: 'Without GOMEMLIMIT the garbage collector does not know the container’s memory limit. By default it lets the heap grow to about twice the live data before collecting, which can cross the limit and get the process OOM-killed. Before Go 1.25, GOMAXPROCS defaulted to the host’s core count rather than the container’s CPU limit. Go 1.25 reads the limit itself, but this Dockerfile builds with 1.22.',
+          note: 'Without GOMEMLIMIT the garbage collector does not know the container’s memory limit. By default it lets the heap grow to about twice the live data before collecting, which can cross the limit and get the process OOM-killed. Before Go 1.25, GOMAXPROCS defaulted to the host’s core count rather than the container’s CPU limit. Go 1.25, which this Dockerfile builds with, reads the limit itself, so setting it explicitly is now a safeguard for older toolchains rather than a requirement.',
         },
       },
       {

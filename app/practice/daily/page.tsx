@@ -8,6 +8,14 @@ import { problemState, useProgress } from '@/lib/store'
 import type { StageId } from '@/lib/types'
 import { StageEngine } from '@/components/system-design/StageEngine'
 import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/common/ui'
+import { ModeIntro } from '@/components/common/ModeIntro'
+
+/** server-rendered in every branch (and the Suspense fallback), so the static HTML explains the tool */
+const INTRO = [
+  "The daily rep is a fifteen-minute system design exercise on one problem. It covers only the first two stages: **requirements**, and the **actors and request lifecycle**. There are no numbers, no architecture and no deep dive; those belong to a full session on the problem's own page.",
+  "To use it, take the suggested problem, which is a shape you have not worked yet, or pick any problem from the list. Write your own answer to each stage first, the way you would say it in an interview. The model answer and checklist appear only after you submit, so compare honestly and note what you missed.",
+  "Progress is kept in this browser, or in your account if you are signed in, so the next suggestion moves you on to a new kind of problem."
+]
 
 const DAILY_STAGES: StageId[] = [1, 2]
 
@@ -63,6 +71,7 @@ function DailyInner() {
             Open all five stages →
           </Button>
         </div>
+        <ModeIntro inPage paragraphs={INTRO} />
       </Page>
     )
   }
@@ -113,6 +122,7 @@ function DailyInner() {
           )
         })}
       </div>
+      <ModeIntro inPage paragraphs={INTRO} />
     </Page>
   )
 }
@@ -128,6 +138,7 @@ export default function DailyPage() {
           <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>
+          <ModeIntro inPage paragraphs={INTRO} />
         </Page>
       }
     >

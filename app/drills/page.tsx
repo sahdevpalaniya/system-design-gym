@@ -8,8 +8,15 @@ import { failingCategories, useProgress } from '@/lib/store'
 import type { FollowUpCategory } from '@/lib/types'
 import { FollowUpDrill } from '@/components/system-design/FollowUpDrill'
 import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
+import { ModeIntro } from '@/components/common/ModeIntro'
 
 const CATEGORIES = Object.keys(CATEGORY_INFO) as FollowUpCategory[]
+
+/** "a, b and c" for the intro. */
+const CATEGORY_NAMES = (() => {
+  const names = CATEGORIES.map((c) => CATEGORY_INFO[c].name.toLowerCase())
+  return names.length > 1 ? `${names.slice(0, -1).join(', ')} and ${names.at(-1)}` : names[0]
+})()
 
 function DrillsInner() {
   const params = useSearchParams()
@@ -207,6 +214,14 @@ export default function DrillsPage() {
       >
         <DrillsInner />
       </Suspense>
+      <ModeIntro
+        inPage
+        paragraphs={[
+          `Each drill is one follow-up question of the kind an interviewer asks after your first design, and you get ninety seconds to write your defence of a design decision. There are ${CATEGORIES.length} categories, matching the ways interviewers push on a design: ${CATEGORY_NAMES}.`,
+          'Practise one at a time, across all of them or filtered to one category. Write your answer before you look at anything. Then compare it against a weak answer, a strong answer and the trap hidden in the question, and rate yourself out of 3.',
+          'Your ratings build a record per category, so you can see which kind of follow-up you are weakest at and drill that one. Every answer also feeds the Defence axis on your progress profile.',
+        ]}
+      />
     </Page>
   )
 }

@@ -15,6 +15,34 @@ export const COMPANIES: Company[] = [
       'Candidates commonly report a scale-first round. Expect very large numbers from the opening sentence, and be ready to justify a data structure choice in more detail than many rounds ask for. Interviewers often go deep on one subproblem rather than broad across the system.',
     weights: 'Numbers and Design weigh heaviest. Vague estimates cost you.',
     archetype: 'scale-breaker',
+    guide: {
+      loop: [
+        "Google describes its process on its [How we hire](https://www.google.com/about/careers/applications/how-we-hire/) page. It starts with one or two shorter recruiter conversations. Some roles add an online assessment or a role-related exercise, such as coding. Then comes 'a panel of interviews, either over video or in person'. Google says every candidate for a role is assessed with the same rubrics, that questions are open-ended and role-related, and that there are no brainteasers. The same page links to a video of Google engineers running a mock system design interview. It is worth watching before your own.",
+        "Google does not publish a fixed list of rounds for engineers, and the mix depends on the role and level. Candidates commonly report that early-career loops are mostly coding, and that a dedicated system design round usually appears for experienced hires. If you are not sure whether your loop has one, ask your recruiter. That is a normal question to ask.",
+      ],
+      emphasis: [
+        "**Numbers that change the design.** Candidates often describe being asked for request rate, storage and bandwidth early, and then being asked which of those numbers changed a decision. A number that changes nothing looks like ritual. Practise this with [back-of-the-envelope estimation](/concepts/back-of-envelope).",
+        "**One subproblem, in depth.** Many reports describe the interviewer picking one part, such as the index, the sharding scheme or the dedup step, and staying there for a long time. Be ready for three levels of detail: what it is, how it works, and what breaks.",
+        "**Data structures, sized out loud.** Why a trie and not a general search index? How big is it? Does it fit in memory? Expect to say the size, not just the name.",
+        "**What happens at ten times the load.** Hot keys, a lost region, a sudden spike. See [partitioning](/concepts/partitioning) and [consistent hashing](/concepts/consistent-hashing).",
+      ],
+      pitfalls: [
+        'Drawing a generic diagram (load balancer, servers, cache, database) before stating a single requirement or number.',
+        'Estimates with no consequence: working out 600,000 requests a second, then designing as if it were 600.',
+        'Going broad when the interviewer wants depth. If they keep asking about one box, follow them into it.',
+        'Naming a product instead of a mechanism. "Use a managed database" does not answer "how do you split the data?"',
+      ],
+      plan: [
+        'Read [how a system design interview works](/learn/how-the-interview-works) and [the five stages](/learn/the-five-stages), so the structure is automatic and your attention goes to the problem.',
+        'Get fast with numbers: [latency numbers](/concepts/latency-numbers), [back-of-the-envelope estimation](/concepts/back-of-envelope), then [capacity and cost](/concepts/capacity-and-cost).',
+        'Work two scale-heavy problems in full: [search typeahead](/problems/typeahead) and the [web crawler](/problems/web-crawler). Then try the Google-style versions of both below.',
+        'Add depth on what those problems lean on: [search indexing](/concepts/search-indexing), [caching](/concepts/caching), [Bloom filters](/concepts/bloom-filters) and [partitioning](/concepts/partitioning).',
+        'Finish with a [timed mock](/practice/mock) with the [Scale Breaker](/archetypes/scale-breaker) as your interviewer, then the scale follow-ups in the [defence drills](/drills).',
+      ],
+      sources: [
+        { label: 'Google Careers: How we hire', url: 'https://www.google.com/about/careers/applications/how-we-hire/' },
+      ],
+    },
   },
   {
     id: 'amazon',
@@ -23,6 +51,36 @@ export const COMPANIES: Company[] = [
       'Operational reality and cost. Who gets paged, what does this cost per month, how does it degrade, what happens on the busiest day of the year. Amazon publishes its Leadership Principles, and they often surface in the technical round too, particularly Ownership and Frugality.',
     weights: 'Tradeoffs and Defence weigh heaviest, with real weight on operations.',
     archetype: 'cost-auditor',
+    guide: {
+      loop: [
+        "Amazon's [interview loop](https://www.amazon.jobs/content/en/how-we-hire/interview-loop) page says you meet individually with current employees, and that each one assesses different aspects of your skills and experience. Its [SDE II interview prep](https://www.amazon.jobs/content/en/how-we-hire/sde-ii-interview-prep) page is more specific. It describes four 55-minute interviews, tells you to 'expect at least one question on software systems design', and lists what a design is judged on: practicality, accuracy, efficiency, reliability, optimisation and scalability. It also asks you to ask questions that complete and validate your design.",
+        "The same page says that a significant part of each conversation covers how you have shown the [Leadership Principles](https://www.amazon.jobs/content/en/our-workplace/leadership-principles) in past jobs, usually two or three behavioural questions per interviewer, answered in the STAR format. That description is for SDE II. Other levels and teams differ, so read the prep material your recruiter sends.",
+      ],
+      emphasis: [
+        '**Cost and operations as real requirements.** Candidates often report questions such as what this costs per month, who gets paged, and what happens on the busiest day of the year. That matches two published principles, Frugality ("accomplish more with less") and Ownership. Read [capacity and cost](/concepts/capacity-and-cost) and [observability](/concepts/observability).',
+        '**Degrading well, not just staying up.** What does the customer see when a dependency is slow? See [circuit breakers](/concepts/circuit-breakers) and [availability patterns](/concepts/availability-patterns).',
+        '**Correctness under retries.** In a flash sale or a notification service, duplicates cost money or trust. [Idempotency](/concepts/idempotency) and [message queues](/concepts/message-queues) come up often.',
+        '**Detail on request.** Dive Deep is one of the principles. Expect at least one "and how does that actually work?"',
+      ],
+      pitfalls: [
+        "Treating the behavioural questions as a warm-up. By Amazon's own description they are a large part of every interview. Prepare real stories, with numbers where you have them.",
+        'Designing for peak traffic and saying nothing about cost for the rest of the year.',
+        'Having no answer to "who gets paged, and what do they see on the dashboard?"',
+        'Claiming the design has no weak points. Name the weakest part yourself before the interviewer does.',
+      ],
+      plan: [
+        'Write four to six STAR stories mapped to the [Leadership Principles](https://www.amazon.jobs/content/en/our-workplace/leadership-principles). Practise these separately from the design work.',
+        'Work [ticket booking](/problems/ticket-booking) and the [notification system](/problems/notification-system) in full, then the Amazon-style flash sale and notification questions below.',
+        'Study the concepts those lean on: [idempotency](/concepts/idempotency), [message queues](/concepts/message-queues), [rate limiting](/concepts/rate-limiting), [transactions and locking](/concepts/transactions-and-locking) and [capacity and cost](/concepts/capacity-and-cost).',
+        'If the role touches money, add [payments and ledger](/problems/payment-ledger).',
+        'Run a [timed mock](/practice/mock) with the [Cost Auditor](/archetypes/cost-auditor) as your interviewer, then drill cost and failure follow-ups in the [defence drills](/drills).',
+      ],
+      sources: [
+        { label: 'Amazon Jobs: Interview loop', url: 'https://www.amazon.jobs/content/en/how-we-hire/interview-loop' },
+        { label: 'Amazon Jobs: SDE II interview prep', url: 'https://www.amazon.jobs/content/en/how-we-hire/sde-ii-interview-prep' },
+        { label: 'Amazon Jobs: Leadership Principles', url: 'https://www.amazon.jobs/content/en/our-workplace/leadership-principles' },
+      ],
+    },
   },
   {
     id: 'meta',
@@ -31,6 +89,36 @@ export const COMPANIES: Company[] = [
       'Product sense plus very large fan-out. Expect social-graph shaped problems, expect the celebrity-user case to come up early, and expect to be pushed on what the user experiences rather than what the diagram says.',
     weights: 'Requirements and Design, with fan-out and hot keys as the recurring pressure point.',
     archetype: 'pressure-tester',
+    guide: {
+      loop: [
+        "Meta's careers site describes a 45-minute [initial technical screen](https://www.metacareers.com/swe-prep-techscreen/) with an engineer, followed by a [full loop](https://www.metacareers.com/swe-prep-onsite/) that 'will consist of several different conversations', meant to assess your technical skills and help hiring managers get to know you. That page offers a downloadable Full Loop Interview Guide. It is the best source for the current format, so read it rather than relying on second-hand summaries, including this one.",
+        'Candidates report that the loop for experienced engineers mixes coding, design and behavioural conversations, and that design carries more weight at senior levels. Some candidates also report a choice between a distributed-systems design round and a more product-focused design round, depending on the role. The two reward different preparation, so ask your recruiter which one you have.',
+      ],
+      emphasis: [
+        '**Fan-out and the celebrity case.** Social-graph problems, where one write must reach a very large number of readers. Know push, pull and the hybrid, and when each wins. See [fan-out](/concepts/fan-out).',
+        '**What the user experiences.** If a feed is thirty seconds stale, does anyone notice? Candidates describe being pushed on the experience rather than the diagram. See [consistency models](/concepts/consistency-models).',
+        "**Read-heavy data and caching.** Meta has written publicly about [TAO](https://engineering.fb.com/2013/06/25/core-infra/tao-the-power-of-the-graph/), its data store for the social graph, which puts a caching layer in front of MySQL to serve a very high volume of reads. It is useful background for why graph data gets cached so heavily. See [caching](/concepts/caching) and [partitioning](/concepts/partitioning).",
+        '**Counting at scale.** Likes and views are small writes in huge numbers. See [distributed counters](/concepts/distributed-counter).',
+      ],
+      pitfalls: [
+        'Choosing push or pull for every account. Strong answers usually treat the very large accounts differently.',
+        'Spending the first ten minutes on infrastructure before saying what the product does and who sees what.',
+        'Promising strong consistency for a feed that does not need it, and paying for it in latency.',
+        'Forgetting the write cost of fan-out on write: one post multiplied by the follower count.',
+      ],
+      plan: [
+        'Work the [follower timeline](/problems/social-timeline) in full, then the Meta-style [news feed](/company/meta/m-newsfeed) question.',
+        'Add real-time delivery with [chat and messaging](/problems/chat-messaging) and [live score push](/problems/live-scores).',
+        'Study [fan-out](/concepts/fan-out), [caching](/concepts/caching), [partitioning](/concepts/partitioning), [consistency models](/concepts/consistency-models), [distributed counters](/concepts/distributed-counter) and [real-time transports](/concepts/realtime-transports).',
+        'If your round is product-focused, spend extra time on the requirements stage in [the five stages](/learn/the-five-stages) and on [API design](/concepts/api-design).',
+        'Run a [timed mock](/practice/mock) with the [Pressure Tester](/archetypes/pressure-tester) as your interviewer, then the [defence drills](/drills).',
+      ],
+      sources: [
+        { label: 'Meta Careers: Initial technical screen', url: 'https://www.metacareers.com/swe-prep-techscreen/' },
+        { label: 'Meta Careers: Full loop interview', url: 'https://www.metacareers.com/swe-prep-onsite/' },
+        { label: 'Engineering at Meta: TAO', url: 'https://engineering.fb.com/2013/06/25/core-infra/tao-the-power-of-the-graph/' },
+      ],
+    },
   },
   {
     id: 'microsoft',
@@ -39,6 +127,36 @@ export const COMPANIES: Company[] = [
       'Often described as calmer and more collaborative than most. The round tests whether you can be reasoned with: expect the interviewer to propose an alternative and watch whether you engage with it or defend by reflex.',
     weights: 'Lifecycle and Tradeoffs. Genuine openness to a better idea scores.',
     archetype: 'scope-shifter',
+    guide: {
+      loop: [
+        "Microsoft's [interview tips](https://careers.microsoft.com/v2/global/en/hiring-tips/interview-tips.html) say that if you advance, 'the next interview steps will vary based on the role', and that your recruiter explains the format and timeline. Some roles include coding exercises, a portfolio review or work samples. Interviewers aim to 'assess fundamental knowledge, capability, and learning potential'.",
+        "Its [technical interviewing](https://careers.microsoft.com/v2/global/en/hiring-tips/technical-interviewing) page lists problem solving, design, coding and testing as the areas assessed, refers to a 45-minute round, and names system design among the topics to prepare. On design, it says engineers should understand 'what it takes to build or design a new system or platform from scratch'. Its advice is to ask clarifying questions about anything ambiguous and to plan before you build. Whether you get a separate system design round, and how deep it goes, depends on the team and the level.",
+      ],
+      emphasis: [
+        "**Clarifying before designing.** This is Microsoft's own published advice, and candidates report interviewers rewarding good questions about scope.",
+        "**Engaging with a better idea.** Candidates describe interviewers proposing a different approach halfway through and watching how you respond. Microsoft's careers pages describe a growth mindset, being a 'learn-it-all' rather than a 'know-it-all', as part of its culture, which fits that pattern.",
+        '**Lifecycle and correctness.** For collaborative or sync problems: what happens when two people edit the same thing, or one of them is offline? See [clocks and ordering](/concepts/clocks-and-ordering) and [replication](/concepts/replication).',
+        '**Testing your own design.** The technical page tells candidates to test before saying "done". In a design round, the same habit means walking through failure cases yourself.',
+      ],
+      pitfalls: [
+        'Defending your first design by reflex when the interviewer offers a better one. Weigh it out loud, and change your mind if it is better.',
+        'Skipping the hard edge cases: offline edits, conflicting edits, partial failures.',
+        'Drawing components before the requirements are agreed.',
+        'Assuming every Microsoft loop looks the same. Ask your recruiter about the format for your team.',
+      ],
+      plan: [
+        'Read [the five stages](/learn/the-five-stages), with extra care on requirements and the request lifecycle.',
+        'Work [file sync across devices](/problems/file-sync) and [chat and messaging](/problems/chat-messaging) in full, then the Microsoft-style [collaborative document editor](/company/microsoft/ms-collab) question.',
+        'Study [real-time transports](/concepts/realtime-transports), [consistency models](/concepts/consistency-models), [replication](/concepts/replication), [clocks and ordering](/concepts/clocks-and-ordering) and [idempotency](/concepts/idempotency).',
+        "For background on real-time collaboration, Microsoft's open-source [Fluid Framework](https://fluidframework.com/) is a real system built for exactly this problem.",
+        'Run a [timed mock](/practice/mock) with the [Scope Shifter](/archetypes/scope-shifter) as your interviewer, so a mid-round change of requirements stops being a surprise.',
+      ],
+      sources: [
+        { label: 'Microsoft Careers: Interview tips', url: 'https://careers.microsoft.com/v2/global/en/hiring-tips/interview-tips.html' },
+        { label: 'Microsoft Careers: Technical interviewing', url: 'https://careers.microsoft.com/v2/global/en/hiring-tips/technical-interviewing' },
+        { label: 'Fluid Framework', url: 'https://fluidframework.com/' },
+      ],
+    },
   },
   {
     id: 'netflix',
@@ -47,6 +165,35 @@ export const COMPANIES: Company[] = [
       'Often senior-heavy and direct. Expect few hand-holding questions, an assumption that you have run systems in production, and strong interest in failure modes, chaos testing and graceful degradation.',
     weights: 'Defence and Tradeoffs. Hand-waving is spotted quickly.',
     archetype: 'domain-specialist',
+    guide: {
+      loop: [
+        "We could not find a published description of Netflix's engineering interview loop on its careers site. What Netflix does publish is its [culture memo](https://jobs.netflix.com/culture), which describes freedom and responsibility, 'context, not control', candour and the keeper test. Candidates commonly report that these ideas come up in interviews, in questions about how you make decisions and work with other people.",
+        'Everything else about the format comes from candidate reports, and those vary a lot by team: the number of rounds, whether there is a separate design round, and how much of it is about your past work. Treat any fixed description you read online with caution, and ask your recruiter what your loop contains.',
+      ],
+      emphasis: [
+        '**Production experience.** Reports describe interviewers assuming you have run systems, and asking what went wrong and what you changed afterwards, not only what you built.',
+        "**Failure and resilience.** Netflix open-sourced [Chaos Monkey](https://github.com/Netflix/chaosmonkey), a tool that 'randomly terminates virtual machine instances and containers that run inside of your production environment'. Expect questions about what your design does when a node, a zone or a dependency disappears. See [circuit breakers](/concepts/circuit-breakers), [availability patterns](/concepts/availability-patterns) and [multi-region](/concepts/multi-region).",
+        '**Delivery at scale.** Video problems are mostly about getting bytes close to the viewer. See [CDN](/concepts/cdn) and [object storage](/concepts/object-storage).',
+        '**Honest tradeoffs.** Say what your design gives up before you are asked. That fits the candour the culture memo describes.',
+      ],
+      pitfalls: [
+        'Saying "we would add retries" without bounding them. Unbounded retries turn a slow dependency into an outage.',
+        'Treating the CDN as magic, with no word about load on the origin when a new title launches and every cache is empty.',
+        'Claiming experience you cannot back up with detail. Follow-up questions find this quickly.',
+        'No graceful degradation: what does the viewer see when a non-essential service, like recommendations, is down?',
+      ],
+      plan: [
+        'Work [video upload and playback](/problems/video-platform) in full, then the Netflix-style [video streaming](/company/netflix/n-video) question.',
+        'Study [CDN](/concepts/cdn), [object storage](/concepts/object-storage), [message queues](/concepts/message-queues) and [circuit breakers](/concepts/circuit-breakers).',
+        'Add the operations topics: [availability patterns](/concepts/availability-patterns), [multi-region](/concepts/multi-region), [observability](/concepts/observability) and [deploys and releases](/concepts/deploys-and-releases).',
+        'Prepare two or three real incidents from your own work: what failed, how you found it, and what you changed.',
+        'Run a [timed mock](/practice/mock) with the [Domain Specialist](/archetypes/domain-specialist) as your interviewer, then the failure follow-ups in the [defence drills](/drills).',
+      ],
+      sources: [
+        { label: 'Netflix Jobs: Culture memo', url: 'https://jobs.netflix.com/culture' },
+        { label: 'Netflix Chaos Monkey (GitHub)', url: 'https://github.com/Netflix/chaosmonkey' },
+      ],
+    },
   },
   {
     id: 'uber',
@@ -55,6 +202,32 @@ export const COMPANIES: Company[] = [
       'Real-time, geospatial and matching problems, because that is the business. Expect hard latency budgets, moving objects, and close attention to what happens when the match fails.',
     weights: 'Lifecycle and Numbers, with latency budgets treated as hard constraints.',
     archetype: 'constraint-setter',
+    guide: {
+      loop: [
+        "We could not find a detailed engineering interview guide on Uber's careers site, so everything here about the format comes from candidate reports. Check it with your recruiter. Reports describe a familiar shape: a recruiter call, a technical screen, then a loop of coding, system design and behavioural conversations, with design carrying more weight for experienced hires. The details vary by team and level.",
+        "The design problems tend to mirror the business: matching riders and drivers, location, pricing and trip state. One useful piece of public background is [H3](https://h3geo.org/), a hexagonal grid system for indexing locations that was developed at Uber and released as open source. You do not need to know H3 for the interview, but it shows how a company that lives on location data splits the map.",
+      ],
+      emphasis: [
+        '**Latency budgets as hard limits.** Candidates report being given a time limit for a match or an update and being graded on everything inside it. That is the [Constraint Setter](/archetypes/constraint-setter) pattern.',
+        '**Moving objects.** Drivers send frequent location updates, so the index changes all the time. See [geospatial indexing](/concepts/geospatial-indexing).',
+        '**What happens when a match fails.** A driver declines, a phone drops off the network, two riders reach for the same driver. See [idempotency](/concepts/idempotency) and [transactions and locking](/concepts/transactions-and-locking).',
+        '**The trip as a state machine.** Requested, matched, picked up, completed, paid. Candidates describe being asked what happens between each step, which is the lifecycle stage in [the five stages](/learn/the-five-stages).',
+      ],
+      pitfalls: [
+        'Querying the main database for nearby drivers on every location update.',
+        'Letting one driver be assigned to two riders because the assignment is not atomic.',
+        'No plan for timeouts: what the rider sees when nobody accepts.',
+        'Designing one global system when cities are a natural way to split the data. See [partitioning](/concepts/partitioning).',
+      ],
+      plan: [
+        'Work [nearby places](/problems/nearby-places) first. It teaches the location index without the moving parts.',
+        'Then [ride matching](/problems/ride-matching) in full, and the Uber-style [driver-rider matching](/company/uber/u-matching) question.',
+        'Study [geospatial indexing](/concepts/geospatial-indexing), [real-time transports](/concepts/realtime-transports), [consensus](/concepts/consensus), [idempotency](/concepts/idempotency) and [partitioning](/concepts/partitioning).',
+        'Add [payments and ledger](/problems/payment-ledger), because every trip ends in a payment that must happen exactly once.',
+        'Run a [timed mock](/practice/mock) with the [Constraint Setter](/archetypes/constraint-setter) as your interviewer, then the [defence drills](/drills).',
+      ],
+      sources: [{ label: 'H3 geospatial index (developed at Uber)', url: 'https://h3geo.org/' }],
+    },
   },
 ]
 

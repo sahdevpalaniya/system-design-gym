@@ -470,6 +470,21 @@ export interface Company {
   style: string
   weights: string
   archetype: ArchetypeId
+  /**
+   * The long-form hub text. Format facts come only from the company's own
+   * careers pages (listed in `sources`); everything else is framed as candidate
+   * reports. Strings use the Rich mini-markdown, so links work inline.
+   */
+  guide?: {
+    /** the loop and where system design sits in it */
+    loop: string[]
+    /** what interviewers emphasise, as candidates report it */
+    emphasis: string[]
+    pitfalls: string[]
+    /** ordered steps, linking our own problem and concept pages */
+    plan: string[]
+    sources: { label: string; url: string }[]
+  }
 }
 
 /* ---------- language tracks ---------- */

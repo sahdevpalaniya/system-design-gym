@@ -9,6 +9,13 @@ import { problemState, useProgress } from '@/lib/store'
 import type { StageId } from '@/lib/types'
 import { StageEngine } from '@/components/system-design/StageEngine'
 import { Badge, Button, Card, Page, PageHeader, StateDot } from '@/components/common/ui'
+import { ModeIntro } from '@/components/common/ModeIntro'
+
+/** server-rendered in every branch (and the Suspense fallback), so the static HTML explains the tool */
+const INTRO = [
+  "The timed mock is a 45-minute system design interview on one problem, under interview conditions. It covers all five stages, from requirements to the deep dive, and each stage has its own timer. The timers keep running past zero instead of cutting you off, because going over is useful information, not a failure.",
+  "Pick a problem, read the rules, then start. Nothing is revealed until all five stages are submitted: no model answers, checklists or hints along the way. At the end you read the model answers, mark honestly what you actually had, and get a report card across six axes. If you have chosen an [interviewer archetype](/archetypes), it decides which follow-up you face at the end."
+]
 
 const ALL: StageId[] = [1, 2, 3, 4, 5]
 
@@ -36,6 +43,7 @@ function MockInner() {
           }
         />
         <StageEngine problem={problem} stageIds={ALL} revealMode="end" timed />
+        <ModeIntro inPage paragraphs={INTRO} />
       </Page>
     )
   }
@@ -87,6 +95,7 @@ function MockInner() {
             </Button>
           </div>
         </Card>
+        <ModeIntro inPage paragraphs={INTRO} />
       </Page>
     )
   }
@@ -151,6 +160,7 @@ function MockInner() {
           </div>
         </section>
       ) : null}
+      <ModeIntro inPage paragraphs={INTRO} />
     </Page>
   )
 }
@@ -166,6 +176,7 @@ export default function MockPage() {
           <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
             Loading…
           </div>
+          <ModeIntro inPage paragraphs={INTRO} />
         </Page>
       }
     >

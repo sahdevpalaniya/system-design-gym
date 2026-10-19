@@ -3,19 +3,12 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
-import type { Language } from '@/lib/types'
-import { CONCEPTS, PATH, getConcept } from '@/content/system-design/concepts'
-import { LESSONS } from '@/content/system-design/foundations'
-import { GROUPS } from '@/content/system-design/method'
-import { PROBLEMS } from '@/content/system-design/problems'
-import { ARCHETYPES } from '@/content/system-design/archetypes'
-import { COMPANIES } from '@/content/system-design/companies'
-import { LANGUAGES, getLanguage } from '@/content/languages'
-import { TRACKS, type Track } from '@/content/tracks'
-import { hasDeepDive } from '@/content/system-design/deep'
+import type { Track } from '@/content/tracks'
+import type { NavIndex } from '@/lib/nav-index'
 import { conceptState, dueConcepts, problemState, readCount, streakCount, useProgress } from '@/lib/store'
 import { AccountButton } from './Account'
 import { Search } from './Search'
+import { useNavIndex } from './NavIndex'
 
 /* ---------- sidebar open/close, shared with the header button ---------- */
 
@@ -27,9 +20,9 @@ const SidebarCtx = createContext<{ open: boolean; setOpen: (v: boolean) => void 
 /* ---------- tracks: the top tabs, w3schools style ---------- */
 
 /** The tab a path belongs to. Everything outside /languages is System Design. */
-function trackFor(pathname: string): Track {
+function trackFor(pathname: string, tracks: Track[]): Track {
   const m = /^\/languages\/([^/]+)/.exec(pathname)
-  return TRACKS.find((t) => t.id === m?.[1]) ?? TRACKS[0]
+  return tracks.find((t) => t.id === m?.[1]) ?? tracks[0]
 }
 
 export function Shell({ children }: { children: ReactNode }) {
@@ -147,7 +140,8 @@ function Header() {
 /** The row of track tabs, always shown, w3schools style. Clicking one swaps the entire sidebar. */
 function TrackTabs() {
   const pathname = usePathname()
-  const active = trackFor(pathname)
+  const { tracks } = useNavIndex()
+  const active = trackFor(pathname, tracks)
 
   return (
     // scrolls sideways on narrow screens; the scrollbar is hidden so it never adds height
@@ -156,7 +150,7 @@ function TrackTabs() {
       className="mx-auto flex w-full max-w-[var(--shell)] gap-1 overflow-x-auto px-3"
       style={{ scrollbarWidth: 'none' }}
     >
-      {TRACKS.map((t) => {
+      {tracks.map((t) => {
         const on = t.id === active.id
         return (
           <Link
@@ -315,7 +309,7 @@ const STATE_COLOR: Record<string, string | undefined> = {
 }
 
 /** The sidebar for one language track: sections, then topics. */
-function LanguageMenu({ lang }: { lang: Language }) {
+function LanguageMenu({ lang }: { lang: NavIndex['languages'][number] }) {
   const { state, ready } = useProgress()
   // topics are numbered straight through the track, not restarted per section
   const order = lang.sections.flatMap((s) => s.lessons)
@@ -329,7 +323,7 @@ function LanguageMenu({ lang }: { lang: Language }) {
       >
         <Item href={`/languages/${lang.id}`}>All topics</Item>
         <Item href={`/languages/${lang.id}/revise`}>Quick revision</Item>
-        {lang.quizzes?.length ? (
+        {lang.hasQuizzes ? (
           <Item href={`/languages/${lang.id}/quiz`}>Tests</Item>
         ) : null}
       </Group>
@@ -366,11 +360,22 @@ function LanguageMenu({ lang }: { lang: Language }) {
 }
 
 function Sidebar() {
+  const {
+    lessons: LESSONS,
+    concepts: CONCEPTS,
+    path: PATH,
+    groups: GROUPS,
+    problems: PROBLEMS,
+    companies: COMPANIES,
+    archetypes: ARCHETYPES,
+    languages,
+    tracks,
+  } = useNavIndex()
   const { open, setOpen } = useContext(SidebarCtx)
   const { state, ready } = useProgress()
   const pathname = usePathname()
   const due = ready ? dueConcepts(state).length : 0
-  const lang = getLanguage(trackFor(pathname).id)
+  const lang = languages.find((l) => l.id === trackFor(pathname, tracks).id)
   // concepts numbered straight through the path, so the sidebar reads 01..NN
   const conceptOrder = PATH.flatMap((st) => st.concepts ?? [])
 
@@ -467,7 +472,7 @@ function Sidebar() {
           ))}
         </Group>
 
-        {PATH.filter((stage) => stage.concepts?.length).map((stage) => (
+        {PATH.map((stage) => (
           <Group
             key={stage.id}
             title={stage.name}
@@ -476,7 +481,7 @@ function Sidebar() {
             paths={(stage.concepts ?? []).map((s) => `/concepts/${s}`)}
           >
             {(stage.concepts ?? []).map((slug) => {
-              const c = getConcept(slug)
+              const c = CONCEPTS.find((x) => x.slug === slug)
               if (!c) return null
               const step = LESSONS.length + conceptOrder.indexOf(slug) + 1
               return (
@@ -484,7 +489,7 @@ function Sidebar() {
                   key={slug}
                   href={`/concepts/${slug}`}
                   dot={ready ? STATE_COLOR[conceptState(state, slug)] : undefined}
-                  deep={hasDeepDive(slug)}
+                  deep={c.deep}
                   done={ready ? Boolean(state.read?.[`concept:${slug}`]) : false}
                 >
                   <span className="tabular mr-1.5" style={{ color: 'var(--dim)' }}>
@@ -568,9 +573,8 @@ function Sidebar() {
 
 export function Footer() {
   const pathname = usePathname()
-  const lang = getLanguage(trackFor(pathname).id)
-  // concepts numbered straight through the path, so the sidebar reads 01..NN
-  const conceptOrder = PATH.flatMap((st) => st.concepts ?? [])
+  const { languages, tracks } = useNavIndex()
+  const lang = languages.find((l) => l.id === trackFor(pathname, tracks).id)
 
   return (
     <footer className="mt-auto border-t px-5 py-6">

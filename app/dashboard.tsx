@@ -2,10 +2,8 @@
 
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { CONCEPTS, getConcept } from '@/content/system-design/concepts'
-import { PROBLEMS, getProblem } from '@/content/system-design/problems'
-import { GROUPS } from '@/content/system-design/method'
-import { CATEGORY_INFO } from '@/content/system-design/followups'
+import { useNavIndex } from '@/components/common/NavIndex'
+import type { FollowUpCategory } from '@/lib/types'
 import {
   axisScores,
   axisScoresBefore,
@@ -20,8 +18,15 @@ import {
 import { AXIS_EARNS, AXIS_LABEL } from '@/lib/types'
 import { Badge, Button, Card, Empty, Radar, StateDot, Stat } from '@/components/common/ui'
 
-export function Dashboard() {
+/** categoryInfo comes from the server page, so the follow-up bank stays out of
+ *  the client bundle; concept and problem titles come from the nav index. */
+export function Dashboard({
+  categoryInfo: CATEGORY_INFO,
+}: {
+  categoryInfo: Record<FollowUpCategory, { name: string; tell: string }>
+}) {
   const { state, ready } = useProgress()
+  const { concepts: CONCEPTS, problems: PROBLEMS, groups: GROUPS } = useNavIndex()
 
   const view = useMemo(() => {
     const due = dueConcepts(state)
@@ -87,7 +92,7 @@ export function Dashboard() {
       streak: streakCount(state),
       mocks: state.mocks.length,
     }
-  }, [state])
+  }, [state, CONCEPTS, PROBLEMS])
 
   // the static introduction above this is already on screen, so a quiet
   // placeholder here is enough — nothing important is hidden behind it
@@ -227,7 +232,7 @@ export function Dashboard() {
           <Card>
             <div className="flex flex-wrap gap-2">
               {view.due.slice(0, 10).map((slug) => {
-                const c = getConcept(slug)
+                const c = CONCEPTS.find((x) => x.slug === slug)
                 if (!c) return null
                 return (
                   <Link

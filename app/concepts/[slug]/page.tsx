@@ -26,9 +26,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const short = c.searchTitle ?? c.navTitle ?? c.title
   // the searcher is not looking up "caching" — they are preparing for an
   // interview, so the intent modifier is the keyword that can actually rank
+  // whole sentences only: take the longest variant that fits a search snippet
+  // (155 chars, pageMeta's limit) rather than letting it cut one mid-sentence
+  const line = /[.!?]$/.test(c.oneLine) ? c.oneLine : `${c.oneLine}.`
+  const first = line.match(/^[^.!?]+[.!?]+/)?.[0] ?? line
+  const description =
+    [
+      `${short} for system design interviews. ${line} What it costs, when to use it, when not to, and the follow-ups.`,
+      `${short} for system design interviews. ${line}`,
+      // a long one-liner: keep its first sentence so the topic and intent stay
+      `${short} for system design interviews. ${first}`,
+      line,
+    ].find((d) => d.length <= 155) ?? line
   return pageMeta(
     `${short} — system design interview`,
-    `${short} explained for a system design interview: ${c.oneLine} What it costs you, when to use it, when not to, and the follow-up interviewers ask.`,
+    description,
     `/concepts/${c.slug}`,
     true,
     true, // own opengraph-image
