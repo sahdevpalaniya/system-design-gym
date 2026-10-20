@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
+import { Fragment, createContext, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 import type { Track } from '@/content/tracks'
 import type { NavIndex } from '@/lib/nav-index'
 import { conceptState, dueConcepts, problemState, readCount, streakCount, useProgress } from '@/lib/store'
@@ -336,6 +336,7 @@ function LanguageMenu({ lang }: { lang: NavIndex['languages'][number] }) {
           total={sec.lessons.length}
           paths={[`/languages/${lang.id}/topics/${sec.id}`, ...sec.lessons.map((sl) => `/languages/${lang.id}/${sl}`)]}
         >
+          <Item href={`/languages/${lang.id}/topics/${sec.id}`}>{sec.name}: overview</Item>
           {sec.lessons.map((slug) => {
             const t = lang.lessons.find((x) => x.slug === slug)
             if (!t) return null
@@ -433,6 +434,8 @@ function Sidebar() {
           total={LESSONS.length + CONCEPTS.length}
         >
           <Item href="/learn">All topics</Item>
+          <Item href="/concepts">All concepts</Item>
+          <Item href="/problems">All problems</Item>
           <Item href="/revise">Quick revision</Item>
           <Item href="/cheat-sheet">Cheat sheet</Item>
           <Item href="/practice/check">
@@ -486,18 +489,29 @@ function Sidebar() {
               if (!c) return null
               const step = LESSONS.length + conceptOrder.indexOf(slug) + 1
               return (
-                <Item
-                  key={slug}
-                  href={`/concepts/${slug}`}
-                  dot={ready ? STATE_COLOR[conceptState(state, slug)] : undefined}
-                  deep={c.deep}
-                  done={ready ? Boolean(state.read?.[`concept:${slug}`]) : false}
-                >
-                  <span className="tabular mr-1.5" style={{ color: 'var(--dim)' }}>
-                    {String(step).padStart(2, '0')}
-                  </span>
-                  {c.navTitle ?? c.title}
-                </Item>
+                <Fragment key={slug}>
+                  <Item
+                    href={`/concepts/${slug}`}
+                    dot={ready ? STATE_COLOR[conceptState(state, slug)] : undefined}
+                    deep={c.deep}
+                    done={ready ? Boolean(state.read?.[`concept:${slug}`]) : false}
+                  >
+                    <span className="tabular mr-1.5" style={{ color: 'var(--dim)' }}>
+                      {String(step).padStart(2, '0')}
+                    </span>
+                    {c.navTitle ?? c.title}
+                  </Item>
+                  {/* the deep dive gets a link of its own: the "+" badge sits
+                      inside the concept's link, so it led nowhere new */}
+                  {c.deep ? (
+                    <Item href={`/concepts/${slug}/deep`}>
+                      <span className="mr-1.5" aria-hidden>
+                        {'  '}
+                      </span>
+                      {c.navTitle ?? c.title} in depth
+                    </Item>
+                  ) : null}
+                </Fragment>
               )
             })}
           </Group>

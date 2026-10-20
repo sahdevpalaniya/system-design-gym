@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       (project
         ? `${project} in ${l.alias ?? l.name}: ${short}`
         : `${short} in ${l.name} (${l.alias ?? l.name}), with examples`),
-    `${t.oneLine} A ${l.alias ?? l.name} tutorial with runnable code, key points and practice exercises.`,
+    t.metaDescription ?? `${t.oneLine} A ${l.alias ?? l.name} tutorial with runnable code, key points and practice exercises.`,
     `/languages/${l.id}/${t.slug}`,
     true,
     true, // own opengraph-image
@@ -168,7 +168,7 @@ export default async function LangLessonPage({
             {section ? (
               <>
                 <span style={{ color: 'var(--border-strong)' }}>·</span>
-                <Link href={`/languages/${l.id}#${section.id}`} className="hover:opacity-70" style={{ color: 'var(--faint)' }}>
+                <Link href={`/languages/${l.id}/topics/${section.id}`} className="hover:opacity-70" style={{ color: 'var(--faint)' }}>
                   {section.name}
                 </Link>
               </>

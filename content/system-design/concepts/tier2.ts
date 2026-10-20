@@ -474,6 +474,7 @@ export const TIER2: Concept[] = [
 
   {
     slug: 'message-queues',
+    plural: true,
     title: 'Message queues and backpressure',
     navTitle: 'Message queues',
     tier: 2,
@@ -544,6 +545,7 @@ export const TIER2: Concept[] = [
 
   {
     slug: 'distributed-transactions',
+    plural: true,
     title: 'Distributed transactions: 2PC, sagas, outbox',
     navTitle: 'Distributed transactions',
     tier: 2,

@@ -107,7 +107,11 @@ export const TIER2_EXTRA: Concept[] = [
     slug: 'fan-out',
     searchTitle: "Fan-out on write vs read",
     subject: "fan-out on write",
-    title: 'Fan-out: push vs pull',
+    title: 'Fan-out on write vs fan-out on read (push vs pull)',
+    navTitle: 'Fan-out: push vs pull',
+    metaTitle: 'Fan-out on Write vs Fan-out on Read (Push vs Pull Feeds)',
+    metaDescription:
+      'Fan-out on write (push) vs fan-out on read (pull) for feeds and timelines: what each costs, the celebrity problem, and the hybrid most large apps use.',
     tier: 2,
     oneLine: 'Do the work when one person writes, or when a million people read. This one choice designs the system.',
     problem: [
@@ -200,6 +204,7 @@ export const TIER2_EXTRA: Concept[] = [
 
   {
     slug: 'clocks-and-ordering',
+    plural: true,
     subject: "logical clocks",
     title: 'Clocks, ordering and why timestamps lie',
     navTitle: 'Clocks and ordering',

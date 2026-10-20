@@ -15,10 +15,26 @@ export const LOGO_URL = `${SITE_URL}/logo.png`
 
 export const TITLE_TEMPLATE = `%s · ${SITE_NAME}`
 
-/** Trim to a length search results will actually show, without cutting a word. */
+/**
+ * Trim to a length search results will actually show. Prefers the longest run
+ * of whole sentences that fits, so the snippet ends on a full stop instead of
+ * "…"; only when the first sentence alone is too long does it cut at a word.
+ */
 function clamp(text: string, max = 155): string {
-  const s = text.replace(/\s+/g, ' ').trim()
+  // descriptions are often built from page copy, whose `code` and **bold**
+  // markup would show literally in a search result
+  const s = text.replace(/\*\*|`/g, '').replace(/\s+/g, ' ').trim()
   if (s.length <= max) return s
+  let fit = ''
+  // a sentence ends at . ! or ?, possibly inside a closing quote or bracket
+  for (const m of s.matchAll(/[.!?]["'”’)]?(?=\s)/g)) {
+    const end = m.index + m[0].length
+    if (end > max) break
+    // "e.g." and "i.e." are not sentence ends
+    if (/\b(e\.g|i\.e|vs)\.$/i.test(s.slice(0, end))) continue
+    fit = s.slice(0, end)
+  }
+  if (fit) return fit
   return s.slice(0, s.lastIndexOf(' ', max - 1)).replace(/[,;:]$/, '') + '…'
 }
 

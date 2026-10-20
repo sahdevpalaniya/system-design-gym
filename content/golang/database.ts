@@ -18,7 +18,7 @@ export const DATABASE: LangLesson[] = [
         body: [
           'So far everything your program stores disappears when it stops. A **database** keeps it. It also enforces rules that your Go code would otherwise have to remember every time: this column cannot be empty, this email must be unique, this row must point at a real user.',
           'Go talks to databases through **`database/sql`**, a package in the standard library. On its own it knows no particular database. It defines a common interface, and a **driver** (a separate package, here `pgx` for Postgres) speaks the database\'s wire protocol.',
-          'There is no ORM here. An **ORM** turns database rows into objects for you and hides the SQL. That is convenient until it produces a query you have to fight. With `database/sql` you write every query yourself, so you always know what runs. SQL is also a skill that outlives every ORM.',
+          'There is no ORM here. An **ORM** turns database rows into objects for you and hides the SQL. That is convenient until it produces a query you have to fight. With `database/sql` you write every query yourself, so you always know what runs. SQL is also a skill that outlives every ORM. If a team you join uses sqlx, sqlc or GORM, [Popular packages](/languages/go/popular-packages) compares them with plain `database/sql`.',
         ],
       },
       {

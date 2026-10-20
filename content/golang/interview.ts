@@ -273,6 +273,7 @@ export const INTERVIEW: LangLesson[] = [
         body: [
           'These are the questions that come up most in Go interviews for freshers, new grads and developers with 1–3 years of experience. Each answer is short on purpose: say it in an interview, then stop. The link after each answer goes to the lesson with the full explanation and runnable code.',
           'Groups: basics, slices and maps, interfaces and errors, concurrency, web and databases, and tricky output, then a set for experienced developers. For the deeper "how would you answer this" versions, see [Interview: language fundamentals](/languages/go/interview-language-fundamentals) and [Interview: concurrency](/languages/go/interview-concurrency).',
+          'Most Go interviews also have a coding round. Three problems that come up often, solved in Go: [Valid parentheses](/languages/go/dsa-valid-parentheses) (a slice as a stack), [Binary search](/languages/go/dsa-binary-search) and [Longest substring without repeating characters](/languages/go/dsa-sliding-window) (a sliding window).',
         ],
       },
       {

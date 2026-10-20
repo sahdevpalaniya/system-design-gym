@@ -1,6 +1,7 @@
 import { LANGUAGES } from './languages'
 import { getConcept } from './system-design/concepts'
 import { getProblem } from './system-design/problems'
+import { hasDeepDive } from './system-design/deep'
 
 /**
  * Pages in different tracks that teach the same idea from different sides:
@@ -27,6 +28,15 @@ const GROUPS: string[][] = [
   ['/problems/web-crawler', '/languages/go/concurrency-patterns', '/languages/go/context', '/concepts/bloom-filters'],
   ['/problems/typeahead', '/concepts/search-indexing', '/languages/go/dsa-binary-search'],
   ['/problems/chat-messaging', '/concepts/realtime-transports', '/languages/go/channels-and-select'],
+  // Go to Go: the concurrency lessons build on each other
+  [
+    '/languages/go/goroutines-vs-threads',
+    '/languages/go/goroutines',
+    '/languages/go/channels-and-select',
+    '/languages/go/mutex-vs-channel',
+    '/languages/go/interview-concurrency',
+  ],
+  ['/languages/go/dsa-sliding-window', '/concepts/rate-limiting'],
 ]
 
 export type CrossLink = { path: string; title: string; track: string }
@@ -38,6 +48,16 @@ function describe(path: string): CrossLink | null {
   if (m) {
     const c = getConcept(m[1])
     return c ? { path, title: c.title, track: 'System design concept' } : null
+  }
+  m = path.match(/^\/concepts\/([^/]+)\/deep$/)
+  if (m) {
+    const c = getConcept(m[1])
+    return c && hasDeepDive(c.slug) ? { path, title: `${c.navTitle ?? c.title} in depth`, track: 'System design deep dive' } : null
+  }
+  m = path.match(/^\/problems\/([^/]+)\/solution$/)
+  if (m) {
+    const p = getProblem(m[1])
+    return p ? { path, title: `${p.searchTitle ?? p.title}: worked solution`, track: 'System design solution' } : null
   }
   m = path.match(/^\/problems\/([^/]+)$/)
   if (m) {

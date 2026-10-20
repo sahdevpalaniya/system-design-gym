@@ -146,6 +146,7 @@ export const TIER3: Concept[] = [
 
   {
     slug: 'bloom-filters',
+    plural: true,
     title: 'Bloom filters',
     tier: 3,
     oneLine: 'A tiny structure that says "definitely not here" or "probably here", and never the wrong way round.',
@@ -227,6 +228,7 @@ export const TIER3: Concept[] = [
 
   {
     slug: 'write-ahead-log',
+    plural: true,
     searchTitle: "Write-ahead log (WAL)",
     title: 'Write-ahead logs',
     tier: 3,
@@ -308,6 +310,7 @@ export const TIER3: Concept[] = [
 
   {
     slug: 'cdn',
+    plural: true,
     searchTitle: "CDN (content delivery network)",
     title: 'CDNs',
     tier: 3,
@@ -474,6 +477,7 @@ export const TIER3: Concept[] = [
 
   {
     slug: 'realtime-transports',
+    plural: true,
     searchTitle: "WebSockets vs SSE vs polling",
     subject: "WebSockets",
     title: 'Long polling vs WebSockets vs SSE',
@@ -655,7 +659,11 @@ export const TIER3: Concept[] = [
 
   {
     slug: 'circuit-breakers',
+    plural: true,
     title: 'Circuit breakers and retries with jitter',
+    metaTitle: 'Circuit Breaker Pattern & Retry with Jitter: System Design',
+    metaDescription:
+      'Circuit breaker pattern for system design: closed, open and half-open states, retries with backoff and jitter, and what each one costs you.',
     navTitle: 'Circuit breakers',
     tier: 3,
     oneLine: 'Stop calling something that is already failing, and never retry all at the same moment.',
@@ -830,7 +838,11 @@ export const TIER3: Concept[] = [
   {
     slug: 'distributed-counter',
     subject: "a sharded counter",
-    title: 'Distributed counters',
+    title: 'Distributed counters: sharded counters, write batching and HyperLogLog',
+    navTitle: 'Distributed counters',
+    metaTitle: 'Sharded Counters: Distributed Counter Design (System Design)',
+    metaDescription:
+      'Sharded counters for system design: split a hot counter row into N shards, sum and cache on read, batch writes in memory, and use HyperLogLog for uniques.',
     tier: 3,
     oneLine: 'Counting is easy until everyone counts the same thing at once.',
     problem: [

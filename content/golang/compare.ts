@@ -4,7 +4,7 @@ import type { LangLesson } from '@/lib/types'
 export const COMPARE: LangLesson[] = [
   {
     slug: 'goroutines-vs-threads',
-    searchTitle: 'Goroutines vs threads: 8 differences that matter',
+    searchTitle: 'Goroutine vs Thread in Golang: 8 Differences That Matter',
     title: 'Goroutines vs threads: 8 differences that matter',
     navTitle: 'Goroutines vs threads',
     oneLine: 'Why Go can run a hundred thousand goroutines when the same number of OS threads would sink your machine.',
@@ -595,7 +595,7 @@ func main() {
 
   {
     slug: 'go-vs-java-vs-python-for-placements',
-    searchTitle: 'Go vs Java vs Python for first-job interviews',
+    searchTitle: 'Golang vs Python vs Java for first-job interviews',
     title: 'Go vs Java vs Python for your first job interviews: which should you pick?',
     navTitle: 'Go vs Java vs Python',
     oneLine: 'An honest comparison for campus hiring, new-grad interviews and your first backend job.',

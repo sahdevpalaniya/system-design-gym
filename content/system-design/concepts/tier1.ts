@@ -9,6 +9,7 @@ import type { Concept } from '@/lib/types'
 export const TIER1: Concept[] = [
   {
     slug: 'latency-numbers',
+    plural: true,
     subject: "the latency numbers",
     title: 'Latency numbers worth memorising',
     navTitle: 'Latency numbers',

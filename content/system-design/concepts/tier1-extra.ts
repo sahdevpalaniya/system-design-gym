@@ -8,7 +8,7 @@ import type { Concept } from '@/lib/types'
 export const TIER1_EXTRA: Concept[] = [
   {
     slug: 'performance-vs-scalability',
-    subject: "the scalability question",
+    subject: 'the performance vs scalability split',
     title: 'Performance vs scalability',
     tier: 1,
     oneLine: 'Fast for one person is not the same as staying fast for a million.',
@@ -323,6 +323,7 @@ export const TIER1_EXTRA: Concept[] = [
 
   {
     slug: 'reverse-proxy',
+    plural: true,
     title: 'Reverse proxies and gateways',
     navTitle: 'Reverse proxies',
     tier: 1,

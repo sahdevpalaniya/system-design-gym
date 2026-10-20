@@ -29,7 +29,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return pageMeta(
     // the generic tail goes when it would push the brand-name title past ~60 chars
     `${search} — full worked solution`.length > 60 ? `${search}: solution` : `${search} — full worked solution`,
-    `${search}: the complete answer stage by stage — requirements, lifecycle, capacity numbers, the architecture and every tradeoff named out loud.`,
+    // the longest version that fits a search snippet, so it is never cut mid-sentence
+    [
+      `${search}: the complete answer stage by stage — requirements, lifecycle, capacity numbers, the architecture and every tradeoff named out loud.`,
+      `${search}: the complete answer stage by stage — requirements, capacity numbers, the architecture and every tradeoff named out loud.`,
+      `${search}: the complete answer stage by stage — requirements, numbers, architecture and every tradeoff.`,
+    ].find((d) => d.length <= 155) ?? `${search}: the complete answer, stage by stage.`,
     `/problems/${p.slug}/solution`,
     true,
   )

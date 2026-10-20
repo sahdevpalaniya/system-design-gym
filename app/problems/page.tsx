@@ -67,26 +67,36 @@ export default function ProblemsPage() {
                     ? Object.keys(state.problems[p.slug]?.stages ?? {}).length
                     : 0
                   return (
-                    <Card key={p.slug} href={`/problems/${p.slug}`}>
-                      <div className="mb-2 flex items-start justify-between gap-3">
-                        <h3 className="text-[1.0312rem] leading-snug font-semibold">{p.title}</h3>
-                        <span className="mt-1.5">
-                          <StateDot state={st} />
-                        </span>
-                      </div>
-                      <p className="mb-3 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                        {p.slack.headline}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <Badge tone={p.difficulty === 'hard' ? 'bad' : p.difficulty === 'core' ? 'accent' : 'neutral'}>
-                          {p.difficulty}
-                        </Badge>
-                        {done > 0 ? <Badge tone="ok">{done}/5 stages</Badge> : null}
-                        <span className="text-[0.75rem]" style={{ color: 'var(--faint)' }}>
-                          {p.concepts.length} concepts
-                        </span>
-                      </div>
-                    </Card>
+                    <div key={p.slug}>
+                      <Card href={`/problems/${p.slug}`}>
+                        <div className="mb-2 flex items-start justify-between gap-3">
+                          <h3 className="text-[1.0312rem] leading-snug font-semibold">{p.title}</h3>
+                          <span className="mt-1.5">
+                            <StateDot state={st} />
+                          </span>
+                        </div>
+                        <p className="mb-3 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                          {p.slack.headline}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          <Badge tone={p.difficulty === 'hard' ? 'bad' : p.difficulty === 'core' ? 'accent' : 'neutral'}>
+                            {p.difficulty}
+                          </Badge>
+                          {done > 0 ? <Badge tone="ok">{done}/5 stages</Badge> : null}
+                          <span className="text-[0.75rem]" style={{ color: 'var(--faint)' }}>
+                            {p.concepts.length} concepts
+                          </span>
+                        </div>
+                      </Card>
+                      {/* outside the Card, which is itself a link */}
+                      <Link
+                        href={`/problems/${p.slug}/solution`}
+                        className="mt-1.5 inline-block px-1 text-[0.8125rem] font-medium hover:opacity-70"
+                        style={{ color: 'var(--accent)' }}
+                      >
+                        Worked solution →
+                      </Link>
+                    </div>
                   )
                 })}
               </div>

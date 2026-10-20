@@ -162,6 +162,7 @@ func main() {
         body: [
           'A goroutine is scheduled by the Go runtime onto a few OS threads, not given a thread of its own. You can skip this on a first read. A goroutine is managed by the Go runtime, not the operating system. It starts with a small stack (2KB minimum) that grows as needed. An OS thread reserves a fixed stack of a megabyte or more (8MB by default on Linux) and needs a system call to create. That is why a Go server can run a hundred thousand goroutines, where a hundred thousand OS threads would strain the machine.',
           'Go runs many goroutines on a few OS threads. When a goroutine blocks — on a channel, a mutex, a network read, a `time.Sleep` — the runtime parks it and runs another one on that thread. No thread sits idle waiting.',
+          'For all eight differences side by side (stack size, scheduling, preemption, why there are no goroutine IDs), see [Goroutines vs threads](/languages/go/goroutines-vs-threads).',
           'This is what makes Go servers simple to write. You write plain blocking code that reads like a script, and the runtime handles the waiting for you. There are no callbacks and no `async`/`await`.',
         ],
       },

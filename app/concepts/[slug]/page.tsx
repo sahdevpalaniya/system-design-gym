@@ -59,6 +59,8 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
   // headings name the topic, so they match how people actually search:
   // "when not to use caching" rather than a generic "when to use it"
   const subj = c.subject ?? subject(c.navTitle ?? c.title)
+  // "what problem do reverse proxies solve", not "does"
+  const verb = (singular: string, plural: string) => (c.plural ? plural : singular)
   const related = (c.related ?? []).map(getConcept).filter(Boolean)
   const usedIn = PROBLEMS.filter((p) => p.concepts.includes(c.slug))
   const askedIn = COMPANY_QUESTIONS.filter((q) => q.concepts.includes(c.slug))
@@ -118,11 +120,11 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         lede={c.oneLine}
       />
 
-      <Section n="1" title={`What problem does ${subj} solve?`}>
+      <Section n="1" title={`What problem ${verb('does', 'do')} ${subj} solve?`}>
         <Prose paragraphs={c.problem} />
       </Section>
 
-      <Section n="2" title={`What ${subj} costs you`}>
+      <Section n="2" title={`What ${subj} ${verb('costs', 'cost')} you`}>
         <Callout variant="cost">
           <Rich text={c.cost} />
         </Callout>
@@ -155,7 +157,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         </div>
       </Section>
 
-      <Section n="4" title={`How ${subj} actually works`}>
+      <Section n="4" title={`How ${subj} actually ${verb('works', 'work')}`}>
         <ConceptVisualBlock visual={c.visual} />
         {c.body?.length ? <Prose paragraphs={c.body} /> : null}
         {c.examples?.map((e) => <CodeBlock key={e.label} label={e.label} src={e.src} note={e.note} />)}
@@ -194,7 +196,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
                 Go deeper · {deep.minutes} min
               </span>
               <span className="block text-[1.125rem] font-semibold">
-                View more — {c.title.toLowerCase()} in depth
+                View more — {c.navTitle ?? c.title} in depth
               </span>
               <span className="mt-1 block text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
                 {deep.sections.length} sections, every sub-topic covered separately, with a worked example at the end.
@@ -210,7 +212,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         </section>
       ) : null}
 
-      <Section n="5" title={`The ${subj} follow-up an interviewer will ask`}>
+      <Section n="5" title={`The follow-up an interviewer will ask about ${subj}`}>
         <Card>
           <p className="mb-4 text-[1.0625rem] leading-snug font-semibold">
             <Rich text={c.followUp.q} />
@@ -340,6 +342,12 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
                   </Link>
                 ))}
               </div>
+              <p className="mt-3 text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
+                All concepts on one page:{' '}
+                <Link href="/cheat-sheet" className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+                  system design cheat sheet
+                </Link>
+              </p>
             </div>
           ) : null}
           {usedIn.length ? (
@@ -347,15 +355,23 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
               <h3 className="mb-3 text-[0.875rem] font-semibold">Where you will use this</h3>
               <div className="flex flex-wrap gap-2">
                 {usedIn.map((p) => (
-                  <Link
-                    key={p.slug}
-                    href={`/problems/${p.slug}`}
-                    className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[0.8438rem] font-medium transition hover:opacity-70"
-                    style={{ borderColor: 'var(--border-strong)' }}
-                  >
-                    {p.title}
-                    <Badge>{p.difficulty}</Badge>
-                  </Link>
+                  <span key={p.slug} className="flex items-center gap-2">
+                    <Link
+                      href={`/problems/${p.slug}`}
+                      className="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-[0.8438rem] font-medium transition hover:opacity-70"
+                      style={{ borderColor: 'var(--border-strong)' }}
+                    >
+                      {p.title}
+                      <Badge>{p.difficulty}</Badge>
+                    </Link>
+                    <Link
+                      href={`/problems/${p.slug}/solution`}
+                      className="text-[0.8125rem] font-medium hover:opacity-70"
+                      style={{ color: 'var(--accent)' }}
+                    >
+                      worked solution
+                    </Link>
+                  </span>
                 ))}
               </div>
             </div>

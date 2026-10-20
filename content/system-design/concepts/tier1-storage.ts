@@ -92,6 +92,7 @@ export const TIER1_STORAGE: Concept[] = [
 
   {
     slug: 'api-design',
+    plural: true,
     subject: "these API rules",
     title: 'API design — pagination, versioning, errors',
     navTitle: 'API design',

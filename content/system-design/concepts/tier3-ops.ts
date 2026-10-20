@@ -8,6 +8,7 @@ import type { Concept } from '@/lib/types'
 export const TIER3_OPS: Concept[] = [
   {
     slug: 'auth-and-security',
+    plural: true,
     searchTitle: "Authentication and authorization",
     subject: "these controls",
     title: 'Authentication, authorization and secrets',
@@ -281,6 +282,7 @@ export const TIER3_OPS: Concept[] = [
 
   {
     slug: 'backups-and-recovery',
+    plural: true,
     searchTitle: "Backups, RPO and RTO",
     subject: "backups",
     title: 'Backups, disaster recovery, RPO and RTO',

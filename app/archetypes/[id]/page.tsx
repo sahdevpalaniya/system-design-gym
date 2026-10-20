@@ -16,7 +16,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!a) return {}
   return pageMeta(
     `${a.name} — interviewer archetype`,
-    `${a.tagline} How this system design interviewer behaves, what they are really testing, and how to answer them.`,
+    // whole sentences only: the longest version that fits a search snippet
+    [
+      `${a.tagline} How this system design interviewer behaves, what they are really testing, and how to answer them.`,
+      `${a.tagline} How this system design interviewer behaves, what they test, and how to answer them.`,
+      `${a.tagline} What this interviewer tests, and how to answer them.`,
+    ].find((d) => d.length <= 155) ?? a.tagline,
     `/archetypes/${a.id}`,
   )
 }

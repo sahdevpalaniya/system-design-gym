@@ -17,7 +17,7 @@ export const WEB: LangLesson[] = [
       {
         body: [
           'Most Go tutorials reach for a web framework on page one. Since Go 1.22 that advice is out of date. `net/http` routes on method and path parameters by itself, and that was the main reason most projects added one.',
-          'Starting without a framework is not stubbornness. You learn what an HTTP handler is, and frameworks you meet later are easy to read because most of them wrap this.',
+          'Starting without a framework is not stubbornness. You learn what an HTTP handler is, and frameworks you meet later are easy to read because most of them wrap this. When you do meet gin, echo or chi, [Popular packages](/languages/go/popular-packages) says what each one adds over `net/http`.',
         ],
       },
       {

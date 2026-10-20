@@ -119,13 +119,22 @@ export default async function QuestionPage({
           <span className="text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
             Want the full five-stage version of this problem?
           </span>
-          <Link
-            href={`/problems/${q.relatedProblem}`}
-            className="rounded-lg border px-4 py-2 text-[0.875rem] font-semibold transition hover:opacity-75"
-            style={{ borderColor: 'var(--border-strong)' }}
-          >
-            Open the gated walkthrough →
-          </Link>
+          <span className="flex flex-wrap items-center gap-3">
+            <Link
+              href={`/problems/${q.relatedProblem}/solution`}
+              className="text-[0.875rem] font-semibold hover:opacity-70"
+              style={{ color: 'var(--accent)' }}
+            >
+              Read the worked solution
+            </Link>
+            <Link
+              href={`/problems/${q.relatedProblem}`}
+              className="rounded-lg border px-4 py-2 text-[0.875rem] font-semibold transition hover:opacity-75"
+              style={{ borderColor: 'var(--border-strong)' }}
+            >
+              Open the gated walkthrough →
+            </Link>
+          </span>
         </div>
       ) : null}
     </Page>

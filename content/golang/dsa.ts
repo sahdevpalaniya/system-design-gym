@@ -1063,6 +1063,7 @@ export const DSA: LangLesson[] = [
   },
   {
     slug: 'dsa-valid-parentheses',
+    searchTitle: 'Valid Parentheses in Go (LeetCode 20): Stack Solution',
     title: 'Valid parentheses with a slice as a stack',
     navTitle: 'Valid parentheses',
     oneLine: 'Go has no stack type, because a slice already is one. Push with append, pop by re-slicing.',
@@ -1105,6 +1106,7 @@ export const DSA: LangLesson[] = [
   },
   {
     slug: 'dsa-binary-search',
+    searchTitle: 'Binary Search in Go: By Hand and with slices.BinarySearch',
     title: 'Binary search, by hand and from the stdlib',
     navTitle: 'Binary search',
     oneLine: 'Write it once without an off-by-one, then know when `slices.BinarySearch` and `sort.Search` do it for you.',
@@ -1556,6 +1558,7 @@ export const DSA: LangLesson[] = [
   },
   {
     slug: 'dsa-sliding-window',
+    searchTitle: 'Sliding Window in Go: Longest Substring Without Repeats',
     title: 'Longest substring without repeating characters',
     navTitle: 'Sliding window',
     oneLine: 'A window with two edges and a map of where each character was last seen. Rune-aware, so it counts characters, not bytes.',

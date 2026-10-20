@@ -180,6 +180,9 @@ export interface Concept {
   /** how the topic is named inside a sentence, when the nav title does not fit
    *  a heading like "When to reach for ___" — e.g. "a relational database" */
   subject?: string
+  /** the subject is plural ("reverse proxies", "CDNs"), so headings say
+   *  "what problem do … solve" and "what … cost you" */
+  plural?: boolean
   /** progressive nudges for the self-check, revealed one at a time */
   hints?: string[]
   /** a second, moving visual — shows the mechanism the static one only labels */
@@ -560,6 +563,9 @@ export interface LangLesson {
   /** the exact phrase people search for (e.g. "Golang interview questions
    *  and answers"), used as the page <title> instead of the generated one */
   searchTitle?: string
+  /** meta description override, for a lesson whose generated one does not
+   *  say what the searcher is looking for; keep it under 155 characters */
+  metaDescription?: string
   oneLine: string
   /** 2–3 measurable outcomes, each starting with a verb: "Write a function that…" */
   objectives?: string[]

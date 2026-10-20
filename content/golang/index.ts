@@ -32,6 +32,7 @@ export const GO: Language = {
     {
       id: 'basics',
       name: 'Getting started',
+      searchTitle: 'Golang basics: setup, syntax, types and control flow',
       blurb: 'Install it, run something, and meet the ideas that make Go different from what you already know.',
       lessons: [
         'setup-and-first-program',

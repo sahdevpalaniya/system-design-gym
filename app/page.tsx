@@ -190,6 +190,15 @@ export default function Home() {
             </Link>{' '}
             are ordered as a dependency chain (caching before CDNs, replication before partitioning),
             so reading top to bottom never asks you to assume something you have not met.
+            To revise, the{' '}
+            <Link href="/cheat-sheet" className="font-medium" style={{ color: 'var(--accent)' }}>
+              system design cheat sheet
+            </Link>{' '}
+            puts every concept on one page, and the{' '}
+            <Link href="/solutions" className="font-medium" style={{ color: 'var(--accent)' }}>
+              worked solutions
+            </Link>{' '}
+            answer each interview problem end to end.
           </p>
         </div>
       </section>
