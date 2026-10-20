@@ -6,7 +6,17 @@ import { SITE_URL } from '@/lib/seo'
  *  To hide a page from search, give it `noindex` rather than adding it here: a
  *  crawler blocked by robots.txt never fetches the page, so it never sees the
  *  noindex and can still list the bare URL. */
-const DISALLOW = ['/admin', '/api']
+const DISALLOW = [
+  '/admin',
+  '/api',
+  // React Server Component payloads that Next.js fetches when it prefetches a
+  // link. Googlebot followed them: in Search Console crawl stats (11–19 Oct
+  // 2026) 84% of 8,060 requests were `?_rsc=` URLs, against 7% real pages.
+  // Every page's HTML already embeds its own payload, so blocking these does
+  // not change how Google renders a page; it only stops the wasted fetches.
+  '/*?_rsc=',
+  '/*&_rsc=',
+]
 
 export default function robots(): MetadataRoute.Robots {
   return {

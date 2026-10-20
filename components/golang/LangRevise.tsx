@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import type { Language } from '@/lib/types'
+import type { LangLesson, LangSection, Language } from '@/lib/types'
 import { useProgress } from '@/lib/store'
 import { Rich } from '@/components/common/ui'
 
@@ -14,11 +14,19 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: 'done', label: 'Already read' },
 ]
 
+/** Only the fields this page shows. The server page builds it, so the client
+ *  payload no longer carries every lesson's full body (~1 MB of flight data). */
+export interface ReviseData {
+  id: Language['id']
+  sections: Pick<LangSection, 'id' | 'name' | 'lessons'>[]
+  lessons: Pick<LangLesson, 'slug' | 'title' | 'oneLine' | 'keyPoints' | 'remember'>[]
+}
+
 /**
  * The 20-minutes-before-an-interview page: every topic's key points and its one
  * line to remember, in order, with nothing else on screen.
  */
-export function LangRevise({ lang }: { lang: Language }) {
+export function LangRevise({ lang }: { lang: ReviseData }) {
   const { state, ready } = useProgress()
   const [filter, setFilter] = useState<Filter>('all')
   const [open, setOpen] = useState<Record<string, boolean>>({})
@@ -84,6 +92,7 @@ export function LangRevise({ lang }: { lang: Language }) {
                       <button
                         type="button"
                         onClick={() => setOpen((o) => ({ ...o, [t.slug]: !o[t.slug] }))}
+                        aria-expanded={isOpen}
                         className="flex w-full items-start gap-3 p-4 text-left transition"
                       >
                         <span
@@ -121,36 +130,36 @@ export function LangRevise({ lang }: { lang: Language }) {
                         ) : null}
                       </button>
 
-                      {isOpen ? (
-                        <div className="border-t px-4 pt-3.5 pb-4">
-                          <ul className="mb-4 space-y-1.5">
-                            {t.keyPoints.map((k, i) => (
-                              <li key={i} className="flex gap-2 text-[0.875rem] leading-relaxed">
-                                <span style={{ color: 'var(--border-strong)' }}>·</span>
-                                <span>
-                                  <Rich text={k} />
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                          <div
-                            className="rounded-lg px-3.5 py-2.5 text-[0.875rem] leading-relaxed"
-                            style={{ background: 'var(--say-bg)' }}
-                          >
-                            <span className="font-semibold" style={{ color: 'var(--say)' }}>
-                              Remember:{' '}
-                            </span>
-                            <Rich text={t.remember} />
-                          </div>
-                          <Link
-                            href={`/languages/${lang.id}/${t.slug}`}
-                            className="mt-3 inline-block text-[0.8125rem] font-medium hover:opacity-70"
-                            style={{ color: 'var(--accent)' }}
-                          >
-                            Read the full topic →
-                          </Link>
+                      {/* Always rendered and only hidden while collapsed, so the
+                          key points and the link to each topic are in the HTML. */}
+                      <div className="border-t px-4 pt-3.5 pb-4" hidden={!isOpen}>
+                        <ul className="mb-4 space-y-1.5">
+                          {t.keyPoints.map((k, i) => (
+                            <li key={i} className="flex gap-2 text-[0.875rem] leading-relaxed">
+                              <span style={{ color: 'var(--border-strong)' }}>·</span>
+                              <span>
+                                <Rich text={k} />
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                        <div
+                          className="rounded-lg px-3.5 py-2.5 text-[0.875rem] leading-relaxed"
+                          style={{ background: 'var(--say-bg)' }}
+                        >
+                          <span className="font-semibold" style={{ color: 'var(--say)' }}>
+                            Remember:{' '}
+                          </span>
+                          <Rich text={t.remember} />
                         </div>
-                      ) : null}
+                        <Link
+                          href={`/languages/${lang.id}/${t.slug}`}
+                          className="mt-3 inline-block text-[0.8125rem] font-medium hover:opacity-70"
+                          style={{ color: 'var(--accent)' }}
+                        >
+                          Read the full topic →
+                        </Link>
+                      </div>
                     </div>
                   )
                 })}

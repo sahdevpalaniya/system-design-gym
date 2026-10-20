@@ -1,15 +1,22 @@
 'use client'
 
 import Link from 'next/link'
-import type { Language } from '@/lib/types'
+import type { Language, QuizSet } from '@/lib/types'
 import { useProgress } from '@/lib/store'
 
-/** The list of concept-wise tests, with your best score on each. */
-export function QuizIndex({ lang }: { lang: Language }) {
-  const { state, ready } = useProgress()
-  const sets = lang.quizzes ?? []
+/** Only what the list shows: the question count, not the questions. Passing
+ *  the whole Language put every question into the page's flight data. */
+export interface QuizIndexData {
+  id: Language['id']
+  quizzes: (Pick<QuizSet, 'id' | 'name' | 'blurb'> & { count: number })[]
+}
 
-  const totalQs = sets.reduce((n, s) => n + s.questions.length, 0)
+/** The list of concept-wise tests, with your best score on each. */
+export function QuizIndex({ lang }: { lang: QuizIndexData }) {
+  const { state, ready } = useProgress()
+  const sets = lang.quizzes
+
+  const totalQs = sets.reduce((n, s) => n + s.count, 0)
   const taken = ready ? sets.filter((s) => state.quiz?.[`quiz:${lang.id}:${s.id}`]).length : 0
 
   return (
@@ -31,7 +38,7 @@ export function QuizIndex({ lang }: { lang: Language }) {
               <div className="mb-1.5 flex items-baseline gap-2">
                 <h2 className="min-w-0 flex-1 text-[1rem] font-semibold">{s.name}</h2>
                 <span className="tabular shrink-0 text-[0.8125rem] font-bold" style={{ color: tone }}>
-                  {r ? `${r.best}/${r.total}` : `${s.questions.length} Q`}
+                  {r ? `${r.best}/${r.total}` : `${s.count} Q`}
                 </span>
               </div>
               <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>

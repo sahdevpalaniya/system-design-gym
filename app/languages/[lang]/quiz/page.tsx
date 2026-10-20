@@ -26,7 +26,12 @@ export default async function QuizPage({ params }: { params: Promise<{ lang: str
         title="Multiple choice, concept by concept"
         lede="Take a test after you finish reading that section. Every answer is explained, right or wrong, and a wrong one links back to the topic."
       />
-      <QuizIndex lang={l} />
+      <QuizIndex
+        lang={{
+          id: l.id,
+          quizzes: l.quizzes.map((s) => ({ id: s.id, name: s.name, blurb: s.blurb, count: s.questions.length })),
+        }}
+      />
     </Page>
   )
 }

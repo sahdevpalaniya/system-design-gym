@@ -1,8 +1,25 @@
 import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage } from '@/content/languages'
 import { pageMeta } from '@/lib/seo'
-import { LangRevise } from '@/components/golang/LangRevise'
+import { LangRevise, type ReviseData } from '@/components/golang/LangRevise'
 import { Page, PageHeader } from '@/components/common/ui'
+import type { Language } from '@/lib/types'
+
+/** Just what LangRevise renders. Passing the whole Language would serialise
+ *  every lesson's full content into the page's flight data. */
+function reviseData(l: Language): ReviseData {
+  return {
+    id: l.id,
+    sections: l.sections.map((s) => ({ id: s.id, name: s.name, lessons: s.lessons })),
+    lessons: l.lessons.map((t) => ({
+      slug: t.slug,
+      title: t.title,
+      oneLine: t.oneLine,
+      keyPoints: t.keyPoints,
+      remember: t.remember,
+    })),
+  }
+}
 
 export function generateStaticParams() {
   return LANGUAGES.map((l) => ({ lang: l.id }))
@@ -26,7 +43,7 @@ export default async function RevisePage({ params }: { params: Promise<{ lang: s
         title={`All ${l.lessons.length} ${l.name} topics, condensed`}
         lede="The main points from every topic, in the order you learnt them. Open the ones you want, or open everything and read straight down."
       />
-      <LangRevise lang={l} />
+      <LangRevise lang={reviseData(l)} />
     </Page>
   )
 }

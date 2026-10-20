@@ -47,6 +47,16 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
   const i = l.sections.findIndex((x) => x.id === s.id)
   const prev = l.sections[i - 1]
   const next = l.sections[i + 1]
+  // This section's test (quiz ids equal section ids), then any checkpoints that
+  // come straight after it in the quiz list: they are placed where they fall due.
+  const quizzes = l.quizzes ?? []
+  const qi = quizzes.findIndex((q) => q.id === s.id)
+  const tests = qi < 0 ? [] : [quizzes[qi]]
+  for (let j = qi + 1; qi >= 0 && j < quizzes.length; j++) {
+    const q = quizzes[j]
+    if (q.id === 'all' || l.sections.some((x) => x.id === q.id)) break
+    tests.push(q)
+  }
 
   return (
     <Page>
@@ -173,6 +183,26 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
           ))}
         </ol>
       </section>
+
+      {tests.length ? (
+        <section className="mb-10 max-w-3xl">
+          <h2 className="mb-3 text-[1.25rem] font-bold tracking-[-0.01em]">Test yourself</h2>
+          <ul className="grid gap-2.5 sm:grid-cols-2">
+            {tests.map((q) => (
+              <li key={q.id}>
+                <Card href={`/languages/${l.id}/quiz/${q.id}`}>
+                  <div className="text-[0.9375rem] font-semibold">
+                    {q.name} · {q.questions.length} questions
+                  </div>
+                  <div className="mt-1 text-[0.8125rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                    {q.blurb}
+                  </div>
+                </Card>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <nav aria-label="Other sections" className="tap-children flex flex-wrap justify-between gap-3 text-[0.875rem]">
         {prev ? (

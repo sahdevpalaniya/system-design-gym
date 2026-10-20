@@ -177,29 +177,29 @@ export default function RevisePage() {
                       </span>
                     </button>
 
-                    {isOpen ? (
-                      <div className="border-t px-4 py-4">
-                        <ul className="mb-3 space-y-2">
-                          {r.points.map((p, i) => (
-                            <li key={i} className="flex gap-2 text-[0.875rem] leading-relaxed">
-                              <span style={{ color: 'var(--accent)' }} aria-hidden>·</span>
-                              <span>
-                                <Rich text={p} />
-                              </span>
-                            </li>
-                          ))}
-                        </ul>
-                        {r.say ? (
-                          <p className="rounded-lg px-3.5 py-2.5 text-[0.875rem] leading-relaxed" style={{ background: 'var(--say-bg)' }}>
-                            <span className="font-semibold" style={{ color: 'var(--say)' }}>Say this: </span>
-                            <Rich text={r.say} />
-                          </p>
-                        ) : null}
-                        <Link href={r.href} className="mt-3 inline-block text-[0.8438rem] font-semibold hover:opacity-70" style={{ color: 'var(--accent)' }}>
-                          Open the full page →
-                        </Link>
-                      </div>
-                    ) : null}
+                    {/* Always rendered and only hidden while collapsed, so the
+                        points and the link to each page are in the HTML. */}
+                    <div className="border-t px-4 py-4" hidden={!isOpen}>
+                      <ul className="mb-3 space-y-2">
+                        {r.points.map((p, i) => (
+                          <li key={i} className="flex gap-2 text-[0.875rem] leading-relaxed">
+                            <span style={{ color: 'var(--accent)' }} aria-hidden>·</span>
+                            <span>
+                              <Rich text={p} />
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                      {r.say ? (
+                        <p className="rounded-lg px-3.5 py-2.5 text-[0.875rem] leading-relaxed" style={{ background: 'var(--say-bg)' }}>
+                          <span className="font-semibold" style={{ color: 'var(--say)' }}>Say this: </span>
+                          <Rich text={r.say} />
+                        </p>
+                      ) : null}
+                      <Link href={r.href} className="mt-3 inline-block text-[0.8438rem] font-semibold hover:opacity-70" style={{ color: 'var(--accent)' }}>
+                        Open the full page →
+                      </Link>
+                    </div>
                   </div>
                 )
               })}
