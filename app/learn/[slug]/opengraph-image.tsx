@@ -1,4 +1,5 @@
 import { LESSONS, getLesson } from '@/content/system-design/foundations'
+import { GUIDES, getGuide } from '@/content/system-design/guides'
 import { OG_SIZE, ogCard } from '@/lib/og-card'
 
 export const runtime = 'nodejs'
@@ -7,11 +8,14 @@ export const contentType = 'image/png'
 export const alt = 'A system design lesson from Dev Skills'
 
 export function generateStaticParams() {
-  return LESSONS.map((l) => ({ slug: l.slug }))
+  return [...LESSONS, ...GUIDES].map((l) => ({ slug: l.slug }))
 }
 
 export default async function Image({ params }: { params: Promise<{ slug: string }> }) {
-  const l = getLesson((await params).slug)
+  const slug = (await params).slug
+  const g = getGuide(slug)
+  if (g) return ogCard({ kicker: 'System design interview guide', title: g.title, footer: ['Dev Skills', 'Free'] })
+  const l = getLesson(slug)
   if (!l) return ogCard({ kicker: 'System design', title: 'Start from scratch' })
   const i = LESSONS.findIndex((x) => x.slug === l.slug)
   return ogCard({

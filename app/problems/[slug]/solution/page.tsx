@@ -26,6 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const p = getProblem((await params).slug)
   if (!p) return {}
   const search = p.searchTitle ?? `Design ${(p.navTitle ?? p.title).toLowerCase()}`
+  if (p.solutionTitle)
+    return pageMeta(p.solutionTitle, p.solutionDescription ?? p.prompt, `/problems/${p.slug}/solution`, true)
   return pageMeta(
     // the generic tail goes when it would push the brand-name title past ~60 chars
     `${search} — full worked solution`.length > 60 ? `${search}: solution` : `${search} — full worked solution`,

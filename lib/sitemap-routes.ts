@@ -1,6 +1,7 @@
 import { CONCEPTS } from '@/content/system-design/concepts'
 import { PROBLEMS } from '@/content/system-design/problems'
 import { LESSONS } from '@/content/system-design/foundations'
+import { GUIDES } from '@/content/system-design/guides'
 import { ARCHETYPES } from '@/content/system-design/archetypes'
 import { COMPANIES, COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { DEEP_DIVES } from '@/content/system-design/deep'
@@ -54,6 +55,7 @@ export function sitemapRoutes(): SitemapRoute[] {
     add(p, 'pages', 0.7, [page(p)])
   for (const p of ['/about', '/privacy', '/terms', '/contact']) add(p, 'pages', 0.3, [page(p)])
   for (const l of LESSONS) add(`/learn/${l.slug}`, 'pages', 0.8, ['content/system-design/foundations.ts'])
+  for (const g of GUIDES) add(`/learn/${g.slug}`, 'pages', 0.8, ['content/system-design/guides.ts'])
   for (const a of ARCHETYPES) add(`/archetypes/${a.id}`, 'pages', 0.5, ['content/system-design/archetypes.ts'])
   for (const t of ['check', 'daily', 'mock', 'blitz'])
     add(`/practice/${t}`, 'pages', 0.6, [page(`/practice/${t}`), `app/practice/${t}/layout.tsx`])

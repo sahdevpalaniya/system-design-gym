@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { LESSONS } from '@/content/system-design/foundations'
+import { GUIDES } from '@/content/system-design/guides'
 import { PATH } from '@/content/system-design/concepts'
 import { getConcept } from '@/content/system-design/concepts'
 import { Card, Page, PageHeader } from '@/components/common/ui'
@@ -41,6 +42,23 @@ export default function LearnPage() {
               </div>
               <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
                 {l.oneLine}
+              </p>
+            </Card>
+          ))}
+        </div>
+      </section>
+
+      <section className="mb-12">
+        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Interview guides</h2>
+        <p className="mb-5 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
+          Standalone answers to the questions people ask before a system design round.
+        </p>
+        <div className="grid gap-3 sm:grid-cols-3">
+          {GUIDES.map((g) => (
+            <Card key={g.slug} href={`/learn/${g.slug}`}>
+              <h3 className="mb-1.5 text-[1rem] font-semibold">{g.title}</h3>
+              <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                {g.description}
               </p>
             </Card>
           ))}

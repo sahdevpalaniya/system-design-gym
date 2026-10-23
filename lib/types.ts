@@ -271,6 +271,10 @@ export interface Problem {
   stages: ProblemStage[]
   /** the phrase people actually search for, e.g. "Design a URL shortener" */
   searchTitle?: string
+  /** full <title> override for the /solution page, when people search for it in other words */
+  solutionTitle?: string
+  /** meta description override for the /solution page; keep it under 155 characters */
+  solutionDescription?: string
   /** where this problem is solved for real — engineering write-ups and papers */
   refs?: { label: string; href: string; note?: string }[]
   lifecycle: LifecycleSpec
@@ -419,6 +423,29 @@ export interface Lesson {
   visual?: ConceptVisual
   keyPoints: string[]
   /** the one thing to remember */
+  remember: string
+}
+
+/** a standalone interview guide under /learn, outside the numbered lessons */
+export interface Guide {
+  slug: string
+  /** the H1 */
+  title: string
+  /** the page <title>, absolute, under ~60 characters */
+  searchTitle: string
+  navTitle: string
+  /** meta description; keep it under 155 characters */
+  description: string
+  /** the 40-60 word answer shown first, before any section */
+  answer: string
+  sections: {
+    /** written as the question the section answers */
+    heading: string
+    body: string[]
+    points?: string[]
+    table?: { caption: string; headers: string[]; rows: string[][] }
+  }[]
+  keyPoints: string[]
   remember: string
 }
 
@@ -605,6 +632,8 @@ export interface LangSection {
   /** the phrase people search for, used as the section hub's title and H1
    *  (e.g. "DSA in Go"); falls back to "<name> in <language>" */
   searchTitle?: string
+  /** meta description override for the section hub; keep it under 155 characters */
+  metaDescription?: string
   blurb: string
   /** longer copy for the section hub, for sections whose blurb and lesson
    *  list alone do not explain what the section is for */

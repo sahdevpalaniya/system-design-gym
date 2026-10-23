@@ -12,7 +12,7 @@ function Visual({ visual }: { visual: NonNullable<DeepSection['visuals']>[number
   return null
 }
 
-function Table({ table }: { table: NonNullable<DeepSection['table']> }) {
+export function Table({ table }: { table: NonNullable<DeepSection['table']> }) {
   return (
     <figure className="my-6">
       <div className="card overflow-x-auto">

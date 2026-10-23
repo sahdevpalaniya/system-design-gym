@@ -30,7 +30,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const n = r.s.lessons.length
   return pageMeta(
     heading(r.l, r.s),
-    `${r.s.blurb.replace(/\*\*/g, '')} ${n} lessons with runnable examples.`,
+    r.s.metaDescription ?? `${r.s.blurb.replace(/\*\*/g, '')} ${n} lessons with runnable examples.`,
     `/languages/${r.l.id}/topics/${r.s.id}`,
     true,
   )

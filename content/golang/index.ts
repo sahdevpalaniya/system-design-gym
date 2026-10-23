@@ -93,6 +93,9 @@ export const GO: Language = {
     {
       id: 'concurrency',
       name: 'Concurrency',
+      searchTitle: 'Golang concurrency practice problems and exercises',
+      metaDescription:
+        'Golang concurrency practice problems with runnable code: goroutines, channels, mutexes, worker pools and race fixes. Try each one, then check the solution.',
       blurb: 'The part people come to Go for. Run things at the same time, safely, and stop them when you need to.',
       lessons: ['goroutines', 'channels-and-select', 'mutex-and-races', 'context', 'concurrency-patterns'],
     },

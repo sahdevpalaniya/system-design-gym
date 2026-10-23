@@ -67,7 +67,7 @@ export function Bullets({ items, marker }: { items: string[]; marker?: ReactNode
 export function Page({ children }: { children: ReactNode; wide?: boolean }) {
   // content fills the shell; the shell (Nav.tsx) is what caps and centres the
   // whole nav+content block, the way w3schools and GeeksforGeeks do it
-  return <main className="w-full px-5 pt-7 pb-20 sm:px-8 lg:pl-10">{children}</main>
+  return <main id="main" className="w-full px-5 pt-7 pb-20 sm:px-8 lg:pl-10">{children}</main>
 }
 
 export function PageHeader({

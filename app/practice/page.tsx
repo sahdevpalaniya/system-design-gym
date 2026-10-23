@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
-  'Practice modes — daily reps to timed mocks',
-  'Four ways to practise system design: a 15-minute daily rep, a 45-minute timed mock, a 10-minute follow-up blitz, and a blank page.',
+  'Free system design practice: mocks and daily reps',
+  'Free system design practice online: a 15-minute daily rep, a 45-minute timed mock, a follow-up blitz or a blank page. Write your answer, then compare.',
   '/practice',
+  true,
 )
 
 const MODES = [

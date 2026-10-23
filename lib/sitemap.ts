@@ -36,12 +36,16 @@ export function sitemapIndexXml(): string {
   return `${XML_HEAD}<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</sitemapindex>\n`
 }
 
+/** Next always emits the homepage canonical as SITE_URL with no trailing
+ *  slash (even given `${SITE_URL}/`), so the sitemap matches that form. */
+const pageUrl = (path: string) => (path === '/' ? SITE_URL : `${SITE_URL}${path}`)
+
 export function sectionSitemapXml(section: SitemapSection): string {
   const entries = sitemapRoutes()
     .filter((r) => r.section === section)
     .map(
       (r) =>
-        `<url>\n<loc>${escape(`${SITE_URL}${r.path}`)}</loc>\n<lastmod>${lastmod(r.path)}</lastmod>\n<priority>${r.priority}</priority>\n</url>`,
+        `<url>\n<loc>${escape(pageUrl(r.path))}</loc>\n<lastmod>${lastmod(r.path)}</lastmod>\n<priority>${r.priority}</priority>\n</url>`,
     )
   return `${XML_HEAD}<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`
 }

@@ -80,6 +80,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="flex min-h-screen flex-col">
         <Providers>
           <NavIndexProvider index={buildNavIndex()}>
+            <a href="#main" className="skip-link">
+              Skip to content
+            </a>
             <Shell>{children}</Shell>
             <Footer />
           </NavIndexProvider>

@@ -1554,7 +1554,7 @@ func (r *Repository) MonthlyReport(ctx context.Context, userID int64, month time
 
   {
     slug: 'expenses-step-7-refresh',
-    searchTitle: 'Refresh token rotation in Go with net/http: reuse detection and logout',
+    searchTitle: 'Refresh token rotation in Go: reuse detection and logout',
     title: 'Step 7 — Refresh token rotation and logout',
     navTitle: 'Step 7 — Refresh tokens',
     oneLine: 'Make sessions endable, without a database lookup on every request.',

@@ -3,6 +3,9 @@ import type { Problem } from '@/lib/types'
 export const TICKET_BOOKING: Problem = {
   slug: 'ticket-booking',
   searchTitle: "Design BookMyShow / Ticketmaster (ticket booking)",
+  solutionTitle: 'Movie ticket booking system design (BookMyShow)',
+  solutionDescription:
+    'Movie ticket booking system design, solved: seat holds with timeouts, a conditional update on the seat row, on-sale spikes and payment.',
   title: 'Ticket booking',
   group: 'contested',
   difficulty: 'core',

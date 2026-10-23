@@ -1,9 +1,10 @@
 import { pageMeta } from '@/lib/seo'
+import { PROBLEMS } from '@/content/system-design/problems'
 
 // the page itself is a client component, so its metadata lives here
 export const metadata = pageMeta(
-  'System design interview questions — 16 worked problems',
-  'Practise the system design questions that actually get asked: URL shortener, chat, news feed, ride matching, rate limiter, payment ledger. Five stages each, you answer first.',
+  `System design interview questions and answers (${PROBLEMS.length})`,
+  'System design interview questions with worked answers: URL shortener, chat, news feed, rate limiter, payments. Five stages each; you answer first.',
   '/problems',
   true,
 )

@@ -1,6 +1,7 @@
 import 'server-only'
 import { CONCEPTS, PATH } from '@/content/system-design/concepts'
 import { LESSONS } from '@/content/system-design/foundations'
+import { GUIDES } from '@/content/system-design/guides'
 import { GROUPS } from '@/content/system-design/method'
 import { PROBLEMS } from '@/content/system-design/problems'
 import { ARCHETYPES } from '@/content/system-design/archetypes'
@@ -42,10 +43,17 @@ export interface NavIndex {
 const link = (x: { slug: string; title: string; navTitle?: string }): NavLink =>
   x.navTitle ? { slug: x.slug, title: x.title, navTitle: x.navTitle } : { slug: x.slug, title: x.title }
 
+/** For lists the client only ever shows as `navTitle ?? title` (the sidebar):
+ *  send that one string, not both, to keep every page's RSC payload small. */
+const navOnly = (x: { slug: string; title: string; navTitle?: string }): NavLink => ({
+  slug: x.slug,
+  title: x.navTitle ?? x.title,
+})
+
 export function buildNavIndex(): NavIndex {
   return {
     tracks: TRACKS,
-    lessons: LESSONS.map(link),
+    lessons: LESSONS.map(navOnly),
     concepts: CONCEPTS.map((c) => ({ ...link(c), deep: hasDeepDive(c.slug) })),
     path: PATH.filter((st) => st.concepts?.length).map((st) => ({
       id: st.id,
@@ -60,7 +68,7 @@ export function buildNavIndex(): NavIndex {
       id: l.id,
       name: l.name,
       hasQuizzes: Boolean(l.quizzes?.length),
-      lessons: l.lessons.map(link),
+      lessons: l.lessons.map(navOnly),
       sections: l.sections.map((s) => ({ id: s.id, name: s.name, lessons: s.lessons })),
     })),
   }
@@ -94,6 +102,13 @@ export function buildSearchRows(): SearchRow[] {
       href: `/learn/${l.slug}`,
       group: 'System Design · basics',
       hay: `${l.title} ${l.oneLine}`.toLowerCase(),
+    })),
+    ...GUIDES.map((g) => ({
+      title: g.title,
+      sub: g.description,
+      href: `/learn/${g.slug}`,
+      group: 'System Design · basics',
+      hay: `${g.title} ${g.description} ${g.sections.map((s) => s.heading).join(' ')}`.toLowerCase(),
     })),
     ...CONCEPTS.map((c) => ({
       title: c.title,
