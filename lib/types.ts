@@ -195,6 +195,9 @@ export interface Concept {
   examples?: { label: string; src: string; note?: string }[]
   /** visible questions and answers; also published as FAQPage markup */
   faq?: { q: string; a: string }[]
+  /** the H1, when the search phrasing differs from `title` (which cards, the
+   *  sidebar and prev/next keep using) */
+  heading?: string
 }
 
 // ---------- problems ----------
@@ -467,6 +470,8 @@ export interface DeepSection {
 export interface DeepDive {
   /** one paragraph on what the deep version adds over the summary */
   intro: string
+  /** meta description; keep it 120-155 characters and name what the sections cover */
+  description?: string
   minutes: number
   sections: DeepSection[]
 }

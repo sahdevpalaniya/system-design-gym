@@ -116,7 +116,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
             </Link>
           </>
         }
-        title={c.title}
+        title={c.heading ?? c.title}
         lede={c.oneLine}
       />
 

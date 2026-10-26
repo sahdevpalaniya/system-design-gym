@@ -73,6 +73,9 @@ export const TIER2: Concept[] = [
 
   {
     slug: 'partitioning',
+    metaTitle: "Database sharding vs partitioning (system design)",
+    heading: "Partitioning and sharding",
+    metaDescription: "Database sharding vs partitioning: what each word means, range vs hash keys, choosing a shard key, hot partitions and resharding a live system.",
     title: 'Partitioning (sharding)',
     navTitle: 'Partitioning',
     tier: 2,
@@ -104,6 +107,7 @@ export const TIER2: Concept[] = [
       'By hash: hash the key and take the remainder. Load spreads evenly, and you lose range queries completely, because neighbouring keys land on unrelated machines. Plain modulo has a second problem. Adding a machine changes almost every mapping, so nearly all the data has to move. Consistent hashing exists to fix that.',
       'Hot partitions are the failure most sharded systems meet eventually. Sharding a social product by user id is even, until one user has 200 million followers and their shard melts. There are two defences. Give the hot key extra sub-partitions by adding a small random suffix, then read from all of them. That is more read work for everyone, in exchange for surviving the outlier. Or detect the hot key and handle it on a separate path, which is where many large systems end up. Say out loud that spreading keys evenly does not mean spreading traffic evenly.',
       'Choosing the key. It should appear in almost every query, so most requests hit one shard. It should have many different values. And its traffic should be roughly even. User id and tenant id are usually good. Timestamps are usually bad. A combined key like (tenant_id, entity_id) is often the right shape.',
+      'Sharding vs partitioning, as words. People use them interchangeably, and in an interview that is usually fine. Strictly, partitioning is any split of one table into pieces, and the pieces can all live on one server: PostgreSQL declarative partitioning splits a big table by month inside a single database, mostly so old months can be dropped or scanned on their own. Splitting by columns instead of rows is vertical partitioning. Sharding is horizontal partitioning where each piece lives on a different machine, which is the version that scales writes and brings all the costs above. If an interviewer says "partition the table", it is worth asking which one they mean.',
       'Resharding is where the difficulty hides. Doing it with no downtime means writing to both old and new layouts, backfilling history, checking the two agree, switching reads over, then removing the old path. That is weeks of work. The way to avoid it is to start with far more logical partitions than machines, say 1024, and map many logical partitions onto each physical machine. Then growing means moving whole logical partitions, with no re-hashing at all. Mentioning this in an interview is a strong signal.',
     ],
     followUp: {
@@ -140,6 +144,7 @@ export const TIER2: Concept[] = [
 
   {
     slug: 'cap-pacelc',
+    metaTitle: "CAP theorem in system design (with PACELC and examples)",
     searchTitle: "CAP theorem and PACELC",
     subject: "the CAP tradeoff",
     title: 'CAP and PACELC as real tradeoffs',
@@ -223,6 +228,9 @@ export const TIER2: Concept[] = [
 
   {
     slug: 'consistency-models',
+    metaTitle: 'Consistency Models in System Design: Strong to Eventual',
+    metaDescription:
+      'Consistency models explained: strong, read-your-writes and eventual, what each costs, and which to pick per feature in a system design interview.',
     subject: "a stronger consistency model",
     title: 'Consistency models',
     tier: 2,
@@ -474,6 +482,8 @@ export const TIER2: Concept[] = [
 
   {
     slug: 'message-queues',
+    metaTitle: "Message queue in system design: when and how to use one",
+    metaDescription: "When to use a message queue in system design: async work, absorbing spikes, duplicate delivery, idempotent consumers, per-key ordering and dead letters.",
     plural: true,
     title: 'Message queues and backpressure',
     navTitle: 'Message queues',

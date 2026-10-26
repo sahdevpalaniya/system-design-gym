@@ -5,7 +5,8 @@ import { getConcept } from '@/content/system-design/concepts'
 import { CompanyDrill, type DrillQuestion } from '@/components/system-design/CompanyDrill'
 import type { CompanyQuestion } from '@/lib/types'
 import { Badge, Bullets, Page, PageHeader, Rich } from '@/components/common/ui'
-import { pageMeta } from '@/lib/seo'
+import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
+import { pageDates } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return COMPANY_QUESTIONS.map((q) => ({ id: q.company, qid: q.id }))
@@ -23,7 +24,10 @@ export async function generateMetadata({
   return pageMeta(
     // drop the generic tail when it would push the title past what results show
     `${q.title} — ${co.name}${`${q.title} — ${co.name} system design`.length > 60 ? '' : ' system design'}`,
-    describe(q.prompt, ` How ${co.name} runs this round, and what a strong answer covers.`),
+    describe(q.prompt, [
+      ` How ${co.name} runs this round, and what a strong answer covers.`,
+      ` How ${co.name} runs this round, step-by-step hints, and what a strong answer covers.`,
+    ]),
     `/company/${co.id}/${q.id}`,
     true,
   )
@@ -31,10 +35,13 @@ export async function generateMetadata({
 
 /** The whole prompt plus the tail when it fits a snippet; otherwise the
  *  prompt's first sentence plus the tail, so the tail is never what gets cut. */
-function describe(prompt: string, tail: string): string {
-  if ((prompt + tail).length <= 155) return prompt + tail
+function describe(prompt: string, tails: string[]): string {
+  // the shortest tail that reaches ~120 characters, so the snippet is not
+  // half empty; a longer prompt keeps the plain tail
+  const whole = tails.map((t) => prompt + t).filter((d) => d.length <= 155)
+  if (whole.length) return whole.find((d) => d.length >= 120) ?? whole[whole.length - 1]
   const first = prompt.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? prompt
-  return first + tail
+  return first + tails[0]
 }
 
 function withoutAnswers({ model, followUp, ...rest }: CompanyQuestion): DrillQuestion {
@@ -54,6 +61,25 @@ export default async function QuestionPage({
 
   return (
     <Page>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Companies', path: '/company' },
+              { name: co.name, path: `/company/${co.id}` },
+              { name: q.title, path: `/company/${co.id}/${q.id}` },
+            ]),
+            articleJsonLd({
+              headline: q.title,
+              description: q.prompt,
+              path: `/company/${co.id}/${q.id}`,
+              ...pageDates(`/company/${co.id}/${q.id}`),
+            }),
+          ]),
+        }}
+      />
       <PageHeader
         eyebrow={
           <>

@@ -8,6 +8,10 @@ import type { Concept } from '@/lib/types'
 export const TIER1_EXTRA: Concept[] = [
   {
     slug: 'performance-vs-scalability',
+    metaTitle: 'Performance vs Scalability in System Design: The Difference',
+    metaDescription:
+      'Performance vs scalability in system design: performance is how fast it is for one user, scalability is whether it stays that fast with 100x more users.',
+    heading: 'Performance vs scalability: what is the difference?',
     subject: 'the performance vs scalability split',
     title: 'Performance vs scalability',
     tier: 1,
@@ -93,6 +97,10 @@ export const TIER1_EXTRA: Concept[] = [
 
   {
     slug: 'latency-vs-throughput',
+    metaTitle: 'Throughput vs Latency in System Design: The Difference',
+    metaDescription:
+      'Throughput vs latency: latency is how long one request takes, throughput is how many finish per second. Why high throughput often costs low latency.',
+    heading: 'Latency vs throughput: what is the difference?',
     subject: "the throughput argument",
     title: 'Latency vs throughput',
     tier: 1,

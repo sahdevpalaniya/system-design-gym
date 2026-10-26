@@ -5,7 +5,8 @@ import { DEEP_DIVES, getDeepDive, getExample } from '@/content/system-design/dee
 import { DeepDiveBody, WorkedExampleBlock } from '@/components/system-design/DeepDive'
 import { Page, PageHeader } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
-import { pageMeta, subject } from '@/lib/seo'
+import { articleJsonLd, breadcrumbJsonLd, pageMeta, subject } from '@/lib/seo'
+import { pageDates } from '@/lib/content-dates'
 
 export function generateStaticParams() {
   return Object.keys(DEEP_DIVES).map((slug) => ({ slug }))
@@ -16,8 +17,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const c = getConcept(slug)
   if (!c) return {}
   const short = c.navTitle ?? c.title
+  const deep = getDeepDive(slug)
   return pageMeta(
     `${short} explained in depth — system design`,
+    deep?.description ??
     `How ${subject(short)} actually ${c.plural ? 'behave' : 'behaves'} under load: the mechanism, the failure modes, the numbers and a worked example.`,
     `/concepts/${slug}/deep`,
     true,
@@ -34,6 +37,26 @@ export default async function DeepDivePage({ params }: { params: Promise<{ slug:
 
   return (
     <Page>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([
+            breadcrumbJsonLd([
+              { name: 'Home', path: '/' },
+              { name: 'Concepts', path: '/concepts' },
+              { name: c.navTitle ?? c.title, path: `/concepts/${c.slug}` },
+              { name: 'In depth', path: `/concepts/${c.slug}/deep` },
+            ]),
+            articleJsonLd({
+              headline: `${c.title} — in depth`,
+              description: deep.intro.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|`/g, ''),
+              path: `/concepts/${c.slug}/deep`,
+              ...pageDates(`/concepts/${c.slug}/deep`),
+              section: TIER_INFO[c.tier].name,
+            }),
+          ]),
+        }}
+      />
       <PageHeader
         eyebrow={
           <>
