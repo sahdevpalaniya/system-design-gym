@@ -4,6 +4,7 @@ import { LANGUAGES, getLanguage } from '@/content/languages'
 import { Card, Page, PageHeader, Rich } from '@/components/common/ui'
 import { humanMinutes, sectionMinutes } from '@/lib/estimate'
 import { breadcrumbJsonLd, itemListJsonLd, pageMeta } from '@/lib/seo'
+import { NOINDEX_GO_SECTIONS, NOINDEX_ROBOTS } from '@/lib/noindex'
 
 /**
  * One indexable page per course section ("DSA in Go", "Concurrency in Go"),
@@ -28,12 +29,12 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const r = lookup(lang, section)
   if (!r) return {}
   const n = r.s.lessons.length
-  return pageMeta(
+  return { ...pageMeta(
     heading(r.l, r.s),
     r.s.metaDescription ?? `${r.s.blurb.replace(/\*\*/g, '')} ${n} lessons with runnable examples.`,
     `/languages/${r.l.id}/topics/${r.s.id}`,
     true,
-  )
+  ), ...(NOINDEX_GO_SECTIONS.includes(r.s.id) ? NOINDEX_ROBOTS : {}) }
 }
 
 export default async function SectionHub({ params }: { params: Promise<{ lang: string; section: string }> }) {

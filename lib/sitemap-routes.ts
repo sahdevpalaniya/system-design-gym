@@ -6,6 +6,7 @@ import { ARCHETYPES } from '@/content/system-design/archetypes'
 import { COMPANIES, COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { DEEP_DIVES } from '@/content/system-design/deep'
 import { LANGUAGES } from '@/content/languages'
+import { isNoindexPath } from '@/lib/noindex'
 
 /**
  * Every URL the sitemap lists, grouped into the child sitemaps it is split
@@ -15,7 +16,8 @@ import { LANGUAGES } from '@/content/languages'
  *
  * Left out on purpose: /admin and /api (blocked in robots.ts), /progress and
  * /practice/blank (personal, noindex), and the mixed final Go test (noindex,
- * because it repeats every question from the section tests word for word).
+ * because it repeats every question from the section tests word for word),
+ * plus everything matched by lib/noindex.ts (tools, quizzes, roll-ups, hubs).
  */
 
 /** One child sitemap each, so Search Console reports indexing per section. */
@@ -46,8 +48,10 @@ const page = (route: string) => `app${route === '/' ? '' : route}/page.tsx`
 
 export function sitemapRoutes(): SitemapRoute[] {
   const r: SitemapRoute[] = []
-  const add = (path: string, section: SitemapSection, priority: number, sources: Source[]) =>
-    r.push({ path, section, priority, sources })
+  // noindexed pages (lib/noindex.ts) never go in the sitemap
+  const add = (path: string, section: SitemapSection, priority: number, sources: Source[]) => {
+    if (!isNoindexPath(path)) r.push({ path, section, priority, sources })
+  }
 
   // hubs and site pages
   add('/', 'pages', 1, ['app/page.tsx', 'app/dashboard.tsx'])

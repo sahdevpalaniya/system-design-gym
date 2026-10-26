@@ -13,6 +13,7 @@ import { Badge, Bullets, Page, PageHeader } from '@/components/common/ui'
 import type { Problem, StageId } from '@/lib/types'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta, withUtm } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
+import { NOINDEX_ROBOTS } from '@/lib/noindex'
 
 export function generateStaticParams() {
   return PROBLEMS.map((p) => ({ slug: p.slug }))
@@ -29,14 +30,14 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // the solution page can rank for the plain "design a ..." search
   const task = search.charAt(0).toLowerCase() + search.slice(1)
   const full = `Practice: ${task} (mock interview workspace)`
-  return pageMeta(
+  return { ...NOINDEX_ROBOTS, ...pageMeta(
     // the generic tail goes when it would push the title past ~60 chars
     p.practiceTitle ?? (full.length > 60 ? `Practice: ${task}` : full),
     `Mock interview practice: ${task}. Write your own answer stage by stage, then compare with the worked solution. ${p.prompt}`,
     `/problems/${p.slug}`,
     true,
     true, // own opengraph-image
-  )
+  ) }
 }
 
 const ALL_STAGES: StageId[] = [1, 2, 3, 4, 5]

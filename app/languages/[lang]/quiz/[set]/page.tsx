@@ -4,7 +4,7 @@ import { LANGUAGES, getLanguage } from '@/content/languages'
 import { Quiz } from '@/components/golang/Quiz'
 import { Page, PageHeader, Rich } from '@/components/common/ui'
 import { fillDescription, pageMeta } from '@/lib/seo'
-import { UNINDEXED_QUIZ_SETS } from '@/lib/sitemap-routes'
+import { NOINDEX_ROBOTS } from '@/lib/noindex'
 
 export function generateStaticParams() {
   return LANGUAGES.flatMap((l) => (l.quizzes ?? []).map((q) => ({ lang: l.id, set: q.id })))
@@ -26,9 +26,8 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
       `/languages/${l.id}/quiz/${s.id}`,
       true,
     ),
-    // the mixed test repeats every section test word for word: useful to take,
-    // but to Google it is one big duplicate of 18 other pages
-    ...(UNINDEXED_QUIZ_SETS.has(s.id) ? { robots: { index: false, follow: true } } : {}),
+    // quizzes are a tool, not an article: kept out of search (lib/noindex.ts)
+    ...NOINDEX_ROBOTS,
   }
 }
 

@@ -4,6 +4,7 @@ import { pageMeta } from '@/lib/seo'
 import { LangRevise, type ReviseData } from '@/components/golang/LangRevise'
 import { Page, PageHeader } from '@/components/common/ui'
 import type { Language } from '@/lib/types'
+import { NOINDEX_ROBOTS } from '@/lib/noindex'
 
 /** Just what LangRevise renders. Passing the whole Language would serialise
  *  every lesson's full content into the page's flight data. */
@@ -28,7 +29,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const l = getLanguage((await params).lang)
   if (!l) return {}
-  return pageMeta(`${l.name} (${l.alias ?? l.name}) cheat sheet: quick revision`, `All ${l.lessons.length} ${l.alias ?? l.name} topics on one page: the key points and the one thing to remember from each lesson, for quick revision before an interview.`, `/languages/${l.id}/revise`, true)
+  return { ...NOINDEX_ROBOTS, ...pageMeta(`${l.name} (${l.alias ?? l.name}) cheat sheet: quick revision`, `All ${l.lessons.length} ${l.alias ?? l.name} topics on one page: the key points and the one thing to remember from each lesson, for quick revision before an interview.`, `/languages/${l.id}/revise`, true) }
 }
 
 export default async function RevisePage({ params }: { params: Promise<{ lang: string }> }) {

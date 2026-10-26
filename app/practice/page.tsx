@@ -2,13 +2,17 @@ import { Card, Page, PageHeader } from '@/components/common/ui'
 import Link from 'next/link'
 
 import { pageMeta } from '@/lib/seo'
+import { NOINDEX_ROBOTS } from '@/lib/noindex'
 
-export const metadata = pageMeta(
+export const metadata = {
+  ...NOINDEX_ROBOTS,
+  ...pageMeta(
   'Free system design practice: mocks and daily reps',
   'Free system design practice online: a 15-minute daily rep, a 45-minute timed mock, a follow-up blitz or a blank page. Write your answer, then compare.',
   '/practice',
   true,
-)
+  ),
+}
 
 const MODES = [
   {

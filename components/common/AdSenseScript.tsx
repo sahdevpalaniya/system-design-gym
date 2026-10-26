@@ -1,17 +1,20 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
+import { isNoindexPath } from '@/lib/noindex'
 
 /**
  * Screens with no publisher content of their own: the 404, the admin and
  * progress screens, the practice tools (which render "Loading…" until the
  * browser has your saved answers) and the curriculum map. The ad tag is not
- * loaded on them at all; /practice itself is a hub with real copy and keeps it.
+ * loaded on them at all. Every noindexed page (lib/noindex.ts: drills,
+ * practice modes and workspaces, quizzes, revision roll-ups, Go section hubs)
+ * is excluded too, and so is /contact, which is a form and an address.
  */
-const NO_ADS = [/^\/_not-found(\/|$)/, /^\/admin(\/|$)/, /^\/progress(\/|$)/, /^\/practice\/.+/, /^\/map(\/|$)/]
+const NO_ADS = [/^\/_not-found(\/|$)/, /^\/admin(\/|$)/, /^\/progress(\/|$)/, /^\/map(\/|$)/, /^\/contact\/?$/]
 
 export function adsAllowed(pathname: string | null): boolean {
-  return !!pathname && !NO_ADS.some((r) => r.test(pathname))
+  return !!pathname && !NO_ADS.some((r) => r.test(pathname)) && !isNoindexPath(pathname)
 }
 
 /** A plain tag, not next/script: it must be in the server HTML for AdSense's
