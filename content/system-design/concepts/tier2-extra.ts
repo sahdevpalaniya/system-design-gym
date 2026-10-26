@@ -273,6 +273,20 @@ export const TIER2_EXTRA: Concept[] = [
     ],
     sayThis:
       '"I would not order these by wall clock, because server clocks never agree exactly and the loser is discarded silently. All writes for one conversation go through one partition, so the order is just arrival order. Where I do need cross-machine ordering I would use a hybrid logical clock, so the value still looks like real time but the causal order is correct."',
+    faq: [
+      {
+        q: 'Lamport clock vs vector clock: what is the difference?',
+        a: 'A Lamport clock is one counter per process, carried on every message. It guarantees that if A happened before B, A\'s number is lower, but a lower number does not prove A happened first, so it cannot detect concurrent events. A vector clock keeps one counter per process, so comparing two vectors tells you whether one event happened before the other or whether they were concurrent. The price is size: the vector grows with the number of processes.',
+      },
+      {
+        q: 'What is the difference between a vector clock and a version vector?',
+        a: 'They use the same structure. A vector clock tracks causality between events (every send and receive), while a version vector tracks versions of a replicated value (one counter per replica that wrote it). Databases that detect conflicting writes, such as Dynamo-style stores, use version vectors.',
+      },
+      {
+        q: 'What is a hybrid logical clock?',
+        a: 'A timestamp that combines physical time with a logical counter. It stays close to wall-clock time, so it is readable, while still respecting causal order when physical clocks disagree. CockroachDB, among others, uses one.',
+      },
+    ],
     related: ['replication', 'consistency-models', 'consensus', 'partitioning'],
     refs: [
       {

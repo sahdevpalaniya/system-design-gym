@@ -127,6 +127,24 @@ export const TIER2: Concept[] = [
     ],
     sayThis:
       '"Hash-partition by conversation id into 1024 logical partitions mapped onto 16 machines, so growing means moving partitions rather than re-hashing. Cost: any query not scoped to a conversation has to ask every shard, and a very large group chat can still make one partition hot. I would handle those specifically rather than change the scheme."',
+    faq: [
+      {
+        q: 'Sharding vs partitioning: what is the difference?',
+        a: 'Partitioning is splitting a table into pieces; the pieces may all live on one server (PostgreSQL declarative partitioning by month, for example). Sharding is horizontal partitioning where each piece lives on a different machine, so it also spreads writes and storage across servers. Many people use the words interchangeably.',
+      },
+      {
+        q: 'Sharding vs replication: what is the difference?',
+        a: 'Sharding splits the data, so each machine holds a different part; it scales writes and storage. Replication copies the same data to several machines; it scales reads and survives failures. Large systems use both: each shard is replicated.',
+      },
+      {
+        q: 'Horizontal vs vertical partitioning?',
+        a: 'Horizontal partitioning splits rows (users 1 to 1M here, the rest there). Vertical partitioning splits columns, keeping rarely used or large columns in a separate table or store. Sharding is horizontal partitioning across machines.',
+      },
+      {
+        q: 'Sharding vs consistent hashing?',
+        a: 'Sharding is the decision to split data across machines. Consistent hashing is one way to decide which machine owns each key, chosen so that adding or removing a machine moves only a small share of keys.',
+      },
+    ],
     related: ['consistent-hashing', 'replication', 'sql-vs-nosql'],
     refs: [
       {

@@ -558,6 +558,20 @@ export const TIER3: Concept[] = [
     ],
     sayThis:
       '"SSE, because updates only flow server to client and reconnection with last-event-id is built in. Connections are grouped by channel so one server holds the subscribers for a topic. Cost: I now have long-lived connections, so deploys need a slow roll and clients need randomised reconnect delays, or every restart is a self-inflicted spike."',
+    faq: [
+      {
+        q: 'Long polling vs short polling: what is the difference?',
+        a: 'Short polling asks the server at a fixed interval and gets an immediate answer, usually "nothing new". Long polling sends a request that the server holds open until there is news or a timeout, then the client immediately asks again. Long polling delivers updates sooner and wastes fewer empty responses; short polling is simpler and easier to cache.',
+      },
+      {
+        q: 'Long polling vs WebSockets?',
+        a: 'Long polling uses ordinary HTTP requests, one per message or timeout, so it works through any proxy but pays request overhead each time. A WebSocket keeps one connection open in both directions, with very little overhead per message, but needs connection-aware infrastructure. Use WebSockets for frequent two-way traffic.',
+      },
+      {
+        q: 'SSE vs WebSockets?',
+        a: 'Server-Sent Events send text from server to client over plain HTTP, with automatic reconnection and Last-Event-ID resume. WebSockets carry text or binary in both directions. If data only flows from the server, SSE is simpler to run.',
+      },
+    ],
     related: ['load-balancing', 'message-queues', 'caching'],
     refs: [
       {
@@ -731,6 +745,20 @@ export const TIER3: Concept[] = [
     ],
     sayThis:
       '"Every outbound call gets a timeout just above p99, two retries with growing delays and full jitter, and a breaker that opens on a failure rate rather than a raw count. Recommendations have their own connection pool and fall back to a cached list. Cost: during an incident, some requests that would have succeeded are rejected. I am trading a few requests to keep the service up."',
+    faq: [
+      {
+        q: 'What is exponential backoff with jitter?',
+        a: 'Exponential backoff doubles the wait after each failed attempt: base, 2 x base, 4 x base, up to a cap. Jitter randomises each wait so clients that failed together do not retry together. With full jitter, the wait before attempt n is a random value between 0 and min(cap, base x 2^n). For example, with a 100 ms base and a 10 s cap, the third retry waits a random time between 0 and 800 ms.',
+      },
+      {
+        q: 'Full jitter vs equal jitter: which should I use?',
+        a: 'Full jitter (a random wait between 0 and the backoff) spreads retries the most and is the usual default. Equal jitter keeps half the backoff fixed and randomises the other half, which guarantees some minimum wait. The AWS Architecture Blog analysis linked below found full jitter did the least total work in its simulation.',
+      },
+      {
+        q: 'How many times should a request be retried?',
+        a: 'Usually two or three attempts at most, only for errors that may be temporary (timeouts, 503, connection resets), and only for operations that are safe to repeat or carry an idempotency key. In a chain of services, retry at one layer, not every layer, or attempts multiply.',
+      },
+    ],
     related: ['idempotency', 'connection-pooling', 'rate-limiting'],
     refs: [
       {
@@ -742,6 +770,11 @@ export const TIER3: Concept[] = [
         label: "Timeouts, retries and backoff with jitter",
         href: "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/",
         note: "Why retries without jitter turn a blip into an outage.",
+      },
+      {
+        label: "AWS Architecture Blog — Exponential Backoff And Jitter",
+        href: "https://aws.amazon.com/blogs/architecture/exponential-backoff-and-jitter/",
+        note: "Simulations comparing no jitter, full jitter, equal jitter and decorrelated jitter.",
       },
     ],
     animation: {
