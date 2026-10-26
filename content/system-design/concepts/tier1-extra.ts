@@ -97,10 +97,10 @@ export const TIER1_EXTRA: Concept[] = [
 
   {
     slug: 'latency-vs-throughput',
-    metaTitle: 'Throughput vs Latency in System Design: The Difference',
+    metaTitle: 'Throughput vs Latency (and Bandwidth) in System Design',
     metaDescription:
-      'Throughput vs latency: latency is how long one request takes, throughput is how many finish per second. Why high throughput often costs low latency.',
-    heading: 'Latency vs throughput: what is the difference?',
+      'Latency vs throughput explained with numbers: why high throughput can mean high latency, how bandwidth and response time fit in, and how to trade them off.',
+    heading: 'Latency vs throughput vs bandwidth: what is the difference?',
     subject: "the throughput argument",
     title: 'Latency vs throughput',
     tier: 1,
@@ -134,6 +134,39 @@ export const TIER1_EXTRA: Concept[] = [
       'Averages lie, and this is the part worth taking to heart. Nobody experiences your average latency. Say your average is 100 ms, but one request in a hundred takes four seconds, and a page makes twenty requests. Then about one page load in five (1 − 0.99²⁰ ≈ 18%) contains at least one slow request. So you quote **percentiles** instead. p50 is the middle. p99 is the request that is worse than 99% of the others. p99 is what your unhappiest users live in, and it is the number worth putting on a dashboard.',
       'The trade in concrete terms. Batching a hundred database writes into one statement raises throughput a lot, because you pay the round trip once instead of a hundred times. It also raises latency for the first write in the batch, which now waits for the other ninety-nine to arrive. That is a good trade for analytics and a terrible one for a checkout button.',
       'One more relationship worth knowing. As a system nears its throughput limit, latency does not get slowly worse. It stays flat, flat, flat, and then climbs almost straight up, because requests start queueing behind each other. That is why "we are at 85% capacity" is much closer to trouble than it sounds.',
+      '**Latency vs throughput vs bandwidth.** Bandwidth is the third word in this family, and it is the one people mix up with throughput. **Bandwidth** is the most a link or component could carry per second: a 1 Gbit/s network card, a disk rated at 500 MB/s. **Throughput** is what you actually get through, which is always at or below bandwidth, because of protocol overhead, contention and waiting. **Latency** is how long one item takes to get across. With the usual pipe picture: bandwidth is how wide the pipe is, latency is how long it is, and throughput is how much water is really flowing.',
+      'A useful formula: time to deliver something ≈ latency + size ÷ bandwidth. A 1 KB API response over a 100 Mbit/s link with 80 ms of round trip spends about 0.08 ms on the wire and 80 ms waiting, so more bandwidth changes nothing and only cutting round trips (or moving closer, as a CDN does) helps. A 1 GB file over the same link needs about 80 seconds of transfer, so there bandwidth is everything and the 80 ms barely registers. Small requests are latency-bound; big transfers are bandwidth-bound.',
+      'Where the two meet: the **bandwidth-delay product**. To keep a link full, the sender must have bandwidth × round-trip time of data in flight before the first acknowledgement returns. A 1 Gbit/s link with 100 ms of round trip holds about 12.5 MB in flight. If the TCP window is smaller than that, throughput stays well below bandwidth however fast the link is, which is why long-distance transfers between regions often disappoint until the window is large enough.',
+      '**Latency vs response time.** Many teams use the words interchangeably. When they are separated, latency is the time a request spends waiting (in queues, on the network) and response time is everything the client sees: waiting plus the time the server spends doing the work. Ask which one a dashboard shows before comparing numbers from two teams.',
+    ],
+    table: {
+      caption: 'The three terms side by side, with what actually improves each one.',
+      headers: ['', 'Latency', 'Throughput', 'Bandwidth'],
+      rows: [
+        ['Measures', 'Time for one request or packet', 'Work actually completed per second', 'Maximum a link or component can carry per second'],
+        ['Unit', 'ms, µs; quote p50 and p99', 'requests/s, messages/s, MB/s', 'Mbit/s, Gbit/s, MB/s'],
+        ['Motorway picture', 'How long your car takes', 'Cars completing the route per hour', 'Number of lanes'],
+        ['Improved by', 'Fewer round trips, caching, moving closer (CDN), less queueing', 'Parallelism, batching, removing the bottleneck', 'A faster link or device'],
+        ['Usually hurt by', 'Batching and queueing', 'Serial work, locks, a single slow dependency', 'Nothing in your code: it is a hardware or contract limit'],
+      ],
+    },
+    faq: [
+      {
+        q: 'What is the difference between latency, throughput and bandwidth?',
+        a: 'Latency is how long one request takes. Throughput is how many requests (or bytes) you actually complete per second. Bandwidth is the most a link could carry per second. Throughput can never exceed bandwidth, and high bandwidth does not reduce latency.',
+      },
+      {
+        q: 'Does high throughput mean low latency?',
+        a: 'No. They are separate, and often traded against each other. Batching raises throughput by making each item wait for the batch, which raises its latency. A system near its throughput limit also has rising latency, because requests queue.',
+      },
+      {
+        q: 'Why does more bandwidth not make my API faster?',
+        a: 'Because small responses are latency-bound. A few kilobytes cross even a slow link in well under a millisecond; the time goes on round trips, TLS handshakes and server work. Cut round trips, reuse connections and cache closer to users instead.',
+      },
+      {
+        q: 'What is the difference between latency and response time?',
+        a: 'Often none in casual use. Strictly, latency is time spent waiting (network, queues) and response time is the whole time the client sees, including the server doing the work. Check which one a metric measures before comparing two numbers.',
+      },
     ],
     followUp: {
       q: '"Your p50 is 20 ms and your p99 is 3 seconds. What is going on?"',
@@ -152,7 +185,7 @@ export const TIER1_EXTRA: Concept[] = [
     ],
     sayThis:
       '"Latency is one request. Throughput is requests per second. I would batch here, because nothing is waiting on any single write. That raises throughput and adds a little latency nobody can feel. On the checkout path I would not, because there one person is watching their one request."',
-    related: ['performance-vs-scalability', 'latency-numbers', 'back-of-envelope'],
+    related: ['performance-vs-scalability', 'latency-numbers', 'back-of-envelope', 'cdn'],
     refs: [
       {
         label: "Google SRE Book \u2014 Monitoring Distributed Systems",
@@ -373,7 +406,7 @@ export const TIER1_EXTRA: Concept[] = [
     },
     body: [
       'People get asked how a reverse proxy differs from a load balancer. They overlap a lot, and the same software usually does both. The difference is purpose. A **load balancer** exists to spread traffic across several identical servers. A **reverse proxy** exists to be a front door, and it is useful even with one server behind it, because it still handles TLS and serves static files. In practice nginx, Envoy and most cloud load balancers do both jobs. Say that, rather than pretending they are separate boxes.',
-      'An **API gateway** is a reverse proxy with stronger opinions. It checks logins, applies per-customer rate limits, reshapes requests, and often combines several backend calls into one response. It is the natural home for the things every public API needs. The risk is that it grows until it holds business logic, and then deploying anything means deploying the gateway.',
+      'An **API gateway** is a reverse proxy with stronger opinions. It checks logins, applies per-customer rate limits, reshapes requests, and often combines several backend calls into one response. It is the natural home for the things every public API needs. The risk is that it grows until it holds business logic, and then deploying anything means deploying the gateway. The three-way comparison, with layer 4 versus layer 7 and when you need each box, is on [API gateway vs load balancer vs reverse proxy](/concepts/api-gateway-vs-load-balancer-vs-reverse-proxy).',
       'A **forward proxy** is the mirror image, and it deserves one sentence so the names do not confuse you. It sits in front of *clients* rather than servers. It is what a company uses to control and inspect traffic leaving its own network.',
       'Two things catch people out. First, if TLS ends at the proxy, then traffic behind it is plain HTTP. That is fine inside a trusted network and not fine across the public internet, so know which one you have. Second, the proxy is where the client\'s real IP address gets lost. That is why `X-Forwarded-For` exists, and why rate limiting by IP breaks if you forget to read it. Trust that header only when your own proxy set it, because clients can send it too.',
     ],
@@ -394,7 +427,7 @@ export const TIER1_EXTRA: Concept[] = [
     ],
     sayThis:
       '"One reverse proxy in front doing TLS, compression and rate limiting, so no service repeats that work. It is also the load balancer (same box), and I will run at least two of them, because it is now in front of everything."',
-    related: ['load-balancing', 'rate-limiting', 'cdn'],
+    related: ['load-balancing', 'api-gateway-vs-load-balancer-vs-reverse-proxy', 'rate-limiting', 'cdn'],
     refs: [
       {
         label: "nginx \u2014 HTTP Load Balancing",

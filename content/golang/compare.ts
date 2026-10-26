@@ -4,13 +4,16 @@ import type { LangLesson } from '@/lib/types'
 export const COMPARE: LangLesson[] = [
   {
     slug: 'goroutines-vs-threads',
-    searchTitle: 'Goroutine vs Thread in Golang: 8 Differences That Matter',
-    title: 'Goroutines vs threads: 8 differences that matter',
+    searchTitle: 'Goroutine vs Thread: OS Threads, Coroutines, Virtual Threads',
+    metaDescription:
+      'How goroutines differ from OS threads, Java virtual threads, coroutines and async/await: stack size, GMP scheduling, cost to create, and what interviews ask.',
+    title: 'Goroutines vs threads: OS threads, coroutines and virtual threads compared',
     navTitle: 'Goroutines vs threads',
-    oneLine: 'Why Go can run a hundred thousand goroutines when the same number of OS threads would sink your machine.',
+    oneLine: 'Why Go can run a hundred thousand goroutines when the same number of OS threads would sink your machine, and how that compares with coroutines and Java virtual threads.',
     objectives: [
       'Explain the 8 differences between a goroutine and an OS thread in an interview.',
       'Describe how the Go scheduler runs many goroutines on a few threads, and how it preempts them.',
+      'Compare goroutines with coroutines, Java virtual threads and async/await in one sentence each.',
       'Run a program that starts 100,000 goroutines and prints the result.',
     ],
     blocks: [
@@ -124,14 +127,59 @@ func main() {
         body: [
           'In Go, almost never directly. You write goroutines and let the runtime choose threads. `runtime.LockOSThread` exists for the rare case where a C library or OS API needs the same thread every time, such as some GUI or graphics libraries.',
         ],
+      },
+      {
+        heading: 'Goroutine vs OS thread vs coroutine vs virtual thread',
+        body: [
+          'Goroutines get compared with three other ideas, and interviewers like to ask about all of them. The short version: goroutines and Java virtual threads are the same design (cheap threads scheduled by a runtime onto a few OS threads), while coroutines and async/await are cooperative and mark every place a task can pause.',
+        ],
+        table: {
+          headers: ['', 'Goroutine (Go)', 'OS thread', 'Java virtual thread (JDK 21+)', 'Coroutine / async (Kotlin, Python, JS)'],
+          rows: [
+            ['Scheduled by', 'Go runtime', 'OS kernel', 'JVM, onto carrier threads', 'Language runtime or event loop'],
+            ['Pausing', 'Preemptive; blocking calls park it', 'Preemptive', 'Parks on blocking calls; no time-slice preemption', 'Cooperative, only at `await` / `suspend` points'],
+            ['Runs in parallel', 'Yes, on GOMAXPROCS threads', 'Yes', 'Yes, on the carrier pool', 'Python asyncio and JS: one thread. Kotlin: depends on the dispatcher'],
+            ['Stack', 'Own small stack that grows', 'Large fixed stack', 'Own stack, kept on the heap while parked', 'Usually stackless: state saved per suspend point'],
+            ['Marked in code', 'No: `go f()`, then ordinary blocking code', 'No', 'No: ordinary blocking Java code', 'Yes: `async`/`await` or `suspend` on every function in the chain'],
+            ['Talks through', 'Channels, or `sync`', 'Locks, shared memory', 'Locks, `java.util.concurrent`', 'Futures, channels (Kotlin), queues'],
+          ],
+        },
+      },
+      {
+        heading: 'Goroutine vs OS thread: the one-line answer',
+        body: [
+          'An OS thread is the kernel\'s unit of scheduling, with a large fixed stack and a system call to create or switch. A goroutine is the Go runtime\'s unit, with a small growable stack, created and switched in user space, and multiplexed onto OS threads. Every goroutine runs on some OS thread while it is running; it just does not own one.',
+        ],
+      },
+      {
+        heading: 'Goroutine vs coroutine: what is the difference?',
+        body: [
+          'A **coroutine** is a function that can suspend itself and be resumed later. In Python (`async def`) and Kotlin (`suspend fun`), suspension happens only at explicit points, so scheduling is cooperative: a coroutine that runs a long loop without awaiting blocks everything else on its thread. Most of these coroutines are stackless: the compiler turns the function into a state machine and saves only what is live at each suspension point.',
+          'A goroutine is not a coroutine in that sense. It has its own stack, it can be preempted anywhere (since Go 1.14), and goroutines run in parallel on several threads. You never mark where a goroutine may pause; a channel receive or a network read simply parks it. The name is a play on "coroutine", which is where the confusion comes from.',
+        ],
+      },
+      {
+        heading: 'Goroutine vs Java virtual thread',
+        body: [
+          'Java 21 made **virtual threads** final (JEP 444). They are the closest thing to goroutines in another mainstream language: cheap threads managed by the JVM and run on a small pool of carrier OS threads, where a blocking call parks the virtual thread and frees the carrier. You write ordinary blocking code and still handle a very large number of concurrent tasks.',
+          'The differences are in the details. Virtual threads were added to a language whose libraries assumed expensive threads, so some code paths pin a virtual thread to its carrier: before JDK 24 (JEP 491), blocking inside a `synchronized` block did this, and native calls still do. Virtual threads are also not time-sliced, so a CPU-bound loop keeps its carrier until it blocks, whereas the Go runtime preempts long-running goroutines. Go has had this model since version 1.0, so the whole standard library was written for it.',
+        ],
         callout: {
           tone: 'note',
-          text: 'In Java 21+, **virtual threads** are a similar idea: cheap, runtime-scheduled threads on top of a few OS threads. If you know them, goroutines will feel familiar.',
+          text: 'If you are coming from Java: a virtual thread maps closely onto a goroutine, an `ExecutorService` with a fixed pool maps onto a [worker pool](/languages/go/worker-pool), and a `BlockingQueue` maps onto a buffered channel.',
         },
+      },
+      {
+        heading: 'Goroutines vs async/await',
+        body: [
+          'With async/await (JavaScript, C#, Python, Rust), a function that waits has to be marked `async`, and so does every function that awaits it. That split is often called function colouring: you end up with two kinds of function that do not mix freely. The upside is that every point where your code can pause is visible.',
+          'Go has no colours. A function that reads from the network looks exactly like one that adds two numbers. When it blocks, the runtime parks the goroutine and uses its network poller to resume it when data arrives, which is what an event loop does, hidden behind blocking calls. The cost is that pause points are not visible in the code, so shared state needs a mutex or a channel even where an async language would have kept it on one thread.',
+        ],
       },
     ],
     keyPoints: [
       'Goroutines are run by the Go runtime; threads by the OS.',
+      'Java virtual threads are the same idea; coroutines and async/await are cooperative and marked in the code.',
       'Goroutines start at 2 KB of stack and grow; threads reserve megabytes.',
       'The scheduler runs many goroutines on GOMAXPROCS threads (M:N, the GMP model).',
       'Goroutines are preemptive since Go 1.14, even in tight loops. "Cooperative" is outdated.',
@@ -156,6 +204,8 @@ func main() {
       { label: 'Go 1.14 release notes: asynchronous preemption', href: 'https://go.dev/doc/go1.14#runtime' },
       { label: 'Go FAQ: why goroutines instead of threads?', href: 'https://go.dev/doc/faq#goroutines' },
       { label: 'Effective Go: goroutines', href: 'https://go.dev/doc/effective_go#goroutines' },
+      { label: 'JEP 444: Virtual Threads (Java 21)', href: 'https://openjdk.org/jeps/444' },
+      { label: 'JEP 491: Synchronize Virtual Threads without Pinning (JDK 24)', href: 'https://openjdk.org/jeps/491' },
     ],
   },
 
@@ -273,7 +323,7 @@ func main() {
       {
         heading: 'When is a mutex clearly better?',
         body: [
-          'When goroutines read and update the same state in place: a cache, a map of sessions, a struct’s fields. Use `sync.RWMutex` if reads far outnumber writes. See [Mutexes and races](/languages/go/mutex-and-races).',
+          'When goroutines read and update the same state in place: a cache, a map of sessions, a struct’s fields. Use `sync.RWMutex` if reads far outnumber writes; [Mutex vs RWMutex](/languages/go/mutex-vs-rwmutex) shows when that actually helps. See [Mutexes and races](/languages/go/mutex-and-races).',
         ],
         callout: {
           tone: 'warn',

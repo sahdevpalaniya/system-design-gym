@@ -255,10 +255,10 @@ export const GUIDES: Guide[] = [
   {
     slug: 'system-design-vs-lld-vs-hld',
     title: 'System design vs LLD vs HLD: what each one means',
-    searchTitle: 'System design vs LLD vs HLD: the difference, with a table',
+    searchTitle: 'HLD vs LLD: The Difference, with Examples and a Table',
     navTitle: 'HLD vs LLD',
     description:
-      'System design vs LLD vs HLD: high-level design is services, data and scale; low-level design is classes, interfaces and code structure. A comparison table and how each interview round works.',
+      'HLD vs LLD compared in a table, with a ticket-booking example, what each interview round expects, and how both fit under system design.',
     answer:
       'System design is the umbrella term. High-level design (HLD) decides which services exist, where data lives and how the system copes with load and failure. Low-level design (LLD) decides the classes, interfaces and data structures inside one of those services. In interviews, "system design" usually means the HLD round.',
     sections: [

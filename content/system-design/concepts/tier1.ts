@@ -191,9 +191,9 @@ export const TIER1: Concept[] = [
       },
     },
     body: [
-      'Where to put it. In the browser: free and closest, but you cannot take it back once you have sent it. In a CDN: great for anything shared between users. Inside the application process: fastest of all, but every server has its own copy, so they drift apart. In a shared cache like Redis or Memcached: one copy every server agrees on, at the cost of a network hop. Inside the database itself (its buffer cache): it helps, but you do not control it.',
+      'Where to put it. In the browser: free and closest, but you cannot take it back once you have sent it. In a CDN: great for anything shared between users. Inside the application process: fastest of all, but every server has its own copy, so they drift apart. In a shared cache like Redis or Memcached: one copy every server agrees on, at the cost of a network hop ([Redis vs Memcached](/concepts/redis-vs-memcached) compares the two). Inside the database itself (its buffer cache): it helps, but you do not control it.',
       'Cache-aside is the default, and the one to describe. The application asks the cache. If it is not there, the app reads the database, writes the answer into the cache, and returns it. It is simple. And if the cache goes down you get slower, not broken.',
-      'Write-through writes to the cache and the database together. The cache stays in step with the database on the normal path, but every write pays both costs, and you also cache items that may never be read. Write-behind writes the cache now and the database shortly after. That is fast, and you can lose data in the gap. Say which one you picked, and why.',
+      'Write-through writes to the cache and the database together. The cache stays in step with the database on the normal path, but every write pays both costs, and you also cache items that may never be read. Write-behind writes the cache now and the database shortly after. That is fast, and you can lose data in the gap. Say which one you picked, and why. All five policies, including write-around and the race that leaves cache-aside stale, are compared on [cache write strategies](/concepts/cache-write-strategies).',
       'Invalidation has two common approaches, and both are compromises. A TTL means the data is wrong for at most that long, and you never have to think about it. Deleting the key on every write means it is right almost always, but every piece of code that writes has to remember. One path that forgets creates a stale-data bug that is hard to reproduce. Many systems use a TTL as the safety net and explicit deletion on top of it.',
       'The empty-cache problem is worth knowing by name. On a cold start, or after a mass eviction, every request goes to the database at the same moment. The database falls over. And when it comes back, the cache is still empty. There are three defences. Request coalescing: when a hundred requests miss on the same key, let one go to the database and make the other ninety-nine wait for that answer. Jittered TTLs, so a million keys written together do not all expire in the same second. And warming the cache before you send traffic to it.',
       'A related problem: a request for a key that does not exist anywhere hits the database every time, because there is nothing to cache. If that is common, say because someone is probing random IDs, cache the "not found" answer too, briefly. Or put a bloom filter in front.',
@@ -215,7 +215,7 @@ export const TIER1: Concept[] = [
     ],
     sayThis:
       '"Cache-aside in Redis, five minute TTL with jitter, and I delete the key on write. Cost: on the rare path where the delete fails, a user can see data up to five minutes old. And if Redis dies the database takes the full read load, so I will coalesce misses to make one key mean one database read."',
-    related: ['latency-numbers', 'cdn', 'bloom-filters', 'consistency-models'],
+    related: ['cache-write-strategies', 'redis-vs-memcached', 'latency-numbers', 'cdn', 'bloom-filters', 'consistency-models'],
     refs: [
       {
         label: "Redis \u2014 Key eviction",
@@ -291,7 +291,7 @@ export const TIER1: Concept[] = [
     ],
     sayThis:
       '"Layer 7 balancer, least-connections, active health checks on a cheap endpoint that does not touch the database. Servers hold no session state, so any server can take any request. Cost: an extra hop, and I need at least two balancers, or the balancer is the single point of failure I just drew."',
-    related: ['circuit-breakers', 'consistent-hashing', 'rate-limiting'],
+    related: ['api-gateway-vs-load-balancer-vs-reverse-proxy', 'circuit-breakers', 'consistent-hashing', 'rate-limiting'],
     refs: [
       {
         label: "Google SRE Book \u2014 Load Balancing at the Frontend",

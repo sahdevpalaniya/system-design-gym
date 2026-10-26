@@ -493,7 +493,7 @@ func main() {
           '**Never copy a struct containing a mutex.** Use pointer receivers. `go vet` catches most copies for you.',
           '**Never make a network or database call while holding a lock.** Lock, take what you need, unlock, then do the slow thing.',
           '**A mutex is not reentrant.** Locking it twice in the same goroutine blocks that goroutine forever.',
-          '`RWMutex` only wins when there are far more reads than writes and the critical section is non-trivial. Otherwise a plain `Mutex` is faster.',
+          '`RWMutex` only pays off when there are far more reads than writes and readers hold the lock long enough to overlap. With frequent writes a plain `Mutex` is faster. The benchmark is in [Mutex vs RWMutex](/languages/go/mutex-vs-rwmutex).',
         ],
       },
       {
@@ -1004,6 +1004,7 @@ func main() {
         heading: 'A worker pool with bounded concurrency',
         body: [
           'Without errgroup, the classic shape is a fixed number of workers reading from one jobs channel. The producer closes `jobs` when it is done, each worker\'s `range` loop then ends, and a separate goroutine closes `results` once every worker has returned.',
+          'This is the short version. [Worker pools in Go](/languages/go/worker-pool) builds it out properly: ordered results, cancellation on the first error, semaphores, and how to choose the number of workers. Every type in `sync` used on this page is covered in [The sync package](/languages/go/sync-package).',
         ],
         code: {
           label: 'pool.go',
@@ -1350,9 +1351,12 @@ func main() {
 
   {
     slug: 'standard-library',
+    searchTitle: 'Go Standard Library Guide: Key Packages, HTTP Router, JSON',
+    metaDescription:
+      'The Go standard library packages to use first: strings, slices, maps, time, encoding/json, and a net/http server with routing and middleware, no framework.',
     title: 'The standard library',
     navTitle: 'The standard library',
-    oneLine: 'The packages that already do what you were about to write.',
+    oneLine: 'The packages that already do what you were about to write, including an HTTP server with routing and middleware.',
     objectives: [
       'Write a small program using `strings`, `strconv` and `sort` instead of hand-rolled loops.',
       'Explain why reaching for the standard library first saves bugs.',
@@ -1420,6 +1424,70 @@ func Initials(name string) string {
             ['`testing`', 'tests, benchmarks, fuzzing'],
             ['`crypto/rand`', 'tokens and IDs. Never `math/rand` for anything security-related.'],
           ],
+        },
+      },
+      {
+        heading: 'Can you build an HTTP server, router and middleware with only the standard library?',
+        body: [
+          'Yes. Since Go 1.22, `http.ServeMux` matches on the method and on path wildcards, so `GET /tasks/{id}` is a route and `r.PathValue("id")` reads the parameter. A request with the wrong method gets a 405 automatically. Middleware is just a function that takes an `http.Handler` and returns one. `encoding/json` reads and writes the bodies.',
+          'The program below wires all three together and calls the handler through `net/http/httptest`, so it runs anywhere without opening a port. For a real server with timeouts and a graceful shutdown, continue with [An HTTP server with no framework](/languages/go/http-server) and [Middleware and graceful shutdown](/languages/go/middleware-and-shutdown).',
+        ],
+        code: {
+          label: 'stdlib-http.go',
+          src: `package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/http/httptest"
+	"strings"
+)
+
+// logging is middleware: it takes a handler and returns one that wraps it.
+func logging(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("log:", r.Method, r.URL.Path)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func main() {
+	mux := http.NewServeMux()
+
+	// Go 1.22+: method and path wildcards in the pattern, read with PathValue.
+	mux.HandleFunc("GET /tasks/{id}", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(map[string]string{"id": r.PathValue("id"), "title": "write docs"})
+	})
+	mux.HandleFunc("POST /tasks", func(w http.ResponseWriter, r *http.Request) {
+		var in map[string]string
+		if err := json.NewDecoder(r.Body).Decode(&in); err != nil {
+			http.Error(w, "bad json", http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusCreated)
+		fmt.Fprintf(w, "created %q", in["title"])
+	})
+
+	handler := logging(mux)
+
+	// httptest calls the handler directly, so this runs without opening a port.
+	body, _ := json.Marshal(map[string]string{"title": "ship it"})
+	for _, req := range []*http.Request{
+		httptest.NewRequest("GET", "/tasks/42", nil),
+		httptest.NewRequest("POST", "/tasks", bytes.NewReader(body)),
+		httptest.NewRequest("DELETE", "/tasks/42", nil),
+	} {
+		rec := httptest.NewRecorder()
+		handler.ServeHTTP(rec, req)
+		fmt.Println(rec.Code, strings.TrimSpace(rec.Body.String()))
+	}
+}
+`,
+          canRun: true,
+          note: 'The DELETE request gets 405 Method Not Allowed without any code of yours: the mux knows only GET is registered for that path. Routers such as chi add route groups on top, but routing itself no longer needs one.',
         },
       },
       {

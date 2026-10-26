@@ -159,7 +159,9 @@ go build -gcflags='-m' ./... 2>&1 | head         # what escaped to the heap`,
 
   {
     slug: 'popular-packages',
-    searchTitle: 'Popular Golang Libraries: Routers, Databases, Logging',
+    searchTitle: 'Popular Go Libraries and Frameworks (2026 List)',
+    metaDescription:
+      'The Go libraries and frameworks teams actually use: chi, gin, sqlc, GORM, logging, config and CLI tools, and when the standard library is the better choice.',
     title: 'The packages everyone actually uses',
     navTitle: 'Popular packages',
     oneLine: 'The well-known third-party libraries, what each is for, and when the standard library is still the better choice.',

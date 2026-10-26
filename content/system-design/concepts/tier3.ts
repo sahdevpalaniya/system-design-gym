@@ -9,6 +9,9 @@ export const TIER3: Concept[] = [
   {
     slug: 'rate-limiting',
     title: 'Rate limiting',
+    metaTitle: 'Rate Limiting Algorithms: Token Bucket, Sliding Window',
+    metaDescription:
+      'Token bucket, leaky bucket, fixed window and sliding window rate limiting algorithms compared, with pros, cons and where each fits in a distributed limiter.',
     tier: 3,
     oneLine: 'Say no cheaply, before the expensive part of your system finds out.',
     problem: [
@@ -37,6 +40,7 @@ export const TIER3: Concept[] = [
     body: [
       'Token bucket is the default, and it is worth being able to describe in one sentence. Tokens are added at a fixed rate up to a maximum. Each request takes one. A request that finds no token is rejected. The bucket size is how big a burst you allow. The refill rate is the steady limit. That burst allowance is why it suits real traffic, which arrives in clumps.',
       'Fixed window means counting per minute and resetting on the minute. It is the easiest to build and it has an obvious flaw. A caller can spend the whole allowance at 10:59:59 and the whole allowance again at 11:00:00, so a 100-per-minute limit allows 200 in one second. A sliding window log keeps every request timestamp and is exact, at the cost of memory that grows with traffic. A sliding window counter blends the current and previous windows in proportion. It is nearly as accurate for a fraction of the memory, which makes it a common production choice.',
+      'Leaky bucket is the token bucket turned around. Requests join a queue of fixed size and leave it at a constant rate; when the queue is full, new requests are rejected. Instead of allowing bursts, it smooths them into a steady flow, which suits protecting something that can only take work at a fixed pace, at the cost of adding queueing delay to requests that are let in. NGINX\'s `limit_req` is documented as using the leaky bucket method, with `burst` setting the queue size.',
       'Where to put it: at the edge or the gateway, so rejected traffic never reaches your services. Per-server counters are simple, and they let a spread-out caller get N times the limit. A shared counter in Redis is accurate, and adds a hop plus a dependency to every request. That means you need a decision: if Redis is down, do you reject everything or allow everything? Usually allow, because a limiter outage should not become a site outage. Say that out loud. It is a deliberate choice, and it has a security cost.',
       'What you limit by matters more than the algorithm. By API key or user id is right for logged-in traffic. By IP is the fallback for anonymous traffic, and it punishes shared networks. Layered limits work well: one per user, one per IP, and a global ceiling that protects the system whatever happens.',
       'Be a good citizen when you reject. Return 429, include a Retry-After header, and document the limits. A client that knows when to come back stops hammering you. One that gets a bare error retries immediately and makes it worse.',
@@ -842,14 +846,15 @@ export const TIER3: Concept[] = [
     subject: "a sharded counter",
     title: 'Distributed counters: sharded counters, write batching and HyperLogLog',
     navTitle: 'Distributed counters',
-    metaTitle: 'Sharded Counters: Distributed Counter Design (System Design)',
+    heading: 'Sharded counters: how a distributed counter scales',
+    metaTitle: 'Sharded Counters: Distributed Counter System Design',
     metaDescription:
-      'Sharded counters for system design: split a hot counter row into N shards, sum and cache on read, batch writes in memory, and use HyperLogLog for uniques.',
+      'How sharded counters scale likes and views: choosing the shard count, spreading writes, summing reads, hot shards and the accuracy vs cost trade-off.',
     tier: 3,
-    oneLine: 'Counting is easy until everyone counts the same thing at once.',
+    oneLine: 'Sharded counters split one hot counter into many rows, so likes and views stop queueing on a single lock.',
     problem: [
       'A view count, a like count, a rate meter. One row and an increment works fine, until thousands of writers hit the same row and all queue behind the same lock.',
-      'That row becomes a hot spot, and the fix depends entirely on whether the number has to be exact.',
+      'That row becomes a hot spot. The standard fix is a **sharded counter**: the one logical counter is stored as N rows, each writer increments one of them, and readers add them up. How far to take it (sharding alone, batching writes in memory, or an approximate structure) depends on whether the number has to be exact.',
     ],
     cost: 'Every technique here trades exactness or freshness for throughput. Sharded counters make reads more expensive, because you have to add the shards up. Approximate structures give you a number that is close but wrong. Batching in memory means losing the last few seconds of counts if a process dies. Pick which of those you can live with, and say so.',
     useWhen: [
@@ -899,7 +904,7 @@ export const TIER3: Concept[] = [
     ],
     sayThis:
       '"View counts batch in memory per server, flush every second into one of 50 shard rows, and the displayed total is a cached sum refreshed every few seconds. Cost: the number is a couple of seconds old, and a crash loses under a second of counts. I would not use any of this for remaining tickets. That needs one row and a conditional update."',
-    related: ['rate-limiting', 'partitioning', 'caching'],
+    related: ['rate-limiting', 'partitioning', 'caching', 'cache-write-strategies'],
     refs: [
       {
         label: "Redis \u2014 Bloom filters and probabilistic types",

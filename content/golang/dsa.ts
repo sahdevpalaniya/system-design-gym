@@ -1542,6 +1542,83 @@ export const DSA: LangLesson[] = [
           'Decide whether touching intervals (`[1,4]` and `[4,5]`) merge. Here they do, because of `<=`. Ask.',
         ],
       },
+      {
+        heading: 'Variant: merge intervals arriving on several channels',
+        body: [
+          'Some online assessments dress this problem up as concurrency: "process data from multiple channels and merge the overlapping intervals". There are two versions, and the first question to ask is whether each channel delivers its intervals sorted by start.',
+          '**If the channels are unsorted**, there is no shortcut: fan the channels into one (a goroutine per input channel, a WaitGroup, and one closer, as in [Concurrency patterns](/languages/go/concurrency-patterns)), collect everything into a slice, then run the sort-and-sweep above. You cannot emit anything early, because the next value on any channel might start before everything you have seen.',
+          '**If each channel is sorted by start**, you can merge as a stream. Keep the next interval from each channel, always take the one with the smallest start, and extend or start a merged interval as before. As soon as the interval you take starts after the current merged end, the current one is final and can be sent on, because no input still to come can start earlier. That is a k-way merge: O(n·k) with a linear scan over k heads, or O(n log k) with `container/heap` when there are many channels.',
+        ],
+        code: { label: 'merge-streams.go', src: `package main
+
+import "fmt"
+
+type interval struct{ start, end int }
+
+// source sends its intervals, already sorted by start, then closes.
+func source(ivs ...interval) <-chan interval {
+	ch := make(chan interval)
+	go func() {
+		defer close(ch)
+		for _, iv := range ivs {
+			ch <- iv
+		}
+	}()
+	return ch
+}
+
+// mergeStreams reads channels that are each sorted by start, and sends a
+// merged interval as soon as no later input can extend it.
+func mergeStreams(ins ...<-chan interval) <-chan interval {
+	out := make(chan interval)
+	go func() {
+		defer close(out)
+		heads := make([]interval, len(ins))
+		alive := make([]bool, len(ins))
+		for i, in := range ins {
+			heads[i], alive[i] = <-in // ok is false once a channel is closed
+		}
+		var cur interval
+		have := false
+		for {
+			best := -1 // the stream whose next interval starts first
+			for i := range ins {
+				if alive[i] && (best < 0 || heads[i].start < heads[best].start) {
+					best = i
+				}
+			}
+			if best < 0 {
+				break // every input is closed
+			}
+			iv := heads[best]
+			heads[best], alive[best] = <-ins[best]
+			switch {
+			case !have:
+				cur, have = iv, true
+			case iv.start <= cur.end:
+				cur.end = max(cur.end, iv.end)
+			default:
+				out <- cur // nothing still to come starts before iv.start: cur is final
+				cur = iv
+			}
+		}
+		if have {
+			out <- cur
+		}
+	}()
+	return out
+}
+
+func main() {
+	a := source(interval{1, 3}, interval{8, 10})
+	b := source(interval{2, 6}, interval{15, 18})
+	c := source(interval{9, 12})
+	for iv := range mergeStreams(a, b, c) {
+		fmt.Println(iv.start, iv.end)
+	}
+}
+`, canRun: true, note: 'Prints 1 6, then 8 12, then 15 18. The first merged interval is sent while the third channel has not even been read past its first value.' },
+      },
     ],
     keyPoints: [
       'Sort by start, then one pass.',

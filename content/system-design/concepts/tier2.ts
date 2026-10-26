@@ -228,15 +228,16 @@ export const TIER2: Concept[] = [
 
   {
     slug: 'consistency-models',
-    metaTitle: 'Consistency Models in System Design: Strong to Eventual',
+    metaTitle: 'Consistency Models in Distributed Systems: Strong vs Eventual',
     metaDescription:
-      'Consistency models explained: strong, read-your-writes and eventual, what each costs, and which to pick per feature in a system design interview.',
+      'Consistency models in distributed systems: strong vs eventual, plus causal and read-your-writes, with real database examples and how to choose per feature.',
+    heading: 'Consistency models in distributed systems: strong vs eventual',
     subject: "a stronger consistency model",
     title: 'Consistency models',
     tier: 2,
-    oneLine: 'Exact words for how out of date a read is allowed to be.',
+    oneLine: 'Exact words for how out of date a read is allowed to be, once data lives on more than one machine.',
     problem: [
-      'Once data lives on more than one machine, "is this current?" stops having one answer. Consistency models give you precise words for how old a read may be, so you can choose per feature instead of waving your hands.',
+      'In a distributed system, once data lives on more than one machine, "is this current?" stops having one answer. Consistency models give you precise words for how old a read may be, so you can choose per feature instead of waving your hands.',
       'This is where interviews separate people. "It is eventually consistent" is a phrase. "A user sees their own comment immediately, and sees other people\'s within about two seconds" is a design.',
     ],
     cost: 'Stronger promises cost speed on every operation, and availability during failures. Weaker promises cost you correctness bugs that only appear under load, in production, and cannot be reproduced on your laptop. They also move the difficulty into application code, where mistakes do not raise errors.',
@@ -276,6 +277,34 @@ export const TIER2: Concept[] = [
       'Monotonic reads: you never see time run backwards. You get it by keeping a user on one replica, so they at least see one steady version of history. It is cheap, and it removes a whole class of "the page keeps flipping between two values" complaints.',
       'Causal consistency: things that depend on each other show up in the right order. Nobody sees the reply before the comment. It is weaker than strong and much cheaper, and it is often what people mean when they say a system "feels" correct.',
       'The practical move in an interview is to go feature by feature. "The like count is eventual, a second of lag is invisible. The comment you just posted is read-your-own-writes, or you will think it failed. The seat you just booked is strong, because two people cannot have it."',
+      '**Strong vs eventual consistency, concretely.** With strong consistency, a read that starts after a write is confirmed returns that write, wherever it lands. To give that promise, a write must reach a majority (or a leader that every read goes through) before it is confirmed, so every write pays a round trip to other machines, and a replica cut off from the majority must refuse requests rather than answer with old data. With eventual consistency, any replica can answer at once and accept writes locally, and copies converge in the background. Reads are fast and stay available during a network split, and for a while different users see different values.',
+      '**Which real systems offer which.** Many databases let you choose per request instead of per system. DynamoDB reads are eventually consistent by default and can be made strongly consistent per read, at twice the read cost. Cassandra sets a consistency level per query: reading and writing at QUORUM gives you overlap between the two, while ONE is fast and can return stale data. Google Spanner offers external consistency, stronger than linearizability, using synchronised clocks (TrueTime). A PostgreSQL primary with asynchronous read replicas is strong on the primary and eventual on the replicas, which is exactly where read-your-own-writes bugs come from. Check each product\'s documentation for the exact promise; the names vary.',
+      'The isolation level inside one database is a related but separate idea: it is about concurrent transactions, not copies on different machines. [Isolation levels](/concepts/isolation-levels) covers that side.',
+    ],
+    table: {
+      caption: 'Consistency models from strongest to weakest. Each row is a promise you can choose per feature.',
+      headers: ['Model', 'What a reader is promised', 'Cost', 'Use it for'],
+      rows: [
+        ['Strong (linearizable)', 'Every read sees the latest confirmed write, as if there were one copy', 'A majority round trip per write (often per read); unavailable on the minority side of a split', 'Money, stock, seats, unique names, permissions'],
+        ['Causal', 'Effects never appear before their causes (no reply before its comment)', 'Tracking dependencies between writes', 'Comments, messaging, collaborative edits'],
+        ['Read-your-own-writes', 'You always see your own writes; others may lag', 'Route that user\'s reads carefully for a short time', 'Profile edits, posts, settings'],
+        ['Monotonic reads', 'You never see an older value after a newer one', 'Keep a user on one replica', 'Any page a user refreshes'],
+        ['Eventual', 'Copies converge if writes stop; no promise when', 'Cheapest and most available', 'Counts, feeds, search, analytics'],
+      ],
+    },
+    faq: [
+      {
+        q: 'What is the difference between strong and eventual consistency?',
+        a: 'Strong consistency means every read after a confirmed write returns it, as if there were a single copy. Eventual consistency means replicas may return older values for a while but converge once writes stop. Strong costs latency and availability during failures; eventual costs correctness windows that your product has to tolerate.',
+      },
+      {
+        q: 'Is eventual consistency ever acceptable for money?',
+        a: 'For displaying a balance, sometimes, with a clear "pending" state. For deciding whether a payment may go ahead, no: that check must read the authoritative value, in the same operation that records the payment.',
+      },
+      {
+        q: 'How is a consistency model different from an isolation level?',
+        a: 'Consistency models describe what reads see when data is copied across machines. Isolation levels describe what concurrent transactions see of each other inside one database. Strict serializability combines the strongest of both.',
+      },
     ],
     followUp: {
       q: '"Two users click at the same millisecond. What happens?"',
@@ -294,8 +323,18 @@ export const TIER2: Concept[] = [
     ],
     sayThis:
       '"Feed and counts are eventually consistent, a couple of seconds of lag nobody notices. A user\'s own posts are read-your-own-writes, so I pin their reads to the leader for ten seconds after they write. The balance check at payment is strongly consistent, and I accept the extra latency there, because being wrong costs real money."',
-    related: ['replication', 'cap-pacelc', 'idempotency'],
+    related: ['replication', 'cap-pacelc', 'isolation-levels', 'idempotency'],
     refs: [
+      {
+        label: "Amazon DynamoDB \u2014 Read consistency",
+        href: "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html",
+        note: "Eventually consistent versus strongly consistent reads, chosen per request.",
+      },
+      {
+        label: "Google Cloud Spanner \u2014 TrueTime and external consistency",
+        href: "https://cloud.google.com/spanner/docs/true-time-external-consistency",
+        note: "How Spanner offers a guarantee stronger than linearizability.",
+      },
       {
         label: "Jepsen \u2014 Consistency models",
         href: "https://jepsen.io/consistency",
@@ -519,6 +558,7 @@ export const TIER2: Concept[] = [
       'Retries need a limit and a delay. Retry immediately and forever, and a message that always fails, from bad data or a bug, spins forever, burns capacity and hides real work behind it. So use exponential backoff with jitter, a maximum number of attempts, and then move it aside.',
       'Where it moves to is the dead letter queue, where poison messages wait for a human. The part people forget: a dead letter queue nobody watches loses data without anyone noticing. Alert when messages arrive in it, and have a way to fix and replay them.',
       'Backpressure is what separates a design from a diagram. If producers stay faster than consumers, the queue grows without limit, and eventually the whole system falls over, having accepted work it can never do. The options are: scale consumers automatically based on the backlog. Slow the producer down by refusing or throttling at the edge. Drop low-value work on purpose. Or set a maximum queue size and reject when it is full. Every one of them means saying no to someone. Choosing which someone is the design.',
+      'If you are asked to design the queue itself (partitions, replication, consumer offsets and delivery guarantees) rather than use one, that is the [distributed message queue problem](/problems/distributed-message-queue).',
       'What to monitor: how far consumers are behind and whether that is growing, the age of the oldest message (the best measure of user pain), and how fast messages arrive in the dead letter queue.',
     ],
     followUp: {
@@ -558,6 +598,10 @@ export const TIER2: Concept[] = [
     plural: true,
     title: 'Distributed transactions: 2PC, sagas, outbox',
     navTitle: 'Distributed transactions',
+    metaTitle: 'Distributed Transactions: Two-Phase Commit vs Saga',
+    metaDescription:
+      'When to use two-phase commit, sagas (choreography vs orchestration) or the outbox pattern, with failure cases and a comparison table for system design.',
+    heading: 'Distributed transactions: two-phase commit vs saga vs outbox',
     tier: 2,
     oneLine: 'When one action must change two systems, and no transaction covers both.',
     problem: [
@@ -600,6 +644,18 @@ export const TIER2: Concept[] = [
       'The outbox pattern solves a narrower and very common version of this. You updated the database, and now you need to publish an event. Do both directly and you can commit the row then crash before publishing, which loses the event. Or publish first and then fail to commit, which creates an event about something that never happened. Instead, write the event into an outbox table in the same transaction as the data, so the two cannot disagree. Then let a relay read that table and publish. The relay may publish twice, so consumers must be safe to repeat, which they had to be anyway.',
       'Change data capture is the same idea, driven from the database log instead of a table. It gives you the same guarantee with less application code.',
     ],
+    table: {
+      caption: 'Two-phase commit vs saga vs outbox. They solve different sizes of the problem, and they combine: a saga\'s steps usually publish through an outbox.',
+      headers: ['', 'Two-phase commit', 'Saga', 'Outbox'],
+      rows: [
+        ['Solves', 'One atomic commit across several participants', 'A multi-step business process across services', 'Writing data and publishing an event about it, reliably'],
+        ['All-or-nothing?', 'Yes', 'No: compensating actions undo completed steps', 'Yes, for the row and its event (one local transaction)'],
+        ['Intermediate states visible?', 'No', 'Yes, and the UI must show them (pending, refunding)', 'Briefly: the event is published after the commit'],
+        ['Failure behaviour', 'Coordinator failure leaves participants blocked holding locks', 'A failed step triggers compensations; a failed compensation needs retries or a human', 'The relay retries; consumers see duplicates and must be idempotent'],
+        ['Availability cost', 'High: every participant must be up to commit', 'Low: each step commits locally', 'Low'],
+        ['Typical home', 'Inside one vendor\'s system (a distributed database, XA within one platform)', 'Orders, bookings, payments across microservices', 'Any service that emits domain events'],
+      ],
+    },
     followUp: {
       q: '"The payment succeeded but the order write failed. Now what?"',
       answer:

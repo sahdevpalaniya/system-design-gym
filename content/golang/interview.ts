@@ -369,7 +369,7 @@ export const INTERVIEW: LangLesson[] = [
       {
         heading: 'Go interview questions for experienced developers',
         body: [
-          'With three or more years of Go, expect fewer definitions and more questions about running Go in production. These go beyond the 60 above. The answers are still short; the linked lessons have the detail and the code.',
+          'With three or more years of Go, expect fewer definitions and more questions about running Go in production. These go beyond the 60 above. The answers are still short; the linked lessons have the detail and the code. For a longer set grouped by 3, 5 and 8+ years, each with the follow-up question, see [Golang interview questions for experienced developers](/languages/go/interview-questions-experienced).',
         ],
         bullets: [
           '**How do you stop a Go service being OOM-killed in a container?** Set `GOMEMLIMIT` to about 90% of the container’s memory limit, so the garbage collector works harder before the heap reaches it. `GOGC` alone knows nothing about the container limit. Then look for the real cause: goroutines that never exit, small slices keeping large buffers alive, and unbounded caches. → [Interview: backend and design](/languages/go/interview-backend-and-design)',

@@ -6,6 +6,7 @@ import { TIER2 } from './tier2'
 import { TIER2_EXTRA } from './tier2-extra'
 import { TIER3 } from './tier3'
 import { TIER3_OPS } from './tier3-ops'
+import { COMPARISONS } from './comparisons'
 
 export const CONCEPTS: Concept[] = [
   ...TIER1,
@@ -15,6 +16,7 @@ export const CONCEPTS: Concept[] = [
   ...TIER2_EXTRA,
   ...TIER3,
   ...TIER3_OPS,
+  ...COMPARISONS,
 ]
 
 export const TIER_INFO: Record<Tier, { name: string; blurb: string }> = {
@@ -84,7 +86,14 @@ export const PATH: PathStage[] = [
     id: 'request-path',
     name: 'How a request reaches you',
     blurb: 'Follow one request from a browser to your code and back, layer by layer.',
-    concepts: ['dns', 'communication-protocols', 'api-design', 'reverse-proxy', 'load-balancing'],
+    concepts: [
+      'dns',
+      'communication-protocols',
+      'api-design',
+      'reverse-proxy',
+      'load-balancing',
+      'api-gateway-vs-load-balancer-vs-reverse-proxy',
+    ],
   },
   {
     id: 'storing',
@@ -94,8 +103,12 @@ export const PATH: PathStage[] = [
       'sql-vs-nosql',
       'indexes',
       'transactions-and-locking',
+      'isolation-levels',
+      'optimistic-vs-pessimistic-locking',
       'connection-pooling',
       'caching',
+      'cache-write-strategies',
+      'redis-vs-memcached',
       'object-storage',
     ],
   },

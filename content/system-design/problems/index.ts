@@ -15,6 +15,7 @@ import { WEB_CRAWLER } from './web-crawler'
 import { FILE_SYNC } from './file-sync'
 import { KEY_VALUE_STORE } from './key-value-store'
 import { PAYMENT_LEDGER } from './payment-ledger'
+import { DISTRIBUTED_MESSAGE_QUEUE } from './distributed-message-queue'
 
 export const PROBLEMS: Problem[] = [
   URL_SHORTENER,
@@ -33,6 +34,7 @@ export const PROBLEMS: Problem[] = [
   FILE_SYNC,
   KEY_VALUE_STORE,
   PAYMENT_LEDGER,
+  DISTRIBUTED_MESSAGE_QUEUE,
 ]
 
 export function getProblem(slug: string): Problem | undefined {

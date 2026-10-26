@@ -37,6 +37,19 @@ const GROUPS: string[][] = [
     '/languages/go/interview-concurrency',
   ],
   ['/languages/go/dsa-sliding-window', '/concepts/rate-limiting'],
+  // comparison pages and the broad page each one builds on
+  ['/concepts/api-gateway-vs-load-balancer-vs-reverse-proxy', '/concepts/reverse-proxy', '/concepts/load-balancing', '/languages/go/middleware-and-shutdown'],
+  ['/concepts/cache-write-strategies', '/concepts/caching', '/concepts/redis-vs-memcached', '/languages/go/dsa-lru-cache'],
+  ['/concepts/optimistic-vs-pessimistic-locking', '/concepts/isolation-levels', '/concepts/transactions-and-locking', '/problems/ticket-booking', '/languages/go/joins-transactions-n-plus-one'],
+  ['/problems/distributed-message-queue', '/concepts/message-queues', '/languages/go/worker-pool', '/languages/go/channels-and-select'],
+  [
+    '/languages/go/sync-package',
+    '/languages/go/mutex-vs-rwmutex',
+    '/languages/go/mutex-and-races',
+    '/languages/go/worker-pool',
+    '/languages/go/concurrency-patterns',
+  ],
+  ['/languages/go/interview-questions-experienced', '/languages/go/go-interview-questions', '/languages/go/interview-concurrency', '/languages/go/profiling-and-shipping'],
 ]
 
 export type CrossLink = { path: string; title: string; track: string }

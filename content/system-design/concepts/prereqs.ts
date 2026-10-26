@@ -23,17 +23,22 @@ export const PREREQS: Record<string, string[]> = {
   'reverse-proxy': ['communication-protocols'],
   'load-balancing': ['reverse-proxy'],
   'availability-patterns': ['load-balancing'],
+  'api-gateway-vs-load-balancer-vs-reverse-proxy': ['reverse-proxy', 'load-balancing'],
 
   // --- where the truth lives
   'sql-vs-nosql': [],
   indexes: ['sql-vs-nosql'],
   'transactions-and-locking': ['sql-vs-nosql'],
+  'isolation-levels': ['transactions-and-locking'],
+  'optimistic-vs-pessimistic-locking': ['transactions-and-locking', 'isolation-levels'],
   'connection-pooling': ['sql-vs-nosql', 'latency-numbers'],
   'object-storage': ['sql-vs-nosql'],
 
   // caching before CDN: the CDN page is entirely TTLs, cache keys and
   // invalidation, which is what the caching page teaches.
   caching: ['latency-numbers'],
+  'cache-write-strategies': ['caching'],
+  'redis-vs-memcached': ['caching'],
   cdn: ['caching', 'dns'],
 
   // --- more than one machine

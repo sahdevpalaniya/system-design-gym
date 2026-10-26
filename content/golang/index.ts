@@ -12,6 +12,7 @@ import { DATABASE } from './database'
 import { PRODUCTION } from './production'
 import { INTERVIEW } from './interview'
 import { COMPARE } from './compare'
+import { EXTRAS } from './extras'
 import { DSA } from './dsa'
 import { EXERCISES } from './exercises'
 import { QUIZZES } from './quiz'
@@ -100,7 +101,7 @@ export const GO: Language = {
       metaDescription:
         'Golang concurrency practice problems with runnable code: goroutines, channels, mutexes, worker pools and race fixes. Try each one, then check the solution.',
       blurb: 'The part people come to Go for. Run things at the same time, safely, and stop them when you need to.',
-      lessons: ['goroutines', 'channels-and-select', 'mutex-and-races', 'context', 'concurrency-patterns'],
+      lessons: ['goroutines', 'channels-and-select', 'mutex-and-races', 'context', 'concurrency-patterns', 'sync-package', 'worker-pool'],
     },
     {
       id: 'generics',
@@ -259,10 +260,11 @@ export const GO: Language = {
       id: 'compare',
       name: 'Go comparisons',
       searchTitle: 'Go (Golang) comparisons: which one to use and why',
-      blurb: 'The "X vs Y" questions people search and interviewers ask: goroutines vs threads, mutex vs channel, arrays vs slices, buffered vs unbuffered channels, and Go vs Java vs Python for first-job interviews.',
+      blurb: 'The "X vs Y" questions people search and interviewers ask: goroutines vs threads, mutex vs channel, mutex vs RWMutex, arrays vs slices, buffered vs unbuffered channels, and Go vs Java vs Python for first-job interviews.',
       lessons: [
         'goroutines-vs-threads',
         'mutex-vs-channel',
+        'mutex-vs-rwmutex',
         'arrays-vs-slices',
         'buffered-vs-unbuffered-channels',
         'go-vs-java-vs-python-for-placements',
@@ -274,6 +276,7 @@ export const GO: Language = {
       blurb: 'Everything above, written the way interviewers ask it. Plus the live coding round and a last checklist.',
       lessons: [
         'go-interview-questions',
+        'interview-questions-experienced',
         'interview-language-fundamentals',
         'interview-concurrency',
         'interview-backend-and-design',
@@ -297,6 +300,7 @@ export const GO: Language = {
     ...PRODUCTION,
     ...DSA,
     ...COMPARE,
+    ...EXTRAS,
     ...INTERVIEW,
   ]),
 }
