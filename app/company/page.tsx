@@ -18,7 +18,7 @@ export default function CompanyIndex() {
       <PageHeader
         eyebrow="Practice · company questions"
         title="System design interview questions by company"
-        lede="Practice questions written in the style of each company's round. You write your answer first; **hints are available one at a time** if you get stuck, and the model answer only unlocks after you submit."
+        lede="Practice questions written in the style of each company's round. You write your answer first; **hints are available one at a time** if you get stuck, and the model answer stays folded away until you choose to open it."
         meta={
           <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
             {COMPANY_QUESTIONS.length} questions across {COMPANIES.length} companies
@@ -72,6 +72,12 @@ export default function CompanyIndex() {
           )
         })}
       </div>
+
+      <p className="mt-8 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
+        These questions are written in the style of each company&rsquo;s interview round. This site is
+        not affiliated with or endorsed by any of the companies named here; their names are used only to
+        say which round a question is modelled on.
+      </p>
     </Page>
   )
 }

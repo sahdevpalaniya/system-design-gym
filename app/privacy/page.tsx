@@ -19,11 +19,12 @@ export default function PrivacyPage() {
         lede={`What this site stores about you, and how to get rid of it. Last updated ${POLICY_UPDATED}.`}
       />
 
-      <Section n="1" title="If you are signed out, nothing leaves your browser">
+      <Section n="1" title="If you are signed out, your progress stays in your browser">
         <Prose
           paragraphs={[
             'You can use every part of this site without an account. When you are signed out, your progress — which topics you have read, the answers you type, your self-ratings and your gap log — is written to **localStorage in your own browser** and nowhere else. It is not sent to us, we cannot read it, and it does not exist on any server.',
             'Clearing your browser data deletes it permanently. There is no copy for us to restore, which is the trade for not having to trust us with it.',
+            'Signed out or not, **Google Analytics** and **Google AdSense** still run on the pages you visit. They see which pages are viewed, never your answers or progress. Sections 3 and 5 below say what they collect and how Consent Mode limits it.',
           ]}
         />
       </Section>
@@ -84,7 +85,7 @@ export default function PrivacyPage() {
             '**Buttondown** runs the newsletter. If you subscribe, your email address is sent straight from your browser to Buttondown, which emails you to confirm and stores your subscription. Every email has an unsubscribe link.',
             '**The Go Playground (go.dev)**: when you press Run or Share on a Go example, the code in the editor is sent through this site to the official Go Playground, which compiles and runs it. Share stores that code on go.dev under a public link. Do not put anything private in code you run.',
             '**Google AdSense** shows ads on this site. Third-party vendors, including Google, use cookies to serve ads based on your prior visits to this website or other websites. Google’s use of advertising cookies enables it and its partners to serve ads to you based on your visits to this site and/or other sites on the Internet. See [how Google uses information from sites that use its services](https://policies.google.com/technologies/partner-sites).',
-            'You can opt out of personalised advertising in [Google Ads Settings](https://adssettings.google.com), or opt out of some third-party vendors’ use of cookies for personalised advertising at [www.aboutads.info](https://www.aboutads.info/choices). Visitors in the EEA, the UK and Switzerland are asked for consent through Google’s consent message before any advertising cookies are set.',
+            'You can opt out of personalised advertising in [Google Ads Settings](https://adssettings.google.com), or opt out of some third-party vendors’ use of cookies for personalised advertising at [www.aboutads.info](https://www.aboutads.info/choices). Ads use Google Consent Mode defaults: for visitors in the EEA, the UK and Switzerland, advertising storage, ad personalisation and ad user data are denied by default, so no advertising cookies are set for them and ads there are not personalised. A consent message will be added before personalised ads are shown in those regions.',
           ]}
         />
       </Section>

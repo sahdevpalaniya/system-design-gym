@@ -4,7 +4,7 @@ import { COMPANY_QUESTIONS, getCompany, getQuestion } from '@/content/system-des
 import { getConcept } from '@/content/system-design/concepts'
 import { CompanyDrill, type DrillQuestion } from '@/components/system-design/CompanyDrill'
 import type { CompanyQuestion } from '@/lib/types'
-import { Badge, Bullets, Page, PageHeader, Rich } from '@/components/common/ui'
+import { Badge, Bullets, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
 
@@ -105,11 +105,30 @@ export default async function QuestionPage({
         }
       />
 
-      {/* answers stay on the server until submit; CompanyDrill fetches them */}
+      {/* server-rendered and closed, so the page reads fully without JS while
+          the drill still asks for an attempt first */}
+      <details className="card mb-6 overflow-hidden">
+        <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
+          What they are actually testing
+        </summary>
+        <p className="border-t px-5 py-4 text-[0.9062rem] leading-relaxed">
+          <Rich text={q.whatTheyWant} />
+        </p>
+      </details>
+
+      {/* the drill fetches its own copy of the answer after submit */}
       <CompanyDrill question={withoutAnswers(q)} />
 
-      {/* static copies so the page reads fully without JS; the model answers stay gated in the drill */}
+      {/* static copies, closed by default: try the question first, open them after */}
       <div className="mt-8 space-y-3">
+        <details className="card overflow-hidden">
+          <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
+            Show model answer
+          </summary>
+          <div className="border-t px-5 py-4">
+            <Prose paragraphs={q.model} />
+          </div>
+        </details>
         <details className="card overflow-hidden">
           <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
             All {q.hints.length} hints

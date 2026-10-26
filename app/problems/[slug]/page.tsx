@@ -109,6 +109,28 @@ export default async function ProblemPage({ params }: { params: Promise<{ slug: 
         }
       />
 
+      {/* ---------- what the problem is and what makes it hard, from the problem's own
+          data; the slack consequence stays on /solution because it is the design ---------- */}
+      <section className="mb-10">
+        <h2 className="mb-2 text-[1.1875rem] font-bold tracking-[-0.01em]">About this problem</h2>
+        <div className="prose">
+          <p>
+            &ldquo;{p.searchTitle ?? p.title}&rdquo; is a {p.difficulty}-level problem in the{' '}
+            <Link href={`/problems#${group.id}`}>{group.name.toLowerCase()}</Link> family. {group.shape}
+          </p>
+          <p>
+            <strong>The key challenge:</strong> {p.slack.headline}
+          </p>
+          <p>
+            <strong>Time budgets:</strong> {p.slack.budget}
+          </p>
+          <p>
+            The <Link href={`/problems/${p.slug}/solution`}>worked solution for {p.navTitle ?? p.title}</Link>{' '}
+            goes through why those budgets shape the design, stage by stage.
+          </p>
+        </div>
+      </section>
+
       {/* ---------- the brief: practice prompts only, the worked answer lives on /solution ---------- */}
       <section className="mb-12">
         <h2 className="mb-2 text-[1.1875rem] font-bold tracking-[-0.01em]">Before you start</h2>

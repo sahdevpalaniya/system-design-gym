@@ -15,7 +15,8 @@ const MIN_CHARS = 60
  * something. Hints are available before submitting — they are nudges that make
  * you think, never the answer itself.
  */
-/** the question minus its answers; those are fetched from the server after submit */
+/** the question minus its answers; the drill fetches them after submit (the
+ *  page also server-renders them in closed <details> for readers without JS) */
 export type DrillQuestion = Omit<CompanyQuestion, 'model' | 'followUp'> & { followUp: { q: string } }
 
 export function CompanyDrill({ question }: { question: DrillQuestion }) {
@@ -65,22 +66,6 @@ export function CompanyDrill({ question }: { question: DrillQuestion }) {
 
   return (
     <div>
-      {/* ---- what they are really testing ---- */}
-      <div
-        className="mb-6 rounded-xl border px-5 py-4"
-        style={{ background: 'var(--surface-2)' }}
-      >
-        <div
-          className="mb-1.5 text-[0.6875rem] font-bold tracking-[0.06em] uppercase"
-          style={{ color: 'var(--accent)' }}
-        >
-          What they are actually testing
-        </div>
-        <p className="text-[0.9062rem] leading-relaxed">
-          <Rich text={question.whatTheyWant} />
-        </p>
-      </div>
-
       {/* ---- your answer ---- */}
       <div className="mb-5">
         <label htmlFor="answer" className="mb-2 block text-[0.875rem] font-semibold">
@@ -166,7 +151,7 @@ export function CompanyDrill({ question }: { question: DrillQuestion }) {
           className="rounded-xl border border-dashed px-4 py-6 text-center text-[0.8438rem]"
           style={{ borderColor: 'var(--border-strong)', color: 'var(--faint)' }}
         >
-          The model answer is locked until you submit.
+          Write your own answer first. The model answer opens here when you submit.
         </div>
       ) : null}
 

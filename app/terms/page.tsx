@@ -22,7 +22,7 @@ export default function TermsPage() {
       <Section n="1" title="What this site is">
         <Prose
           paragraphs={[
-            'An educational site about system design interviews. It is free to read and use. There is no account requirement, no trial, and nothing to cancel.',
+            'An educational site about system design interviews and the Go (Golang) programming language, from a first program to a working API. It is free to read and use. There is no account requirement, no trial, and nothing to cancel.',
             'It is written by one person and is not affiliated with, endorsed by, or connected to any of the companies named on it. Company names are used to describe the style of their interviews, which is commentary, not a partnership.',
           ]}
         />

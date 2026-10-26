@@ -1,8 +1,7 @@
 import Link from 'next/link'
 import { LESSONS } from '@/content/system-design/foundations'
 import { GUIDES } from '@/content/system-design/guides'
-import { PATH } from '@/content/system-design/concepts'
-import { getConcept } from '@/content/system-design/concepts'
+import { CONCEPTS, PATH, getConcept } from '@/content/system-design/concepts'
 import { Card, Page, PageHeader } from '@/components/common/ui'
 
 import { pageMeta } from '@/lib/seo'
@@ -15,12 +14,13 @@ export const metadata = pageMeta(
 )
 
 export default function LearnPage() {
+  const stages = PATH.filter((s) => s.concepts?.length)
   return (
     <Page wide>
       <PageHeader
         eyebrow="Start from scratch"
         title="System design for beginners"
-        lede={`No prior knowledge assumed. Read these ${LESSONS.length} short lessons in order, then work through the topics one at a time. The core topics also have a **View more** deep dive and a worked example.`}
+        lede={`No prior knowledge assumed. Read these ${LESSONS.length} short lessons in order, then the concepts stage by stage. The core topics also have a **View more** deep dive and a worked example.`}
       />
 
       <section className="mb-12">
@@ -65,44 +65,52 @@ export default function LearnPage() {
         </div>
       </section>
 
+      {/* the order to read the concepts in, not the concepts themselves: the full
+          list with every one-liner is /concepts, so it is linked rather than repeated */}
       <section>
-        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Then, the topics in order</h2>
+        <h2 className="mb-1 text-[1.25rem] font-bold tracking-[-0.01em]">Then, the concepts in order</h2>
         <p className="mb-5 text-[0.9062rem]" style={{ color: 'var(--muted)' }}>
-          Grouped so each stage builds on the last. You can jump around, but this order assumes the least.
+          The {CONCEPTS.length} concept pages fall into {stages.length} stages, each building on the last. Start each
+          stage with the topic named here, then read the rest of that stage before moving on. You can jump
+          around, but this order assumes the least.
         </p>
-        <div className="space-y-6">
-          {PATH.filter((s) => s.concepts?.length).map((stage, si) => (
-            <div key={stage.id}>
-              <div className="mb-1 flex items-baseline gap-2.5">
-                <span className="tabular text-[0.75rem] font-bold" style={{ color: 'var(--accent)' }}>
-                  {String(si + 1).padStart(2, '0')}
-                </span>
-                <h3 className="text-[1.125rem] font-semibold">{stage.name}</h3>
-              </div>
-              <p className="mb-3 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                {stage.blurb}
-              </p>
-              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                {(stage.concepts ?? []).map((slug) => {
-                  const c = getConcept(slug)
-                  if (!c) return null
-                  return (
-                    <Link
-                      key={slug}
-                      href={`/concepts/${slug}`}
-                      className="card p-3.5 transition hover:-translate-y-px"
-                    >
-                      <div className="text-[0.9062rem] leading-snug font-semibold">{c.title}</div>
-                      <div className="mt-1 text-[0.7812rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-                        {c.oneLine}
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+        <ol className="mb-6 space-y-3">
+          {stages.map((stage, si) => {
+            const first = getConcept(stage.concepts?.[0] ?? '')
+            return (
+              <li key={stage.id} className="card p-4">
+                <div className="mb-1 flex items-baseline gap-2.5">
+                  <span className="tabular text-[0.75rem] font-bold" style={{ color: 'var(--accent)' }}>
+                    {String(si + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="text-[1.0625rem] font-semibold">{stage.name}</h3>
+                  <span className="text-[0.7812rem]" style={{ color: 'var(--faint)' }}>
+                    {stage.concepts?.length} topics
+                  </span>
+                </div>
+                <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                  {stage.blurb}
+                  {first ? (
+                    <>
+                      {' '}
+                      Start with{' '}
+                      <Link href={`/concepts/${first.slug}`} className="font-semibold" style={{ color: 'var(--accent)' }}>
+                        {first.title}
+                      </Link>
+                      .
+                    </>
+                  ) : null}
+                </p>
+              </li>
+            )
+          })}
+        </ol>
+        <Card href="/concepts">
+          <div className="text-[1rem] font-semibold">Browse all {CONCEPTS.length} system design concepts →</div>
+          <p className="mt-1 text-[0.8438rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            Every concept by tier, with a one-line summary of each and your progress marked.
+          </p>
+        </Card>
       </section>
     </Page>
   )

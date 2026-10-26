@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import Script from 'next/script'
 import './globals.css'
 import { Providers } from '@/components/common/Providers'
+import { AdSenseScript } from '@/components/common/AdSenseScript'
 import { Footer, Shell } from '@/components/common/Nav'
 import { NavIndexProvider } from '@/components/common/NavIndex'
 import { buildNavIndex } from '@/lib/nav-index'
@@ -67,15 +68,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_JSONLD) }} />
         {/* consent defaults must exist before any Google tag loads, ads included */}
         <script dangerouslySetInnerHTML={{ __html: CONSENT_SCRIPT }} />
-        {/* plain tag, not next/script: it must be in the server HTML for AdSense's code check.
-            itemProp stops React 19 hoisting this async script above the consent defaults
-            (it renders an async src script in place only when itemProp is set) */}
-        <script
-          itemProp="adsbygoogle"
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6252978753553349"
-          crossOrigin="anonymous"
-        />
+        {/* the ad tag, skipped on screens with no content of their own (404, tools, map) */}
+        <AdSenseScript />
       </head>
       <body className="flex min-h-screen flex-col">
         <Providers>
