@@ -2,6 +2,8 @@ import type { Problem } from '@/lib/types'
 
 export const URL_SHORTENER: Problem = {
   slug: 'url-shortener',
+  solutionTitle: "URL shortener system design (TinyURL): HLD solution",
+  solutionDescription: "URL shortener system design (TinyURL), solved: random base62 codes with a unique constraint, 302 vs 301 redirects, read caching, and capacity numbers.",
   searchTitle: "Design a URL shortener (TinyURL)",
   title: 'Link shortener',
   navTitle: 'URL shortener',

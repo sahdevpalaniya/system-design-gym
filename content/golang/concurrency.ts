@@ -14,6 +14,7 @@ export const CHANNEL_TABLE = {
 export const CONCURRENCY: LangLesson[] = [
   {
     slug: 'goroutines',
+    searchTitle: "Goroutines in Golang, with examples and WaitGroup",
     title: 'Goroutines',
     navTitle: 'Goroutines',
     oneLine: 'Start ten thousand concurrent things with one keyword.',

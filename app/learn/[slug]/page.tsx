@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     (/^What is system design/.test(l.title)
       ? 'What is system design? A beginner\u2019s introduction'
       : `${l.navTitle ?? l.title} — system design basics`),
-    `${l.oneLine} ${l.body[0] ?? ''}`,
+    l.description ?? `${l.oneLine} ${l.body[0] ?? ''}`,
     `/learn/${l.slug}`,
     true,
     true, // own opengraph-image

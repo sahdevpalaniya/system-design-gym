@@ -75,6 +75,8 @@ export const TIER3: Concept[] = [
 
   {
     slug: 'consistent-hashing',
+    metaTitle: "Consistent hashing in system design (ring, virtual nodes)",
+    metaDescription: "Consistent hashing in system design: the hash ring, virtual nodes, and why adding a server moves only about 1/N of keys. With a worked interview answer.",
     title: 'Consistent hashing',
     tier: 3,
     oneLine: 'Add or remove a machine and move only a small slice of the keys, not all of them.',

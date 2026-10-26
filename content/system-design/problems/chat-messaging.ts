@@ -2,6 +2,9 @@ import type { Problem } from '@/lib/types'
 
 export const CHAT_MESSAGING: Problem = {
   slug: 'chat-messaging',
+  solutionTitle: "WhatsApp system design: chat app HLD, full solution",
+  solutionHeading: "WhatsApp system design: a chat app, fully worked",
+  solutionDescription: "WhatsApp system design, solved: a WebSocket connection layer, per-conversation ordering, receipts, large groups, and history sync to a new phone.",
   searchTitle: "Design a chat app like WhatsApp",
   title: 'Chat and messaging',
   group: 'write-heavy',

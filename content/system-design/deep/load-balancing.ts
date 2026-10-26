@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const LOAD_BALANCING_DEEP: DeepDive = {
+  description:
+    "Load balancing in depth: L4 vs L7, round robin, weighted, least connections and consistent hashing, health checks, sticky sessions and balancer failover.",
   intro:
     'The summary said "spread requests across servers and skip the broken ones". That is true and it hides every decision that matters. This page covers the two layers you can balance at, the main routing algorithms and when each is right, how health checks work and how they can take down whole fleets, sticky sessions and why to avoid them, and the failure modes that are easy to miss.',
   minutes: 18,

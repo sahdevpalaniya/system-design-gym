@@ -13,7 +13,7 @@ import { headingSlug } from '@/lib/slug'
 import { humanMinutes, practiceMinutes, readMinutes } from '@/lib/estimate'
 import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
-import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
+import { articleJsonLd, breadcrumbJsonLd, fillDescription, lowerFirst, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
 
 export function generateStaticParams() {
@@ -32,12 +32,26 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   // titled by their project instead of as a topic tutorial
   const section = sectionOf(l, t.slug)
   const project = section?.id.startsWith('project-') ? section.name.replace(/^Project \d+ — /, '') : null
+  const alias = l.alias ?? l.name
+  const line = /[.!?]$/.test(t.oneLine) ? t.oneLine : `${t.oneLine}.`
+  const standard = `${line} A ${alias} tutorial with runnable code, key points and practice exercises.`
+  // a short one-liner leaves the snippet half empty; the lesson's own
+  // objectives say what it teaches, so they fill it before anything generic
+  const description =
+    standard.length >= 120
+      ? standard
+      : fillDescription([
+          line,
+          ...(t.objectives ?? []).map((o) => `You will ${lowerFirst(o)}`),
+          `A ${alias} tutorial with runnable code and exercises.`,
+          'With runnable code and exercises.',
+        ])
   return pageMeta(
     t.searchTitle ??
       (project
         ? `${project} in ${l.alias ?? l.name}: ${short}`
         : `${short} in ${l.name} (${l.alias ?? l.name}), with examples`),
-    t.metaDescription ?? `${t.oneLine} A ${l.alias ?? l.name} tutorial with runnable code, key points and practice exercises.`,
+    t.metaDescription ?? description,
     `/languages/${l.id}/${t.slug}`,
     true,
     true, // own opengraph-image

@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const PARTITIONING_DEEP: DeepDive = {
+  description:
+    "Partitioning in depth: range vs hash, choosing a shard key from your queries, hot partitions, logical partitions, and resharding a live system safely.",
   intro:
     'The summary said "split the data and everything depends on the key". This page is about that key. It covers range against hash partitioning and what each destroys, how to choose a shard key from your queries, hot partitions and three defences against them, why the logical-partition trick makes rebalancing survivable, what breaks once data is split (joins, transactions, uniqueness, pagination), and how to reshard a live system without downtime.',
   minutes: 22,

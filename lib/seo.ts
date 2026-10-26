@@ -39,6 +39,32 @@ function clamp(text: string, max = 155): string {
 }
 
 /**
+ * A description from real page copy that uses the snippet space: starts with
+ * `parts[0]` and appends later parts, in order, while the whole still fits in
+ * 155 characters, stopping once it reaches 120. A part that would overflow is
+ * skipped rather than cut, so every sentence in the result is whole.
+ */
+export function fillDescription(parts: (string | undefined)[], min = 120, max = 155): string {
+  const len = (t: string) => t.replace(/\*\*|`/g, '').replace(/\s+/g, ' ').trim().length
+  let out = ''
+  for (const raw of parts) {
+    const p = raw?.trim()
+    if (!p) continue
+    const next = out ? `${out} ${p}` : p
+    if (out && len(next) > max) continue
+    out = next
+    if (len(out) >= min) break
+  }
+  return out
+}
+
+/** "Write a test" -> "write a test", for joining an objective into a sentence;
+ *  leaves "`Add`" and acronyms like "HTTP" alone */
+export function lowerFirst(s: string): string {
+  return /^[A-Z][a-z]/.test(s) ? s[0].toLowerCase() + s.slice(1) : s
+}
+
+/**
  * Per-page title, description and canonical. Every indexable page gets one.
  *
  * `absolute` drops the " · Dev Skills" suffix. Worth doing when the title is

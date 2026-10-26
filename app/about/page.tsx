@@ -9,7 +9,7 @@ import { AUTHOR } from '@/lib/author'
 
 export const metadata = pageMeta(
   'About Dev Skills: who builds it and why',
-  'Why this exists, who writes it, and how it differs from the usual system design catalogue.',
+  'Why Dev Skills exists, who writes it, and how it works: you write your own system design answer before you see one, and every topic names what it costs.',
   '/about',
   true,
 )

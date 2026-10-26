@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const full = `Practice: ${task} (mock interview workspace)`
   return pageMeta(
     // the generic tail goes when it would push the title past ~60 chars
-    full.length > 60 ? `Practice: ${task}` : full,
+    p.practiceTitle ?? (full.length > 60 ? `Practice: ${task}` : full),
     `Mock interview practice: ${task}. Write your own answer stage by stage, then compare with the worked solution. ${p.prompt}`,
     `/problems/${p.slug}`,
     true,

@@ -8,7 +8,7 @@ import { CompanyQuestionLinks } from '@/components/system-design/CompanyQuestion
 import { COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { Callout } from '@/components/common/visuals'
 import { getDeepDive, getExample } from '@/content/system-design/deep'
-import { WorkedExampleBlock } from '@/components/system-design/DeepDive'
+import { Table, WorkedExampleBlock } from '@/components/system-design/DeepDive'
 import { ConceptCheck, ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
 import { AnimatedFlow } from '@/components/common/visuals'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
@@ -34,16 +34,33 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // (155 chars, pageMeta's limit) rather than letting it cut one mid-sentence
   const line = /[.!?]$/.test(c.oneLine) ? c.oneLine : `${c.oneLine}.`
   const first = line.match(/^[^.!?]+[.!?]+/)?.[0] ?? line
-  const description =
-    [
-      `${short} for system design interviews. ${line} What it costs, when to use it, when not to, and the follow-ups.`,
-      `${short} for system design interviews. ${line}`,
-      // a long one-liner: keep its first sentence so the topic and intent stay
-      `${short} for system design interviews. ${first}`,
-      line,
-    ].find((d) => d.length <= 155) ?? line
+  const tails = [
+    ' What it costs, when to use it, when not to, and the follow-ups.',
+    ' What it costs, when to use it, and when not to.',
+    ' What it costs, and when to use it.',
+  ]
+  // the longest whole-sentence version that still fits (155, pageMeta's
+  // limit); under ~120 a result leaves snippet space empty, so the page's own
+  // problem statement fills it before falling back to something shorter
+  const why = c.problem[0]?.match(/^[^.!?]+[.!?]/)?.[0]
+  const candidates = [
+    ...tails.map((t) => `${short} for system design interviews. ${line}${t}`),
+    ...(why ? [`${short} for system design interviews. ${line} ${why}`, `${short} in system design: ${why}${tails[2]}`] : []),
+    ...tails.map((t) => `${short} for system design interviews. ${first}${t}`),
+    `${short} for system design interviews. ${line}`,
+    `${short} for system design interviews. ${first}`,
+    line,
+  ]
+  const fits = candidates.filter((d) => d.length <= 155)
+  const description = fits.find((d) => d.length >= 120) ?? fits[0] ?? line
+  // "caching in system design" is how the topic is typed; the interview
+  // modifier follows, and the shorter forms keep the term whole under 60
+  const title =
+    [`${short} in system design: explained for interviews`, `${short} in system design, for interviews`, `${short} in system design`].find(
+      (t) => t.length <= 60,
+    ) ?? short
   return pageMeta(
-    c.metaTitle ?? `${short} — system design interview`,
+    c.metaTitle ?? title,
     c.metaDescription ?? description,
     `/concepts/${c.slug}`,
     true,
@@ -160,6 +177,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
       <Section n="4" title={`How ${subj} actually ${verb('works', 'work')}`}>
         <ConceptVisualBlock visual={c.visual} />
         {c.body?.length ? <Prose paragraphs={c.body} /> : null}
+        {c.table ? <Table table={c.table} /> : null}
         {c.examples?.map((e) => <CodeBlock key={e.label} label={e.label} src={e.src} note={e.note} />)}
         {c.animation ? (
           <div className="my-8">

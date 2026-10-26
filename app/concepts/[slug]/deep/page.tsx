@@ -21,7 +21,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return pageMeta(
     `${short} explained in depth — system design`,
     deep?.description ??
-    `How ${subject(short)} actually ${c.plural ? 'behave' : 'behaves'} under load: the mechanism, the failure modes, the numbers and a worked example.`,
+    // the concept page's subject, so the verb agrees with `plural`
+    // ("a stronger consistency model ... behaves", "CDNs ... behave")
+    `How ${c.subject ?? subject(short)} actually ${c.plural ? 'behave' : 'behaves'} under load: the mechanism, the failure modes, the numbers and a worked example.`,
     `/concepts/${slug}/deep`,
     true,
   )

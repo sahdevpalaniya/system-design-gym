@@ -27,6 +27,8 @@ export const GO: Language = {
   tagline: 'Start from nothing. Finish with a real API you could put online.',
   blurb:
     'Go is small enough to learn well, and big enough to build real things with. You start with variables. You finish with a working JSON API that has user accounts, a database, file uploads and tests. It uses only four outside packages. Everything else comes with Go. **Interview path:** if you are preparing for campus hiring, new-grad interviews or online assessments, do Getting started → Core language → Go for coding rounds → Interview preparation first, and come back for the rest.',
+  metaDescription:
+    'Golang tutorial for beginners: start with variables, finish with a JSON API with accounts, a database, file uploads and tests, using four outside packages.',
   home: 'https://go.dev/',
   sections: [
     {
@@ -47,6 +49,7 @@ export const GO: Language = {
     },
     {
       id: 'core',
+      searchTitle: "Golang core language: functions, slices, maps, interfaces",
       name: 'Core language',
       blurb: 'Functions, errors as values, the two data structures you use all day, your own types, and tests.',
       lessons: [
@@ -125,6 +128,8 @@ export const GO: Language = {
     },
     {
       id: 'web',
+      searchTitle: "Golang web services: a net/http API, no framework",
+      metaDescription: "Golang web services with only net/http: method-and-path routing, JSON handlers, server timeouts, middleware and a graceful shutdown, with runnable code.",
       name: 'Web services',
       blurb: 'Build an HTTP API with no framework, add middleware, and shut it down cleanly.',
       intro: {
@@ -155,6 +160,7 @@ export const GO: Language = {
     {
       id: 'database',
       searchTitle: 'Databases in Go (Golang): PostgreSQL, SQL and pgx',
+      metaDescription: "Golang with PostgreSQL through database/sql and pgx: safe queries, placeholders, nullable columns, transactions, the N+1 problem and query plans. No ORM.",
       name: 'Databases',
       blurb: 'Postgres through database/sql. No ORM, so you write and see every query that runs.',
       intro: {
@@ -188,6 +194,7 @@ export const GO: Language = {
     },
     {
       id: 'project-shortener',
+      metaDescription: "Build a URL shortener in Golang step by step, with a layered folder structure: validation, an in-memory store, the redirect, then Postgres and a container.",
       name: 'Project 1 — URL shortener',
       blurb:
         'Optional — after you finish the basics. Built with a **layered** structure: a folder per kind of code. Validation, storage, a redirect, then Postgres and a container.',
@@ -236,6 +243,7 @@ export const GO: Language = {
     },
     {
       id: 'production',
+      searchTitle: "Golang in production: logging, Docker, deploys, profiling",
       name: 'Production',
       blurb: 'Optional — after you finish the basics. The difference between something that works and something you can put online and keep running.',
       lessons: [

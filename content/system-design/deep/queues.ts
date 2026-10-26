@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const QUEUES_DEEP: DeepDive = {
+  description:
+    "Message queues in depth: work queue vs log, delivery guarantees, per-key ordering, retries and dead letter queues, backpressure, and what to monitor.",
   intro:
     'The summary said "write the job down now, do it soon". This page is about everything that goes wrong between now and soon. It covers work queues against logs and when each is right, delivery guarantees stated precisely, ordering per key rather than globally, retries and poison messages, dead letter queues that someone reads, backpressure and what saying no means in practice, and the metrics that tell you a backlog is a problem before users do.',
   minutes: 20,

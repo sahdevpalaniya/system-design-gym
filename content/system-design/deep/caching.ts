@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const CACHING_DEEP: DeepDive = {
+  description:
+    "Caching in depth: where a cache can live, the four write strategies, invalidation, cache stampedes and hot keys, plus a worked incident to debug.",
   intro:
     'The summary said "keep a copy near whoever keeps asking". That is the easy half. This page covers the five places a cache can live and what each one costs you, the four write strategies and when each is right, how invalidation fails, the three ways an empty cache takes down a database, hot keys, and how to decide what your hit rate needs to be.',
   minutes: 20,

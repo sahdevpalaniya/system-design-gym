@@ -3,7 +3,7 @@ import { pageMeta } from '@/lib/seo'
 // the page itself is a client component, so its metadata lives here
 export const metadata = pageMeta(
   'System design follow-up questions — defence drills',
-  'Practise the seven kinds of follow-up an interviewer uses to break your system design, one drill at a time.',
+  'System design follow-up questions to practise: seven kinds an interviewer uses to break your design, each with a weak answer, a strong one and the trap.',
   '/drills',
   true,
 )

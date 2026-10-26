@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const REPLICATION_DEEP: DeepDive = {
+  description:
+    "Replication in depth: leader-follower, multi-leader and leaderless, sync vs async, failover second by second, split brain and fencing, and replication lag.",
   intro:
     'The summary said "keep copies and decide who is allowed to write". That is true and it hides every decision that matters. This page covers the three topologies and when each is right, the difference synchronous replication makes to your data loss window, what happens second by second during a failover, split brain and how fencing prevents it, replication lag and the four ways to hide it from users, and the failure modes that only appear at three in the morning.',
   minutes: 20,

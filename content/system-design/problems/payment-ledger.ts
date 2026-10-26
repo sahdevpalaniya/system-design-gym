@@ -2,6 +2,8 @@ import type { Problem } from '@/lib/types'
 
 export const PAYMENT_LEDGER: Problem = {
   slug: 'payment-ledger',
+  solutionTitle: "Payment system design (HLD) with a double-entry ledger",
+  solutionDescription: "Payment system design (HLD), solved: a double-entry append-only ledger, sagas over 2PC, unknown provider outcomes, reconciliation and seller payouts.",
   searchTitle: "Design a payment system with a double-entry ledger",
   title: 'Payments and ledger',
   navTitle: 'Payment ledger',

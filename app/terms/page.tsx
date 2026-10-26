@@ -5,7 +5,7 @@ import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
   'Terms of use · Dev Skills',
-  'The terms for using this site: what it is, what it is not, and what is and is not promised.',
+  'Terms for using Dev Skills: what the site is, what it does not promise, how you may use the content, and what happens to your account and answers.',
   '/terms',
   true,
 )

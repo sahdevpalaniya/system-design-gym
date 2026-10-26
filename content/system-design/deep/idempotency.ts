@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const IDEMPOTENCY_DEEP: DeepDive = {
+  description:
+    "Idempotency in depth: why exactly-once delivery cannot exist, idempotency keys and their crash windows, choosing the key, and idempotent consumers.",
   intro:
     'The summary said "make doing it twice the same as doing it once". This page is about building that. It covers why exactly-once delivery is impossible rather than merely hard, the three-state outcome people forget, how to implement a key store correctly and the crash windows in the naive version, choosing a key, what to return for a repeat, operations that are naturally safe, and the consumer-side version for queues.',
   minutes: 20,

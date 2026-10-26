@@ -4,7 +4,7 @@ import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
   'Contact Dev Skills: questions and feedback',
-  'How to report a mistake, ask a question, or have your account and stored answers deleted.',
+  'Email the person who writes Dev Skills to report a mistake on a page, ask a question, report a security problem, or have your account and answers deleted.',
   '/contact',
   true,
 )

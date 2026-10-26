@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const SQL_NOSQL_DEEP: DeepDive = {
+  description:
+    "SQL vs NoSQL in depth: what a relational database gives you, normalisation, four ways to scale it, each NoSQL type and BASE, and how to choose in the room.",
   intro:
     'The summary said "pick by access pattern, not by which word sounds bigger". This page goes further: what ACID means one word at a time, how relational databases scale before you give up on them, all four kinds of NoSQL and what each is for, what BASE means, and a decision procedure you can run in an interview instead of guessing.',
   minutes: 25,

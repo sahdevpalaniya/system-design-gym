@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage } from '@/content/languages'
 import { Quiz } from '@/components/golang/Quiz'
 import { Page, PageHeader, Rich } from '@/components/common/ui'
-import { pageMeta } from '@/lib/seo'
+import { fillDescription, pageMeta } from '@/lib/seo'
 import { UNINDEXED_QUIZ_SETS } from '@/lib/sitemap-routes'
 
 export function generateStaticParams() {
@@ -18,7 +18,11 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   return {
     ...pageMeta(
       `${s.name}: ${l.alias ?? l.name} quiz (${s.questions.length} questions)`,
-      `${s.blurb} ${s.questions.length} ${l.alias ?? l.name} questions, every answer explained.`,
+      fillDescription([
+        `${s.blurb} ${s.questions.length} ${l.alias ?? l.name} questions, every answer explained.`,
+        'Multiple choice with one right answer each, and a link back to the lesson when you miss one.',
+        'Multiple choice, one right answer each.',
+      ]),
       `/languages/${l.id}/quiz/${s.id}`,
       true,
     ),

@@ -28,7 +28,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }) {
   const l = getLanguage((await params).lang)
   if (!l) return {}
-  return pageMeta(`${l.name} (${l.alias ?? l.name}) cheat sheet: quick revision`, `Every ${l.alias ?? l.name} topic on one page: the key points and the one thing to remember, for revision before an interview.`, `/languages/${l.id}/revise`, true)
+  return pageMeta(`${l.name} (${l.alias ?? l.name}) cheat sheet: quick revision`, `All ${l.lessons.length} ${l.alias ?? l.name} topics on one page: the key points and the one thing to remember from each lesson, for quick revision before an interview.`, `/languages/${l.id}/revise`, true)
 }
 
 export default async function RevisePage({ params }: { params: Promise<{ lang: string }> }) {

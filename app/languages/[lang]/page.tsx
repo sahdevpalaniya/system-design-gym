@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   if (!l) return {}
   return pageMeta(
     `Learn ${l.name} (${l.alias ?? l.name}) from scratch: tutorial with examples`,
-    `${l.alias ?? l.name} tutorial for beginners. ${l.tagline} ${l.blurb}`,
+    l.metaDescription ?? `${l.alias ?? l.name} tutorial for beginners. ${l.tagline} ${l.blurb}`,
     `/languages/${l.id}`,
     true,
     true, // own opengraph-image

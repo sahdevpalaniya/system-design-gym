@@ -2,6 +2,9 @@ import type { Problem } from '@/lib/types'
 
 export const RATE_LIMITER: Problem = {
   slug: 'rate-limiter',
+  practiceTitle: "Rate limiter system design: practice the interview",
+  solutionTitle: "Rate limiter system design: full solution and algorithms",
+  solutionDescription: "Rate limiter system design, solved: token bucket vs fixed window, local decisions synced across regions, per-region quota shares, and when to fail open.",
   searchTitle: "Design a rate limiter",
   title: 'Distributed API rate limiter',
   navTitle: 'Rate limiter',

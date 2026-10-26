@@ -550,6 +550,8 @@ if err := doWork(); err != nil {
 
   {
     slug: 'interview-concurrency',
+    searchTitle: "Golang concurrency interview questions with code",
+    metaDescription: "Golang concurrency interview questions with code: goroutines vs threads, channels, leaks and data races, plus a worker pool, rate limiter and safe cache.",
     title: 'Interview: concurrency',
     navTitle: 'Interview — concurrency',
     oneLine: 'The half of the interview that usually decides it, and the code they will put in front of you.',

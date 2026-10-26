@@ -2,6 +2,8 @@ import type { Problem } from '@/lib/types'
 
 export const NOTIFICATION_SYSTEM: Problem = {
   slug: 'notification-system',
+  solutionTitle: "Notification system design (HLD): full worked solution",
+  solutionDescription: "Notification system design (HLD), solved: push, email and SMS through priority queues, user preferences, deduplication, and provider failover.",
   searchTitle: "Design a notification system",
   title: 'Notification system',
   group: 'write-heavy',

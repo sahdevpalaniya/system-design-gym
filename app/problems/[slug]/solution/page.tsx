@@ -91,7 +91,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             <span style={{ color: 'var(--faint)' }}>Worked solution</span>
           </>
         }
-        title={`${p.searchTitle ?? p.title}: a full worked answer`}
+        title={p.solutionHeading ?? `${p.searchTitle ?? p.title}: a full worked answer`}
         lede="The whole thing, start to finish, in the order you would actually say it. Read it to learn the shape of a strong answer — then go and produce one yourself, because reading is not the same skill as producing."
         meta={<Badge>{p.difficulty}</Badge>}
       />

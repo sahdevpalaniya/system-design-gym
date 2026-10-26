@@ -14,7 +14,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!co) return {}
   return pageMeta(
     `${co.name} system design interview — what they test`,
-    metaDescription(co.name, co.style, questionsFor(co.id).length),
+    metaDescription(co.name, co.style, questionsFor(co.id).length, !!co.guide?.plan.length),
     `/company/${co.id}`,
     true,
   )
@@ -22,16 +22,23 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 /** Whole sentences of the style note that fit in 155 characters, so the
  *  description never ends mid-sentence, plus the question count if it fits. */
-function metaDescription(name: string, style: string, questions: number): string {
+function metaDescription(name: string, style: string, questions: number, plan: boolean): string {
   const max = 155
   let d = `${name} system design interview:`
+  // a sentence that does not fit is skipped, not cut, and a shorter one after
+  // it may still fit
   for (const s of style.match(/[^.!?]+[.!?]+/g) ?? []) {
     const next = `${d} ${s.trim()}`
-    if (next.length > max) break
-    d = next
+    if (next.length <= max) d = next
   }
-  const extra = ` ${questions} practice question${questions === 1 ? '' : 's'} with model answers.`
-  return questions && d.length + extra.length <= max ? d + extra : d
+  const n = `${questions} practice question${questions === 1 ? '' : 's'} with model answers`
+  const tails = questions
+    ? [
+        ...(plan ? [` What candidates report about the round, ${n}, and a study plan.`, ` ${n[0].toUpperCase()}${n.slice(1)}, and a study plan.`] : []),
+        ` ${n[0].toUpperCase()}${n.slice(1)}.`,
+      ]
+    : []
+  return d + (tails.find((t) => d.length + t.length <= max) ?? '')
 }
 
 export default async function CompanyPage({ params }: { params: Promise<{ id: string }> }) {

@@ -1,6 +1,8 @@
 import type { DeepDive, WorkedExample } from '@/lib/types'
 
 export const CONSISTENCY_DEEP: DeepDive = {
+  description:
+    "Consistency models in depth: six models from eventual to linearizable, read-your-own-writes, what strong consistency costs, and choosing per feature.",
   intro:
     'The summary said "precise words for how out of date a read is allowed to be". This page makes them precise. It covers the six models in the order of what they cost, how to pick one per feature rather than per system, the mechanics of read-your-own-writes, why eventual consistency lets reads go backwards, what strong consistency costs on a good day, and the sentence that turns this from vocabulary into a design.',
   minutes: 20,

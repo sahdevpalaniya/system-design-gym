@@ -2,6 +2,8 @@ import type { Problem } from '@/lib/types'
 
 export const RIDE_MATCHING: Problem = {
   slug: 'ride-matching',
+  solutionTitle: "Uber system design (ride-hailing HLD): full solution",
+  solutionDescription: "Uber system design (ride-hailing HLD), solved: a city-sharded in-memory geo index, ETA-ranked greedy matching, sequential driver offers and timeouts.",
   searchTitle: "Design a ride-hailing app like Uber / Ola",
   title: 'Ride matching',
   group: 'matching',

@@ -198,6 +198,8 @@ export interface Concept {
   /** the H1, when the search phrasing differs from `title` (which cards, the
    *  sidebar and prev/next keep using) */
   heading?: string
+  /** a side-by-side table under "How it works", for comparison pages */
+  table?: { caption: string; headers: string[]; rows: string[][] }
 }
 
 // ---------- problems ----------
@@ -278,6 +280,10 @@ export interface Problem {
   solutionTitle?: string
   /** meta description override for the /solution page; keep it under 155 characters */
   solutionDescription?: string
+  /** the /solution page H1, when it should lead with the searched phrase */
+  solutionHeading?: string
+  /** full <title> override for the practice page */
+  practiceTitle?: string
   /** where this problem is solved for real — engineering write-ups and papers */
   refs?: { label: string; href: string; note?: string }[]
   lifecycle: LifecycleSpec
@@ -420,6 +426,8 @@ export interface Lesson {
   navTitle?: string
   /** the exact phrase people search for, used as the page <title> when set */
   searchTitle?: string
+  /** meta description override; keep it 120-155 characters */
+  description?: string
   oneLine: string
   /** why a total beginner should care, before any jargon */
   body: string[]
@@ -661,6 +669,8 @@ export interface Language {
   alias?: string
   tagline: string
   blurb: string
+  /** meta description for the track home; keep it 120-155 characters */
+  metaDescription?: string
   /** where the official docs live */
   home: string
   sections: LangSection[]

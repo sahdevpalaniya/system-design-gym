@@ -161,6 +161,9 @@ export const TIER1: Concept[] = [
 
   {
     slug: 'caching',
+    metaTitle: "Caching in system design: strategies and trade-offs",
+    heading: "Caching strategies in system design",
+    metaDescription: "Caching strategies for system design interviews: cache-aside, write-through, write-behind, TTLs and invalidation, cache stampedes, and when not to cache.",
     title: 'Caching',
     tier: 1,
     oneLine: 'Keep a copy of the answer near whoever keeps asking for it.',
@@ -237,6 +240,8 @@ export const TIER1: Concept[] = [
 
   {
     slug: 'load-balancing',
+    metaTitle: "Load balancer in system design: algorithms, L4 vs L7",
+    metaDescription: "How a load balancer works in system design: L4 vs L7, round robin vs least connections, health checks, sticky sessions and zero-downtime deploys.",
     title: 'Load balancing',
     tier: 1,
     oneLine: 'One address in front, many machines behind, and a way to stop sending traffic to a broken one.',

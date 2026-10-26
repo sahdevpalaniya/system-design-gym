@@ -55,7 +55,7 @@ export const LESSONS: Lesson[] = [
 
   {
     slug: 'system-design-for-freshers',
-    searchTitle: 'System design for freshers and new grads',
+    searchTitle: 'System design for freshers: questions and a 30-day plan',
     title: 'System design for freshers and new grads: is it asked, and what to learn first',
     navTitle: 'For new grads',
     oneLine: 'An honest answer on whether new grads get system design rounds, and a 30-day plan if you do.',
@@ -165,6 +165,8 @@ export const LESSONS: Lesson[] = [
 
   {
     slug: 'where-is-the-slack',
+    description:
+      "Slack in system design is how long you have before a person notices. Ride hailing vs food delivery shows why it decides do-it-now versus queue-it-later.",
     title: "Where's the slack?",
     oneLine: 'How much time the system has before a person notices. This one question shapes most designs.',
     body: [
@@ -213,6 +215,8 @@ export const LESSONS: Lesson[] = [
 
   {
     slug: 'the-vocabulary',
+    description:
+      "System design vocabulary in plain English: latency, throughput, load balancer, cache, replica, shard, queue, stateless, consistency and idempotent.",
     title: 'The words you need, in plain English',
     navTitle: 'The words, in plain English',
     oneLine: 'A dozen or so words that unlock every other page. Nothing left undefined.',

@@ -7,7 +7,7 @@ import { pageMeta } from '@/lib/seo'
 
 export const metadata = pageMeta(
   'Worked solutions to every system design problem',
-  'Every practice problem answered end to end, the way you would say it in an interview.',
+  'Worked system design solutions to every practice problem: requirements, lifecycle, numbers, architecture, tradeoffs and follow-ups, in interview order.',
   '/solutions',
 )
 
