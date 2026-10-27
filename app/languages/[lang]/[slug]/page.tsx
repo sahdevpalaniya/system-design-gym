@@ -16,6 +16,7 @@ import { MarkRead } from '@/components/common/MarkRead'
 import { articleJsonLd, breadcrumbJsonLd, fillDescription, lowerFirst, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
 import { sectionHref } from '@/lib/redirects'
+import { GO_TITLES } from '@/content/golang/titles'
 
 export function generateStaticParams() {
   return LANGUAGES.flatMap((l) => l.lessons.map((t) => ({ lang: l.id, slug: t.slug })))
@@ -48,10 +49,11 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
           'With runnable code and exercises.',
         ])
   return pageMeta(
+    // written per lesson (content/golang/titles.ts); project steps are named
+    // by their project, since every project has a "Step 1"
     t.searchTitle ??
-      (project
-        ? `${project} in ${l.alias ?? l.name}: ${short}`
-        : `${short} in ${l.name} (${l.alias ?? l.name}), with examples`),
+      (l.id === 'go' ? GO_TITLES[t.slug] : undefined) ??
+      (project ? `${project} in ${l.alias ?? l.name}: ${short}` : `${short} in ${l.name}`),
     t.metaDescription ?? description,
     `/languages/${l.id}/${t.slug}`,
     true,
@@ -200,20 +202,21 @@ export default async function LangLessonPage({
         }
       />
 
-      {t.objectives?.length ? (
-        <div className="mb-6 rounded-xl border px-5 py-4" style={{ borderColor: 'var(--border)' }}>
-          <div className="mb-2 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
-            After this topic you can
-          </div>
-          <Bullets items={t.objectives} />
-        </div>
-      ) : null}
 
       <Contents headings={t.blocks.map((b) => b.heading).filter((h): h is string => Boolean(h))} />
 
       {t.blocks.map((b, bi) => (
         <Block key={bi} b={b} />
       ))}
+
+      {t.objectives?.length ? (
+        <div className="my-8 rounded-xl border px-5 py-4" style={{ borderColor: 'var(--border)' }}>
+          <div className="mb-2 text-[0.6875rem] font-bold tracking-[0.07em] uppercase" style={{ color: 'var(--faint)' }}>
+            Check you can now
+          </div>
+          <Bullets items={t.objectives} />
+        </div>
+      ) : null}
 
       <CrossLinks path={path} />
 

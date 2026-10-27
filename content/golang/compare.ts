@@ -362,7 +362,6 @@ func main() {
 
   {
     slug: 'arrays-vs-slices',
-    searchTitle: 'Arrays vs slices in Go (Golang), with examples',
     title: 'Arrays vs slices in Go: the differences, with examples',
     navTitle: 'Arrays vs slices',
     oneLine: 'An array is a fixed box of values. A slice is a window onto one. You will use slices 99% of the time.',

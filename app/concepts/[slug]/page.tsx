@@ -16,6 +16,7 @@ import { CodeBlock } from '@/components/golang/Code'
 import { MarkRead } from '@/components/common/MarkRead'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta, subject, withUtm } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
+import { CONCEPT_TITLES } from '@/content/system-design/concepts/titles'
 
 /** FAQ answers are written with the same light markup as the page; schema wants plain text */
 const plain = (s: string) => s.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').replace(/\*\*|`/g, '')
@@ -55,12 +56,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = fits.find((d) => d.length >= 120) ?? fits[0] ?? line
   // "caching in system design" is how the topic is typed; the interview
   // modifier follows, and the shorter forms keep the term whole under 60
-  const title =
-    [`${short} in system design: explained for interviews`, `${short} in system design, for interviews`, `${short} in system design`].find(
-      (t) => t.length <= 60,
-    ) ?? short
+  // titles are written per concept (concepts/titles.ts), not generated
+  const title = `${short} in system design`.length <= 60 ? `${short} in system design` : short
   return pageMeta(
-    c.metaTitle ?? title,
+    c.metaTitle ?? CONCEPT_TITLES[c.slug] ?? title,
     c.metaDescription ?? description,
     `/concepts/${c.slug}`,
     true,
