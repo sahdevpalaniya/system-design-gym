@@ -66,7 +66,38 @@ export default function AboutPage() {
         </p>
       </Section>
 
-      <Section n="4" title="Get in touch">
+      <Section n="4" title="How content is written and reviewed">
+        <Prose
+          paragraphs={[
+            'Each page starts from a question a learner or interviewer actually asks, and is written to one template: what problem the technique solves, what it costs, when to use it and when not to, how it works, and the follow-up question that usually comes next. A topic is not published without its cost section.',
+            'Technical claims are checked against primary sources (specifications, papers, official documentation), and those sources are linked on the page under "Learn it from the source" or "Official documentation".',
+            'Go code is checked by machine as well as by eye: before each release a script compiles every Go example with the Go toolchain and runs `go vet` on the runnable ones, and every coding challenge is tested against a known wrong answer to make sure its tests fail it.',
+            'Company pages describe interview formats only from the company’s own public pages, listed as sources on each page. Anything else about a company’s round is labelled as what candidates report. This site has no inside information and is not affiliated with any company it names.',
+          ]}
+        />
+      </Section>
+
+      <Section n="5" title="How the site uses AI">
+        <Prose
+          paragraphs={[
+            'Much of the drafting, editing and code on this site is done with the help of an AI assistant (Anthropic’s Claude). It is a writing and programming tool here, not the author: the topics, the method and the decisions about what each page says are the author’s, and AI-assisted text is published under his name only after he has reviewed it.',
+            'AI output is treated like any first draft. Facts are checked against the linked sources, Go examples have to pass the compile checks above, and anything that cannot be verified is cut rather than published.',
+            'If you find something that reads as wrong or invented, please report it. Corrections are fixed, and significant ones are recorded in the changelog.',
+          ]}
+        />
+      </Section>
+
+      <Section n="6" title="Updates and corrections">
+        <Prose
+          paragraphs={[
+            'Pages are revised when a reader reports a mistake, when a language or tool release changes the right answer (for example a new Go version), and in periodic review passes across a whole track.',
+            'Every lesson, concept and worked solution shows the date its content last changed, taken from the site’s version history, so the date moves only when the text does. The [changelog](/changelog) lists significant changes, newest first.',
+            'Pages that turn out to repeat another page are merged into the fuller one, and the old address redirects there, rather than being left up as a thinner copy.',
+          ]}
+        />
+      </Section>
+
+      <Section n="7" title="Get in touch">
         <Prose
           paragraphs={[
             `Corrections are welcome. Email **${CONTACT_EMAIL}**.`,

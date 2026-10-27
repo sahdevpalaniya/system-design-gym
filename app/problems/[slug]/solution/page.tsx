@@ -17,6 +17,7 @@ import {
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
+import { ReviewedLine } from '@/components/common/Byline'
 
 export function generateStaticParams() {
   return PROBLEMS.map((p) => ({ slug: p.slug }))
@@ -96,6 +97,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         lede="The whole thing, start to finish, in the order you would actually say it. Read it to learn the shape of a strong answer — then go and produce one yourself, because reading is not the same skill as producing."
         meta={<Badge>{p.difficulty}</Badge>}
       />
+      <ReviewedLine path={`/problems/${p.slug}/solution`} />
 
       <Callout variant="trap">
         <strong>Read this second, not first.</strong> Reading a good answer feels like learning and only

@@ -58,7 +58,7 @@ export function sitemapRoutes(): SitemapRoute[] {
   add('/', 'pages', 1, ['app/page.tsx', 'app/dashboard.tsx'])
   for (const p of ['/learn', '/concepts', '/cheat-sheet', '/problems', '/archetypes', '/company', '/revise', '/drills', '/practice'])
     add(p, 'pages', 0.7, [page(p)])
-  for (const p of ['/about', '/privacy', '/terms', '/contact']) add(p, 'pages', 0.3, [page(p)])
+  for (const p of ['/about', '/changelog', '/privacy', '/terms', '/contact']) add(p, 'pages', 0.3, [page(p)])
   for (const l of LESSONS) add(`/learn/${l.slug}`, 'pages', 0.8, ['content/system-design/foundations.ts'])
   for (const g of GUIDES) add(`/learn/${g.slug}`, 'pages', 0.8, ['content/system-design/guides.ts'])
   for (const t of ['check', 'daily', 'mock', 'blitz'])

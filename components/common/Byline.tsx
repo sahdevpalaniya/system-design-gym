@@ -6,15 +6,34 @@ import { pageDates } from "@/lib/content-dates";
 import { ShareButton } from "./ShareButton";
 import { Newsletter } from "./Newsletter";
 
-/** Who wrote the page, when it was last checked, and a way to report a
- *  mistake. On every lesson, concept and problem, so trust is never one
- *  click away. */
-export function Byline({ title, path }: { title: string; path: string }) {
-  const reviewed = new Date(pageDates(path).modified).toLocaleDateString("en-GB", {
+/** The date a page's content last changed, from git (lib/content-dates). */
+export function reviewedOn(path: string): string {
+  return new Date(pageDates(path).modified).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "long",
     year: "numeric",
   });
+}
+
+/** Author and "Last reviewed" date under a content page's heading, so both
+ *  are visible without scrolling to the footer byline. */
+export function ReviewedLine({ path }: { path: string }) {
+  return (
+    <p className="-mt-2 mb-6 text-[0.8125rem]" style={{ color: "var(--faint)" }}>
+      By{" "}
+      <Link href="/about" className="font-medium hover:opacity-70" style={{ color: "var(--muted)" }}>
+        {AUTHOR.name}
+      </Link>
+      {" · "}Last reviewed <time dateTime={pageDates(path).modified}>{reviewedOn(path)}</time>
+    </p>
+  );
+}
+
+/** Who wrote the page, when it was last checked, and a way to report a
+ *  mistake. On every lesson, concept and problem, so trust is never one
+ *  click away. */
+export function Byline({ title, path }: { title: string; path: string }) {
+  const reviewed = reviewedOn(path);
   return (
     <>
       <Newsletter compact />

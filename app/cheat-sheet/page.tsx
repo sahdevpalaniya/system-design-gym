@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { PATH, getConcept } from '@/content/system-design/concepts'
 import { STAGES } from '@/content/system-design/method'
-import { Byline } from '@/components/common/Byline'
+import { Byline, ReviewedLine } from '@/components/common/Byline'
 import { Page, PageHeader, Rich, Section } from '@/components/common/ui'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
@@ -73,6 +73,7 @@ export default function CheatSheetPage() {
         title="System design cheat sheet"
         lede="Everything on one page for the last hour before an interview: how to run the hour, the numbers to know, which pattern fixes which problem, and the price of each. Every row links to the full explanation."
       />
+      <ReviewedLine path={"/cheat-sheet"} />
 
       <Section n="1" title="How to run the interview">
         <ol className="space-y-3">

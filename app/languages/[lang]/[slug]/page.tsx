@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Byline } from '@/components/common/Byline'
+import { Byline, ReviewedLine } from '@/components/common/Byline'
 import { notFound } from 'next/navigation'
 import { LANGUAGES, getLanguage, orderedLessons, sectionOf } from '@/content/languages'
 import type { LangBlock } from '@/lib/types'
@@ -201,6 +201,7 @@ export default async function LangLessonPage({
           </span>
         }
       />
+      <ReviewedLine path={path} />
 
 
       <Contents headings={t.blocks.map((b) => b.heading).filter((h): h is string => Boolean(h))} />

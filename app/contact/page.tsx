@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Page, PageHeader, Prose, Section } from '@/components/common/ui'
 import { CONTACT_EMAIL } from '@/lib/legal'
 import { pageMeta } from '@/lib/seo'
@@ -23,6 +24,10 @@ export default function ContactPage() {
           <a href={`mailto:${CONTACT_EMAIL}`} style={{ color: 'var(--accent)' }}>
             {CONTACT_EMAIL}
           </a>
+        </p>
+        <p className="mb-4 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
+          Expect a reply within three working days. Corrections to a page are usually made in the same window, and
+          significant ones are listed in the <Link href="/changelog" style={{ color: 'var(--accent)' }}>changelog</Link>.
         </p>
         <Prose
           paragraphs={[

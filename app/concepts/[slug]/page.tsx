@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Byline } from '@/components/common/Byline'
+import { Byline, ReviewedLine } from '@/components/common/Byline'
 import { CrossLinks } from '@/components/common/CrossLinks'
 import { notFound } from 'next/navigation'
 import { CONCEPTS, TIER_INFO, getConcept } from '@/content/system-design/concepts'
@@ -135,6 +135,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         title={c.heading ?? c.title}
         lede={c.oneLine}
       />
+      <ReviewedLine path={`/concepts/${c.slug}`} />
 
       <Section n="1" title={`What problem ${verb('does', 'do')} ${subj} solve?`}>
         <Prose paragraphs={c.problem} />

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Byline } from '@/components/common/Byline'
+import { Byline, ReviewedLine } from '@/components/common/Byline'
 import { notFound } from 'next/navigation'
 import { LESSONS, getLesson } from '@/content/system-design/foundations'
 import { GUIDES, getGuide } from '@/content/system-design/guides'
@@ -83,6 +83,7 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         title={l.title}
         lede={l.oneLine}
       />
+      <ReviewedLine path={`/learn/${l.slug}`} />
 
       <Prose paragraphs={l.body} />
 
@@ -187,6 +188,7 @@ function GuidePage({ g }: { g: Guide }) {
         title={g.title}
         lede={g.answer}
       />
+      <ReviewedLine path={path} />
 
       {g.sections.map((s) => (
         <section key={s.heading} className="mb-8">

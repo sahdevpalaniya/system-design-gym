@@ -11,6 +11,9 @@ import { LANGUAGES } from '@/content/languages'
 import { CATEGORY_INFO } from '@/content/system-design/followups'
 import { Dashboard } from './dashboard'
 import { sectionHref } from '@/lib/redirects'
+import { AUTHOR } from '@/lib/author'
+import { CONTENT_MODIFIED } from '@/lib/content-dates'
+import DATES from '@/lib/content-dates.json'
 
 /** Per track, the lessons with the most search demand (from Search Console and
  *  keyword research), linked straight from the home page. Unknown slugs are skipped. */
@@ -34,6 +37,11 @@ const POPULAR: Record<string, string[]> = {
  * Everything that explains what this site is now renders without JavaScript.
  */
 export default function Home() {
+  const updated = new Date(Object.values(DATES as Record<string, string>).sort().at(-1) ?? CONTENT_MODIFIED).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
   return (
     <Page wide>
       <section className="mb-12">
@@ -50,6 +58,17 @@ export default function Home() {
           and still freeze when someone says &ldquo;design a ride-hailing app&rdquo;. What is usually
           missing is not the components. It is the order you make decisions in, and the habit of saying
           what each one costs. That is what this site drills.
+        </p>
+        <p className="mt-4 text-[0.875rem]" style={{ color: 'var(--faint)' }}>
+          Written and maintained by{' '}
+          <Link href="/about" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
+            {AUTHOR.name}
+          </Link>
+          {' · '}Last updated {updated}
+          {' · '}
+          <Link href="/changelog" className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
+            What changed
+          </Link>
         </p>
 
         {/* pick a goal: a newcomer is one click from doing something, rather

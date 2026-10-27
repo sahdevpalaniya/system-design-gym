@@ -96,12 +96,9 @@ export function Dashboard({
 
   // the static introduction above this is already on screen, so a quiet
   // placeholder here is enough — nothing important is hidden behind it
+  // no text: the server HTML should not say "Loading" anywhere
   if (!ready) {
-    return (
-      <div className="py-16 text-center text-[0.875rem]" style={{ color: 'var(--faint)' }}>
-        Loading your progress…
-      </div>
-    )
+    return <div className="min-h-[8rem]" aria-hidden />
   }
 
   const fresh = view.conceptsTouched === 0 && view.problemsTouched === 0

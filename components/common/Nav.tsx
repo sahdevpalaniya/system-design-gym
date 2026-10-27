@@ -595,6 +595,9 @@ export function Footer() {
           <Link href="/about" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             About
           </Link>
+          <Link href="/changelog" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
+            Changelog
+          </Link>
           <Link href="/privacy" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Privacy
           </Link>
