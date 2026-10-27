@@ -106,3 +106,23 @@ function DrillCard({ n, d }: { n: number; d: Archetype['drill'][number] }) {
     </div>
   )
 }
+
+/** The "currently practising against" banner; empty until the browser has your saved choice. */
+export function CurrentArchetype({ names }: { names: Record<string, string> }) {
+  const { state, setArchetype, ready } = useProgress()
+  if (!ready || !state.archetype) return null
+  return (
+    <div
+      className="mb-8 flex flex-wrap items-center justify-between gap-3 rounded-xl border px-5 py-4"
+      style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
+    >
+      <div className="text-[0.9062rem]">
+        <strong>Currently practising against: </strong>
+        {names[state.archetype]}. Problem pages, mocks and the follow-up blitz will lean toward their style.
+      </div>
+      <Button variant="secondary" size="sm" onClick={() => setArchetype(null)}>
+        Clear
+      </Button>
+    </div>
+  )
+}

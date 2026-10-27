@@ -332,7 +332,7 @@ export const QUIZZES: QuizSet[] = [
         ],
         answer: 2,
         why: 'Capitalisation **is** the access modifier. `Println` is exported; `println` would be package-private. There is no `public` or `private` keyword.',
-        from: 'packages',
+        from: 'packages-in-code',
       },
     ],
   },

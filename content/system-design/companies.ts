@@ -1,3 +1,4 @@
+import { MERGED_COMPANY_QUESTIONS } from '@/lib/redirects'
 import type { Company, CompanyQuestion } from '@/lib/types'
 
 /**
@@ -37,7 +38,7 @@ export const COMPANIES: Company[] = [
         'Get fast with numbers: [latency numbers](/concepts/latency-numbers), [back-of-the-envelope estimation](/concepts/back-of-envelope), then [capacity and cost](/concepts/capacity-and-cost).',
         'Work two scale-heavy problems in full: [search typeahead](/problems/typeahead) and the [web crawler](/problems/web-crawler). Then try the Google-style versions of both below.',
         'Add depth on what those problems lean on: [search indexing](/concepts/search-indexing), [caching](/concepts/caching), [Bloom filters](/concepts/bloom-filters) and [partitioning](/concepts/partitioning).',
-        'Finish with a [timed mock](/practice/mock) with the [Scale Breaker](/archetypes/scale-breaker) as your interviewer, then the scale follow-ups in the [defence drills](/drills).',
+        'Finish with a [timed mock](/practice/mock) with the [Scale Breaker](/archetypes#scale-breaker) as your interviewer, then the scale follow-ups in the [defence drills](/drills).',
       ],
       sources: [
         { label: 'Google Careers: How we hire', url: 'https://www.google.com/about/careers/applications/how-we-hire/' },
@@ -73,7 +74,7 @@ export const COMPANIES: Company[] = [
         'Work [ticket booking](/problems/ticket-booking) and the [notification system](/problems/notification-system) in full, then the Amazon-style flash sale and notification questions below.',
         'Study the concepts those lean on: [idempotency](/concepts/idempotency), [message queues](/concepts/message-queues), [rate limiting](/concepts/rate-limiting), [transactions and locking](/concepts/transactions-and-locking) and [capacity and cost](/concepts/capacity-and-cost).',
         'If the role touches money, add [payments and ledger](/problems/payment-ledger).',
-        'Run a [timed mock](/practice/mock) with the [Cost Auditor](/archetypes/cost-auditor) as your interviewer, then drill cost and failure follow-ups in the [defence drills](/drills).',
+        'Run a [timed mock](/practice/mock) with the [Cost Auditor](/archetypes#cost-auditor) as your interviewer, then drill cost and failure follow-ups in the [defence drills](/drills).',
       ],
       sources: [
         { label: 'Amazon Jobs: Interview loop', url: 'https://www.amazon.jobs/content/en/how-we-hire/interview-loop' },
@@ -107,11 +108,11 @@ export const COMPANIES: Company[] = [
         'Forgetting the write cost of fan-out on write: one post multiplied by the follower count.',
       ],
       plan: [
-        'Work the [follower timeline](/problems/social-timeline) in full, then the Meta-style [news feed](/company/meta/m-newsfeed) question.',
+        'Work the [follower timeline](/problems/social-timeline) in full, then read the Meta news feed angle in its [worked solution](/problems/social-timeline/solution).',
         'Add real-time delivery with [chat and messaging](/problems/chat-messaging) and [live score push](/problems/live-scores).',
         'Study [fan-out](/concepts/fan-out), [caching](/concepts/caching), [partitioning](/concepts/partitioning), [consistency models](/concepts/consistency-models), [distributed counters](/concepts/distributed-counter) and [real-time transports](/concepts/realtime-transports).',
         'If your round is product-focused, spend extra time on the requirements stage in [the five stages](/learn/the-five-stages) and on [API design](/concepts/api-design).',
-        'Run a [timed mock](/practice/mock) with the [Pressure Tester](/archetypes/pressure-tester) as your interviewer, then the [defence drills](/drills).',
+        'Run a [timed mock](/practice/mock) with the [Pressure Tester](/archetypes#pressure-tester) as your interviewer, then the [defence drills](/drills).',
       ],
       sources: [
         { label: 'Meta Careers: Initial technical screen', url: 'https://www.metacareers.com/swe-prep-techscreen/' },
@@ -149,7 +150,7 @@ export const COMPANIES: Company[] = [
         'Work [file sync across devices](/problems/file-sync) and [chat and messaging](/problems/chat-messaging) in full, then the Microsoft-style [collaborative document editor](/company/microsoft/ms-collab) question.',
         'Study [real-time transports](/concepts/realtime-transports), [consistency models](/concepts/consistency-models), [replication](/concepts/replication), [clocks and ordering](/concepts/clocks-and-ordering) and [idempotency](/concepts/idempotency).',
         "For background on real-time collaboration, Microsoft's open-source [Fluid Framework](https://fluidframework.com/) is a real system built for exactly this problem.",
-        'Run a [timed mock](/practice/mock) with the [Scope Shifter](/archetypes/scope-shifter) as your interviewer, so a mid-round change of requirements stops being a surprise.',
+        'Run a [timed mock](/practice/mock) with the [Scope Shifter](/archetypes#scope-shifter) as your interviewer, so a mid-round change of requirements stops being a surprise.',
       ],
       sources: [
         { label: 'Microsoft Careers: Interview tips', url: 'https://careers.microsoft.com/v2/global/en/hiring-tips/interview-tips.html' },
@@ -183,11 +184,11 @@ export const COMPANIES: Company[] = [
         'No graceful degradation: what does the viewer see when a non-essential service, like recommendations, is down?',
       ],
       plan: [
-        'Work [video upload and playback](/problems/video-platform) in full, then the Netflix-style [video streaming](/company/netflix/n-video) question.',
+        'Work [video upload and playback](/problems/video-platform) in full, then read the Netflix streaming angle in its [worked solution](/problems/video-platform/solution).',
         'Study [CDN](/concepts/cdn), [object storage](/concepts/object-storage), [message queues](/concepts/message-queues) and [circuit breakers](/concepts/circuit-breakers).',
         'Add the operations topics: [availability patterns](/concepts/availability-patterns), [multi-region](/concepts/multi-region), [observability](/concepts/observability) and [deploys and releases](/concepts/deploys-and-releases).',
         'Prepare two or three real incidents from your own work: what failed, how you found it, and what you changed.',
-        'Run a [timed mock](/practice/mock) with the [Domain Specialist](/archetypes/domain-specialist) as your interviewer, then the failure follow-ups in the [defence drills](/drills).',
+        'Run a [timed mock](/practice/mock) with the [Domain Specialist](/archetypes#domain-specialist) as your interviewer, then the failure follow-ups in the [defence drills](/drills).',
       ],
       sources: [
         { label: 'Netflix Jobs: Culture memo', url: 'https://jobs.netflix.com/culture' },
@@ -208,7 +209,7 @@ export const COMPANIES: Company[] = [
         "The design problems tend to mirror the business: matching riders and drivers, location, pricing and trip state. One useful piece of public background is [H3](https://h3geo.org/), a hexagonal grid system for indexing locations that was developed at Uber and released as open source. You do not need to know H3 for the interview, but it shows how a company that lives on location data splits the map.",
       ],
       emphasis: [
-        '**Latency budgets as hard limits.** Candidates report being given a time limit for a match or an update and being graded on everything inside it. That is the [Constraint Setter](/archetypes/constraint-setter) pattern.',
+        '**Latency budgets as hard limits.** Candidates report being given a time limit for a match or an update and being graded on everything inside it. That is the [Constraint Setter](/archetypes#constraint-setter) pattern.',
         '**Moving objects.** Drivers send frequent location updates, so the index changes all the time. See [geospatial indexing](/concepts/geospatial-indexing).',
         '**What happens when a match fails.** A driver declines, a phone drops off the network, two riders reach for the same driver. See [idempotency](/concepts/idempotency) and [transactions and locking](/concepts/transactions-and-locking).',
         '**The trip as a state machine.** Requested, matched, picked up, completed, paid. Candidates describe being asked what happens between each step, which is the lifecycle stage in [the five stages](/learn/the-five-stages).',
@@ -221,17 +222,17 @@ export const COMPANIES: Company[] = [
       ],
       plan: [
         'Work [nearby places](/problems/nearby-places) first. It teaches the location index without the moving parts.',
-        'Then [ride matching](/problems/ride-matching) in full, and the Uber-style [driver-rider matching](/company/uber/u-matching) question.',
+        'Then [ride matching](/problems/ride-matching) in full, and read the Uber matching angle in its [worked solution](/problems/ride-matching/solution).',
         'Study [geospatial indexing](/concepts/geospatial-indexing), [real-time transports](/concepts/realtime-transports), [consensus](/concepts/consensus), [idempotency](/concepts/idempotency) and [partitioning](/concepts/partitioning).',
         'Add [payments and ledger](/problems/payment-ledger), because every trip ends in a payment that must happen exactly once.',
-        'Run a [timed mock](/practice/mock) with the [Constraint Setter](/archetypes/constraint-setter) as your interviewer, then the [defence drills](/drills).',
+        'Run a [timed mock](/practice/mock) with the [Constraint Setter](/archetypes#constraint-setter) as your interviewer, then the [defence drills](/drills).',
       ],
       sources: [{ label: 'H3 geospatial index (developed at Uber)', url: 'https://h3geo.org/' }],
     },
   },
 ]
 
-export const COMPANY_QUESTIONS: CompanyQuestion[] = [
+const ALL_QUESTIONS: CompanyQuestion[] = [
   /* ---------------- Google ---------------- */
   {
     id: 'g-typeahead',
@@ -714,6 +715,27 @@ export const COMPANY_QUESTIONS: CompanyQuestion[] = [
     },
   },
 ]
+
+/**
+ * Company questions that were the same design as one of the main problems.
+ * They no longer have pages of their own: what the company is actually testing
+ * and its follow-up are shown as a section of the matching worked solution
+ * (/problems/<relatedProblem>/solution), and the old URLs redirect there.
+ */
+export const MERGED_INTO_SOLUTION = new Set(Object.keys(MERGED_COMPANY_QUESTIONS))
+
+/** Questions with their own practice page. */
+export const COMPANY_QUESTIONS: CompanyQuestion[] = ALL_QUESTIONS.filter((q) => !MERGED_INTO_SOLUTION.has(q.id))
+
+/** The company angles shown on a problem's solution page. */
+export function companyAnglesFor(problemSlug: string): CompanyQuestion[] {
+  return ALL_QUESTIONS.filter((q) => MERGED_INTO_SOLUTION.has(q.id) && q.relatedProblem === problemSlug)
+}
+
+/** Every question for a company, merged ones included (for the company hub). */
+export function allQuestionsFor(companyId: string): CompanyQuestion[] {
+  return ALL_QUESTIONS.filter((q) => q.company === companyId)
+}
 
 export function getCompany(id: string): Company | undefined {
   return COMPANIES.find((c) => c.id === id)

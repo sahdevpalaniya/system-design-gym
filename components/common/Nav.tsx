@@ -9,6 +9,7 @@ import { conceptState, dueConcepts, problemState, readCount, streakCount, usePro
 import { AccountButton } from './Account'
 import { Search } from './Search'
 import { useNavIndex } from './NavIndex'
+import { SECTION_HUB_TARGET, sectionHref } from '@/lib/redirects'
 
 /* ---------- sidebar open/close, shared with the header button ---------- */
 
@@ -334,9 +335,9 @@ function LanguageMenu({ lang }: { lang: NavIndex['languages'][number] }) {
           title={sec.name}
           done={ready ? readCount(state, sec.lessons.map((sl) => `lang:${lang.id}:${sl}`)) : 0}
           total={sec.lessons.length}
-          paths={[`/languages/${lang.id}/topics/${sec.id}`, ...sec.lessons.map((sl) => `/languages/${lang.id}/${sl}`)]}
+          paths={[sectionHref(lang.id, sec.id), ...sec.lessons.map((sl) => `/languages/${lang.id}/${sl}`)]}
         >
-          <Item href={`/languages/${lang.id}/topics/${sec.id}`}>{sec.name}: overview</Item>
+          {sec.id in SECTION_HUB_TARGET ? null : <Item href={sectionHref(lang.id, sec.id)}>{sec.name}: overview</Item>}
           {sec.lessons.map((slug) => {
             const t = lang.lessons.find((x) => x.slug === slug)
             if (!t) return null
@@ -454,7 +455,6 @@ function Sidebar() {
         <Group title="Today">
           <Item href="/">What to do today</Item>
           <Item href="/progress">Progress &amp; gap log</Item>
-          <Item href="/map">Curriculum map</Item>
         </Group>
 
         <Group
@@ -501,16 +501,6 @@ function Sidebar() {
                     </span>
                     {c.navTitle ?? c.title}
                   </Item>
-                  {/* the deep dive gets a link of its own: the "+" badge sits
-                      inside the concept's link, so it led nowhere new */}
-                  {c.deep ? (
-                    <Item href={`/concepts/${slug}/deep`}>
-                      <span className="mr-1.5" aria-hidden>
-                        {'  '}
-                      </span>
-                      {c.navTitle ?? c.title} in depth
-                    </Item>
-                  ) : null}
                 </Fragment>
               )
             })}
@@ -523,7 +513,7 @@ function Sidebar() {
           <Item href="/practice/mock">Timed mock · 45 min</Item>
           <Item href="/practice/blitz">Follow-up blitz · 10 min</Item>
           <Item href="/practice/blank">Blank page &amp; whiteboard</Item>
-          <Item href="/solutions">Worked solutions</Item>
+          <Item href="/problems">Problems &amp; worked solutions</Item>
           <Item href="/company">Company questions</Item>
           {COMPANIES.map((co) => (
             <Item key={co.id} href={`/company/${co.id}`}>
@@ -535,7 +525,6 @@ function Sidebar() {
 
         <Group title="Revision">
           <Item href="/drills">Defence drills</Item>
-          <Item href="/map">Where I am</Item>
         </Group>
 
         {GROUPS.map((g) => {
@@ -565,7 +554,7 @@ function Sidebar() {
         <Group title="Interviewers">
           <Item href="/archetypes">All interviewer types</Item>
           {ARCHETYPES.map((a) => (
-            <Item key={a.id} href={`/archetypes/${a.id}`}>
+            <Item key={a.id} href={`/archetypes#${a.id}`}>
               {a.name.replace(/^The /, '')}
             </Item>
           ))}

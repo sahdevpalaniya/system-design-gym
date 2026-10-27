@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import { REDIRECTS } from './lib/redirects'
 
 /**
  * Baseline security headers on every response. No Content-Security-Policy
@@ -27,12 +28,16 @@ const nextConfig: NextConfig = {
     return [{ source: '/:path*', headers: SECURITY_HEADERS }]
   },
   async redirects() {
-    return OLD_HOSTS.map((host) => ({
-      source: '/:path*',
-      has: [{ type: 'host' as const, value: host }],
-      destination: 'https://www.devskills.in/:path*',
-      permanent: true,
-    }))
+    return [
+      ...OLD_HOSTS.map((host) => ({
+        source: '/:path*',
+        has: [{ type: 'host' as const, value: host }],
+        destination: 'https://www.devskills.in/:path*',
+        permanent: true,
+      })),
+      // merged pages (lib/redirects.ts)
+      ...REDIRECTS,
+    ]
   },
 }
 

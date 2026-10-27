@@ -1,7 +1,6 @@
 import { LANGUAGES } from './languages'
 import { getConcept } from './system-design/concepts'
 import { getProblem } from './system-design/problems'
-import { hasDeepDive } from './system-design/deep'
 
 /**
  * Pages in different tracks that teach the same idea from different sides:
@@ -61,11 +60,6 @@ function describe(path: string): CrossLink | null {
   if (m) {
     const c = getConcept(m[1])
     return c ? { path, title: c.title, track: 'System design concept' } : null
-  }
-  m = path.match(/^\/concepts\/([^/]+)\/deep$/)
-  if (m) {
-    const c = getConcept(m[1])
-    return c && hasDeepDive(c.slug) ? { path, title: `${c.navTitle ?? c.title} in depth`, track: 'System design deep dive' } : null
   }
   m = path.match(/^\/problems\/([^/]+)\/solution$/)
   if (m) {

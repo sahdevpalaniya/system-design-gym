@@ -4,7 +4,7 @@ import { PROBLEMS, getProblem } from '@/content/system-design/problems'
 import { STAGES, getGroup } from '@/content/system-design/method'
 import { getConcept } from '@/content/system-design/concepts'
 import { CompanyQuestionLinks } from '@/components/system-design/CompanyQuestionLinks'
-import { COMPANY_QUESTIONS } from '@/content/system-design/companies'
+import { COMPANY_QUESTIONS, companyAnglesFor, getCompany } from '@/content/system-design/companies'
 import { getFollowUp } from '@/content/system-design/followups'
 import {
   AnimatedFlow,
@@ -57,6 +57,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   if (!p) notFound()
 
   const group = getGroup(p.group)
+  const angles = companyAnglesFor(p.slug)
 
   return (
     <Page>
@@ -113,7 +114,11 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             What kind of problem this is
           </div>
           <p className="mb-2 text-[0.9375rem] leading-relaxed">
-            <span className="font-semibold">{group.name}.</span> {group.shape}
+            &ldquo;{p.searchTitle ?? p.title}&rdquo; is a {p.difficulty}-level problem in the{' '}
+            <Link href={`/problems#${group.id}`} style={{ color: 'var(--accent)' }}>
+              {group.name.toLowerCase()}
+            </Link>{' '}
+            family. {group.shape}
           </p>
           <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
             {group.tell}
@@ -309,6 +314,45 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           })}
         </div>
       </section>
+
+      {angles.length ? (
+        <section className="mb-10">
+          <h2 className="mb-3 text-[1.1875rem] font-semibold tracking-[-0.01em]">How companies ask this one</h2>
+          <p className="mb-4 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
+            The same design comes up in company rounds with a different emphasis. Based on public candidate reports,
+            not inside information.
+          </p>
+          <div className="space-y-4">
+            {angles.map((q) => {
+              const co = getCompany(q.company)
+              return (
+                <Card key={q.id}>
+                  <h3 className="mb-1 text-[1rem] font-semibold">
+                    At {co?.name ?? q.company}: {q.title.replace(/^Design /, 'design ')}
+                  </h3>
+                  <p className="mb-3 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+                    {q.prompt}
+                  </p>
+                  <div className="mb-1 text-[0.7188rem] font-bold tracking-[0.05em] uppercase" style={{ color: 'var(--faint)' }}>
+                    What they are actually testing
+                  </div>
+                  <p className="prose mb-4 text-[0.9375rem]">
+                    <Rich text={q.whatTheyWant} />
+                  </p>
+                  <div className="border-t pt-3">
+                    <p className="mb-1 text-[0.9375rem] font-semibold">
+                      Their follow-up: <Rich text={q.followUp.q} />
+                    </p>
+                    <p className="prose text-[0.9062rem]">
+                      <Rich text={q.followUp.answer} />
+                    </p>
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
+        </section>
+      ) : null}
 
       <CompanyQuestionLinks
         title="Asked in the style of"

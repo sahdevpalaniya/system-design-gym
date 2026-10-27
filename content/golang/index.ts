@@ -65,7 +65,6 @@ export const GO: Language = {
         'interfaces',
         'type-switches',
         'error-values',
-        'packages',
         'json',
         'testing',
       ],
@@ -286,7 +285,7 @@ export const GO: Language = {
     },
   ],
   quizzes: [...QUIZZES, mixedTest(QUIZZES)],
-  lessons: withExercises([
+  lessons: mergeLessons(withExercises([
     ...BASICS,
     ...FUNDAMENTALS,
     ...TOOLING,
@@ -302,7 +301,7 @@ export const GO: Language = {
     ...COMPARE,
     ...EXTRAS,
     ...INTERVIEW,
-  ]),
+  ])),
 }
 
 /**
@@ -321,4 +320,33 @@ function mixedTest(sets: QuizSet[]): QuizSet {
 /** Exercises live in one file so they are easy to review together, not scattered across ten. */
 function withExercises(lessons: LangLesson[]): LangLesson[] {
   return lessons.map((l) => (l.exercises ? l : { ...l, exercises: EXERCISES[l.slug] }))
+}
+
+/**
+ * "Packages" and "Packages in code" were two halves of one topic. The basics
+ * now open the fuller lesson, and /languages/go/packages redirects to it
+ * (lib/redirects.ts). The first block of the old lesson only previewed JSON
+ * and testing, which have lessons of their own, so it is not repeated.
+ */
+function mergeLessons(lessons: LangLesson[]): LangLesson[] {
+  const from = lessons.find((l) => l.slug === 'packages')
+  if (!from) return lessons
+  return lessons
+    .filter((l) => l.slug !== 'packages')
+    .map((l) =>
+      l.slug !== 'packages-in-code'
+        ? l
+        : {
+            ...l,
+            oneLine:
+              'A folder is a package and capitalisation is your access control. Then how a real module splits into many packages, what `internal/` hides, why imports cannot go in a circle, and what the popular libraries look like in code.',
+            objectives: [...(from.objectives ?? []), ...(l.objectives ?? [])],
+            blocks: [...from.blocks.slice(1), ...l.blocks],
+            keyPoints: [...from.keyPoints, ...l.keyPoints],
+            remember: `${from.remember} ${l.remember}`,
+            exercises: [...(from.task ? [from.task] : []), ...(from.exercises ?? []), ...(l.exercises ?? [])],
+            refs: [...(from.refs ?? []), ...(l.refs ?? [])].filter((r, i, a) => a.findIndex((x) => x.href === r.href) === i),
+            challenge: l.challenge ?? from.challenge,
+          },
+    )
 }

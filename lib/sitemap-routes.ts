@@ -7,6 +7,7 @@ import { COMPANIES, COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { DEEP_DIVES } from '@/content/system-design/deep'
 import { LANGUAGES } from '@/content/languages'
 import { isNoindexPath } from '@/lib/noindex'
+import { SECTION_HUB_TARGET } from '@/lib/redirects'
 
 /**
  * Every URL the sitemap lists, grouped into the child sitemaps it is split
@@ -55,20 +56,21 @@ export function sitemapRoutes(): SitemapRoute[] {
 
   // hubs and site pages
   add('/', 'pages', 1, ['app/page.tsx', 'app/dashboard.tsx'])
-  for (const p of ['/learn', '/concepts', '/cheat-sheet', '/problems', '/solutions', '/archetypes', '/company', '/map', '/revise', '/drills', '/practice'])
+  for (const p of ['/learn', '/concepts', '/cheat-sheet', '/problems', '/archetypes', '/company', '/revise', '/drills', '/practice'])
     add(p, 'pages', 0.7, [page(p)])
   for (const p of ['/about', '/privacy', '/terms', '/contact']) add(p, 'pages', 0.3, [page(p)])
   for (const l of LESSONS) add(`/learn/${l.slug}`, 'pages', 0.8, ['content/system-design/foundations.ts'])
   for (const g of GUIDES) add(`/learn/${g.slug}`, 'pages', 0.8, ['content/system-design/guides.ts'])
-  for (const a of ARCHETYPES) add(`/archetypes/${a.id}`, 'pages', 0.5, ['content/system-design/archetypes.ts'])
   for (const t of ['check', 'daily', 'mock', 'blitz'])
     add(`/practice/${t}`, 'pages', 0.6, [page(`/practice/${t}`), `app/practice/${t}/layout.tsx`])
 
   // system design concepts, with their "view more" deep dives
+  // (the in-depth material is a section of the concept page itself)
   for (const c of CONCEPTS)
-    add(`/concepts/${c.slug}`, 'concepts', 0.8, [{ dir: 'content/system-design/concepts', key: c.slug }])
-  for (const s of Object.keys(DEEP_DIVES))
-    add(`/concepts/${s}/deep`, 'concepts', 0.6, [{ dir: 'content/system-design/deep', key: s }])
+    add(`/concepts/${c.slug}`, 'concepts', 0.8, [
+      { dir: 'content/system-design/concepts', key: c.slug },
+      ...(c.slug in DEEP_DIVES ? [{ dir: 'content/system-design/deep', key: c.slug }] : []),
+    ])
 
   // system design problems and their solutions
   for (const p of PROBLEMS) {
@@ -79,11 +81,10 @@ export function sitemapRoutes(): SitemapRoute[] {
 
   // company pages
   for (const c of COMPANIES) add(`/company/${c.id}`, 'companies', 0.6, ['content/system-design/companies.ts'])
-  for (const q of COMPANY_QUESTIONS)
+  for (const q of COMPANY_QUESTIONS) // merged questions are excluded already
     add(`/company/${q.company}/${q.id}`, 'companies', 0.6, ['content/system-design/companies.ts'])
 
   // language tracks
-  add('/languages', 'go-lessons', 0.5, [page('/languages'), 'content/languages.ts'])
   for (const l of LANGUAGES) {
     const dir = `content/${l.id === 'go' ? 'golang' : l.id}`
     const lessonSrc = (slug: string): Source => ({ dir, key: slug })
@@ -96,8 +97,9 @@ export function sitemapRoutes(): SitemapRoute[] {
     }
     for (const sec of l.sections) {
       const section: SitemapSection = GO_PROJECT_SECTIONS.has(sec.id) ? 'go-projects' : 'go-lessons'
-      // a section hub shows its lessons' objectives, so it changes when they do
-      add(`/languages/${l.id}/topics/${sec.id}`, section, 0.7, [
+      // a section hub shows its lessons' objectives, so it changes when they do;
+      // project hubs redirect to their first lesson and are not listed
+      if (!(sec.id in SECTION_HUB_TARGET)) add(`/languages/${l.id}/topics/${sec.id}`, section, 0.7, [
         'app/languages/[lang]/topics/[section]/page.tsx',
         ...sec.lessons.map(lessonSrc),
       ])

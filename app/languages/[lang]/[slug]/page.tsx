@@ -15,6 +15,7 @@ import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/commo
 import { MarkRead } from '@/components/common/MarkRead'
 import { articleJsonLd, breadcrumbJsonLd, fillDescription, lowerFirst, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
+import { sectionHref } from '@/lib/redirects'
 
 export function generateStaticParams() {
   return LANGUAGES.flatMap((l) => l.lessons.map((t) => ({ lang: l.id, slug: t.slug })))
@@ -160,7 +161,7 @@ export default async function LangLessonPage({
             breadcrumbJsonLd([
               { name: 'Home', path: '/' },
               { name: l.name, path: `/languages/${l.id}` },
-              ...(section ? [{ name: section.name, path: `/languages/${l.id}/topics/${section.id}` }] : []),
+              ...(section ? [{ name: section.name, path: sectionHref(l.id, section.id) }] : []),
               { name: t.navTitle ?? t.title, path },
             ]),
             articleJsonLd({
@@ -182,7 +183,7 @@ export default async function LangLessonPage({
             {section ? (
               <>
                 <span style={{ color: 'var(--border-strong)' }}>·</span>
-                <Link href={`/languages/${l.id}/topics/${section.id}`} className="hover:opacity-70" style={{ color: 'var(--faint)' }}>
+                <Link href={sectionHref(l.id, section.id)} className="hover:opacity-70" style={{ color: 'var(--faint)' }}>
                   {section.name}
                 </Link>
               </>

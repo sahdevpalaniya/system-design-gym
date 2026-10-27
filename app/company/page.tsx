@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { COMPANIES, COMPANY_QUESTIONS, questionsFor } from '@/content/system-design/companies'
+import { COMPANIES, MERGED_INTO_SOLUTION, allQuestionsFor } from '@/content/system-design/companies'
 import { getArchetype } from '@/content/system-design/archetypes'
 import { Badge, Card, Page, PageHeader } from '@/components/common/ui'
 
@@ -21,7 +21,7 @@ export default function CompanyIndex() {
         lede="Practice questions written in the style of each company's round. You write your answer first; **hints are available one at a time** if you get stuck, and the model answer stays folded away until you choose to open it."
         meta={
           <span className="text-[0.8125rem]" style={{ color: 'var(--muted)' }}>
-            {COMPANY_QUESTIONS.length} questions across {COMPANIES.length} companies
+            {COMPANIES.flatMap((c) => allQuestionsFor(c.id)).length} questions across {COMPANIES.length} companies
           </span>
         }
       />
@@ -39,7 +39,7 @@ export default function CompanyIndex() {
 
       <div className="grid gap-4 md:grid-cols-2">
         {COMPANIES.map((co) => {
-          const qs = questionsFor(co.id)
+          const qs = allQuestionsFor(co.id)
           const arch = getArchetype(co.archetype)
           return (
             <Card key={co.id}>
@@ -60,7 +60,7 @@ export default function CompanyIndex() {
                 {qs.map((q) => (
                   <Link
                     key={q.id}
-                    href={`/company/${co.id}/${q.id}`}
+                    href={MERGED_INTO_SOLUTION.has(q.id) ? `/problems/${q.relatedProblem}/solution` : `/company/${co.id}/${q.id}`}
                     className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5 text-[0.875rem] transition hover:opacity-70"
                   >
                     <span className="font-medium">{q.title}</span>

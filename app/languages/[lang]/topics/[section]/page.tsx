@@ -5,13 +5,14 @@ import { Card, Page, PageHeader, Rich } from '@/components/common/ui'
 import { humanMinutes, sectionMinutes } from '@/lib/estimate'
 import { breadcrumbJsonLd, itemListJsonLd, pageMeta } from '@/lib/seo'
 import { NOINDEX_GO_SECTIONS, NOINDEX_ROBOTS } from '@/lib/noindex'
+import { SECTION_HUB_TARGET, sectionHref } from '@/lib/redirects'
 
 /**
  * One indexable page per course section ("DSA in Go", "Concurrency in Go"),
  * built from the section data, so every track gets section hubs for free.
  */
 export function generateStaticParams() {
-  return LANGUAGES.flatMap((l) => l.sections.map((s) => ({ lang: l.id, section: s.id })))
+  return LANGUAGES.flatMap((l) => l.sections.filter((s) => !(s.id in SECTION_HUB_TARGET)).map((s) => ({ lang: l.id, section: s.id })))
 }
 
 function lookup(lang: string, section: string) {
@@ -207,14 +208,14 @@ export default async function SectionHub({ params }: { params: Promise<{ lang: s
 
       <nav aria-label="Other sections" className="tap-children flex flex-wrap justify-between gap-3 text-[0.875rem]">
         {prev ? (
-          <Link href={`/languages/${l.id}/topics/${prev.id}`} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
+          <Link href={sectionHref(l.id, prev.id)} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
             ← {prev.name}
           </Link>
         ) : (
           <span />
         )}
         {next ? (
-          <Link href={`/languages/${l.id}/topics/${next.id}`} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
+          <Link href={sectionHref(l.id, next.id)} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
             {next.name} →
           </Link>
         ) : null}

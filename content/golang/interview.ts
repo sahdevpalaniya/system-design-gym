@@ -281,7 +281,7 @@ export const INTERVIEW: LangLesson[] = [
         bullets: [
           '**1. What is a zero value?** Every type has a default when declared without a value: `0`, `""`, `false`, or `nil`. There is no "undefined" in Go. → [Basic data types](/languages/go/basic-data-types)',
           '**2. What is the difference between `var` and `:=`?** `:=` declares and assigns in one step and works only inside functions. `var` works anywhere and can declare without a value. → [Syntax and comments](/languages/go/syntax-and-comments)',
-          '**3. How do you make a name public in Go?** Start it with a capital letter. `User` is exported from the package; `user` is not. → [Packages](/languages/go/packages)',
+          '**3. How do you make a name public in Go?** Start it with a capital letter. `User` is exported from the package; `user` is not. → [Packages](/languages/go/packages-in-code)',
           '**4. What is `iota`?** A counter inside a `const` block that starts at 0 and goes up by one on each line. It is used for enums. → [Constants and iota](/languages/go/constants-and-iota)',
           '**5. What does `defer` do?** It runs a call when the surrounding function returns, even on panic. Arguments are evaluated when the `defer` line runs, not later. → [Defer](/languages/go/defer)',
           '**6. In what order do multiple defers run?** Last in, first out, like a stack. → [Defer](/languages/go/defer)',

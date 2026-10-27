@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { COMPANIES, getCompany, questionsFor } from '@/content/system-design/companies'
+import { COMPANIES, MERGED_INTO_SOLUTION, allQuestionsFor, getCompany, questionsFor } from '@/content/system-design/companies'
 import { getArchetype } from '@/content/system-design/archetypes'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
 import { pageMeta } from '@/lib/seo'
@@ -45,7 +45,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
   const { id } = await params
   const co = getCompany(id)
   if (!co) notFound()
-  const qs = questionsFor(co.id)
+  const qs = allQuestionsFor(co.id)
   const arch = getArchetype(co.archetype)
 
   return (
@@ -69,7 +69,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
           <div className="border-t pt-4">
             <p className="text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
               Closest interviewer archetype:{' '}
-              <Link href={`/archetypes/${arch.id}`} className="font-semibold" style={{ color: 'var(--accent)' }}>
+              <Link href={`/archetypes#${arch.id}`} className="font-semibold" style={{ color: 'var(--accent)' }}>
                 {arch.name}
               </Link>{' '}
               — {arch.tagline}
@@ -109,7 +109,10 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
       <h2 className="mb-3 text-[1.1875rem] font-semibold">Questions</h2>
       <div className="space-y-3">
         {qs.map((q) => (
-          <Link key={q.id} href={`/company/${co.id}/${q.id}`} className="card block p-5 transition hover:-translate-y-px">
+          <Link
+            key={q.id}
+            href={MERGED_INTO_SOLUTION.has(q.id) ? `/problems/${q.relatedProblem}/solution` : `/company/${co.id}/${q.id}`}
+            className="card block p-5 transition hover:-translate-y-px">
             <div className="mb-1.5 flex flex-wrap items-center gap-2">
               <h3 className="text-[1.125rem] font-semibold">{q.title}</h3>
               <Badge tone={q.difficulty === 'hard' ? 'bad' : 'accent'}>{q.difficulty}</Badge>
@@ -118,7 +121,9 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
               {q.prompt}
             </p>
             <span className="text-[0.8125rem] font-semibold" style={{ color: 'var(--accent)' }}>
-              {q.hints.length} hints available · try it →
+              {MERGED_INTO_SOLUTION.has(q.id)
+                ? `What ${co.name} tests, in the worked solution →`
+                : `${q.hints.length} hints available · try it →`}
             </span>
           </Link>
         ))}

@@ -8,7 +8,7 @@ import { CompanyQuestionLinks } from '@/components/system-design/CompanyQuestion
 import { COMPANY_QUESTIONS } from '@/content/system-design/companies'
 import { Callout } from '@/components/common/visuals'
 import { getDeepDive, getExample } from '@/content/system-design/deep'
-import { Table, WorkedExampleBlock } from '@/components/system-design/DeepDive'
+import { DeepDiveBody, Table, WorkedExampleBlock } from '@/components/system-design/DeepDive'
 import { ConceptCheck, ConceptVisualBlock } from '@/components/system-design/ConceptCheck'
 import { AnimatedFlow } from '@/components/common/visuals'
 import { Badge, Bullets, Card, Page, PageHeader, Prose, Rich, Section } from '@/components/common/ui'
@@ -202,31 +202,17 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         ) : null}
       </Section>
 
+      {/* the deep dive used to be a separate /deep page; it is part of this page now */}
       {deep ? (
-        <section className="mb-10">
-          <Link
-            href={`/concepts/${c.slug}/deep`}
-            className="card flex flex-wrap items-center justify-between gap-4 p-5 transition hover:-translate-y-px"
-            style={{ background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }}
-          >
-            <span className="min-w-0">
-              <span className="mb-1 block text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
-                Go deeper · {deep.minutes} min
-              </span>
-              <span className="block text-[1.125rem] font-semibold">
-                View more — {c.navTitle ?? c.title} in depth
-              </span>
-              <span className="mt-1 block text-[0.8438rem]" style={{ color: 'var(--muted)' }}>
-                {deep.sections.length} sections, every sub-topic covered separately, with a worked example at the end.
-              </span>
-            </span>
-            <span
-              className="shrink-0 rounded-lg px-4 py-2.5 text-[0.875rem] font-semibold"
-              style={{ background: 'var(--accent)', color: 'var(--on-accent)' }}
-            >
-              Read it →
-            </span>
-          </Link>
+        <section id="in-depth" className="mb-10 scroll-mt-20 border-t pt-8">
+          <div className="mb-1 text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
+            In depth · {deep.minutes} min
+          </div>
+          <h2 className="mb-3 text-[1.5rem] leading-tight font-bold tracking-[-0.01em]">
+            {c.navTitle ?? c.title} in depth
+          </h2>
+          <Prose paragraphs={[deep.intro.replace(/This page/g, 'This part')]} className="mb-8" />
+          <DeepDiveBody deep={deep} />
         </section>
       ) : null}
 

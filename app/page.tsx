@@ -10,6 +10,7 @@ import { Newsletter } from '@/components/common/Newsletter'
 import { LANGUAGES } from '@/content/languages'
 import { CATEGORY_INFO } from '@/content/system-design/followups'
 import { Dashboard } from './dashboard'
+import { sectionHref } from '@/lib/redirects'
 
 /** Per track, the lessons with the most search demand (from Search Console and
  *  keyword research), linked straight from the home page. Unknown slugs are skipped. */
@@ -149,7 +150,7 @@ export default function Home() {
               <ul className="grid max-w-4xl gap-x-6 gap-y-1.5 text-[0.9062rem] sm:grid-cols-2 lg:grid-cols-3">
                 {lang.sections.map((s) => (
                   <li key={s.id}>
-                    <Link href={`/languages/${lang.id}/topics/${s.id}`} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
+                    <Link href={sectionHref(lang.id, s.id)} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
                       {s.name}
                     </Link>{' '}
                     <span style={{ color: 'var(--faint)' }}>· {s.lessons.length}</span>
@@ -195,7 +196,7 @@ export default function Home() {
               system design cheat sheet
             </Link>{' '}
             puts every concept on one page, and the{' '}
-            <Link href="/solutions" className="font-medium" style={{ color: 'var(--accent)' }}>
+            <Link href="/problems" className="font-medium" style={{ color: 'var(--accent)' }}>
               worked solutions
             </Link>{' '}
             answer each interview problem end to end.

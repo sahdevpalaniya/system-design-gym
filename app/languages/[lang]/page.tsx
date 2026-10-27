@@ -4,6 +4,7 @@ import { LANGUAGES, getLanguage } from '@/content/languages'
 import { Card, Page, PageHeader } from '@/components/common/ui'
 import { humanMinutes, sectionMinutes, trackMinutes } from '@/lib/estimate'
 import { courseJsonLd, pageMeta } from '@/lib/seo'
+import { sectionHref } from '@/lib/redirects'
 
 export function generateStaticParams() {
   return LANGUAGES.map((l) => ({ lang: l.id }))
@@ -45,8 +46,8 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
       <PageHeader
         eyebrow={
           <>
-            <Link href="/languages" className="hover:opacity-70">
-              Languages
+            <Link href="/" className="hover:opacity-70">
+              Home
             </Link>
             <span style={{ color: 'var(--border-strong)' }}>·</span>
             <span style={{ color: 'var(--faint)' }}>
@@ -96,7 +97,7 @@ export default async function LanguagePage({ params }: { params: Promise<{ lang:
                   {String(si + 1).padStart(2, '0')}
                 </span>
                 <h2 className="text-[1.1875rem] font-bold tracking-[-0.01em]">
-                  <Link href={`/languages/${l.id}/topics/${s.id}`} className="hover:opacity-70">
+                  <Link href={sectionHref(l.id, s.id)} className="hover:opacity-70">
                     {s.name}
                   </Link>
                 </h2>

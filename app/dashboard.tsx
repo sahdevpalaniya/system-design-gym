@@ -283,7 +283,7 @@ export function Dashboard({
           {[
             { href: '/practice/mock', t: 'Timed mock', d: '45 minutes, all five stages, nothing revealed until the end.' },
             { href: '/practice/blitz', t: 'Follow-up blitz', d: '10 minutes of rapid-fire defence drills.' },
-            { href: '/map', t: 'Curriculum map', d: 'Everything at a glance, coloured by where you are.' },
+            { href: '/progress', t: 'Progress', d: 'What is solid, what needs review, and your gap log.' },
             { href: '/practice/blank', t: 'Blank page', d: 'Empty canvas, five-stage scaffold, no help.' },
           ].map((s) => (
             <Card key={s.href} href={s.href}>
