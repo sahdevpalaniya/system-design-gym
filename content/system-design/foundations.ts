@@ -161,6 +161,41 @@ export const LESSONS: Lesson[] = [
     ],
     remember:
       'Requirements, lifecycle, numbers, design, trade-offs. Same order, every time.',
+    example: {
+      title: 'The five stages on one problem: a URL shortener',
+      scenario:
+        'The interviewer says "design a URL shortener" and stops talking. Here is what each stage sounds like on that one question, in the order you would say it. The numbers are assumptions you state out loud, not facts about any real service.',
+      steps: [
+        {
+          step: 'Stage 1 — Requirements',
+          detail:
+            'Assume out loud: anyone can shorten a link, links never expire unless deleted, no accounts in the first version. Ask the one question that changes a box: "Do people need custom aliases?" If yes, you need a uniqueness check on user-chosen strings, which is a different write path from generated codes. Click analytics would be a separate box too, so ask whether it is in scope. A question like "what colour is the button?" changes no box, so you do not ask it.',
+        },
+        {
+          step: 'Stage 2 — Actors and lifecycle',
+          detail:
+            'Actors: the person creating a link, the many people clicking it, and the system itself, which generates codes. Lifecycle of a link: requested → code generated → stored → resolved on every click → maybe deleted. Now the failure branches. What if two creates generate the same code? What if the store write fails after the code was shown to the user? What if a link is deleted while a copy is still cached? Each of those becomes a design decision later.',
+        },
+        {
+          step: 'Stage 3 — Numbers',
+          detail:
+            'Assume 100 million new links a month: about 40 writes a second on average. Assume each link is clicked 100 times: about 4,000 reads a second, a 100:1 read-to-write ratio. Five years of links is 6 billion; at roughly 500 bytes each that is about 3 TB. Then the sentence you must not skip: "so the hard part is serving reads fast and cheaply, and generating codes that never collide. Writes are small."',
+        },
+        {
+          step: 'Stage 4 — High-level design',
+          detail:
+            'Every box points back to a stage. A write API that generates a code and stores it (Stage 1). A key-value store keyed by code, because every read is a single lookup by code (Stage 3). A cache in front of it, because reads outnumber writes 100 to 1 (Stage 3). A redirect service that looks up the code and answers with a 301 or 302. There is no analytics box, because Stage 1 left it out of scope.',
+        },
+        {
+          step: 'Stage 5 — Deep dive and trade-offs',
+          detail:
+            'Go deep on the two hard parts Stage 3 named. Code generation: a counter encoded in base 62 never collides, but the codes are guessable; random codes are not guessable, but need a collision check on every write. Say which you pick and what it costs. Redirect type: a 301 is cached by browsers, so repeat clicks never reach you, which is cheap but invisible to click counting; a 302 sends every click to you. If analytics comes back into scope, that choice flips.',
+        },
+      ],
+      outcome:
+        'Ten minutes in, every box on the whiteboard has a reason you can point to, and the deep dive is on the two parts the numbers said were hard. That is what the fixed order buys you.',
+      problemSlug: 'url-shortener',
+    },
   },
 
   {
@@ -211,6 +246,36 @@ export const LESSONS: Lesson[] = [
     ],
     remember:
       'Before drawing anything, ask how long the system has before someone notices. That answer designs half the system for you.',
+    example: {
+      title: 'Finding the slack in three messages from one app',
+      scenario:
+        'An online shop sends three kinds of message: a one-time login code, a "your order has shipped" notice, and a weekly email of recommendations. They look like one feature, "send a notification". Ask where the slack is for each, and the design splits three ways.',
+      steps: [
+        {
+          step: 'Login code: almost no slack',
+          detail:
+            'The person is on the login screen, waiting. A code that arrives after 30 seconds feels broken, and after a few minutes it has probably expired. So it is sent straight away, on its own, on the fastest channel, with a retry within seconds if the provider fails. It never waits behind other messages.',
+        },
+        {
+          step: 'Shipping notice: minutes of slack',
+          detail:
+            'Nobody is staring at their inbox for this. If it arrives two minutes after the parcel is scanned, nobody notices. So it goes on a queue: the order service records "send shipped notice" and moves on, and a worker sends it shortly after. If the email provider is down for five minutes, the worker retries and nobody can tell.',
+        },
+        {
+          step: 'Weekly recommendations: days of slack',
+          detail:
+            'Nobody is waiting for this one at all, and Monday or Tuesday makes little difference. So it is a batch job: compute the recommendations overnight, then send in bulk at a rate the email provider accepts. Being hours late costs nothing; sending everything in one burst could get the sender rate-limited.',
+        },
+        {
+          step: 'Keep the slow ones away from the fast one',
+          detail:
+            'Because the slack differs, the three must not share one queue. A million weekly emails in the same queue as login codes would put a code behind the whole batch. So the design has a priority path for codes, a normal queue for order notices, and a scheduled batch for the digest.',
+        },
+      ],
+      outcome:
+        'One question, asked three times, gave three designs: send now, queue and retry, batch overnight. The size of the system did not change between them. The slack did.',
+      problemSlug: 'notification-system',
+    },
   },
 
   {

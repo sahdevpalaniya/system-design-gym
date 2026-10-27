@@ -435,6 +435,8 @@ export interface Lesson {
   keyPoints: string[]
   /** the one thing to remember */
   remember: string
+  /** the lesson's idea applied to one concrete problem, step by step */
+  example?: WorkedExample
 }
 
 /** a standalone interview guide under /learn, outside the numbered lessons */

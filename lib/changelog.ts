@@ -16,6 +16,7 @@ export const CHANGELOG: ChangelogEntry[] = [
       'Merged thin pages into fuller ones: each concept’s in-depth material is now a section of the concept page, the six interviewer types are one [interviewer guide](/archetypes), and company questions that repeated a main problem now appear as “How companies ask this one” on that problem’s worked solution. Old addresses redirect.',
       'Rewrote the titles of 61 Go lessons and 29 concept pages so each says what that page covers.',
       'Practice tools, quizzes and revision roll-ups stay available but are no longer listed for search engines.',
+      'Worked examples added to [The five stages](/learn/the-five-stages) and [Where’s the slack?](/learn/where-is-the-slack); fuller model answers for the Amazon flash sale and Microsoft collaborative editor questions; runnable examples, pitfalls and complexity tables added to the Go lessons on constants and iota, valid parentheses, cycle detection, sliding windows and the final interview checklist; the concepts index now shows what each concept costs and the order to read them in.',
       'Added this changelog, an editorial and AI-use policy on the [about page](/about), and a “Last reviewed” date at the top of lessons.',
     ],
   },

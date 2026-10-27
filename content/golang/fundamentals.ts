@@ -549,6 +549,104 @@ func main() {
           note: '`iota` starts at 0 in each `const` block and goes up by one per line. A line with no `=` repeats the previous expression with the next `iota`. Go has no `enum` keyword; this is how you number a set of choices. In **Methods and embedding** you will give them a type and make them print as words.',
         },
       },
+      {"heading": "A real enum: its own type, a String method, and a safe zero value", "body": ["Plain `iota` constants are untyped integers, so any `int` can be passed where you meant a state. Giving them a named type (`type State int`) lets the compiler reject a stray number, and a `String()` method makes `fmt` print the name instead of the number.", "Start the block with an `Unknown` (or `Invalid`) value. Every Go variable starts at its zero value, so a `State` that was never set is `0`. If `0` were `Pending`, a forgotten assignment would look like a real state and nobody would notice.", "`1 << iota` gives each constant its own bit, which is the Go way to write a set of flags: combine them with `|`, test with `&`, and clear one with `&^` (AND NOT, an operator many languages do not have)."]},
+      { code: { label: 'enum.go', src: `package main
+
+import "fmt"
+
+// State gets its own type, so a plain int cannot be passed by mistake.
+type State int
+
+const (
+	Unknown   State = iota // 0, the zero value: "not set yet"
+	Pending                // 1
+	Active                 // 2
+	Suspended              // 3
+)
+
+// String makes fmt print the name instead of the number.
+func (s State) String() string {
+	switch s {
+	case Unknown:
+		return "unknown"
+	case Pending:
+		return "pending"
+	case Active:
+		return "active"
+	case Suspended:
+		return "suspended"
+	}
+	return fmt.Sprintf("State(%d)", int(s))
+}
+
+// Perm is a set of bit flags: each constant is its own bit.
+type Perm uint8
+
+const (
+	Read   Perm = 1 << iota // 1
+	Write                   // 2
+	Delete                  // 4
+)
+
+func main() {
+	var s State // never assigned
+	fmt.Println(s, Active, State(9))
+
+	p := Read | Write
+	fmt.Println(p&Write != 0, p&Delete != 0) // true false
+	p &^= Write                              // clear the Write bit
+	fmt.Println(p == Read)                   // true
+}
+`, run: `package main
+
+import "fmt"
+
+// State gets its own type, so a plain int cannot be passed by mistake.
+type State int
+
+const (
+	Unknown   State = iota // 0, the zero value: "not set yet"
+	Pending                // 1
+	Active                 // 2
+	Suspended              // 3
+)
+
+// String makes fmt print the name instead of the number.
+func (s State) String() string {
+	switch s {
+	case Unknown:
+		return "unknown"
+	case Pending:
+		return "pending"
+	case Active:
+		return "active"
+	case Suspended:
+		return "suspended"
+	}
+	return fmt.Sprintf("State(%d)", int(s))
+}
+
+// Perm is a set of bit flags: each constant is its own bit.
+type Perm uint8
+
+const (
+	Read   Perm = 1 << iota // 1
+	Write                   // 2
+	Delete                  // 4
+)
+
+func main() {
+	var s State // never assigned
+	fmt.Println(s, Active, State(9))
+
+	p := Read | Write
+	fmt.Println(p&Write != 0, p&Delete != 0) // true false
+	p &^= Write                              // clear the Write bit
+	fmt.Println(p == Read)                   // true
+}
+` } },
+      {"heading": "Pitfalls", "bullets": ["**Inserting a line renumbers everything after it.** If the numbers are stored in a database or sent over the wire, adding `Archived` in the middle silently changes what `3` means. Append new values at the end, or write the numbers out explicitly once they are persisted.", "**`iota` resets to 0 in every `const` block** and counts lines, not names: a blank `_` line still uses up a number.", "**A typed constant does not adapt.** `const Limit int32 = 100` cannot be assigned to an `int64` without a conversion; an untyped `const Limit = 100` can.", "**Untyped constants are exact until used.** `const big = 1 << 62` is fine; `var x int32 = big` does not compile, because the value does not fit. The check happens at compile time, not as a runtime overflow.", "**Only basic values can be constants:** numbers, strings, booleans and runes. A slice, map or struct has to be a `var`."]},
+      {"heading": "Cost and the Go angle", "body": ["Constants cost nothing at run time: the compiler substitutes the value wherever it is used, and a `switch` over a small typed enum compiles to a few comparisons. The price of the Go approach is that nothing stops `State(9)` from existing, which is why the `String` method above has a fallback, and why code that receives a state from outside should validate it.", "For a larger set, `go generate` with the `stringer` tool writes the `String` method for you; it is in the `golang.org/x/tools` module."]},
     ],
     keyPoints: [
       'A constant is fixed at compile time. The compiler enforces it; it is not a promise.',

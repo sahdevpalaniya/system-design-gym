@@ -1093,6 +1093,104 @@ export const DSA: LangLesson[] = [
           '**A `switch` with several values per `case`** reads better than a chain of `if r == ... || r == ...`.',
         ],
       },
+      {"heading": "A version you can extend, and when you do not need a stack", "body": ["Keeping the pairs in a `map[rune]rune` from closer to opener means adding `<>` is a one-line change, and the check reads as \"the top must be my opener\". The `make([]rune, 0, 16)` gives the stack room for 16 openers before `append` has to grow it.", "With only **one** kind of bracket, a stack is overkill: a counter that goes up on `(` and down on `)` does the job in O(1) space, as long as it is never allowed below zero (`\")(\"` has a count of zero but is invalid). The moment there are two kinds, the counter breaks on `\"([)]\"`, and you need the stack."]},
+      { code: { label: 'parens_map.go', src: `package main
+
+import "fmt"
+
+// pairs maps each closer to the opener it must match.
+var pairs = map[rune]rune{')': '(', ']': '[', '}': '{'}
+
+func isValid(s string) bool {
+	stack := make([]rune, 0, 16)
+	for _, r := range s {
+		switch r {
+		case '(', '[', '{':
+			stack = append(stack, r)
+		case ')', ']', '}':
+			if len(stack) == 0 || stack[len(stack)-1] != pairs[r] {
+				return false
+			}
+			stack = stack[:len(stack)-1]
+		}
+	}
+	return len(stack) == 0
+}
+
+// balanced handles ONE kind of bracket, where a counter is enough:
+// O(n) time, O(1) space. It must never go below zero.
+func balanced(s string) bool {
+	depth := 0
+	for _, r := range s {
+		switch r {
+		case '(':
+			depth++
+		case ')':
+			depth--
+			if depth < 0 {
+				return false
+			}
+		}
+	}
+	return depth == 0
+}
+
+func main() {
+	for _, s := range []string{"{[]()}", "([)]", "f(a[0], {k: v})", "(", ""} {
+		fmt.Printf("%-18q %v\\n", s, isValid(s))
+	}
+	fmt.Println(balanced("(())()"), balanced(")("))
+}
+`, run: `package main
+
+import "fmt"
+
+// pairs maps each closer to the opener it must match.
+var pairs = map[rune]rune{')': '(', ']': '[', '}': '{'}
+
+func isValid(s string) bool {
+	stack := make([]rune, 0, 16)
+	for _, r := range s {
+		switch r {
+		case '(', '[', '{':
+			stack = append(stack, r)
+		case ')', ']', '}':
+			if len(stack) == 0 || stack[len(stack)-1] != pairs[r] {
+				return false
+			}
+			stack = stack[:len(stack)-1]
+		}
+	}
+	return len(stack) == 0
+}
+
+// balanced handles ONE kind of bracket, where a counter is enough:
+// O(n) time, O(1) space. It must never go below zero.
+func balanced(s string) bool {
+	depth := 0
+	for _, r := range s {
+		switch r {
+		case '(':
+			depth++
+		case ')':
+			depth--
+			if depth < 0 {
+				return false
+			}
+		}
+	}
+	return depth == 0
+}
+
+func main() {
+	for _, s := range []string{"{[]()}", "([)]", "f(a[0], {k: v})", "(", ""} {
+		fmt.Printf("%-18q %v\\n", s, isValid(s))
+	}
+	fmt.Println(balanced("(())()"), balanced(")("))
+}
+` } },
+      {"heading": "Complexity", "table": {"headers": ["Approach", "Time", "Extra space"], "rows": [["Repeated `strings.ReplaceAll`", "O(n²)", "O(n)"], ["Slice as a stack", "O(n)", "O(n) in the worst case, all openers"], ["Counter (one bracket kind only)", "O(n)", "O(1)"]]}},
+      {"heading": "Follow-ups interviewers ask", "bullets": ["**\"Can you exit early?\"** If the input is only brackets, an odd length can never be valid. Do not apply that shortcut when other characters are allowed, as in this version.", "**\"What if the input is huge?\"** The stack is the only memory; read the input with a `bufio.Reader` and feed runes through the same loop, so you never hold the whole string.", "**\"Return the position of the first error.\"** Range gives you the byte offset `i`; return it instead of `false`, and for leftover openers keep their offsets on the stack too."]},
     ],
     keyPoints: [
       'Slice as stack: `append` to push, `s[:len(s)-1]` to pop, `s[len(s)-1]` to peek.',
@@ -1270,6 +1368,100 @@ export const DSA: LangLesson[] = [
           '**Pointers are valid map keys,** so `map[*Node]bool` works for the simple version.',
         ],
       },
+      {"heading": "Why they must meet, and how long the loop is", "body": ["Once both pointers are inside the loop, `fast` closes the gap on `slow` by exactly one node per step. A gap that shrinks by one each step cannot jump over zero, so they meet, and they meet before `slow` finishes one lap. That is where the O(n) bound comes from.", "Once they have met you can measure the loop: keep one pointer still and walk the other round until it comes back, counting steps. Returning the meeting node rather than a `bool` makes both of these follow-ups easy."]},
+      { code: { label: 'cycle_length.go', src: `package main
+
+import "fmt"
+
+type Node struct {
+	Val  int
+	Next *Node
+}
+
+// meet returns where slow and fast meet, or nil if there is no cycle.
+func meet(head *Node) *Node {
+	slow, fast := head, head
+	for fast != nil && fast.Next != nil {
+		slow, fast = slow.Next, fast.Next.Next
+		if slow == fast {
+			return slow
+		}
+	}
+	return nil
+}
+
+// cycleLength walks once round the loop from the meeting point.
+func cycleLength(m *Node) int {
+	n := 1
+	for p := m.Next; p != m; p = p.Next {
+		n++
+	}
+	return n
+}
+
+func main() {
+	// 1 → 2 → 3 → 4 → 5 → 6, and 6 points back to 3
+	nodes := make([]*Node, 6)
+	for i := range nodes {
+		nodes[i] = &Node{Val: i + 1}
+	}
+	for i := 0; i < 5; i++ {
+		nodes[i].Next = nodes[i+1]
+	}
+	nodes[5].Next = nodes[2]
+
+	m := meet(nodes[0])
+	fmt.Println("cycle:", m != nil, "meet at:", m.Val, "length:", cycleLength(m))
+	fmt.Println("no cycle:", meet(&Node{Val: 1, Next: &Node{Val: 2}}) == nil)
+}
+`, run: `package main
+
+import "fmt"
+
+type Node struct {
+	Val  int
+	Next *Node
+}
+
+// meet returns where slow and fast meet, or nil if there is no cycle.
+func meet(head *Node) *Node {
+	slow, fast := head, head
+	for fast != nil && fast.Next != nil {
+		slow, fast = slow.Next, fast.Next.Next
+		if slow == fast {
+			return slow
+		}
+	}
+	return nil
+}
+
+// cycleLength walks once round the loop from the meeting point.
+func cycleLength(m *Node) int {
+	n := 1
+	for p := m.Next; p != m; p = p.Next {
+		n++
+	}
+	return n
+}
+
+func main() {
+	// 1 → 2 → 3 → 4 → 5 → 6, and 6 points back to 3
+	nodes := make([]*Node, 6)
+	for i := range nodes {
+		nodes[i] = &Node{Val: i + 1}
+	}
+	for i := 0; i < 5; i++ {
+		nodes[i].Next = nodes[i+1]
+	}
+	nodes[5].Next = nodes[2]
+
+	m := meet(nodes[0])
+	fmt.Println("cycle:", m != nil, "meet at:", m.Val, "length:", cycleLength(m))
+	fmt.Println("no cycle:", meet(&Node{Val: 1, Next: &Node{Val: 2}}) == nil)
+}
+` } },
+      {"heading": "Complexity", "table": {"headers": ["Approach", "Time", "Extra space"], "rows": [["`map[*Node]bool` of visited nodes", "O(n)", "O(n), one map entry per node"], ["Floyd's slow and fast pointers", "O(n)", "O(1)"], ["Cycle length, after they meet", "O(loop length)", "O(1)"]]}},
+      {"heading": "Pitfalls", "bullets": ["**Starting `fast` one node ahead** (`fast := head.Next`) also works, but changes where they meet; mixing the two styles is how off-by-one bugs get in.", "**Checking `slow == fast` before the first move** returns true immediately, because both start at `head`.", "**The map version allocates.** In Go a map grows as you insert, so the \"simple\" version also costs allocations and GC work on a long list. The hidden tests on this page check that your solution allocates nothing."]},
     ],
     keyPoints: [
       'Map of visited nodes first, then two pointers for O(1) space.',
@@ -1665,6 +1857,110 @@ func main() {
           'For ASCII-only input, a `[128]int` array is faster than a map. Say it as an optimisation, after it works.',
         ],
       },
+      {"heading": "The array fast path, and the same window with a different rule", "body": ["When the input is bytes (or you know it is ASCII), a `[256]int` replaces the map: no hashing and no allocation. Storing `i + 1` instead of `i` lets the zero value mean \"never seen\", so you do not need a comma-ok lookup. It counts bytes, so it gives the wrong answer for text like `\"héé\"`; that is the trade you are making, and worth saying out loud.", "The window itself is a template. Only the rule for \"the window is invalid\" changes. Here it is \"more than `k` zeros\", which solves the longest run of 1s if you may flip at most `k` zeros."]},
+      { code: { label: 'window_variants.go', src: `package main
+
+import "fmt"
+
+// longestBytes is the array version: last[c] holds the index after the
+// last sighting of byte c, so 0 can mean "never seen". It counts bytes,
+// which equals characters only for ASCII input.
+func longestBytes(s string) int {
+	var last [256]int
+	best, start := 0, 0
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if last[c] > start {
+			start = last[c]
+		}
+		last[c] = i + 1
+		if i-start+1 > best {
+			best = i - start + 1
+		}
+	}
+	return best
+}
+
+// longestOnes is the same window with a different rule: the longest run of
+// 1s if you may flip at most k zeros. Grow on the right; when the window
+// holds more than k zeros, shrink from the left.
+func longestOnes(nums []int, k int) int {
+	best, start, zeros := 0, 0, 0
+	for i, v := range nums {
+		if v == 0 {
+			zeros++
+		}
+		for zeros > k {
+			if nums[start] == 0 {
+				zeros--
+			}
+			start++
+		}
+		if i-start+1 > best {
+			best = i - start + 1
+		}
+	}
+	return best
+}
+
+func main() {
+	fmt.Println(longestBytes("abcabcbb"), longestBytes("pwwkew"), longestBytes(""))
+	fmt.Println(longestOnes([]int{1, 1, 0, 0, 1, 1, 1, 0, 1}, 1))
+	fmt.Println(longestBytes("héé")) // 3, not 2: it counts bytes, and "é" is two bytes
+}
+`, run: `package main
+
+import "fmt"
+
+// longestBytes is the array version: last[c] holds the index after the
+// last sighting of byte c, so 0 can mean "never seen". It counts bytes,
+// which equals characters only for ASCII input.
+func longestBytes(s string) int {
+	var last [256]int
+	best, start := 0, 0
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		if last[c] > start {
+			start = last[c]
+		}
+		last[c] = i + 1
+		if i-start+1 > best {
+			best = i - start + 1
+		}
+	}
+	return best
+}
+
+// longestOnes is the same window with a different rule: the longest run of
+// 1s if you may flip at most k zeros. Grow on the right; when the window
+// holds more than k zeros, shrink from the left.
+func longestOnes(nums []int, k int) int {
+	best, start, zeros := 0, 0, 0
+	for i, v := range nums {
+		if v == 0 {
+			zeros++
+		}
+		for zeros > k {
+			if nums[start] == 0 {
+				zeros--
+			}
+			start++
+		}
+		if i-start+1 > best {
+			best = i - start + 1
+		}
+	}
+	return best
+}
+
+func main() {
+	fmt.Println(longestBytes("abcabcbb"), longestBytes("pwwkew"), longestBytes(""))
+	fmt.Println(longestOnes([]int{1, 1, 0, 0, 1, 1, 1, 0, 1}, 1))
+	fmt.Println(longestBytes("héé")) // 3, not 2: it counts bytes, and "é" is two bytes
+}
+` } },
+      {"heading": "Complexity", "table": {"headers": ["Approach", "Time", "Extra space"], "rows": [["Every start, extend to the right", "O(n²)", "O(k)"], ["Window with `map[rune]int`, over `[]rune(s)`", "O(n)", "O(n) for the rune slice, O(k) for the map"], ["Window with `[256]int`, over bytes", "O(n)", "O(1), a fixed 2 KB array"]]}},
+      {"heading": "Pitfalls", "bullets": ["**`[]rune(s)` copies the string** into a new slice of 4-byte runes. That is O(n) extra memory; fine in an interview, worth mentioning if they ask about very long input.", "**Shrink with `for`, not `if`,** when one step can make the window invalid by more than one unit, as in the `k` zeros version.", "**Update `best` after fixing the window,** not before, or you record the length of an invalid window."]},
     ],
     keyPoints: [
       'Two edges; the right one always moves, the left one only jumps forward.',

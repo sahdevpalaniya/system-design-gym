@@ -211,7 +211,7 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
           <h2 className="mb-3 text-[1.5rem] leading-tight font-bold tracking-[-0.01em]">
             {c.navTitle ?? c.title} in depth
           </h2>
-          <Prose paragraphs={[deep.intro.replace(/This page/g, 'This part')]} className="mb-8" />
+          <Prose paragraphs={[deep.intro.replace(/\bThis page\b/g, 'This part')]} className="mb-8" />
           <DeepDiveBody deep={deep} />
         </section>
       ) : null}

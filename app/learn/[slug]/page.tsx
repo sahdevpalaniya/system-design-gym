@@ -11,6 +11,7 @@ import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/commo
 import { MarkRead } from '@/components/common/MarkRead'
 import { articleJsonLd, breadcrumbJsonLd, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
+import { WorkedExampleBlock } from '@/components/system-design/DeepDive'
 
 export function generateStaticParams() {
   return [...LESSONS, ...GUIDES].map((l) => ({ slug: l.slug }))
@@ -108,6 +109,12 @@ export default async function LessonPage({ params }: { params: Promise<{ slug: s
         </span>
         <Rich text={l.remember} />
       </div>
+
+      {l.example ? (
+        <div className="mb-10">
+          <WorkedExampleBlock example={l.example} />
+        </div>
+      ) : null}
 
       <div className="mb-8">
         <MarkRead id={`lesson:${slug}`} label="this lesson" />

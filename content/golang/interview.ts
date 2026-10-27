@@ -1076,6 +1076,118 @@ if err := g.Wait(); err != nil {     // first error cancels the rest
           text: 'Do not learn anything new the night before. Revising what you already half-know converts far more of it into answers than a new topic does, and it stops you second-guessing yourself mid-sentence.',
         },
       },
+      {"heading": "Six lines to predict before you run them", "body": ["Most \"what does this print?\" questions in Go interviews come from the same handful of mechanics. Predict every line of output below, then run it. Each one maps to a row of the revision list above."]},
+      { code: { label: 'predict.go', src: `package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+type notFound struct{}
+
+func (*notFound) Error() string { return "not found" }
+
+// find returns a typed nil pointer when nothing went wrong: a classic bug.
+func find(fail bool) error {
+	var e *notFound
+	if fail {
+		e = &notFound{}
+	}
+	return e
+}
+
+func main() {
+	// 1. b shares a's backing array, so append writes into a
+	a := []int{1, 2, 3, 4}
+	b := a[:2]
+	b = append(b, 99)
+	fmt.Println(a, b)
+
+	// 2. an interface holding a nil *notFound is not nil
+	fmt.Println(find(false) == nil)
+
+	// 3. defer evaluates its arguments when the defer line runs
+	x := 1
+	defer fmt.Println("deferred x =", x)
+	x = 2
+
+	// 4. since Go 1.22 each iteration has its own i
+	var fs []func() int
+	for i := 0; i < 3; i++ {
+		fs = append(fs, func() int { return i })
+	}
+	fmt.Println(fs[0](), fs[1](), fs[2]())
+
+	// 5. writing to a nil map panics
+	func() {
+		defer func() { fmt.Println("recovered:", recover()) }()
+		var m map[string]int
+		m["a"] = 1
+	}()
+
+	// 6. errors.Is sees through %w wrapping
+	base := errors.New("no rows")
+	err := fmt.Errorf("load user 7: %w", base)
+	fmt.Println(errors.Is(err, base))
+}
+`, run: `package main
+
+import (
+	"errors"
+	"fmt"
+)
+
+type notFound struct{}
+
+func (*notFound) Error() string { return "not found" }
+
+// find returns a typed nil pointer when nothing went wrong: a classic bug.
+func find(fail bool) error {
+	var e *notFound
+	if fail {
+		e = &notFound{}
+	}
+	return e
+}
+
+func main() {
+	// 1. b shares a's backing array, so append writes into a
+	a := []int{1, 2, 3, 4}
+	b := a[:2]
+	b = append(b, 99)
+	fmt.Println(a, b)
+
+	// 2. an interface holding a nil *notFound is not nil
+	fmt.Println(find(false) == nil)
+
+	// 3. defer evaluates its arguments when the defer line runs
+	x := 1
+	defer fmt.Println("deferred x =", x)
+	x = 2
+
+	// 4. since Go 1.22 each iteration has its own i
+	var fs []func() int
+	for i := 0; i < 3; i++ {
+		fs = append(fs, func() int { return i })
+	}
+	fmt.Println(fs[0](), fs[1](), fs[2]())
+
+	// 5. writing to a nil map panics
+	func() {
+		defer func() { fmt.Println("recovered:", recover()) }()
+		var m map[string]int
+		m["a"] = 1
+	}()
+
+	// 6. errors.Is sees through %w wrapping
+	base := errors.New("no rows")
+	err := fmt.Errorf("load user 7: %w", base)
+	fmt.Println(errors.Is(err, base))
+}
+` } },
+      {"heading": "What each one tests", "bullets": ["**Slices share arrays.** `b` has spare capacity in `a`, so `append` writes into `a[2]`. Say \"length, capacity, shared backing array\" in that order.", "**Typed nil.** `find(false)` returns an interface holding a nil `*notFound`; the interface itself is not nil. Return a literal `nil` on success.", "**`defer` arguments are evaluated immediately,** so it prints 1, and it prints last, after `main` returns.", "**Loop variables are per-iteration since Go 1.22.** On Go 1.21 and earlier the same code prints `3 3 3`; knowing that it changed, and when, is worth saying.", "**A nil map reads fine but panics on write.** `make` it first.", "**`%w` keeps the chain,** so `errors.Is` finds the original; `%v` would flatten it into text."]},
+      {"heading": "Complexity of the operations you will use most", "table": {"headers": ["Operation", "Cost", "Note"], "rows": [["`append` to a slice", "O(1) amortised", "occasional O(n) copy when capacity runs out; preallocate with `make` when you know the size"], ["map read, write, delete", "O(1) average", "iteration order is random on purpose"], ["`s += t` in a loop", "O(n²) total", "use `strings.Builder`"], ["`sort.Slice` / `slices.Sort`", "O(n log n)", "not stable; use `slices.SortStableFunc` when order of equals matters"], ["`copy(dst, src)`", "O(n)", "copies `min(len(dst), len(src))` elements"], ["`[]rune(s)`", "O(n)", "allocates 4 bytes per character"]]}},
       {
         heading: 'How to answer anything you do not know',
         bullets: [
