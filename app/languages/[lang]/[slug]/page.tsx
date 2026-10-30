@@ -159,7 +159,7 @@ export default async function LangLessonPage({
             ]),
             articleJsonLd({
               // don't add "(Golang)" to a title that already names Go
-              headline: /(go|golang)/i.test(t.title) ? t.title : `${t.title} (${l.alias ?? l.name})`,
+              headline: /\b(go|golang)\b/i.test(t.title) ? t.title : `${t.title} (${l.alias ?? l.name})`,
               description: t.oneLine,
               path,
               ...pageDates(path),
