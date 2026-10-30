@@ -15,7 +15,7 @@ export function reviewedOn(path: string): string {
   });
 }
 
-/** Author and "Last reviewed" date under a content page's heading, so both
+/** Author and "Last updated" date under a content page's heading, so both
  *  are visible without scrolling to the footer byline. */
 export function ReviewedLine({ path }: { path: string }) {
   return (
@@ -24,7 +24,7 @@ export function ReviewedLine({ path }: { path: string }) {
       <Link href="/about" className="font-medium hover:opacity-70" style={{ color: "var(--muted)" }}>
         {AUTHOR.name}
       </Link>
-      {" · "}Last reviewed <time dateTime={pageDates(path).modified}>{reviewedOn(path)}</time>
+      {" · "}Last updated <time dateTime={pageDates(path).modified}>{reviewedOn(path)}</time>
     </p>
   );
 }
@@ -51,7 +51,7 @@ export function Byline({ title, path }: { title: string; path: string }) {
             {AUTHOR.name}
           </Link>
         </span>
-        <span>Last reviewed {reviewed}</span>
+        <span>Last updated {reviewed}</span>
         <a
           href={reportHref(CONTACT_EMAIL, title, `${SITE_URL}${path}`)}
           className="inline-block py-2 font-medium hover:opacity-70 sm:py-0"

@@ -36,18 +36,9 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   const project = section?.id.startsWith('project-') ? section.name.replace(/^Project \d+ — /, '') : null
   const alias = l.alias ?? l.name
   const line = /[.!?]$/.test(t.oneLine) ? t.oneLine : `${t.oneLine}.`
-  const standard = `${line} A ${alias} tutorial with runnable code, key points and practice exercises.`
   // a short one-liner leaves the snippet half empty; the lesson's own
-  // objectives say what it teaches, so they fill it before anything generic
-  const description =
-    standard.length >= 120
-      ? standard
-      : fillDescription([
-          line,
-          ...(t.objectives ?? []).map((o) => `You will ${lowerFirst(o)}`),
-          `A ${alias} tutorial with runnable code and exercises.`,
-          'With runnable code and exercises.',
-        ])
+  // objectives say what it teaches, so they extend it (no shared boilerplate)
+  const description = fillDescription([line, ...(t.objectives ?? []).map((o) => `You will ${lowerFirst(o)}`)])
   return pageMeta(
     // written per lesson (content/golang/titles.ts); project steps are named
     // by their project, since every project has a "Step 1"
@@ -167,7 +158,8 @@ export default async function LangLessonPage({
               { name: t.navTitle ?? t.title, path },
             ]),
             articleJsonLd({
-              headline: `${t.title} (${l.alias ?? l.name})`,
+              // don't add "(Golang)" to a title that already names Go
+              headline: /(go|golang)/i.test(t.title) ? t.title : `${t.title} (${l.alias ?? l.name})`,
               description: t.oneLine,
               path,
               ...pageDates(path),
