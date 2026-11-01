@@ -563,7 +563,7 @@ Notes with accounts and file attachments. Go 1.25, Postgres, no framework.
 POST {{host}}/auth/register
 Content-Type: application/json
 
-{"name":"Sahdev","email":"s@example.com","password":"password123"}
+{"name":"Asha","email":"s@example.com","password":"password123"}
 
 ### login
 # @name login

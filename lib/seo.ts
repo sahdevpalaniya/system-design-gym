@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { trackList } from '@/content/tracks'
-import { AUTHOR } from '@/lib/author'
 
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.devskills.in'
@@ -128,7 +127,7 @@ export function articleJsonLd(a: {
     articleSection: a.section,
     inLanguage: 'en',
     isAccessibleForFree: true,
-    author: { '@type': 'Person', name: AUTHOR.name, jobTitle: AUTHOR.role, url: `${SITE_URL}/about`, sameAs: AUTHOR.links.map((l) => l.href) },
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL, logo: { '@type': 'ImageObject', url: LOGO_URL, width: 512, height: 512 } },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}${a.path}` },
   }
@@ -145,7 +144,6 @@ export const SITE_JSONLD = [
     alternateName: 'devskills.in',
     url: SITE_URL,
     logo: LOGO_URL,
-    founder: { '@type': 'Person', name: AUTHOR.name, sameAs: AUTHOR.links.map((l) => l.href) },
   },
   {
     '@context': 'https://schema.org',

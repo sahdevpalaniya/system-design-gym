@@ -11,5 +11,5 @@ Allow: /
 # Bulk collection into a training corpus, with no link back: not fine.
 Disallow-AI-Training: /
 
-Contact: sahdevsinhpalaniya98@gmail.com
+Contact: devskills98@gmail.com
 Sitemap: https://www.devskills.in/sitemap.xml

@@ -185,7 +185,7 @@ func main() {
         heading: 'The three printing functions',
         code: {
           label: 'output.go',
-          src: `name, age := "Sahdev", 25
+          src: `name, age := "Asha", 25
 
 fmt.Print("no newline, no spaces between strings")
 fmt.Println("adds spaces and a newline:", name, age)
@@ -204,8 +204,8 @@ fmt.Println(s)`,
             ['`%v`', 'the value in its default form — your default choice', '`25`'],
             ['`%T`', 'the type of the value', '`int`'],
             ['`%d`', 'an integer', '`25`'],
-            ['`%s`', 'a string', '`Sahdev`'],
-            ['`%q`', 'a quoted string — shows whitespace clearly', '`"Sahdev"`'],
+            ['`%s`', 'a string', '`Asha`'],
+            ['`%q`', 'a quoted string — shows whitespace clearly', '`"Asha"`'],
             ['`%f` / `%.2f`', 'a float / to two decimal places', '`3.140000` / `3.14`'],
             ['`%t`', 'a bool', '`true`'],
             ['`%x`', 'hexadecimal', '`1f`'],
@@ -256,7 +256,7 @@ fmt.Println(s)`,
 import "fmt"
 
 func main() {
-	name, age, height, student := "sahdev", 25, 1.72, true
+	name, age, height, student := "asha", 25, 1.72, true
 
 	fmt.Printf("%v %v %v %v\\n", name, age, height, student) // %v works for anything
 	fmt.Printf("%T %T %T %T\\n", name, age, height, student) // the types

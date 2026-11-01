@@ -60,7 +60,7 @@ export default function Home() {
           what each one costs. That is what this site drills.
         </p>
         <p className="mt-4 text-[0.875rem]" style={{ color: 'var(--faint)' }}>
-          Written and maintained by{' '}
+          Written and maintained by the{' '}
           <Link href="/about" className="font-medium hover:opacity-70" style={{ color: 'var(--muted)' }}>
             {AUTHOR.name}
           </Link>

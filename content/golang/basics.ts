@@ -105,7 +105,7 @@ import "fmt"
 func main() {
 \tfmt.Println("hello")
 
-\tname := "sahdev"    // short declaration, the type is inferred
+\tname := "asha"      // short declaration, the type is inferred
 \tvar age int = 25    // the long form, type written out
 \tvar city string     // no value given, so it gets the zero value: ""
 \tconst pi = 3.14     // fixed at compile time, cannot change
@@ -118,7 +118,7 @@ func main() {
       {
         heading: 'Three ways to declare, one you will mostly use',
         bullets: [
-          '`name := "sahdev"` — inside a function, the common case. Go works out the type.',
+          '`name := "asha"` — inside a function, the common case. Go works out the type.',
           '`var age int = 25` — when you want the type written down, or you are outside a function.',
           '`var city string` — declare now, assign later. It holds the **zero value** until you do.',
           '`const pi = 3.14` — a value fixed at compile time. It cannot be changed and has no address.',
@@ -165,7 +165,7 @@ func main() {
 import "fmt"
 
 func main() {
-	name := "sahdev"    // short declaration, the type is inferred
+	name := "asha"      // short declaration, the type is inferred
 	var age int = 25    // the long form, type written out
 	var city string     // never assigned, so it holds the zero value
 	const pi = 3.14     // fixed at compile time
@@ -1459,7 +1459,7 @@ func WordCount(words []string) map[string]int {
 \tEmail string
 }
 
-u := User{ID: 1, Name: "sahdev", Email: "s@x.com"}   // always name the fields
+u := User{ID: 1, Name: "asha", Email: "s@x.com"}   // always name the fields
 fmt.Println(u.Name)`,
           run: `package main
 
@@ -1473,22 +1473,22 @@ type User struct {
 
 func main() {
 
-	u := User{ID: 1, Name: "sahdev", Email: "s@x.com"}   // always name the fields
+	u := User{ID: 1, Name: "asha", Email: "s@x.com"}   // always name the fields
 	fmt.Println(u.Name)
 }
 `,
-          note: 'You can write `User{1, "sahdev", "s@x.com"}`, but do not. Adding a field later breaks every positional literal, and swapping two fields of the same type (say `Name` and `Email`) silently swaps their values.',
+          note: 'You can write `User{1, "asha", "s@x.com"}`, but do not. Adding a field later breaks every positional literal, and swapping two fields of the same type (say `Name` and `Email`) silently swaps their values.',
         },
       },
       {
         heading: 'Printing a struct',
         code: {
           label: 'print.go',
-          src: `u := User{ID: 1, Name: "sahdev", Email: "s@x.com"}
+          src: `u := User{ID: 1, Name: "asha", Email: "s@x.com"}
 
-fmt.Printf("%v\\n", u)   // {1 sahdev s@x.com}          — just the values
-fmt.Printf("%+v\\n", u)  // {ID:1 Name:sahdev Email:s@x.com} — with field names
-fmt.Printf("%#v\\n", u)  // main.User{ID:1, Name:"sahdev", Email:"s@x.com"}
+fmt.Printf("%v\\n", u)   // {1 asha s@x.com}          — just the values
+fmt.Printf("%+v\\n", u)  // {ID:1 Name:asha Email:s@x.com} — with field names
+fmt.Printf("%#v\\n", u)  // main.User{ID:1, Name:"asha", Email:"s@x.com"}
 fmt.Printf("%T\\n", u)   // main.User`,
           note: '`%+v` is the one you will use most when debugging: it shows which value belongs to which field.',
         },
@@ -1534,7 +1534,7 @@ fmt.Println(display(u))   // new <o@x.com>`,
         ],
         code: {
           label: 'ptr-struct.go',
-          src: `p := &User{Name: "sahdev"}   // a new User, and its address
+          src: `p := &User{Name: "asha"}   // a new User, and its address
 
 fmt.Println(p.Name)          // Go rewrites this as (*p).Name
 p.Name = "changed"           // and this too`,
@@ -2716,7 +2716,7 @@ type User struct {
 }
 
 func main() {
-	u := User{ID: 1, Name: "sahdev", Password: "hunter2", internal: "hidden"}
+	u := User{ID: 1, Name: "asha", Password: "hunter2", internal: "hidden"}
 
 	b, _ := json.MarshalIndent(u, "", "  ")
 	fmt.Println(string(b)) // no password, no bio, no internal

@@ -45,18 +45,11 @@ export default function AboutPage() {
       <Section n="3" title="Who writes it">
         <Prose
           paragraphs={[
-            `**${AUTHOR.name}**, ${AUTHOR.role.toLowerCase()}. ${AUTHOR.bio}`,
+            `Dev Skills is written and maintained by the **${AUTHOR.name}**. ${AUTHOR.bio}`,
             'Every topic links out to its sources, such as the RFC, the paper or the language documentation, rather than asking you to take its word for anything. Where this site and a specification disagree, the specification is right.',
             'Every Go example on the site is compiled and run automatically before each release, and every coding challenge is checked to make sure its tests catch a wrong answer.',
           ]}
         />
-        <p className="mt-3 flex flex-wrap gap-4 text-[0.9375rem]">
-          {AUTHOR.links.map((l) => (
-            <a key={l.href} href={l.href} target="_blank" rel="noreferrer me" className="tap font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
-              {l.label}
-            </a>
-          ))}
-        </p>
         <p className="mt-3 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
           Found a mistake? Every page has a &ldquo;Report a mistake&rdquo; link, or write to{' '}
           <a href={`mailto:${CONTACT_EMAIL}`} className="font-medium hover:opacity-70" style={{ color: 'var(--accent)' }}>
@@ -80,7 +73,7 @@ export default function AboutPage() {
       <Section n="5" title="How the site uses AI">
         <Prose
           paragraphs={[
-            'Much of the drafting, editing and code on this site is done with the help of an AI assistant (Anthropic’s Claude). It is a writing and programming tool here, not the author: the topics, the method and the decisions about what each page says are the author’s, and AI-assisted text is published under his name only after he has reviewed it.',
+            'Much of the drafting, editing and code on this site is done with the help of an AI assistant (Anthropic’s Claude). It is a writing and programming tool here, not the author: the topics, the method and the decisions about what each page says are the editorial team’s, and AI-assisted text is published only after a person on the team has reviewed it.',
             'AI output is treated like any first draft. Facts are checked against the linked sources, Go examples have to pass the compile checks above, and anything that cannot be verified is cut rather than published.',
             'If you find something that reads as wrong or invented, please report it. Corrections are fixed, and significant ones are recorded in the changelog.',
           ]}

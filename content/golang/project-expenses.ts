@@ -438,11 +438,11 @@ go build ./... && go run ./cmd/api
 
 # register
 curl -s -X POST localhost:8080/v1/auth/register \\
-  -d '{"name":"Sahdev","email":"a@b.c","password":"password123"}' | jq
+  -d '{"name":"Asha","email":"a@b.c","password":"password123"}' | jq
 
 # the same email again — must be a clean 409
 curl -si -X POST localhost:8080/v1/auth/register \\
-  -d '{"name":"Sahdev","email":"a@b.c","password":"password123"}' | head -1
+  -d '{"name":"Asha","email":"a@b.c","password":"password123"}' | head -1
 
 # validation failures
 curl -s -X POST localhost:8080/v1/auth/register -d '{"email":"a@b.c","password":"password123"}'
