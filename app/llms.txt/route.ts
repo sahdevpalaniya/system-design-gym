@@ -20,6 +20,8 @@ export function GET() {
     '',
     `> Learning tracks: ${trackList()}. More are added over time.`,
     '',
+    `The full text of the concept, worked-solution and Go lesson pages is at ${url('/llms-full.txt')}.`,
+    '',
     '## System Design track',
     '',
     '> Teaches the method for answering system design interviews (requirements,',
@@ -49,10 +51,10 @@ export function GET() {
   lines.push(
     '## Worked problems',
     '',
-    'Each is answered in five stages, with the tradeoffs named explicitly.',
+    'Each is answered in five stages, with the tradeoffs named explicitly. The links go to the worked solutions.',
     '',
     ...PROBLEMS.map(
-      (p) => `- [${p.searchTitle ?? p.title}](${url(`/problems/${p.slug}`)}): ${p.prompt}`,
+      (p) => `- [${p.searchTitle ?? p.title}](${url(`/problems/${p.slug}/solution`)}): ${p.prompt}`,
     ),
     '',
     ...LANGUAGES.flatMap((l) => [

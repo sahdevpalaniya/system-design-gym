@@ -87,6 +87,7 @@ export function FollowUpDrill({
               value={answer}
               onChange={(e) => setAnswer(e.target.value)}
               readOnly={submitted}
+              aria-label="Your answer to the follow-up question"
               rows={submitted ? 4 : 7}
               placeholder="Defend it. Name the cost. Do not bluff — 'I would measure that' is a strong answer."
               className="w-full resize-y rounded-xl border px-4 py-3 text-[0.9375rem] leading-relaxed outline-none"

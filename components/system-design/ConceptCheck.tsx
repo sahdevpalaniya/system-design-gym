@@ -47,6 +47,7 @@ export function ConceptCheck({ concept }: { concept: Concept }) {
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           readOnly={revealed}
+          aria-label="Your answer to the self-check question"
           rows={revealed ? 4 : 6}
           placeholder="Answer from memory before you look. This is the whole point."
           className="w-full resize-y rounded-xl border px-4 py-3 text-[0.9375rem] leading-relaxed outline-none"

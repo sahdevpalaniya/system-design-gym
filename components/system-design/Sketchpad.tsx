@@ -54,6 +54,7 @@ export function Sketchpad({
           onChange={(e) => setText(e.target.value)}
           rows={rows}
           spellCheck={false}
+          aria-label="Sketchpad arrow chains, one per line"
           placeholder={PLACEHOLDER}
           className="w-full resize-y rounded-xl border px-4 py-3 font-mono text-[0.8438rem] leading-relaxed outline-none"
           style={{ borderColor: 'var(--border-strong)', background: 'var(--surface)' }}

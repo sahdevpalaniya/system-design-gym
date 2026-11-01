@@ -38,6 +38,7 @@ export function GapLog({
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={3}
+        aria-label="What you missed or got wrong"
         placeholder="e.g. I forgot to say what the cache costs, and I never mentioned what happens when it is empty."
         className="w-full resize-y rounded-xl border px-4 py-3 text-[0.9375rem] leading-relaxed outline-none"
         style={{ borderColor: 'var(--border-strong)' }}

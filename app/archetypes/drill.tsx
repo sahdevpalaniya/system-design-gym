@@ -64,6 +64,7 @@ function DrillCard({ n, d }: { n: number; d: Archetype['drill'][number] }) {
           value={answer}
           onChange={(e) => setAnswer(e.target.value)}
           readOnly={open}
+          aria-label="Your answer"
           rows={open ? 4 : 6}
           placeholder="Answer it the way you would say it out loud."
           className="w-full resize-y rounded-xl border px-4 py-3 text-[0.9375rem] leading-relaxed outline-none"

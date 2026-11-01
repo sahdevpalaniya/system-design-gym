@@ -341,6 +341,8 @@ export function WhiteboardView({ value }: { value?: string }) {
   return (
     <canvas
       ref={ref}
+      role="img"
+      aria-label="Whiteboard diagram of the design"
       className="w-full rounded-xl border"
       style={{ borderColor: 'var(--border-strong)', background: BOARD, maxWidth: MAX_BOARD_WIDTH }}
     />
@@ -911,7 +913,7 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
           </button>
           <Dropdown id="components" width={268}>
             <div className="border-b p-2">
-              <input autoFocus value={query} onChange={(e) => setQuery(e.target.value)}
+              <input autoFocus aria-label="Search components" value={query} onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={(e) => { if (e.key !== 'Escape') e.stopPropagation() }}
                 placeholder="Search — redis, kafka, oauth…"
                 className="w-full rounded-lg border px-2.5 py-1.5 text-[0.8125rem] outline-none"
@@ -1086,6 +1088,8 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
       <div className="relative" style={full ? { flex: '1 1 auto', minHeight: 0 } : undefined}>
         <canvas
           ref={ref}
+          role="img"
+          aria-label="Whiteboard drawing canvas. Draw with a pointer; the same design can be typed as arrow chains in the sketchpad."
           onPointerDown={down}
           onPointerMove={move}
           onPointerUp={up}
@@ -1101,6 +1105,7 @@ export function Whiteboard({ value, onChange }: { value: string; onChange: (v: s
         {typing ? (
           <input
             ref={inputRef}
+            aria-label="Label text"
             value={label}
             onChange={(e) => setLabel(e.target.value)}
             onBlur={placeLabel}

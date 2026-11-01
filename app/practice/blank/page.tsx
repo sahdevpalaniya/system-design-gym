@@ -77,6 +77,7 @@ export default function BlankPage() {
               value={values[s.id] ?? ''}
               onChange={(e) => setValues((v) => ({ ...v, [s.id]: e.target.value }))}
               rows={8}
+              aria-label={`Stage ${s.id}: ${s.name}`}
               className="w-full resize-y rounded-xl border px-4 py-3.5 text-[0.9375rem] leading-relaxed outline-none"
               style={{ borderColor: 'var(--border-strong)' }}
             />
