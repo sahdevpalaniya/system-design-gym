@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const KEY_VALUE_STORE: Problem = {
   slug: 'key-value-store',
   searchTitle: "Design a distributed key-value store",
+  solutionDescription:
+    "Build the store itself: get and put by key on data spread across many machines, still fast when some of them fail. Every request has a caller waiting, so repair and rebalancing run in the background, and durability becomes a per-write choice with a latency cost.",
   title: 'Distributed key-value store',
   navTitle: 'Key-value store',
   group: 'storage-engine',

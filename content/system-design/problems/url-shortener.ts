@@ -304,6 +304,7 @@ export const URL_SHORTENER: Problem = {
   },
 
   followUps: [
+    'consistency-disabled-link',
     'scale-10x',
     'kill-cache',
     'consistency-retry',

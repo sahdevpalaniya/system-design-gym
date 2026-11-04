@@ -65,17 +65,17 @@ export default function AboutPage() {
             'Each page starts from a question a learner or interviewer actually asks, and is written to one template: what problem the technique solves, what it costs, when to use it and when not to, how it works, and the follow-up question that usually comes next. A topic is not published without its cost section.',
             'Technical claims are checked against primary sources (specifications, papers, official documentation), and those sources are linked on the page under "Learn it from the source" or "Official documentation".',
             'Go code is checked by machine as well as by eye: before each release a script compiles every Go example with the Go toolchain and runs `go vet` on the runnable ones, and every coding challenge is tested against a known wrong answer to make sure its tests fail it.',
-            'Company pages describe interview formats only from the company’s own public pages, listed as sources on each page. Anything else about a company’s round is labelled as what candidates report. This site has no inside information and is not affiliated with any company it names.',
+            'Company pages describe interview formats only from the company’s own public pages, listed as sources on each page. Everything else on those pages is preparation advice, not a description of how the company interviews. This site has no inside information and is not affiliated with any company it names.',
           ]}
         />
       </Section>
 
-      <Section n="5" title="How the site uses AI">
+      <Section n="5" title="How the site uses AI" id="ai">
         <Prose
           paragraphs={[
-            'Much of the drafting, editing and code on this site is done with the help of an AI assistant (Anthropic’s Claude). It is a writing and programming tool here, not the author: the topics, the method and the decisions about what each page says are the editorial team’s, and AI-assisted text is published only after a person on the team has reviewed it.',
+            'Pages on this site are written with AI assistance (Anthropic’s Claude), and much of the code is too. The site’s maintainer picks the topics and the method, decides what each page says, and checks AI-assisted text before it is published.',
             'AI output is treated like any first draft. Facts are checked against the linked sources, Go examples have to pass the compile checks above, and anything that cannot be verified is cut rather than published.',
-            'If you find something that reads as wrong or invented, please report it. Corrections are fixed, and significant ones are recorded in the changelog.',
+            `If something reads as wrong or invented, use the “Report a mistake” link under the page heading where there is one, or email ${CONTACT_EMAIL}. Mistakes get fixed, and significant corrections are listed in the [changelog](/changelog).`,
           ]}
         />
       </Section>

@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const WEB_CRAWLER: Problem = {
   slug: 'web-crawler',
   searchTitle: "Design a web crawler",
+  solutionDescription:
+    "Fetch and store a few billion pages and keep them reasonably fresh, without overloading any site or fetching the same content twice. Most of the design is the scheduler: a strict per-domain delay, URL and content deduplication, and recrawl frequency that follows how often each page actually changes.",
   title: 'Web crawler',
   group: 'crawling',
   difficulty: 'core',
@@ -267,6 +269,7 @@ export const WEB_CRAWLER: Problem = {
   },
 
   followUps: [
+    'choice-crawl-budget',
     'scale-hot-key',
     'kill-dependency',
     'cost-storage-growth',

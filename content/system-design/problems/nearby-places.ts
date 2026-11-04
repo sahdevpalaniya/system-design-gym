@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const NEARBY_PLACES: Problem = {
   slug: 'nearby-places',
   searchTitle: "Design nearby restaurants search (Yelp, Zomato)",
+  solutionDescription:
+    "Answer \"what is near me?\" in about 200 ms, ranked by distance and quality and filtered by category and opening hours. The trick is keeping \"open now\" from turning a static, heavily cached index of geographic tiles into a live one: work it out at read time from stored opening hours.",
   title: 'Nearby places',
   group: 'location',
   difficulty: 'core',

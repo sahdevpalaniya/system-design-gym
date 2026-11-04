@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const CLICK_ANALYTICS: Problem = {
   slug: 'click-analytics',
   searchTitle: "Design an ad click aggregator",
+  solutionDescription:
+    "Accept billions of click and view events a day with as little loss as possible, then answer dashboard rollups and ad hoc questions over two years of raw data. The ingest edge is the hard part, because a dropped browser event is never retried, while every aggregate behind it has hours of slack and should be batched.",
   title: 'Click analytics pipeline',
   navTitle: 'Click analytics',
   group: 'pipelines',
@@ -320,6 +322,7 @@ export const CLICK_ANALYTICS: Problem = {
   },
 
   followUps: [
+    'consistency-restated-report',
     'kill-queue',
     'scale-hot-key',
     'consistency-retry',

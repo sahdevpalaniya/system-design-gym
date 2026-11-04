@@ -20,7 +20,12 @@ export const NOINDEX_GO_SECTIONS = [
   'production',
   'compare',
   'interview',
+  // thin hub: a list of DSA lessons, no copy of its own
+  'dsa',
 ]
+
+/** Individual Go lessons kept out of search (thin or near-duplicate content). */
+export const NOINDEX_GO_LESSONS = ['dsa-merge-sorted-lists', 'dsa-reverse-linked-list']
 
 export const NOINDEX_PATTERNS: RegExp[] = [
   /^\/drills\/?$/,
@@ -30,6 +35,7 @@ export const NOINDEX_PATTERNS: RegExp[] = [
   /^\/revise\/?$/,
   /^\/languages\/[^/]+\/revise\/?$/,
   /^\/languages\/[^/]+\/quiz(\/.*)?$/,
+  new RegExp(`^/languages/[^/]+/(${NOINDEX_GO_LESSONS.join('|')})/?$`),
   new RegExp(`^/languages/[^/]+/topics/(${NOINDEX_GO_SECTIONS.join('|')})/?$`),
 ]
 

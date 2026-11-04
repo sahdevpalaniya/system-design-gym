@@ -145,10 +145,6 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
         <Callout variant="cost">
           <Rich text={c.cost} />
         </Callout>
-        <p className="text-[0.8438rem] leading-relaxed" style={{ color: 'var(--faint)' }}>
-          Every concept in here states a cost. A technique with no price is a technique you have not understood
-          yet — and naming the cost out loud is most of what separates a senior answer from a junior one.
-        </p>
       </Section>
 
       <Section n="3" title={`When to reach for ${subj}, and when not to`}>
@@ -259,10 +255,6 @@ export default async function ConceptPage({ params }: { params: Promise<{ slug: 
 
       {c.refs?.length ? (
         <Section n={c.faq?.length ? '8' : '7'} title="Learn it from the source">
-          <p className="mb-4 text-[0.9375rem]" style={{ color: 'var(--muted)' }}>
-            This page gets you interview-ready. These take you to where the idea
-            is actually specified or measured — read them when you want the real depth.
-          </p>
           <ul className="space-y-3">
             {c.refs.map((r) => (
               <li key={r.href}>

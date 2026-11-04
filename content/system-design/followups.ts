@@ -559,7 +559,74 @@ export const FOLLOW_UPS: FollowUp[] = [
       '"More changes than it sounds. Authentication and authorisation for a party that is not a user, which means API keys or OAuth and a permission model expressing what a partner may see. Rate limiting per partner, because they will write a script that pages through everything at 3am. Versioning, because the moment an external party depends on the shape of my response I cannot change it freely — so I would version from day one rather than retrofit it. Pagination with cursors rather than offsets, because a partner pulling a large dataset with offsets creates the deep-pagination problem that gets expensive. And a read model separate from my internal one, so my schema stays free to evolve behind a stable contract. The traffic pattern is also different from user traffic: bulk, bursty, and often at off-peak hours, which is good for capacity and bad for any cache tuned around user access patterns. If they need large volumes regularly, a bulk export to object storage beats an API — cheaper for both sides and far kinder to my database."',
     trap: 'The version-and-decouple point is the one that costs most to get wrong. An external contract tied directly to your internal schema freezes your ability to change anything.',
   },
+  {
+    id: 'consistency-disabled-link',
+    category: 'attack-consistency',
+    q: 'A short link is reported as malware. How long until nobody can reach it, and which layer decides that?',
+    weak: '"We mark it disabled in the database and delete it from the cache." That covers one cache out of several. The redirect servers hold their own copies, and the answer gives no number for how long the link stays live.',
+    strong:
+      '"The worst case is set by the slowest layer, so I go through them in order. The database row flips to disabled first, since every cache refills from it. Redis gets a disabled marker, and an invalidation message goes to the redirect servers. A server that misses the message still drops its copy when the 30-second in-process TTL runs out, so 30 seconds is the number I would quote. Browsers depend on an earlier choice: with a 302 and no headers allowing it to be stored, the next click comes back to me and gets a warning page. A 301 could stay in a browser cache indefinitely, and I would have no way to reach it. Disabled links also return a clear status instead of a 404, because the code still exists and must never be reissued. Cost: every redirect server takes a little invalidation traffic, and a bad link stays reachable for up to 30 seconds."',
+    trap: 'Deleting the Redis key can fail quietly. A cache miss that read the row just before the flip can write the old destination back just after the delete, and with a long TTL it then stays for a long time. Writing a disabled marker and having refills use set-if-absent closes that race. Interviewers who push on this want to see that you noticed cache-aside has a gap between the read and the write.',
+  },
+  {
+    id: 'choice-crawl-budget',
+    category: 'question-choice',
+    q: 'Your per-domain page cap stops crawler traps. It also stops a retailer with tens of millions of real product pages. How do you tell them apart?',
+    weak: '"Raise the cap for big sites." That needs a list of big sites, and it fails on the first big site with a trap inside it. A popular forum with a broken calendar plugin is both.',
+    strong:
+      '"A fixed cap asks the wrong question, so I would replace it with a budget each domain earns. Pages on a real site tend to get links from other domains, and they produce new content when fetched. Pages in a trap get few outside links, and they tend to come back as near-duplicates from the content-seen store, or sit on one URL pattern with a parameter that keeps counting up. So the budget grows with outside links and with the share of fetches that produced new content, and it shrinks when that yield falls. I would apply the throttle per URL pattern within the domain, so the calendar path stops while the product pages carry on. All of this state fits in the frontier partition that already owns the domain. Cost: more per-domain state, thresholds that need tuning, and some real pages in low-yield sections that never get crawled. I would log everything the budget rejected and sample it, so that loss is visible."',
+    trap: 'Content deduplication alone will not catch every trap. A generator can put a different date or number on each page, so the fingerprints differ while the pages are worthless. Links from other domains are harder for a trap to produce, which is why they carry more weight here. Keeping the hard page cap as a final backstop is still sensible, because the scoring can be wrong.',
+  },
+  {
+    id: 'consistency-restated-report',
+    category: 'attack-consistency',
+    q: 'Your rollups get recomputed when late events arrive. Finance already invoiced on yesterday\'s number. What now?',
+    weak: '"Recompute and overwrite, because the new number is more correct." It is more correct, and it no longer matches the invoice. Nobody can now explain the difference, because the old value is gone.',
+    strong:
+      '"Recomputing is right, so what is missing is a rule for when a number stops moving. Each time bucket has a state. It is provisional while the streaming window is open and until the batch recomputation over the archive has run, and dashboards label it that way. At a published cut-off, say 48 hours, the bucket becomes final, and billing only reads final buckets. An event later than the cut-off goes into a correction bucket, dated by when it arrived, and shows up as an adjustment on the next invoice. Reprocessing after a bug is a separate, explicit act: it writes a new version of the affected buckets, keeps the old one, and produces a report of the difference for whoever has to explain it. Cost: billing waits for the cut-off, there is a correction path to build and test, and storage grows with every restated version."',
+    trap: 'Writing each bucket as a replacement is what makes reruns safe, and the same write also destroys a number someone may already have used. So the answer has to keep idempotent reruns and add a point after which a rerun cannot change a published value in place. Treating these as one problem is the usual slip. Dashboards can tolerate a number moving, and an invoice cannot.',
+  },
 ]
+
+/**
+ * The one worked solution that prints each follow-up shared by several
+ * problems. The answer text is the same wherever it appears, so the other
+ * solutions link to it in /drills instead of repeating it. Follow-ups used by a
+ * single problem are not listed.
+ */
+export const FOLLOWUP_HOME: Record<string, string> = {
+  'scale-10x': 'url-shortener',
+  'cost-monthly': 'video-platform',
+  'kill-cache': 'typeahead',
+  'scope-multiregion': 'key-value-store',
+  'scale-hot-key': 'rate-limiter',
+  'ops-alert-first': 'live-scores',
+  'choice-queue': 'notification-system',
+  'kill-region': 'ride-matching',
+  'consistency-simultaneous': 'ticket-booking',
+  'consistency-retry': 'distributed-message-queue',
+  'choice-database': 'nearby-places',
+  'ops-deploy': 'live-scores',
+  'ops-debug-slow': 'typeahead',
+  'kill-worker-mid-job': 'payment-ledger',
+  'kill-dependency': 'notification-system',
+  'cost-storage-growth': 'file-sync',
+  'scope-privacy': 'click-analytics',
+  'scale-sale-day': 'ticket-booking',
+  'ops-capacity': 'key-value-store',
+  'kill-queue': 'social-timeline',
+  'cost-cheaper-slower': 'ride-matching',
+  'scope-scheduled': 'web-crawler',
+  'scope-offline': 'chat-messaging',
+  'scale-growth': 'file-sync',
+  'scale-celebrity': 'social-timeline',
+  'ops-migration': 'payment-ledger',
+  'kill-network': 'key-value-store',
+  'kill-half': 'distributed-message-queue',
+  'consistency-two-systems': 'payment-ledger',
+  'consistency-ordering': 'chat-messaging',
+  'consistency-lag': 'typeahead',
+}
 
 export function followUpsByCategory(c: FollowUpCategory): FollowUp[] {
   return FOLLOW_UPS.filter((f) => f.category === c)

@@ -5,7 +5,7 @@ import { STAGES, getGroup } from '@/content/system-design/method'
 import { getConcept } from '@/content/system-design/concepts'
 import { CompanyQuestionLinks } from '@/components/system-design/CompanyQuestionLinks'
 import { COMPANY_QUESTIONS, companyAnglesFor, getCompany } from '@/content/system-design/companies'
-import { getFollowUp } from '@/content/system-design/followups'
+import { FOLLOWUP_HOME, getFollowUp } from '@/content/system-design/followups'
 import {
   AnimatedFlow,
   Callout,
@@ -43,13 +43,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   )
 }
 
-/** what each stage is for, in one line a beginner can hold on to */
-const WHY: Record<number, string> = {
-  1: 'Because the question is deliberately vague, and every box you draw before this is a guess.',
-  2: 'Because the happy path is the easy half. The failure branches are where the design actually lives.',
-  3: 'Because one part of this is hard and the rest is easy, and they look identical until you do the arithmetic.',
-  4: 'Because now — and only now — you have a reason for every box you are about to draw.',
-  5: 'Because naming what a decision costs is the single clearest signal of seniority there is.',
+/** generic stage-level lines shared by many solutions are left out; they live on /learn/the-five-stages */
+const SHARED_MIN = 3
+function sharedCount(stage: number, field: 'ask' | 'checklist', value: string) {
+  return PROBLEMS.filter((q) =>
+    q.stages.some((s) => s.id === stage && (field === 'ask' ? s.ask === value : s.checklist.includes(value))),
+  ).length
 }
 
 export default async function SolutionPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -59,6 +58,10 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
   const group = getGroup(p.group)
   const angles = companyAnglesFor(p.slug)
+  // a follow-up shared by several problems is printed on one solution only
+  const printsHere = (id: string) => !(id in FOLLOWUP_HOME) || FOLLOWUP_HOME[id] === p.slug
+  const ownFollowUps = p.followUps.filter(printsHere)
+  const linkedFollowUps = p.followUps.filter((id) => !printsHere(id) && getFollowUp(id))
 
   return (
     <Page>
@@ -94,18 +97,21 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           </>
         }
         title={p.solutionHeading ?? `${p.searchTitle ?? p.title}: a full worked answer`}
-        lede="The whole thing, start to finish, in the order you would actually say it. Read it to learn the shape of a strong answer — then go and produce one yourself, because reading is not the same skill as producing."
+        lede={p.solutionDescription}
         meta={<Badge>{p.difficulty}</Badge>}
       />
       <ReviewedLine path={`/problems/${p.slug}/solution`} />
 
       <Callout variant="trap">
-        <strong>Read this second, not first.</strong> Reading a good answer feels like learning and only
-        builds recognition. If you have not tried this problem yet, close this page and{' '}
+        Try it{' '}
         <Link href={`/problems/${p.slug}`} style={{ color: 'var(--accent)' }}>
-          write your own answer first
+          before reading
         </Link>
-        . It will feel worse and it is the part that works.
+        . How the stages work:{' '}
+        <Link href="/learn/the-five-stages" style={{ color: 'var(--accent)' }}>
+          the five stages
+        </Link>
+        .
       </Callout>
 
       <section className="mb-10">
@@ -133,8 +139,9 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
           Before anything: where is the slack?
         </h2>
         <p className="mb-3 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
-          How long the system has before a person notices. Ask this before you draw a single box — it
-          decides more of the design than scale does.
+          <Link href="/learn/where-is-the-slack" style={{ color: 'var(--accent)' }}>
+            What slack means
+          </Link>
         </p>
         <div className="card p-5">
           <div className="mb-2 text-[0.8125rem] font-semibold" style={{ color: 'var(--accent)' }}>
@@ -151,6 +158,8 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
 
       {p.stages.map((ps) => {
         const def = STAGES.find((s) => s.id === ps.id)!
+        const ownAsk = sharedCount(ps.id, 'ask', ps.ask) < SHARED_MIN
+        const ownChecklist = ps.checklist.filter((c) => sharedCount(ps.id, 'checklist', c) < SHARED_MIN)
         return (
           <section key={ps.id} className="mb-12">
             <div className="mb-2 flex flex-wrap items-baseline gap-2.5">
@@ -165,18 +174,15 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
                 about {def.minutes} min
               </span>
             </div>
-            <p className="mb-4 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-              <span className="font-semibold">Why this stage exists: </span>
-              {WHY[ps.id]}
-            </p>
-
-            <div
-              className="mb-4 rounded-xl px-4 py-3 text-[0.9062rem] leading-relaxed"
-              style={{ background: 'var(--surface-2)' }}
-            >
-              <span className="font-semibold">What you are being asked for: </span>
-              {ps.ask}
-            </div>
+            {ownAsk ? (
+              <div
+                className="mb-4 rounded-xl px-4 py-3 text-[0.9062rem] leading-relaxed"
+                style={{ background: 'var(--surface-2)' }}
+              >
+                <span className="font-semibold">What you are being asked for: </span>
+                {ps.ask}
+              </div>
+            ) : null}
 
             <div className="card mb-4 p-5">
               <div
@@ -216,14 +222,16 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
               </Callout>
             ) : null}
 
-            <details className="card overflow-hidden">
-              <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
-                What an interviewer is ticking off in this stage
-              </summary>
-              <div className="border-t px-5 py-4">
-                <Bullets items={ps.checklist} />
-              </div>
-            </details>
+            {ownChecklist.length ? (
+              <details className="card overflow-hidden">
+                <summary className="cursor-pointer px-5 py-3.5 text-[0.875rem] font-semibold select-none">
+                  Stage checklist
+                </summary>
+                <div className="border-t px-5 py-4">
+                  <Bullets items={ownChecklist} />
+                </div>
+              </details>
+            ) : null}
 
             {ps.id === 2 ? (
               <div className="mt-6">
@@ -260,12 +268,8 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         <h2 className="mb-1 text-[1.1875rem] font-semibold tracking-[-0.01em]">
           And then they push back
         </h2>
-        <p className="mb-4 text-[0.875rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
-          A complete answer is where the interview starts, not where it ends. These are the questions
-          this design invites — the interview is decided here far more often than in the diagram.
-        </p>
         <div className="space-y-3">
-          {p.followUps.map((id) => {
+          {ownFollowUps.map((id) => {
             const f = getFollowUp(id)
             if (!f) return null
             return (
@@ -295,6 +299,17 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             )
           })}
         </div>
+        {linkedFollowUps.length ? (
+          <ul className="mt-4 space-y-1 text-[0.875rem]">
+            {linkedFollowUps.map((id) => (
+              <li key={id}>
+                <Link href={`/drills?q=${id}`} style={{ color: 'var(--accent)' }}>
+                  {getFollowUp(id)?.q}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </section>
 
       <section className="mb-10">
@@ -321,8 +336,8 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         <section className="mb-10">
           <h2 className="mb-3 text-[1.1875rem] font-semibold tracking-[-0.01em]">How companies ask this one</h2>
           <p className="mb-4 text-[0.875rem]" style={{ color: 'var(--muted)' }}>
-            The same design comes up in company rounds with a different emphasis. Based on public candidate reports,
-            not inside information.
+            The same design comes up in company rounds with a different emphasis. These are practice framings
+            written for this site, not inside information.
           </p>
           <div className="space-y-4">
             {angles.map((q) => {
@@ -368,10 +383,6 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
         <div className="mb-1 text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--accent)' }}>
           Now do it yourself
         </div>
-        <p className="mb-3 text-[0.9375rem] leading-relaxed">
-          You have read a good answer. That is worth very little until you can produce one on a blank
-          page — so go and write this problem without looking, and compare afterwards.
-        </p>
         <div className="flex flex-wrap gap-2">
           <Link
             href={`/problems/${p.slug}`}

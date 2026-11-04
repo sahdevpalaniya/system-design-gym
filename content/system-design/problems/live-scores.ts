@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const LIVE_SCORES: Problem = {
   slug: 'live-scores',
   searchTitle: "Design a live sports scores system",
+  solutionDescription:
+    "Push each score change to millions of people watching the same match, within a second or two. The update is a few hundred bytes; the work is fanning it out to that many open connections, surviving mass reconnects, and handling provider corrections such as a disallowed goal.",
   title: 'Live score push',
   navTitle: 'Live scores',
   group: 'live-push',

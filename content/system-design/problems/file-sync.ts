@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const FILE_SYNC: Problem = {
   slug: 'file-sync',
   searchTitle: "Design file sync like Dropbox",
+  solutionDescription:
+    "Keep a folder in step across devices, with saves that work offline and multi-gigabyte files that upload and download in resumable chunks. The hard part is two devices editing the same file offline: the design has to detect the conflict and keep both versions, since silently dropping one is data loss.",
   title: 'File sync across devices',
   navTitle: 'File sync',
   group: 'sync',

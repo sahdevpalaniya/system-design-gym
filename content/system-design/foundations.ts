@@ -133,6 +133,8 @@ export const LESSONS: Lesson[] = [
       '**Stage 3 — Numbers.** Estimate requests per second, storage, and bandwidth. Then say one sentence you must not skip: "so the hard part here is ___." If the numbers did not change your mind about anything, you either did the maths wrong or you ignored the answer.',
       '**Stage 4 — High-level design.** Now, at last, boxes and arrows. Every box needs a reason from Stage 1 or Stage 3. A part that nobody asked for loses you points.',
       '**Stage 5 — Deep dive and trade-offs.** Pick the two hardest parts and go deep on them. After every decision, say what it costs. Someone who picks a slightly worse option and names the cost scores higher than someone who picks the best option in silence.',
+      '**Why each stage exists.** Requirements: the question is deliberately vague, and every box you draw before this is a guess. Lifecycle: the happy path is the easy half, and the failure branches are where the design actually lives. Numbers: one part of the problem is hard and the rest is easy, and they look identical until you do the arithmetic. Design: by this point you have a reason for every box you are about to draw. Trade-offs: naming what a decision costs is one of the clearest signs of seniority.',
+      '**What an interviewer is ticking off.** Roughly one thing per stage, in order: that you stated your assumptions, that you named the failure branches, that the numbers changed your mind about something, that every box has a reason, and that every decision has a stated cost. When a problem adds checks of its own, its worked solution lists them in a stage checklist.',
     ],
     visual: {
       type: 'diagram',

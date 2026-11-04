@@ -13,6 +13,7 @@ import { headingSlug } from '@/lib/slug'
 import { humanMinutes, practiceMinutes, readMinutes } from '@/lib/estimate'
 import { Bullets, Card, Page, PageHeader, Prose, Rich } from '@/components/common/ui'
 import { MarkRead } from '@/components/common/MarkRead'
+import { NOINDEX_GO_LESSONS, NOINDEX_ROBOTS } from '@/lib/noindex'
 import { articleJsonLd, breadcrumbJsonLd, fillDescription, lowerFirst, pageMeta } from '@/lib/seo'
 import { pageDates } from '@/lib/content-dates'
 import { sectionHref } from '@/lib/redirects'
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
   // a short one-liner leaves the snippet half empty; the lesson's own
   // objectives say what it teaches, so they extend it (no shared boilerplate)
   const description = fillDescription([line, ...(t.objectives ?? []).map((o) => `You will ${lowerFirst(o)}`)])
-  return pageMeta(
+  return { ...pageMeta(
     // written per lesson (content/golang/titles.ts); project steps are named
     // by their project, since every project has a "Step 1"
     t.searchTitle ??
@@ -49,7 +50,7 @@ export async function generateMetadata({ params }: { params: Promise<{ lang: str
     `/languages/${l.id}/${t.slug}`,
     true,
     true, // own opengraph-image
-  )
+  ), ...(NOINDEX_GO_LESSONS.includes(t.slug) ? NOINDEX_ROBOTS : {}) }
 }
 
 const CALLOUT = {

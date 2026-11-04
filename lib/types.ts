@@ -278,7 +278,7 @@ export interface Problem {
   searchTitle?: string
   /** full <title> override for the /solution page, when people search for it in other words */
   solutionTitle?: string
-  /** meta description override for the /solution page; keep it under 155 characters */
+  /** the /solution page lede; also its meta description when solutionTitle is set, so keep it under 155 characters in that case */
   solutionDescription?: string
   /** the /solution page H1, when it should lead with the searched phrase */
   solutionHeading?: string
@@ -531,7 +531,7 @@ export interface Company {
   guide?: {
     /** the loop and where system design sits in it */
     loop: string[]
-    /** what interviewers emphasise, as candidates report it */
+    /** what to prepare for in this company's round (preparation advice, not reported fact) */
     emphasis: string[]
     pitfalls: string[]
     /** ordered steps, linking our own problem and concept pages */

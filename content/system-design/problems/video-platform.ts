@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const VIDEO_PLATFORM: Problem = {
   slug: 'video-platform',
   searchTitle: "Design a video platform like YouTube / Netflix",
+  solutionDescription:
+    "Take uploads from phones on unreliable networks, transcode them, and start playback in under two seconds at a quality that suits the viewer's connection. It is really two systems: a resumable, retryable processing pipeline with hours of slack, and a CDN path for static segments with almost none.",
   title: 'Video upload and playback',
   navTitle: 'Video platform',
   group: 'big-files',

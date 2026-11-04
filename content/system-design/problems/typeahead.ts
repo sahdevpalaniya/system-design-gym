@@ -3,6 +3,8 @@ import type { Problem } from '@/lib/types'
 export const TYPEAHEAD: Problem = {
   slug: 'typeahead',
   searchTitle: "Design search autocomplete (Google)",
+  solutionDescription:
+    "Return ranked suggestions on every keystroke in about 100 ms, based on what people have searched for before. That budget leaves no time to search at request time, so the answer for each prefix is precomputed and served from memory, with a small fast layer for trending terms.",
   title: 'Search typeahead',
   navTitle: 'Typeahead',
   group: 'search',

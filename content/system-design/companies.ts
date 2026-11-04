@@ -13,17 +13,17 @@ export const COMPANIES: Company[] = [
     id: 'google',
     name: 'Google',
     style:
-      'Candidates commonly report a scale-first round. Expect very large numbers from the opening sentence, and be ready to justify a data structure choice in more detail than many rounds ask for. Interviewers often go deep on one subproblem rather than broad across the system.',
-    weights: 'Numbers and Design weigh heaviest. Vague estimates cost you.',
+      'Candidates commonly report a scale-first round. Be ready for very large numbers from the opening sentence, and for justifying a data structure choice in real detail. Practise going deep on one subproblem, since an interviewer can stay on a single box for a long time.',
+    weights: 'Numbers and Design. Practise making your estimates precise.',
     archetype: 'scale-breaker',
     guide: {
       loop: [
         "Google describes its process on its [How we hire](https://www.google.com/about/careers/applications/how-we-hire/) page. It starts with one or two shorter recruiter conversations. Some roles add an online assessment or a role-related exercise, such as coding. Then comes 'a panel of interviews, either over video or in person'. Google says every candidate for a role is assessed with the same rubrics, that questions are open-ended and role-related, and that there are no brainteasers. The same page links to a video of Google engineers running a mock system design interview. It is worth watching before your own.",
-        "Google does not publish a fixed list of rounds for engineers, and the mix depends on the role and level. Candidates commonly report that early-career loops are mostly coding, and that a dedicated system design round usually appears for experienced hires. If you are not sure whether your loop has one, ask your recruiter. That is a normal question to ask.",
+        "Google does not publish a fixed list of rounds for engineers, and the mix depends on the role and level. Whether your loop includes a dedicated system design round is worth asking your recruiter directly. It is a normal question, and the answer decides how you split your time between coding and design practice.",
       ],
       emphasis: [
-        "**Numbers that change the design.** Candidates often describe being asked for request rate, storage and bandwidth early, and then being asked which of those numbers changed a decision. A number that changes nothing looks like ritual. Practise this with [back-of-the-envelope estimation](/concepts/back-of-envelope).",
-        "**One subproblem, in depth.** Many reports describe the interviewer picking one part, such as the index, the sharding scheme or the dedup step, and staying there for a long time. Be ready for three levels of detail: what it is, how it works, and what breaks.",
+        "**Numbers that change the design.** Practise working out request rate, storage and bandwidth early, then saying which of those numbers changed a decision. A number that changes nothing looks like ritual. Practise this with [back-of-the-envelope estimation](/concepts/back-of-envelope).",
+        "**One subproblem, in depth.** If the interviewer picks one part, such as the index, the sharding scheme or the dedup step, follow them into it. Be ready for three levels of detail: what it is, how it works, and what breaks.",
         "**Data structures, sized out loud.** Why a trie and not a general search index? How big is it? Does it fit in memory? Expect to say the size, not just the name.",
         "**What happens at ten times the load.** Hot keys, a lost region, a sudden spike. See [partitioning](/concepts/partitioning) and [consistent hashing](/concepts/consistent-hashing).",
       ],
@@ -49,8 +49,8 @@ export const COMPANIES: Company[] = [
     id: 'amazon',
     name: 'Amazon',
     style:
-      'Operational reality and cost. Who gets paged, what does this cost per month, how does it degrade, what happens on the busiest day of the year. Amazon publishes its Leadership Principles, and they often surface in the technical round too, particularly Ownership and Frugality.',
-    weights: 'Tradeoffs and Defence weigh heaviest, with real weight on operations.',
+      'Operational reality and cost. Who gets paged, what does this cost per month, how does it degrade, what happens on the busiest day of the year. Amazon publishes its Leadership Principles, and its SDE II prep page says they take up a significant part of each interview, so keep Ownership and Frugality in mind during the design discussion too.',
+    weights: 'Tradeoffs and Defence, with real time on operations.',
     archetype: 'cost-auditor',
     guide: {
       loop: [
@@ -58,9 +58,9 @@ export const COMPANIES: Company[] = [
         "The same page says that a significant part of each conversation covers how you have shown the [Leadership Principles](https://www.amazon.jobs/content/en/our-workplace/leadership-principles) in past jobs, usually two or three behavioural questions per interviewer, answered in the STAR format. That description is for SDE II. Other levels and teams differ, so read the prep material your recruiter sends.",
       ],
       emphasis: [
-        '**Cost and operations as real requirements.** Candidates often report questions such as what this costs per month, who gets paged, and what happens on the busiest day of the year. That matches two published principles, Frugality ("accomplish more with less") and Ownership. Read [capacity and cost](/concepts/capacity-and-cost) and [observability](/concepts/observability).',
+        '**Cost and operations as real requirements.** Have answers ready for what this costs per month, who gets paged, and what happens on the busiest day of the year. Those questions follow from two published principles, Frugality ("accomplish more with less") and Ownership. Read [capacity and cost](/concepts/capacity-and-cost) and [observability](/concepts/observability).',
         '**Degrading well, not just staying up.** What does the customer see when a dependency is slow? See [circuit breakers](/concepts/circuit-breakers) and [availability patterns](/concepts/availability-patterns).',
-        '**Correctness under retries.** In a flash sale or a notification service, duplicates cost money or trust. [Idempotency](/concepts/idempotency) and [message queues](/concepts/message-queues) come up often.',
+        '**Correctness under retries.** In a flash sale or a notification service, duplicates cost money or trust. Know [idempotency](/concepts/idempotency) and [message queues](/concepts/message-queues) well.',
         '**Detail on request.** Dive Deep is one of the principles. Expect at least one "and how does that actually work?"',
       ],
       pitfalls: [
@@ -93,11 +93,11 @@ export const COMPANIES: Company[] = [
     guide: {
       loop: [
         "Meta's careers site describes a 45-minute [initial technical screen](https://www.metacareers.com/swe-prep-techscreen/) with an engineer, followed by a [full loop](https://www.metacareers.com/swe-prep-onsite/) that 'will consist of several different conversations', meant to assess your technical skills and help hiring managers get to know you. That page offers a downloadable Full Loop Interview Guide. It is the best source for the current format, so read it rather than relying on second-hand summaries, including this one.",
-        'Candidates report that the loop for experienced engineers mixes coding, design and behavioural conversations, and that design carries more weight at senior levels. Some candidates also report a choice between a distributed-systems design round and a more product-focused design round, depending on the role. The two reward different preparation, so ask your recruiter which one you have.',
+        'If you are an experienced engineer, ask your recruiter how your loop splits between coding, design and behavioural conversations, and whether the design conversation is about distributed systems or about a product. The two need different preparation. A systems round leans on partitioning, replication and failure handling; a product round leans on requirements, APIs and what each user sees.',
       ],
       emphasis: [
         '**Fan-out and the celebrity case.** Social-graph problems, where one write must reach a very large number of readers. Know push, pull and the hybrid, and when each wins. See [fan-out](/concepts/fan-out).',
-        '**What the user experiences.** If a feed is thirty seconds stale, does anyone notice? Candidates describe being pushed on the experience rather than the diagram. See [consistency models](/concepts/consistency-models).',
+        '**What the user experiences.** If a feed is thirty seconds stale, does anyone notice? Be ready to argue from what the user sees, not only from the diagram. See [consistency models](/concepts/consistency-models).',
         "**Read-heavy data and caching.** Meta has written publicly about [TAO](https://engineering.fb.com/2013/06/25/core-infra/tao-the-power-of-the-graph/), its data store for the social graph, which puts a caching layer in front of MySQL to serve a very high volume of reads. It is useful background for why graph data gets cached so heavily. See [caching](/concepts/caching) and [partitioning](/concepts/partitioning).",
         '**Counting at scale.** Likes and views are small writes in huge numbers. See [distributed counters](/concepts/distributed-counter).',
       ],
@@ -125,8 +125,8 @@ export const COMPANIES: Company[] = [
     id: 'microsoft',
     name: 'Microsoft',
     style:
-      'Often described as calmer and more collaborative than most. The round tests whether you can be reasoned with: expect the interviewer to propose an alternative and watch whether you engage with it or defend by reflex.',
-    weights: 'Lifecycle and Tradeoffs. Genuine openness to a better idea scores.',
+      'Often described as calmer and more collaborative than most. Practise being reasoned with: when an interviewer proposes an alternative, weigh it out loud instead of defending your first design by reflex.',
+    weights: 'Lifecycle and Tradeoffs. Practise taking a better idea on board.',
     archetype: 'scope-shifter',
     guide: {
       loop: [
@@ -134,8 +134,8 @@ export const COMPANIES: Company[] = [
         "Its [technical interviewing](https://careers.microsoft.com/v2/global/en/hiring-tips/technical-interviewing) page lists problem solving, design, coding and testing as the areas assessed, refers to a 45-minute round, and names system design among the topics to prepare. On design, it says engineers should understand 'what it takes to build or design a new system or platform from scratch'. Its advice is to ask clarifying questions about anything ambiguous and to plan before you build. Whether you get a separate system design round, and how deep it goes, depends on the team and the level.",
       ],
       emphasis: [
-        "**Clarifying before designing.** This is Microsoft's own published advice, and candidates report interviewers rewarding good questions about scope.",
-        "**Engaging with a better idea.** Candidates describe interviewers proposing a different approach halfway through and watching how you respond. Microsoft's careers pages describe a growth mindset, being a 'learn-it-all' rather than a 'know-it-all', as part of its culture, which fits that pattern.",
+        "**Clarifying before designing.** This is Microsoft's own published advice: ask about anything ambiguous and plan before you build, so agree the scope before you draw.",
+        "**Engaging with a better idea.** If the interviewer suggests a different approach halfway through, compare it with yours and say which you would pick and why. Microsoft's careers pages describe a growth mindset, being a 'learn-it-all' rather than a 'know-it-all', as part of its culture.",
         '**Lifecycle and correctness.** For collaborative or sync problems: what happens when two people edit the same thing, or one of them is offline? See [clocks and ordering](/concepts/clocks-and-ordering) and [replication](/concepts/replication).',
         '**Testing your own design.** The technical page tells candidates to test before saying "done". In a design round, the same habit means walking through failure cases yourself.',
       ],
@@ -163,16 +163,16 @@ export const COMPANIES: Company[] = [
     id: 'netflix',
     name: 'Netflix',
     style:
-      'Often senior-heavy and direct. Expect few hand-holding questions, an assumption that you have run systems in production, and strong interest in failure modes, chaos testing and graceful degradation.',
-    weights: 'Defence and Tradeoffs. Hand-waving is spotted quickly.',
+      'Often senior-heavy and direct. Prepare for few hand-holding questions, for being treated as someone who has run systems in production, and for close questions on failure modes, chaos testing and graceful degradation.',
+    weights: 'Defence and Tradeoffs. Practise backing each claim with detail.',
     archetype: 'domain-specialist',
     guide: {
       loop: [
-        "We could not find a published description of Netflix's engineering interview loop on its careers site. What Netflix does publish is its [culture memo](https://jobs.netflix.com/culture), which describes freedom and responsibility, 'context, not control', candour and the keeper test. Candidates commonly report that these ideas come up in interviews, in questions about how you make decisions and work with other people.",
-        'Everything else about the format comes from candidate reports, and those vary a lot by team: the number of rounds, whether there is a separate design round, and how much of it is about your past work. Treat any fixed description you read online with caution, and ask your recruiter what your loop contains.',
+        "We could not find a published description of Netflix's engineering interview loop on its careers site. What Netflix does publish is its [culture memo](https://jobs.netflix.com/culture), which describes freedom and responsibility, 'context, not control', candour and the keeper test. It is worth reading before any interview there, along with a few examples of how you make decisions and work with other people that you can discuss in those terms.",
+        'Because Netflix does not publish its format, this page does not describe one. Ask your recruiter how many rounds there are, whether one of them is a separate design round, and how much of it is about your past work, and treat any fixed description you read online with caution.',
       ],
       emphasis: [
-        '**Production experience.** Reports describe interviewers assuming you have run systems, and asking what went wrong and what you changed afterwards, not only what you built.',
+        '**Production experience.** Be ready to talk about systems you have run: what went wrong, and what you changed afterwards, as well as what you built.',
         "**Failure and resilience.** Netflix open-sourced [Chaos Monkey](https://github.com/Netflix/chaosmonkey), a tool that 'randomly terminates virtual machine instances and containers that run inside of your production environment'. Expect questions about what your design does when a node, a zone or a dependency disappears. See [circuit breakers](/concepts/circuit-breakers), [availability patterns](/concepts/availability-patterns) and [multi-region](/concepts/multi-region).",
         '**Delivery at scale.** Video problems are mostly about getting bytes close to the viewer. See [CDN](/concepts/cdn) and [object storage](/concepts/object-storage).',
         '**Honest tradeoffs.** Say what your design gives up before you are asked. That fits the candour the culture memo describes.',
@@ -205,14 +205,14 @@ export const COMPANIES: Company[] = [
     archetype: 'constraint-setter',
     guide: {
       loop: [
-        "We could not find a detailed engineering interview guide on Uber's careers site, so everything here about the format comes from candidate reports. Check it with your recruiter. Reports describe a familiar shape: a recruiter call, a technical screen, then a loop of coding, system design and behavioural conversations, with design carrying more weight for experienced hires. The details vary by team and level.",
-        "The design problems tend to mirror the business: matching riders and drivers, location, pricing and trip state. One useful piece of public background is [H3](https://h3geo.org/), a hexagonal grid system for indexing locations that was developed at Uber and released as open source. You do not need to know H3 for the interview, but it shows how a company that lives on location data splits the map.",
+        "We could not find a detailed engineering interview guide on Uber's careers site, so this page does not describe a format. Ask your recruiter what your loop contains and whether it includes a system design round; that varies by team and level.",
+        "A sensible place to start is problems that mirror the business: matching riders and drivers, location, pricing and trip state. One useful piece of public background is [H3](https://h3geo.org/), a hexagonal grid system for indexing locations that was developed at Uber and released as open source. You do not need to know H3 for the interview, but it shows how a company that lives on location data splits the map.",
       ],
       emphasis: [
-        '**Latency budgets as hard limits.** Candidates report being given a time limit for a match or an update and being graded on everything inside it. That is the [Constraint Setter](/archetypes#constraint-setter) pattern.',
+        '**Latency budgets as hard limits.** Practise designing to a fixed time limit for a match or an update, and accounting for every step inside it. That is the [Constraint Setter](/archetypes#constraint-setter) pattern.',
         '**Moving objects.** Drivers send frequent location updates, so the index changes all the time. See [geospatial indexing](/concepts/geospatial-indexing).',
         '**What happens when a match fails.** A driver declines, a phone drops off the network, two riders reach for the same driver. See [idempotency](/concepts/idempotency) and [transactions and locking](/concepts/transactions-and-locking).',
-        '**The trip as a state machine.** Requested, matched, picked up, completed, paid. Candidates describe being asked what happens between each step, which is the lifecycle stage in [the five stages](/learn/the-five-stages).',
+        '**The trip as a state machine.** Requested, matched, picked up, completed, paid. Be ready to say what happens between each step, and when a step fails. That is the lifecycle stage in [the five stages](/learn/the-five-stages).',
       ],
       pitfalls: [
         'Querying the main database for nearby drivers on every location update.',

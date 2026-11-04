@@ -62,7 +62,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
 
       <Card className="mb-8">
         <div className="mb-2 text-[0.7188rem] font-bold tracking-[0.06em] uppercase" style={{ color: 'var(--faint)' }}>
-          How they weight it, based on public candidate reports
+          Where to put your preparation time
         </div>
         <p className="mb-4 text-[0.9375rem] leading-relaxed">{co.weights}</p>
         {arch ? (
@@ -83,7 +83,7 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
           <Section title={`The ${co.name} interview loop`}>
             <Prose paragraphs={co.guide.loop} className="text-[0.9375rem]" />
           </Section>
-          <Section title="What interviewers emphasise" sub="As candidates report it. Teams and levels differ.">
+          <Section title="What interviewers emphasise" sub="What to prepare for. Teams and levels differ.">
             <Bullets items={co.guide.emphasis} />
           </Section>
           <Section title="Common pitfalls">
@@ -147,9 +147,9 @@ export default async function CompanyPage({ params }: { params: Promise<{ id: st
       ) : null}
 
       <p className="mt-6 text-[0.8125rem]" style={{ color: 'var(--faint)' }}>
-        Format details come only from the public pages listed under Sources. What {co.name} tests is based on
-        public candidate reports, not on any inside information, and formats change, so confirm yours with your
-        recruiter. These questions
+        Format details come only from the public pages listed under Sources. The rest of this page is
+        preparation advice, not inside information about how {co.name} assesses candidates. Formats change, so
+        confirm yours with your recruiter. These questions
         are written in the style of {co.name}&rsquo;s interview round. This site is not affiliated with or endorsed
         by {co.name}.
       </p>

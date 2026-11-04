@@ -598,6 +598,9 @@ export function Footer() {
           <Link href="/changelog" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Changelog
           </Link>
+          <Link href="/about#ai" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
+            How we use AI
+          </Link>
           <Link href="/privacy" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Privacy
           </Link>
@@ -606,9 +609,6 @@ export function Footer() {
           </Link>
           <Link href="/contact" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
             Contact
-          </Link>
-          <Link href="/progress" className="inline-block py-2 font-medium hover:opacity-70 sm:py-0" style={{ color: 'var(--muted)' }}>
-            Export or clear your data →
           </Link>
         </nav>
       </div>

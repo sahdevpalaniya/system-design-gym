@@ -106,14 +106,17 @@ export function Section({
   n,
   children,
   sub,
+  id,
 }: {
   title: string
   n?: string
   sub?: string
+  /** anchor target, for links such as /about#ai */
+  id?: string
   children: ReactNode
 }) {
   return (
-    <section className="mb-10">
+    <section id={id} className="mb-10 scroll-mt-24">
       <div className="mb-3 flex items-baseline gap-2.5">
         {n ? (
           <span
