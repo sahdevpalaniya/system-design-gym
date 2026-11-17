@@ -18,7 +18,7 @@ export const CONCEPT_TITLES: Record<string, string> = {
   replication: 'Database replication: leaders, followers and lag',
   consensus: 'Consensus explained: Raft, majorities and split brain',
   idempotency: 'Idempotency keys: making retries safe',
-  'transactions-and-locking': 'Transactions and row locks: preventing double booking',
+  'transactions-and-locking': 'Transactions and locking — system design interview',
   'clocks-and-ordering': 'Clocks and ordering: why timestamps lie',
   'multi-region': 'Multi-region architecture: latency, data laws, cost',
   'bloom-filters': 'Bloom filters: "definitely not" in a few bits',

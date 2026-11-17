@@ -1351,7 +1351,7 @@ func main() {
 
   {
     slug: 'standard-library',
-    searchTitle: 'Go Standard Library Guide: Key Packages, HTTP Router, JSON',
+    searchTitle: 'The standard library in Go (Golang), with examples',
     metaDescription:
       'The Go standard library packages to use first: strings, slices, maps, time, encoding/json, and a net/http server with routing and middleware, no framework.',
     title: 'The standard library',

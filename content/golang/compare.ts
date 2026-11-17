@@ -4,10 +4,10 @@ import type { LangLesson } from '@/lib/types'
 export const COMPARE: LangLesson[] = [
   {
     slug: 'goroutines-vs-threads',
-    searchTitle: 'Goroutine vs Thread: OS Threads, Coroutines, Virtual Threads',
+    searchTitle: 'Goroutine vs Thread in Golang: 8 Differences That Matter',
     metaDescription:
       'How goroutines differ from OS threads, Java virtual threads, coroutines and async/await: stack size, GMP scheduling, cost to create, and what interviews ask.',
-    title: 'Goroutines vs threads: OS threads, coroutines and virtual threads compared',
+    title: 'Goroutines vs threads: 8 differences that matter',
     navTitle: 'Goroutines vs threads',
     oneLine: 'Why Go can run a hundred thousand goroutines when the same number of OS threads would sink your machine, and how that compares with coroutines and Java virtual threads.',
     objectives: [

@@ -20,12 +20,14 @@ export const NOINDEX_GO_SECTIONS = [
   'production',
   'compare',
   'interview',
-  // thin hub: a list of DSA lessons, no copy of its own
-  'dsa',
+  // 'dsa' is indexed again (18 Nov 2026): it has its own intro and a guide to
+  // the problems (~1,400 words) and ranked on page 1-2 before it was noindexed
 ]
 
 /** Individual Go lessons kept out of search (thin or near-duplicate content). */
-export const NOINDEX_GO_LESSONS = ['dsa-merge-sorted-lists', 'dsa-reverse-linked-list']
+// dsa-reverse-linked-list is indexed again (18 Nov 2026): a full lesson that
+// averaged position 9.8 before it was noindexed on 5 Nov
+export const NOINDEX_GO_LESSONS = ['dsa-merge-sorted-lists']
 
 export const NOINDEX_PATTERNS: RegExp[] = [
   /^\/drills\/?$/,
