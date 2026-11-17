@@ -37,6 +37,25 @@ export default function ContactPage() {
           ]}
         />
       </Section>
+
+      <Section n="2" title="Who you are writing to">
+        <Prose
+          paragraphs={[
+            'Dev Skills is a small, independent site run by one maintainer, who writes and reviews every page. [About](/about) explains why the site exists, how pages are written and checked, and how AI assistance is used.',
+            'The site is free to read and is supported by advertising (Google AdSense). No company it mentions has paid for or reviewed any page. It is not affiliated with any company whose interviews it describes.',
+          ]}
+        />
+      </Section>
+
+      <Section n="3" title="Before you write">
+        <Prose
+          paragraphs={[
+            'What is stored about you, and how to remove it: [Privacy policy](/privacy).',
+            'The rules for using the site and its code examples: [Terms of use](/terms).',
+            'What changed on the site recently, and which corrections were made: [Changelog](/changelog).',
+          ]}
+        />
+      </Section>
     </Page>
   )
 }
