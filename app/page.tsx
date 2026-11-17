@@ -27,8 +27,26 @@ const POPULAR: Record<string, string[]> = {
     'mutex-and-races',
     'interfaces',
     'http-server',
+    'dsa-sliding-window',
+    'dsa-valid-parentheses',
+    'dsa-merge-intervals',
+    'arrays-vs-slices',
   ],
 }
+
+/** System design topics that already reach page 1 of Google (Search Console,
+ *  13-25 Oct 2026), linked from the home page so readers and crawlers find them
+ *  first. Unknown slugs are skipped. */
+const POPULAR_CONCEPTS = [
+  'distributed-counter',
+  'performance-vs-scalability',
+  'latency-vs-throughput',
+  'fan-out',
+  'circuit-breakers',
+  'transactions-and-locking',
+  'message-queues',
+  'connection-pooling',
+]
 
 /**
  * The introduction is a server component on purpose. The dashboard below it is
@@ -143,6 +161,30 @@ export default function Home() {
               </li>
             ))}
           </ol>
+        </div>
+
+        <div className="mt-10">
+          <h2 className="mb-1 text-[1.0625rem] font-semibold">
+            <Link href="/concepts" className="hover:opacity-70">
+              Most-read system design topics
+            </Link>
+          </h2>
+          <p className="mb-4 max-w-2xl text-[0.9062rem] leading-relaxed" style={{ color: 'var(--muted)' }}>
+            Each one says what the technique costs, when to use it and when not to, and the follow-up
+            question an interviewer usually asks next.
+          </p>
+          <ul className="grid max-w-4xl gap-x-6 gap-y-1.5 text-[0.9062rem] sm:grid-cols-2">
+            {POPULAR_CONCEPTS.map((slug) => CONCEPTS.find((c) => c.slug === slug))
+              .filter((c) => c !== undefined)
+              .map((c) => (
+                <li key={c.slug}>
+                  <Link href={`/concepts/${c.slug}`} className="hover:opacity-70" style={{ color: 'var(--accent)' }}>
+                    {c.heading ?? c.title}
+                  </Link>
+                  <span style={{ color: 'var(--faint)' }}> · {c.oneLine}</span>
+                </li>
+              ))}
+          </ul>
         </div>
 
         {/* each language track's map, from its own data: one link per section

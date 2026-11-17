@@ -36,6 +36,11 @@ const GROUPS: string[][] = [
     '/languages/go/interview-concurrency',
   ],
   ['/languages/go/dsa-sliding-window', '/concepts/rate-limiting'],
+  // topics with page-1 impressions (Search Console, Oct 2026) and the pages
+  // a reader of each one goes to next
+  ['/concepts/distributed-counter', '/problems/click-analytics', '/concepts/fan-out', '/languages/go/mutex-and-races'],
+  ['/concepts/performance-vs-scalability', '/concepts/latency-vs-throughput', '/concepts/latency-numbers', '/concepts/capacity-and-cost'],
+  ['/languages/go/dsa-valid-parentheses', '/languages/go/dsa-merge-intervals', '/languages/go/dsa-binary-search', '/languages/go/dsa-fast-io'],
   // comparison pages and the broad page each one builds on
   ['/concepts/api-gateway-vs-load-balancer-vs-reverse-proxy', '/concepts/reverse-proxy', '/concepts/load-balancing', '/languages/go/middleware-and-shutdown'],
   ['/concepts/cache-write-strategies', '/concepts/caching', '/concepts/redis-vs-memcached', '/languages/go/dsa-lru-cache'],
